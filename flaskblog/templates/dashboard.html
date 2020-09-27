@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<body>  
+
+      
+
+      <div class="dashboardheading">Chart Dashboard</div>
+      
+
+      <div class="container-charts">
+ 
+                     
+                          <div class="chartcard">
+                                <div class="chartheading">Fuel Volume</div>
+                                  <canvas id="mycanvas" width="1" height="1"></canvas>
+                                  <script type="text/javascript" src="static/js/fuelvolume.js"></script>
+                          </div>
+                  
+                          <div class="chartcard">
+                                <div class="chartheading">C Store Sales</div>
+                                 <canvas id="storemargin" width="1" height="1" ></canvas>
+                                 <script type="text/javascript" src="static/js/cstoresales.js"></script>
+                          </div>
+                      
+                          <div class="chartcard">
+                              
+                                <div class="chartheading">C Store Margin Dollars</div>
+                                <canvas id="cstoremargin"  width="1" height="1"></canvas>
+                                <script type="text/javascript" src="static/js/cstoremargin.js"></script>
+                          </div>
+                    
+                       
+                          <div class="chartcard">
+                               
+                                 <div class="chartheading">Car Wash Commissios</div>
+                                 <canvas id="carwashmargin"  width="1" height="1" ></canvas>
+                                 <script type="text/javascript" src="static/js/carwashmargin.js"></script>
+                          </div>
+                     
+      </div>
+
+</body>
+
+{% endblock content %}

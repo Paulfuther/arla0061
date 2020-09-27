@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+    <div class="hr-container">   
+                <div>
+                <a class = "hrbutton" <a href="{{ url_for('hrlist')}}">List of Employees</a>
+                </div>
+                <div>
+                <a class = "hrbutton" <a href="{{ url_for('hrhome')}}">HR Main Page</a>
+                </div>
+                <div>
+                <form method="POST">
+                    <!--<input type ="text" autofocus="autofocus" name="search_string">-->
+                    <select id="search_string" class = "hrbutton3" name = "search_string">
+                        <option value="all">All</options>
+                        <option value="396">396</options>
+                        <option value="398">398</options>
+                        <option value="402">402</options>
+                        <option value="414">414</options>
+                        <option value="1616">1616</options>
+                        <option value="8156">8156</options>
+                        <option value="8435">8435</options>
+                        <option value="33410">33410</options>
+                        <option value="33485">33485</options>
+                        <option value="48314">48314</options>
+                        <option value="65231">65231</options>
+                        <option value="65077">65077</options>
+                    <input type ="submit" class="hrbutton2" formaction="/search" value = "Search"> 
+                </form>
+                </div>
+    </div>    
+                <div class = "tableheader">
+
+                        <!-- <div class = "tableheader"> -->
+                        <div> Image </div>
+                        <div> Store</div>
+                        <div> Frist Name</div>
+                        <!--<div> Nickname</div>-->
+                        <div> Last Name</div>
+                        <div> Mobile Phone</div>
+                      
+                        <div> Options</div>
+                        <div> Delete</div>
+                        <div> File </div>
+                       
+                        <!-- </div> -->
+                </div>
+                           <!--url_for('static', filename='profile_pics/mobile/' +-->
+
+                        {% for staff in gsa %}
+
+                        <div class = "tablecard">
+
+                        <img class="hrlistimage" src= {{url_for('static', filename='empfiles/thumb/') + staff.image_file}}>
+                       
+                        <div class = "hritem1"> {{staff.store}}</div>   
+                        <div class = "hritem2"> {{staff.firstname}}</div>
+                        <div class = "hritemactive">Active: {{staff.active}}</div>
+                        <div class = "hritem3"> {{staff.lastname}}</div> 
+                        <div class = "hritem4"> {{staff.mobilephone}}</div> 
+                        
+                       
+                        <a class = "hrbutton2" <a href="/updategsa{{staff.id}}">Update</a>
+                        
+                        <a class = "hrbutton4" <a href="/updategsa{{staff.id}}"><i class="far fa-trash-alt"></i></a>
+                        <a class = "hrbutton5" <a href="/hrfile{{staff.id}}"><i class="far fa-file-alt"></i></a>
+                        </div>
+
+                        {% endfor %}
+
+{% endblock content %}
+
+

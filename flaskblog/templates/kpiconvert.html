@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<body>  
+           
+
+            <div class= "container">
+
+                         <!-- Applications Nav Bar -->       
+
+                    <nav class="app-nav">
+
+                        <ul class = "app-menu">
+                                <ul>
+                                    <li> <a href="kpiconvert">Growth KPI Converter</a></li>
+                                </ul>
+                                <ul>
+                                    <li> <a href="carwashkpiconvert">Carwash KPI Converter</a></li>
+                                </ul>
+                                <ul>      
+                                    <li> <a href="tpfileconvert">Team Performance Converter</a></li>
+                                </ul>
+                                <ul>
+                                    <li> <a href="securityfileconvert">Security Log Converter</a></li>
+                                </ul>
+                                <ul>      
+                                    <li> <a href="securityfilenegconvert">Security Log Negative Sales Converter</a></li>
+                                </ul>
+                        </ul>
+                    </nav>
+
+            </div>
+
+            <div class="upload">
+
+                <form id="upload-form" action="{{ url_for('upload')}}" method="POST" enctype="multipart/form-data">  
+                <input type= "file" name="inputFile" multiple="true" >
+                <input type="submit" value"send">
+            
+                </br>
+                </br>
+                
+                <p style="font-size:11px" style="font-family:Courier New">Remember, this has to be an ABM Growth KPI .xlsx file </p>
+
+            </div>
+   
+</body>
+
+{% endblock content %}

@@ -1,0 +1,542 @@
+FLASKWEBSITE\templates\dashboard.html
+FLASKWEBSITE\Chartdata.js
+<script src="{{url_for('static', filename='somejavascriptfile.js')}}"></script>
+<script src="{{url_for('static', filename='Chartdata.js')}}"></script>
+FLASKWEBSITE\Chartdata.js
+ <script src="{{url_for('static', filename='Chartdata.js')}}"></script>
+ function doSomething(success){
+    console.log(success);
+
+ <main role="main" class="container">
+    <div class="row">
+      <div class="col-md-8">
+        {% with messages = get_flashed_messages(with_categories=true)%}
+          {%if messages%}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category}}">
+                {{ messagge }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </div>
+      <div class="col-md-4">
+        <div class="content-section">
+          <h3>Our Sidebar</h3>
+          <p class='text-muted'>You can put any information here you'd like.
+            <ul class="list-group">
+              <li class="list-group-item list-group-item-light">Latest Posts</li>
+              <li class="list-group-item list-group-item-light">Announcements</li>
+              <li class="list-group-item list-group-item-light">Calendars</li>
+              <li class="list-group-item list-group-item-light">etc</li>
+            </ul>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="col-md-4">
+        <div class="content-section">
+          <h3>Our Sidebar</h3>
+          <p class='text-muted'>You can put any information here you'd like.
+            <ul class="list-group">
+              <li class="list-group-item list-group-item-light">Latest Posts</li>
+              <li class="list-group-item list-group-item-light">Announcements</li>
+              <li class="list-group-item list-group-item-light">Calendars</li>
+              <li class="list-group-item list-group-item-light">etc</li>
+            </ul>
+          </p>
+        </div>
+      </div>
+
+
+
+      function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+
+
+<main role="main" class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {% with messages = get_flashed_messages(with_categories=true)%}
+          {%if messages%}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category}}">
+                {{ messagge }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </div>
+      
+    </div>
+  </main>
+
+
+
+
+   <div class="row">
+      <div class="col-md-12">
+        {% with messages = get_flashed_messages(with_categories=true)%}
+          {%if messages%}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category}}">
+                {{ messagge }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </div>
+      
+    </div>
+
+
+
+    <head>
+ <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+   
+    <title>Hello, world!</title>
+</head>
+
+
+
+
+
+function doSomething(success){
+  fetch(firstfetch)
+      .then(data => data.json())
+      .then(success => doSomething(success));     
+}
+
+function doSomething(success){
+    console.log(success);
+
+
+    <div class="col-md-6 py-1">
+               <div class="card w-100 text-center">
+                <div class="card-body">
+                  <h5 class="card-title">Special titled 4treatment</h5>
+                 
+                    <div style="width: 100">
+                    <canvas id="CarwashChart" width="100" height="100"></canvas>
+                    <script src="static/js/Chartdata.js"></script>    
+                    </div>
+
+                  <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+               </div>
+              </div>t
+
+
+  function getvalues(success){ 
+    fetch(firstfetch)
+        .then(data => data.json())
+        .then(success => getvalues(success));
+}
+
+
+function getvalues(success){
+      console.log(success); 
+
+};
+
+
+ 
+
+@app.route("/graphlayout")
+def graphlayout():
+    return render_template('graphlayout.html',posts=posts)
+
+@app.route("/about")
+def about():
+    return render_template('about.html', title ='About')
+
+@app.route("/applications")
+def Applications():
+    return render_template('applications.html', title ='Applications')
+
+@app.route("/register", methods=['GET','POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        flash(f'Account created for {form.username.data}!', 'success')
+        return redirect(url_for('home'))
+    return render_template('register.html', title='Register', form=form)
+
+@app.route("/login", methods=['GET','POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
+            flash('You have been logged in!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('login unsuccessfull. Please check username and password', 'danger')
+
+    return render_template('login.html', title='Login', form=form)
+
+@app.route("/dashboard2")
+def dashboard():
+    return render_template('dashboard2.html', title='Charts')
+
+
+
+    posts = [
+    {
+        'author': 'Paul Futher',
+        'title': 'Blog post 1',
+        'content': 'First post content',
+        'date_posted': 'April 14, 2019'
+    },
+    {
+        'author': 'Paul the man Futher',
+        'title': 'Blog post 2',
+        'content': 'Seond post content',
+        'date_posted': 'April 14, 2019'
+    }
+]
+
+
+
+rom flask import Flask, render_template, url_for, flash, redirect, Markup, Response, abort, request, url_for, jsonify
+from wtforms import Form, BooleanField, StringField, PasswordField, validators
+import json
+import jsonify
+import Data
+from flask_mysqldb import MySQL
+
+from random import sample
+#cur.execute("SELECT * FROM growthkpi WHERE category = 'Total Fuel Volume' and store ='48314' AND date BETWEEN '2018-09-1' and  '2019-9-1' order by date")
+#maxdatequery = (""" SELECT max(date) as "MaxDate"
+ #               FROM growthkpi """)
+#cur.execute(maxdatequery)
+#print(cur)
+
+#chartstore =input("Enter Store: ")
+
+
+#from wtforms import RegistrationForm, LoginForm
+
+app.config['SECRET_KEY']='ade995af3a9a70d503fb71f6dbdfcf68'
+
+
+
+#query = """SELECT * FROM growthkpi
+     #    WHERE category = 'Total Fuel Volume'
+      #   and store = %s
+       #  AND date BETWEEN '2018-09-1' and (SELECT max(Date) FROM growthkpi) 
+        # order by date""" % (chartstore)
+
+
+
+
+        #query = """SELECT * FROM growthkpi
+     #    WHERE category = 'Total Fuel Volume'
+      #   and store = %s
+       #  AND date BETWEEN '2018-09-1' and (SELECT max(Date) FROM growthkpi) 
+        # order by date""" % (chartstore)
+
+
+
+
+
+
+ success: function (result) {
+            var data = [];
+            data.push(result.month);
+            data.push(result.amount);
+            var labels = result.labels;
+            renderChart(data, labels);
+        },
+
+
+
+
+
+<script src="static/js/Chartdata.js"></script>        
+
+
+
+
+ <script type="text/javascript" src ="static/js/jquery.min.js"><script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script type="text/javascript" src="static/js/last.js"></script>
+
+
+
+@app.route("/cstoresales")
+def data():
+    
+    query = """SELECT Date, Amount 
+         FROM growthkpi
+         WHERE category = 'Total C-Store Margin ($)'
+         and store = %s
+         AND date BETWEEN '2018-09-1' and (SELECT max(Date) FROM growthkpi) 
+         order by date""" % (chartstore)
+    cur.execute(query)    
+    rv = cur.fetchall() 
+    
+    newdata = []
+    content= {}
+    for result in rv:
+       content = {'date': result[0], 'margin': result[1]}
+       newdata.append(content)
+       content = {}
+    return jsonify(newdata)
+
+
+
+     console.log(newdata)
+
+
+      error: function(newdata) {
+        console.log(newdata);
+
+
+
+
+   error: function(newdata2) {
+        console.log(newdata2);
+      }
+
+
+
+
+  @app.route("/data")
+  def seconddata():
+    cur = conn.cursor()
+    query = """SELECT Date, Amount 
+         FROM growthkpi
+         WHERE category = 'Total Fuel Volume'
+         and store = %s
+         AND date BETWEEN '2018-09-1' and (SELECT max(Date) FROM growthkpi) 
+         order by date""" % (chartstore)
+    cur.execute(query)    
+    rv = cur.fetchall() 
+    
+    newdata = []
+    content = {}
+    for result in rv:
+       content = {'date': result[0], 'volume': result[1]}
+       newdata.append(content)
+       content = {}
+    return jsonify(newdata)
+    
+
+    cur.close()
+    conn.close()    
+
+
+    @app.route("/data")
+def seconddata():
+    cur = mysql.connection.cursor()
+    
+    query = """SELECT Date, Amount 
+         FROM growthkpi
+         WHERE category = 'Total Fuel Volume'
+         and store = %s
+         AND date BETWEEN '2018-09-1' and (SELECT max(Date) FROM growthkpi) 
+         order by date""" % (chartstore)
+    cur.execute(query)    
+    rv = cur.fetchall() 
+    
+    newdata = []
+    content = {}
+    for result in rv:
+       content = {'date': result[0], 'volume': result[1]}
+       newdata.append(content)
+       content = {}
+    return jsonify(newdata)
+    
+
+    cur.close()
+    #conn.close()    
+
+
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_DB'] = 'work'
+app.config['MYSQL_PORT']= 3306
+
+mysql= MySQL()
+
+
+@app.route("/data")
+def seconddata():
+    
+    
+    query = """SELECT Date, Amount 
+         FROM growthkpi
+         WHERE category = 'Total Fuel Volume'
+         and store = %s
+         AND date BETWEEN '2018-09-1' and (SELECT max(Date) FROM growthkpi) 
+         order by date""" % (chartstore)
+    cur2.execute(query)    
+    rv = cur2.fetchall() 
+    
+    newdata = []
+    content = {}
+    for result in rv:
+       content = {'date': result[0], 'volume': result[1]}
+       newdata.append(content)
+       content = {}
+    return jsonify(newdata)
+
+
+    order by date
+
+xAxes: [{
+                type: 'time',
+                time: {
+                  displayFormats: {
+                    'millisecond': 'MMM DD',
+                    'second': 'MMM DD',
+                    'minute': 'MMM DD',
+                    'hour': 'MMM DD',
+                    'day': 'MMM DD',
+                    'week': 'MMM DD',
+                    'month': 'MMM DD',
+                    'quarter': 'MMM DD',
+                    'year': 'MMM DD',
+                  }
+                }
+              }],
+
+
+'millisecond': 'MMM YY',
+                    'second': 'MMM YY',
+                    'minute': 'MMM YY',
+                    'hour': 'MMM YY',
+                    'day': 'MMM YY',
+                    'week': 'MMM YY',
+
+
+
+  </div>
+
+                  <a href="#" class="btn btn-primary">Click</a>
+                </div>                
+
+
+
+
+                div class="col-md-6 py-1">
+                <div class="card w-100 text-center">
+
+
+               <div class="col-md-6 py-1">
+               <div class="card w-100 text-center">
+                <div class="card-body">
+
+
+                 <div style="width: 100">
+                    <canvas id="mycanvas" width="100" height="100"></canvas>
+
+
+
+                   </div>
+              </div> 
+
+
+
+              cur4 = mysql.connection.cursor()
+    query4 = """SELECT Date, Amount 
+         FROM growthkpi
+         WHERE category = 'Total Fuel Volume'
+         and store = %s
+         AND date BETWEEN '2017-09-1' and '2018-08-1'
+         order by date""" % (chartstore)
+    cur4.execute(query4)    
+    rv4 = cur4.fetchall() 
+    print(rv4)
+    
+    newdata4 = []
+    content4 = {}
+    for result in rv4:
+       content4 = {'date': result[0], 'volume': result[1]}
+       newdata4.append(content4)
+       content4 = {}
+    
+    jsonify(newdata4)
+    
+
+
+
+    type: 'time',
+                distribution: 'linear',
+                time: {
+                  displayFormats: {
+                    'day': 'MMM YY',
+                    'month': 'MMM YY',
+                    'quarter': 'MMM YY',
+                    'year': 'MMM YY',
+                  }
+                }
+
+
+                //var endpoint = 'http://127.0.0.1:5000/cstoresales'
+
+
+function GetText(){
+  fetch('http://127.0.0.1:5000/cstoresales')
+  .then(function(res){
+    return res.json();
+  })
+  .then (function(data){
+    console.log(data);
+  })
+};
+
+
+options: {
+          responsive: true,
+          scales: {
+            xAxes: [{
+              type: 'time',
+              //distribution: 'series',
+              time: {
+                unit: 'month',
+
+                //min: datenew[2],
+                //max: datenew[12],
+                displayFormats: {
+
+                  'day': 'MMM YY',
+                  'month': 'MMM YY',
+                  'quarter': 'MMM YY',
+                  'year': 'MMM YY',
+                }
+              },
+              ticks: {
+                source: 'data',
+                beginAtZero: true
+              }
+            }],
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        }

@@ -1,0 +1,2881 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+
+    <div class="hr-container">
+
+            <div>
+            <a class = "hrbutton" <a href="{{ url_for('hrlist')}}">List of Employees</a>
+            </div>
+            <div>
+            <a class = "hrbutton" <a href="{{ url_for('hrhome')}}">HR Main Page</a>
+            </div>
+            <div>
+            <a class = "hrbutton" <a href="{{ url_for('hr')}}">Add Employee</a>
+            </div>
+    
+    </div>
+
+    <div style="break-after:page"></div>
+
+ <div class="file-container">
+ </div>
+
+<!-- Intro-->
+
+    <div class="requiredgrid">
+
+                
+                    <h2>WELCOME TO: {{gsa.store}} 
+                    </h2>
+                    <h2>1900 Dundas St London Ontario 
+                    </h2>
+                    <h2>N5W 3G4
+                    </h2>
+                    <br/>
+
+                <p>DEAR {{gsa.firstname}}{{gsa.lastname}}
+                </p>
+                <br/>
+
+                <p>You have been hand-picked from a field of many to join our winning team.  We look forward to your contribution to our team effort in striving to meet our targets and goals.  We expect a lot from you, but we will give a lot in return.
+
+                This conditional offer of employment is based on successful completion of our three-day Paypoint Training Program.
+                </p>
+                <br/>
+                <h4> OUR SERVICE STRATEGY</h4>
+                <br/>
+                <p>
+                “We will Genuinely deliver fast, friendly and responsive service, so that our Guests feel welcome and appreciates.”
+
+                Our team commitment at site 00396 is to meet our business objectives of offering Genuine Guest service, by keeping our store clean, handling Guest concerns effectively, offering Guests the opportunity to participate in our Petro-Points Loyalty Program and to purchase added-calue items in-store. 
+
+                You’ll start to get the hang of our Guests’ needs once you work the Paypoint and see your trainer in action!
+                </p>
+                <br/>
+                <p>I maintain an open door policy.  Please feel free to come to me with any questions or matters of concern. Problems will be dealt with quickly, fairly and in an orderly fashion.  A happy team is a Winning Team!
+
+                Work schedules are prepare in advance. Once posted, these schedules are not subject to change without management authorization.  Paydays are the 5th and the 20th day of each month.  Pay period cut off is the 15th and the end of each month. If you are not able to work your scheduled shift, it is your responsibility to arrange with another employee for coverage. We will talk more about this during your training.
+                </p>
+                <br/>
+                <p> At Petro-Canada Site {{gsa.store}} we are very much a team and strive to help each other where possible. We like to have a lot of FUN and it shows in the people that work here. Our secret to success is to attract a Winning Team with high expectations and drive. We feel we have done that by hiring you!  
+
+                As the Manager, I believe I’m only as good as the people I hire. I can provide you with the tools and training needed so you are in a position to win, but at the end of the day, it’s all up to you! 
+                </p>
+                <br/>
+                <p>~I look forward to working with you~ 
+                </p>
+                <br/>
+                <p>Welcome to the team!
+                </p>
+                <br/>
+               
+
+                {{gsa.manager}}
+               
+
+    </div>       
+
+                   <div style="break-after:page"></div>
+
+<!-- Required Actions Documents-->
+               
+        
+    <div class="requiredgrid">   
+            <div class = "hrheader">
+                Required Action Policies Checklist
+            </div>
+                <div class = "hrheaderdata">
+                    <p>Effective Date:  January 3, 2016</p>
+                    <p> Last Reviewed by Owner:  January 3, 2016t</p>
+                </div><br/>
+               
+                <p>
+               
+                Petro-Canada Site {{gsa.store}}
+                <p>
+               
+                (This is a SAMPLE checklist.  Ensure you are not going against employment standards or human rights legislation.)
+                <p>
+                
+                <li>	RULE #1 - Use your best judgment. </li>
+
+                <li>	GUESTS come first. They pay our wages.  Let the paperwork tasks, side conversations and the telephone wait while you serve our Guests.  If there is a concern or complaint, here are a few guidelines to follow: </il> 
+                <li>	LISTEN - get the whole story from the Guest.</li>
+                <li>	EMPATHIZE - put yourself in the Guest’s shoes, show genuine concern and caring. </li> 
+                <li>	ACT - be fast and responsive when taking action for the Guest.</li>
+                <li>	WRAP-UP – tell the Guest the next steps, what you will do, and that you value their business.</li>
+                <li>	RECOVERY recommendations:</li>
+                <li>	Handle complaints with a POSITIVE ATTITUDE. <li>
+                <li>	Conduct yourself PROFESSIONALLY.</li>
+                <li>	Surprise the complaining Guest by giving them something extra, within your Associates Guidelines on offering free products or discounts for Complaint recovery.</li>
+                <li>	It may not be always necessary to offer recovery funds for every complaint.  You can use your best judgment to offer the Guest one of the items approved by the Associate.</li>
+
+                <li>	SECURITY is a top priority.  Cash in the till drawers will be kept to a minimum; drop as often as needed.  Do not have any denominations larger than $20.00 in your drawer. </li>
+                <li>	The midnight Employee is NOT to leave the building unless there is an emergency situation. There are no exceptions.  Day and afternoon shift should never have more than $100.00 in the till, and midnight should never have more than $50.00. </li>
+
+                <li>	TELEPHONE etiquette is very important. Always answer the phone with a SMILE in the following manner: </li> 
+                <li>	“Good morning / afternoon / evening, 00396 Petro-Canada, Amritpal Kaur.” How can I help you? Do not deviate from this format.</il>
+
+                <li>	SAFETY EQUIPMENT will be explained and you will need to know the location of all fire extinguishers, first aid kit, spill kit, emergency shut off switches and the location of the site’s Emergency Response Manual including all MSDS sheets. </li>
+
+                <li>	EMERGENCY NUMBERS will be explained and emergency policies must be adhered to for the protection of you, our Guests and Suncor Energy assets. </li>
+
+                <li>	SAFETY AT THE PUMPS includes turning off ignitions while refuelling, no smoking around the pumps and using approved CSA or ULC jerry cans only.  Rental jerry cans are NOT available.</li>
+
+                <li>	STAFF PURCHASES are to be rung in prior to consuming products and you will need to keep your receipt for review. No tabs allowed, all purchases must be paid for immediately.</li>
+
+                <li>	STAFF SMOKING is only permitted in the designated area.</li>
+                <li>	PETS are not allowed in the store with the exception of Guide dogs.</li>
+                <li>	RETURN POLICY- everything is 100% refundable.  However, returns over $7.00 must have manager’s authorization.  Be wary of sunglasses, cameras, suntan lotion, batteries and other high-ticket items coming back for refund.  These are popular scams for return and theft.</li>
+
+                <li>	SHOPLIFTING - if the offender is an adult, we will call the police and lay criminal charges.  If the offender is a minor, we will ask the child to stay and call the parents to discuss the situation and ask how they would like things handled.  </li> 
+
+                <li>	TELEPHONE calls to and from friends and family while on shift are not permitted. Only emergency calls are allowed.</li>
+
+                <li>	ATTEMPT to falsify company records; i.e., cash out reports, counts, or end of day reporting is cause for termination.</li>
+
+                <li>	CONSUMPTION of alcohol or illegal drugs while on site and buying or selling of such material will be cause for immediate termination.</li>
+
+                <li>	READING is not permitted on site unless it is related to the job.</li>
+
+                <li>	DISCLOSURE of sensitive information such as sales figures, gas volume and site targets is strictly prohibited. Disclosure of this data is cause for termination. </li>
+
+                <li>	LARGE BILLS such as $50 or $100 are to be dropped in the safe immediately after receiving. More than four $20 dollar bills are to be skimmed and dropped as well. This is extremely important for Robbery Prevention.</li>
+
+                <li>	SITE OPERATING PROCEDURES are the foundation of Suncor Energy’s training and will assist you in the development of your job. These procedures are updated regularly. </li>
+
+                <li>	UNIFORMS must be worn when on shift and shirts must be TUCKED in. Shirts and nametags will be provided. You will need BLACK cotton/poly blend pants and black comfortable shoes. Jeans are not allowed.</li>
+
+                <li>	KEYS are assigned as needed and must be put back in their place when you are finished with them.</li>
+
+                <li>	PAYPOINT etiquette is very important.
+                <ul>
+                <li>1	NEVER talk with other Employees while Guests are waiting in line. 
+                </li>
+                <li>2	ALWAYS put down the phone to serve a Guest who is waiting in line.
+                </li>
+                <li>3	NEVER talk inappropriately or use profane language while working on shift.
+                </li>
+                <li>4	ALWAYS wear the approved uniform and nametag while working on shift.
+                </ul>
+                <li>	ASK your employer questions if you are unsure of any aspect of safety and security with your job.  It is your responsibility to comply with legislation. </li>
+
+                <p> During your training period, you will learn more about these policies.
+                </p>
+                <br/>
+                <p>I understand that these required actions are the site policies to be adhered to during my employment at Petro-Canada Site 00396
+                </p>
+                <br/>
+    
+
+                <div class = "sigcontainer">
+                    <div class = "sig">
+                        <div class = "sigmarker">X </div>
+                        {{gsa.firstname}}{{gsa.lastname}}	
+                        </div>		
+                        <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            {{gsa.manager}}
+                        </div>
+
+                </div>
+
+                        <div class = "sigdate">										
+                        {{gsa.Startdate}}
+                        </div>
+
+                    
+        </div>        
+    
+                <div style="break-after:page"></div>
+
+<!-- Required Actions Tobacco Document-->
+
+    <div class="requiredgrid">
+                <div class = "hrheader">
+                Required Action Policy for Tobacco Products
+                </div>
+                <p>1.	WHAT IS REQUIRED?</p>
+                <li> 	To comply with federal and provincial tobacco regulations.</li> 
+                <li> 	You must request ID from anyone purchasing tobacco products, who looks to be younger than 25.</li> 
+
+
+
+                <p>2.	 WHY?</p>  
+                    <li>To ensure we are not selling tobacco products to minors.</li>
+                    <li>It is against the law to sell tobacco products to minors.  A person who distributes tobacco products to a minor is guilty of an offence, and could be punished with: </li>
+                <li>	Loss of employment</li>
+                <li>	Face personal fines of $4,000 to $100,000</li>
+                <li>	Loss of license to sell tobacco products, as well as face additional fines of $10,000 to $150,000. (for the Associate)</li>
+                <p>3.	 WHO? </p>
+                <li>    Each and every Guest that wants to buy tobacco products.</li>
+                <p>4.	REQUIRED ACTION</p>
+                <li>  Guests that look under the age of 25 are asked for (picture) I.D. when purchasing tobacco products.</li>
+                <li>  Ask for (picture) I.D. if they look under 25 before quoting the price of tobacco products.</li>
+                <li>    Ask for (picture) I.D. if they look under 25 before placing tobacco products on the counter.</li>
+                <li>    Don’t let an angry Guest stop you from asking for (picture) I.D.  IT’S THE LAW!</li>
+                <p>5.	I.D. THAT MAKES THE GRADE</p>
+                <li>    Driver’s license</li>
+                <li>    Passport</li>
+                <li>    Certificate of Canadian Citizenship</li>
+                <li>    Canadian permanent resident card</li>
+                <li>    Canadian Armed Forces I.D. card</li>
+                <li>    Any documents issued by a federal or provincial authority or a foreign government that contain a photo, date of birth and signature are also acceptable.</li>
+                <li>   IMPORTANT – School I.D. cannot be accepted as proof of age.</li>
+                <p>6.	EXPECTED RESULTS</p>
+                <li>    No Employee is charged with selling tobacco products to a minor.</li>
+                <li>   Employees always remember to ask for I.D.</li>
+                <li>    No Employee receives a warning letter about selling to a minor.</li>
+                <li>    Employees are supported by the manager for asking ALL Guests for I.D. who want to buy tobacco products.</li>
+                <p>7.	SIGN OFF</p><br/>
+                <p>I have read and understand my role in complying with this Required Action Policy.
+                </p><br/>
+
+                    <div class = "sigcontainer">
+                        <div class = "sig">
+                        <div class = "sigmarker"> X </div>
+                        {{gsa.firstname}}{{gsa.lastname}}    
+                        </div>
+                    </div>
+
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>                                                                                                     
+
+                    <footer class = "hrfooter">For protection of both the Employee and Associate, once you have read the above required actions please have the Employee sign this document in understanding and acceptance of the above mentioned guidelines.  Please file this form in the Employee file for future reference or upon request from a provincial tobacco inspector.
+                    </footer>
+    </div>
+                    <div style="break-after:page"></div>
+
+<!-- Required Actions Lottery Document-->
+
+    <div class = "requiredgrid">
+            <div class = "hrheader">
+            Required Action Policy for Lottery Products
+            </div>
+                <div class = "hrheaderdata">
+                <p>Effective Date:  April 1, 2016</p>
+                <p>Last Reviewed by Owner:  April 1, 2016</p>
+                </div><br/>
+
+
+                <p>1.	WHAT IS REQUIRED?</p>
+                    <li>To comply with Local Lottery Corporation regulations. </li>
+                    <li>To read, understand and comply with the SOP ENMCCL108 Petro-Canada Fair Game Promise.</li>
+
+                <p>2.	 WHY?</p>
+                    <li>To ensure we are not selling lottery products to minors.</li>
+                    <li>To ensure all lottery tickets are validated properly and fraud prevention procedures are followed.</li>
+                    <li>To ensure our Guests have a safe and enjoyable experience playing lottery at all Petro-Canada locations.</li>
+                    <li>Auditors will visit Associates, measure compliance and levy penalties.  </li>
+                <p>3.	 WHO?</p>
+                    <li> Each and every Guest who looks to be under 25 year old, that wants to buy lottery products should be asked for ID.</li>
+                    <li> Every Employee must adhere to the proper validation and purchase procedures.</li>
+                <p>4.	REQUIRED ACTIONS</p>
+                    <li>Always check photo ID during the purchase and validation process for anyone who looks under the age of 25 to ensure the Guest is of the age of majority.</li>
+                <li>	Ensure that the ticket checker is fully functional and available and that the play area is clean and fully stocked</li>
+                    <li>Ensure that the lottery terminal screen is always clearly viewable by the Guest during any transaction</li>
+                    <li>Only sell, validate or redeem lottery tickets/products when the customer is present in the store.</li>
+                    <li>Do not validate any ticket that has not been signed.  If the ticket has not been signed, ask the Guest to sign it. </li>
+                    <li>Always return the original ticket to the Guest along with the validation slip.</li>
+                    <li>Do not purchase or validate your own tickets at your place of employment (your own site).  This does not apply to Quebec.</li>
+                <p>5.	I.D. THAT MAKES THE GRADE</p>
+                    <li>Driver’s license or Passport, or any other form of Government Issued Photo I.D.</li>
+                    <li>Certificate of Canadian Citizenship or Canadian permanent resident card.</li>
+                    <li>Canadian Armed Forces I.D. card.</li>
+                    <li>Any documents issued by a federal or provincial authority or a foreign government that contain a photo, date of birth and signature are also acceptable.</li>
+                    <li>IMPORTANT – School I.D. cannot be accepted as proof of age.</li>
+                <p>6.	EXPECTED RESULTS</p>
+                    <li>No Employee sells lottery to a minor.</li>
+                    <li>Employees always remember to ask for I.D.</li>
+                    <li>External auditors find the site to be in compliance with all Local Lottery Corporation regulations. (Ontario Only)</li>
+                    <li>Employees are supported by the manager in asking ALL Guests who want to purchase lottery for I.D. who look under 25 years old and in using the proper lottery ticket validation and purchase procedures.</li>
+                <p>7.	SIGN OFF</p>
+
+                <p>I have read and understand my role in complying with this Required Action Policy.</p>
+                <p>I have read and understand the information in the SOP Petro-Canada Fair Game Promise.</p>
+
+
+                    <div class = "sigcontainer">
+                        <div class = "sig">
+                        <div class = "sigmarker"> X </div>
+                        {{gsa.firstname}}{{gsa.lastname}}    
+                        </div>
+                    </div>
+
+                    <div class = "sigdate">
+                        {{gsa.Startdate}}
+                    </div>                                                                                                     
+
+                    <footer class = "hrfooter">For protection of both the Employee and Associate, once you have read the above required actions please have the Employee sign this document in understanding and acceptance of the above mentioned guidelines.  Please file this form in the Employee file for future reference or upon request from a provincial lottary inspector.
+                    </footer>
+
+    </div>
+                    <div style="break-after:page"></div>
+
+    <div class  = "requiredgrid">
+
+<!-- Payroll Info-->
+
+            <div class = "payrollgrid">
+
+
+                <div class="payrollheader">Payroll Information Sheet</div>
+                <div>
+                </div>
+                <div>NAME:</div>	<div>{{gsa.firstname}}{{gsa.lastname}}</div>
+                <div>ADDRESS:</div>	<div>{{gsa.addressone}} {{gsa.addresstwo}}</div>
+                <div>APT/UNIT:</div>	<div>{{gsa.apt}}</div>
+                <div>CITY:</div>	<div>{{gsa.city}} {{gsa.province}} {{gsa.country}}</div>
+                <div>POSTAL CODE:</div>	<div>{{gsa.postal}}</div>
+                <div>SIN:</div>	<div>{{gsa.SIN}}</div>
+
+                <div>DATE OF BIRTH:</div><div></div>	
+                <div>STARTING DATE:</div><div>{{gsa.Startdate}}</div>
+
+                <div>STARTING WAGE:</div><div>	$14.00/hr</div>
+
+                <div>COPY OF I.D.:</div><div></div>	
+                <div>EMERGENCY CONTACt NAME:</div><div> </div>
+                <div>RELATIONSHIP:</div><div></div>
+                <div>HOME TEL:</div><div></div>
+                <div> WORK TEL:</div><div></div>                               
+
+
+            </div>
+
+                <div>	ATTACH A VOID CHEQUE OR SAVINGS ACCOUNT BOOK FOR AUTOMATIC DEPOSIT</div>
+
+                <div class = "voidcheck"></div>
+
+                        <div class = "sigcontainer">
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+                        </div>
+
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>                                                                                                     
+
+                        <footer class = "hrfooter">"Disclosure - use of personal information.  Personal information for payroll purposes is shared with our 3rd party payroll provider (insert name ex. Ceridian).  Business systems to schedule staff and administer payroll, which also contain personal information, are provided by Petro-Canada and Quick Service Software. Access to these business systems is restricted and governed by Petro-Canada's Privacy Policies and Procedures" 
+                        
+                    
+                        </footer>
+
+    </div>                   
+
+
+                    <div style="break-after:page"></div>
+
+<!-- Uniform Signout-->
+
+    <div class = "requiredgrid">
+                    <div class = "hrheader">
+                    Petro Canada
+                    </div>
+                        <div class = "hrheaderdata">
+                        <p>Uniform Sign Out Sheet</p>
+                        <p>Site:  {{gsa.site}}</p>
+                        </div>
+
+
+                        <p>I have received the following uniform: </p>
+
+
+                        <li>	Employee Long Sleeved shirt(s)</li>
+
+                        <li>	Employee Short Sleeved shirt(s)</li>
+
+                        <li>	Black Baseball Cap(s)</li>
+
+                        <li>	Name Tags</li>
+
+                        <li>	Black vest</li>
+
+                        <li>	Petro-Canada jacket</li>
+
+                        <li>	Petro-Canada rain gear</li>
+
+                        <li>	Petro-Canada car wash overalls</li>
+
+                        <li>Note: No other non-approved clothes, hats, buttons and pins are to be worn.</li>
+
+ 
+
+
+                    <div class = "sigcontainer">
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                        {{gsa.firstname}}{{gsa.lastname}}    
+                        </div>
+                        </div>
+
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>                                                                                                     
+
+                        <footer class = "hrfooter"> 
+                        I understand that the above items are assigned to me for use while working at Petro-Canada. 
+
+                        I am responsible to return them with reasonable wear and tear at the end of my employment. 
+                    
+                        </footer>
+
+                    </div>
+
+
+
+                    <div style="break-after:page"></div>
+
+<!-- Fraud Prevention Document-->
+
+    <div class = "requiredgrid">
+        <div class = "hrheader">
+        <p>Schedule B</p>
+        <p>Suncor Energy Fraud Prevention Program</p>
+        
+        </div>
+            <div class = "hrheaderdata">
+            <p>Site Staff Policy Acknowledgement</p>
+            <p>Effective Date: April 28, 2010</p>
+            <p>Last Reviewed by Owner: Jan 14, 2013 </p>
+            </div>
+
+ 
+
+            <p>The Employee acknowledges the critical importance of following a fraud prevention program in accordance with Site Operating Procedures. 
+            In the performance of this Site Staff Site Policy/Acknowledgement and every activity connected with the prevention of debit and/or credit card fraud at Petro-Canada branded sites, the Site Staff shall comply fully with all applicable federal, provincial or municipal laws and site operating procedures (Site Operating Procedures) as prepared by Suncor Energy.  
+            Should the Site Staff wilfully engage in a fraudulent or deceptive business practice or act in a manner that is detrimental to Suncor Energy’s image and/or policies related to the prevention of credit / debit card fraud, and/or suspected criminal/fraudulent activities, it may result in termination of employment, a possible criminal investigation and subsequent charges.  
+            The Site Staff will comply with all Site Policies (rules and regulations) at all times.  After having the necessary skills and expertise, the trained Site Staff shall use best efforts to adhere to performance standards and responsibilities as described in this Retail Site Operating Procedure: </p>
+            <br/>
+            <li>a)	Site Staff shall advise the Associate of any persons that have approached him/her to participate in fraudulent credit and/or debit card activities, including the installation of: electronic devices and/or photographic equipment. </li>
+            <li>b)	Site Staff shall adequately protect all customers from the installation of electronic devices and / or surveillance cameras that are focused on the PINPads at the Paypoint counter, the keypads and card readers on the Automated Fuel Dispensers (AFDs), or connected to the Paypoint computer for the purposes of recording confidential card or PIN data.</li>
+            <li>c)	When processing credit card transactions at the in-store Paypoint, the Site Staff will ensure that the customer’s credit card is tapped or inserted in the card reader terminal in full view at all times. </li>
+            <li>d)	When processing debit card transactions at the in-store Paypoint, the Site Staff will ensure that customers tap or insert their own debit card in the PINPad terminal.  </li>
+            <li>e)	In the performance of the Site Staff services, including the processing of any card transactions, the Site Staff shall ensure that all such signage used in accordance with the site operating procedures/policies referring to preventing fraud are clearly displayed and/or affixed to the PINPads. </li>
+            <li>f)	Site Staff shall co-operate fully with the Associate and not permit the loitering of unauthorized persons behind or in front of the Paypoint area.  </li>
+            <li>g)	Site Staff shall provide his/her Petro-Points account number to the Associate for tracking activity and fraud detection purposes.  </li>
+            <li>h)	Site Staff will ensure that the Petro-Points earned by a customer are accredited only to the paying Guest.  Facilitation of inappropriate use of Petro-Points for personal or Guest benefit will result in disciplinary action and will be deemed as fraudulent which may lead to permanent revoking of the Petro-Points account.  </li>
+            <li>i)	As noted under Privacy legislation, Site Staff shall adequately protect and can only use a customer's personal information for the purposes for which it was collected, or for security or safety reasons.  The Site Staff SHALL NOT use this information for any other purpose or reason. </li> 
+
+            <br/>
+            <p>i.e. The Site Staff shall not use a customer's information to contact them for personal reasons; the Site Staff shall not provide customer information to anyone without proper authorization; the Site Staff shall not watch the site video to view a customer for personal reasons.</p>
+            <br/>
+            <p>In the performance of this Site Policy / Acknowledgement the Site Staff shall furnish the Associate with such evidence of personal representation in accordance with Suncor Energy Site Operating Procedures.  Site Staff will provide accurate information as described below:  </p>
+            <br/>
+            <li>	Full name</li>
+            <li>	Residence address</li>
+            <li>	Residence phone number (cell numbers are not accepted)</li>
+            <li>	Social insurance number (SIN)</li>
+            <li>	Date of birth</li>
+            <li>	Photocopy of driver’s license or other photo identification</li>
+            <li>	Verified references</li>
+
+
+
+                <div class = "sigcontainer">
+
+                    <div class = "sig">
+                    <div class = "sigmarker"> X </div>
+                    {{gsa.firstname}}{{gsa.lastname}}    
+                    </div>
+
+                    <div class = "sig">	
+                    <div class = "sigmarker"> X </div>
+                    {{gsa.manager}}
+                    </div>
+                
+                </div>
+
+                    <div class = "sigdate">
+                    {{gsa.Startdate}}
+                    </div>                                                                                                     
+
+                    <footer class = "hrfooter"> 
+                <p> I, the undersigned, hereby acknowledge the receipt of the Site Staff Site Policy Acknowledgement and understand its content.
+                    I also authorize Suncor Energy, or its Associate or representatives, to release my information to the police and/or the applicable financial institution(s) during an investigation of credit/debit card and/or suspected criminal/fraudulent activities at Petro-Canada sites. </p>
+                
+                    </footer>
+    </div>
+
+                    <div style="break-after:page"></div>
+
+<!-- Fraud Prevention Carwash or Bookeeper Document-->
+
+    <div class = "requiredgrid">
+            <div class = "hrheader">
+                <p>Schedule A</p>
+                <p>Suncor Energy Fraud Prevention Program</p>
+                <p>Site Manager/Car Wash Manager/Bookkeeper Site Policy Acknowledgement</p>
+                <p>Last Updated: April 1, 2016</p>
+            </div>
+                <div class = "hrheaderdata">
+                    <p>Site Staff Policy Acknowledgement</p>
+                    <p>Effective Date: April 28, 2010</p>
+                    <p>Last Reviewed by Owner: Jan 14, 2013 </p>
+                </div>
+
+
+
+
+
+
+
+
+
+        <p>While in the employment of  {{gsa.manager}}, I the undersigned {{gsa.firstname}}{{gsa.lastname}} and assuming the responsibility of a : GSA agree to the following:</p>
+        <br/>
+        <p>The Site Manager / Car Wash Manager / Bookkeeper acknowledges the critical importance of implementing a fraud prevention program in accordance with Site Operating Procedures. </p>
+        <br/>
+        <p>Any reference to Site Manager/Car Wash Manager/Bookkeeper in this Site Manager/Car Wash Manager/Bookkeeper Site Policy Acknowledgement will include each of their respective employees </p>
+        <br/>
+
+        <p>In the performance of this Site Manager/Car Wash Manager/Bookkeeper Site Policy Acknowledgement and every activity connected with the prevention of credit and/or debit card fraud at Petro-Canada branded sites, the Site Manager/Car Wash Manager/Bookkeeper shall comply fully with all applicable federal, provincial or municipal laws and Site Operating Procedures (SOPs) as prepared by Suncor Energy.  </p>
+        <br/>
+        <p>Should the Site Manager/Car Wash Manager/Bookkeeper and / or Employee in the employment of the Associate wilfully engage in a fraudulent or deceptive business practice or act in a manner that is detrimental to site’s image and / or policies related to the prevention of, credit/debit card fraud, and/or suspected criminal/fraudulent activities, this action may result in counselling, notice of non-renewal and/or termination of employment with Associate and could lead to possible criminal investigation and subsequent charges. </p>
+        <br/>
+        <p>In performing the service of processing Petro-Points transactions at the Paypoint located in the store, the Site Manager and Employee will ensure that the Petro-Points earned by a Guest are accredited only to the paying Guest. Facilitation of inappropriate use of Petro-Points for personal or Guest benefit will result in a disciplinary action and will be deemed as fraudulent use which may lead to permanent revoking of the Petro-Points card. Therefore, Site Manager/Car Wash Manager/Bookkeeper shall provide his/her Petro-Points account number to the Associate when newly acquired or in the event of any changes to the account. Acct # : Click here to enter text.</p>
+        <br/>
+        <p>In performing the Site Operating Procedures, Site Manager/Car Wash Manager shall diligently and carefully provide all necessary training to the Employees, materials (signage), tools & equipment and supervision to prevent fraud at our sites and shall be fully responsible for all work and services performed by its employees and Employees.  </p>  
+        <br/>
+        <p>The Site Manager/Car Wash Manager/Bookkeeper will comply with all rules and regulations at all times and after having the necessary skills and expertise the trained Site Manager/Car Wash Manager/Bookkeeper shall use best efforts to adhere to performance standards and responsibilities as described in this Site Operating Procedure. </p>
+        <br/>
+        <p>Site Manager shall provide a copy of the Suncor Energy Fraud Prevention Program – Employee Site Policy Acknowledgement (see schedule B), to all Employees for execution / signature, ensuring all Employees are made fully aware of and comply with laws and Site Operating Procedures as described below:  </p>
+
+        </br>
+
+        <li>a) Employee shall advise the Site Manager/Car Wash Manager/Bookkeeper of any persons that have approached the Employee to participate in fraudulent activities, including the installation of electronic devices and/or photographic equipment. </li>
+        <li>b) In performing the service of processing credit card transactions at the Paypoint located in the store, the Site Manager and Employee will ensure that the Guest’s credit card is tapped or inserted in the card reader terminal in full view at all times. </li>
+        <li>c) In performing the service of processing debit card transactions at the Paypoint located in the store, the Site Manager and Employee will ensure the Guests tap or insert their own debit card in the PINPad terminal. </li>
+        <li>d) In the performance of the Employee services, including the processing of any card transactions, the Site Manager and Employee shall ensure that all such signage used in accordance with the Site Operating Procedures referring to preventing fraud are clearly displayed and/or affixed to the PINPads. </li>
+        <li>e) Site Manager and Employee shall adequately protect all Guests from the installation of electronic devices and / or surveillance cameras that are focused on the PINPads at the Paypoint counter, the keypads and card readers on the Automated Fuel Dispensers (AFDs) or connected to the Paypoint computer for the purposes of recording confidential card or PIN data.</li>
+        <li>f) Site Manager shall advise the Associate immediately of any persons that have approached them or another Employee to participate in fraudulent activities, including the installation of electronic devices and/or photographic equipment, or any other suspicious activities.</li>
+        <li>g) Employee shall cooperate fully with the Site Manager/Car Wash Manager/Bookkeeper / Site Policy and not permit the loitering of friends or unauthorized persons behind or in front of the Paypoint area that may have purposes to ‘shoulder surf’ Guests for the purposes of recording confidential credit card or PIN data. </li>
+        <li>h) Site Manager and Employee will inspect PINPads at Paypoint counters, ensuring that PINPads have complete mobility at all times and are not affixed in any manner to the counter that may prevent the Guest from concealing their confidential personal identification information, card or PIN data.  </li>
+        <li>i) Site Manager and Employee will inspect the keypads and card readers on the AFDs, ensuring that no unauthorized electronic devices and / or surveillance cameras are affixed in any manner that may prevent the Guest from concealing their confidential personal identification information, card or PIN data.</li>
+        <br/>
+        <p>As noted under the Privacy legislation, a Site Manager/Car Wash Manager/Bookkeeper/Employee shall adequately protect and can only use a Guest's personal information for the purposes for which it was collected, or for security or safety reasons.  The Site Manager/Car Wash Manager/Bookkeeper/ Employee SHALL NOT use this information for any other purpose or reason (for example – the Site Manager/Car Wash Manager/Bookkeeper/ Employee shall not use a Guest's information to contact them for personal reasons; the Site Manager/Car Wash Manager/Bookkeeper/ Employee shall not sell or provide a Guest’s information to someone who wants to contact the Guest; the Site Manager/Car Wash Manager/Bookkeeper/ Employee shall not watch the site video to view a Guest for personal reasons).
+        </p>
+        <br/>
+        <p>In the performance of this Site Manager/Car Wash Manager/Bookkeeper Site Policy Acknowledgement the Site Manager shall develop and maintain for each employee, an Employee file. This Employee file will contain: 
+        </p>
+        <br/>
+
+        <ul>
+                <li>a)  Application Form: 
+                <ul>
+                    <li>	Full name </li>
+                    <li>	Residence address </li>
+                    <li>	Residence phone number (cell numbers are not accepted) </li>
+                    <li>	Social insurance number </li>
+                    <li>	Date of birth (cannot ask if it is not on application…obtain once hired)</li>
+                    <li>	Photocopy of driver’s license or other photo identification </li>
+                    <li>	Verified references </li>
+
+                </ul>
+                </li>
+                    </ul>
+                    <ul>
+                <li>b)  Resume if submitted</li>
+                <li>c) Interview sheet  </li>
+                <li>d) Criminal Reference Check </li>
+                <li>e) TD-1 government form (s)</li>
+                <li>f) SIN # (must visually see card and match it to the SIN # used on hiring forms)</li>
+                <li>g) Telephone Reference sheet  </li>
+                <li>h) Tobacco required action sheet </li>
+                <li>i)  Alcohol required action sheet </li>
+                <li>j)  Lottery required action sheet</li>
+                <li>k) Payroll information sheets</li>
+                <li>l)  Copy of course certification</li>
+                <li>m) Required Action Sheet for Personal Petro-Points Card</li>
+                <li>n) Signed copy of Suncor Energy Fraud Prevention Program – Employee Site Policy Acknowledgement (Schedule B)</li>
+
+            </ul>
+            <br/>
+            <p>Site Manager/Car Wash Manager/Bookkeeper agree to keep and maintain complete and accurate Employee files seven (7) years from Employee termination date, as required by law. 
+            </p>
+            <br/>
+            <p>Suncor Energy shall have access to and the right to audit or inspect employee files relating in any way to this Site Operating Procedure. Any claims or discrepancies disclosed by such audit shall be made in writing to the Associate within a reasonable period of time after the completion of the audit and Site Manager/Car Wash Manager/Bookkeeper shall work with the Associate to promptly resolve these issues. Site Manager/Car Wash Manager/Bookkeeper or the Associate shall make no charge to Suncor Energy for such resolution to the audit. 
+            </p>
+            <br/>
+            <p>The Site Manager shall develop and maintain shift schedules / time sheets for all employees and accurately record / complete and update these sheets should changes be made from time to time. 
+            </p>
+            <br/>
+            <p>Site Manager agrees to keep and maintain complete and accurate shift schedules / time sheets for a minimum of twelve (12) months to assist investigators in determining which Employee was working at the Paypoint at the time of the suspected fraudulent activity.  
+            </p>
+            <br/>
+            <p>The parties agree to be bound by the provisions of this Site Manager/Car Wash Manager/Bookkeeper Site Policy Acknowledgement and acknowledge that any Site Manager/Car Wash Manager/Bookkeeper found committing or permitting any type of credit/debit/Petro-Points card fraud and/or suspected criminal/fraudulent activities and have neglected to follow the terms and conditions outlined in the Site Operating Procedure could be subject to: 
+            </p>
+            <br/>
+            <li>•	Counselling 
+            </li>
+            <li>•	Contract non-renewal  
+            </li>
+            <li>•	Contract termination, and / or   
+            </li>
+            <li>•	Criminal investigation   
+            </li>
+            <br/>
+
+
+
+
+
+            <p>I, the undersigned, hereby acknowledge the receipt of the Site Manager/Car Wash Manager/Bookkeeper Site Policy Acknowledgement and understand its content.
+            </p>
+            <br/>
+            <p>I also authorize Associate, or its representatives, to release my information to the police and/or the applicable financial institution(s) during an investigation of credit/debit card and/or suspected criminal/fraudulent activities at the below referenced retail site(s).
+            </p>
+            <br/>
+
+
+                    <div class = "sigcontainer">
+
+                                <div class = "sig">
+                                <div class = "sigmarker"> X </div>
+                                GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                </div>
+
+                                <div class = "sig">	
+                                <div class = "sigmarker"> X </div>
+                                Site Manager/Car Wash Manager/Bookkeeper’s Name: {{gsa.manager}}
+                                </div>
+                            
+                                <div class = "sig">	
+                                <div class = "sigmarker"> X </div>     
+                                Site Manager/Car Wash Manager/Bookkeeper’s Name: {{gsa.manager}}
+                                </div>
+                        
+                                <div class = "sig">	
+                                <div class = "sigmarker"> X </div>
+                                Associate Signature 
+                                </div>
+                    </div>
+                            <div class = "sigdate">
+                            {{gsa.Startdate}}
+                            </div>                                                                                                     
+
+                            <footer class = "hrfooter"> 
+                        
+                        
+                            </footer>
+    </div>
+                <div style="break-after:page"></div>  
+
+<!-- Site Security Document-->
+
+    <div class = "requiredgrid">
+                <div class = "hrheader">
+                <p>Site Security Acknowledgement</p>
+                <p>Last Updated: April 1, 2016</p>
+                </div>
+                    <div class = "hrheaderdata">
+                    <p>Site Staff Policy Acknowledgement</p>
+                    <p>Effective Date:  April 27, 2016</p>
+                    <p>Last Review by Owner:  April 27, 2016</p>
+                    </div>
+
+                                                                        
+
+
+                <p>Purpose: A form that all Site Staff must complete after reviewing and understanding the site security policies with their manager.
+                </p>
+                <p>Employee: {{gsa.firstname}}{{gsa.lastname}}	Site: {{gsa.store}}
+                </p>
+                <p>I {{gsa.firstname}} {{gsa.lastname}} have reviewed and understand the following policies.  I agree for my own safety and the safety of other staff members that I will adhere to these policies.
+                </p>
+
+                    <div class = "sigcontainer">
+
+                                <div class = "sig">	
+                                    <div class = "sigmarker"> X </div>
+                                    Associate Signature 
+                                </div>
+                    </div>
+                            <div class = "sigdate">
+                            {{gsa.Startdate}}
+                            </div>    
+
+
+            <div class = "sitesecuritygrid">
+
+                <div>SOP #</div><div>	Policy Name</div>	<div>Date of Review</div><div>	Completed</div>
+                <div>ENMCPR441</div	><div>Pay Window Procedures	</div>	<div></div><div></div>
+                <div>ENMCCL002</div>	<div>Fuel-Theft Prevention		</div><div></div><div></div>
+                <div>Web Based Training	</div><div>Preventing Robberies & Theft	</div><div></div>	<div></div>
+                <div>ENMCDS004	</div><div>Robbery Do’s and Don’ts acknowledgement</div>	<div></div>	<div></div>
+                <div>ENMCCL001	</div><div>Robbery and Shoplifting Prevention	</div>	<div></div><div></div>
+                <div>ENMCPR329	</div><div>Cash Safe Drop Guidelines and Amount Set-Up</div>	<div></div>	<div></div>
+                <div>ENRLDS077</div>	<div>Banking Policies	</div>	<div></div><div></div>
+
+            </div>
+
+            <br/>
+
+
+
+        <p>Work Place Safety – Our #1 Priority
+        </p>
+        <p>I, {{gsa.manager}} (Manager) at site # {{gsa.store}} have done all in my power and will continue to focus to ensure our employees are safe at work.
+        </p>
+        <p>I, {{gsa.manager}} (Manager) met with {{gsa.firstname}}{{gsa.lastname}} (Employee) on {{gsa.startdate}} to discuss the following SOPs to ensure our workplace is safe.
+        </p>
+        <li>•	SOP ENMCPR441 – Pay Window Procedures </li>
+        <li>•	SOP ENMCDS550 - Working Alone Guidelines</li>
+        <li>•	SOP ENMCCL002 – Fuel Theft (Drive-Off) Prevention</li>
+        <li>•	SOP ENMCDS004 – Robbery and Theft DO’s & DON’T’s Acknowledgement </li>
+        <li>•	SOP ENMCPR441 – Pay Window Procedures</li>
+        <br/>
+        <p>We also discussed the set times when the Magnetic Lock System is to be used and when the doors are to be locked and the pay through window used.
+        </p>
+        <p>We also talked about the zero tolerance for Site Staff unlocking the doors, leaving the site during back shift, and confronting drive-off suspects.
+        </p>
+        <p>I, {{gsa.firstname}}{{gsa.lastname}} (Employee), fully comprehend all safety policies and procedures.  I also understand that it is my duty and responsibility to ensure my safety at the workplace.
+
+
+            <div class = "sigcontainer">
+
+                <div class = "sig">
+                <div class = "sigmarker"> X </div>
+                {{gsa.firstname}}{{gsa.lastname}}    
+                </div>
+
+                <div class = "sig">	
+                <div class = "sigmarker"> X </div>
+                {{gsa.manager}}  
+                </div>
+            
+                </div>
+
+                <div class = "sigdate">
+                {{gsa.Startdate}}
+                </div>                                                                                                     
+
+                <footer class = "hrfooter"> 
+                <p> Retain in employee’s file.
+                </footer>
+
+            </div>
+
+            <div style="break-after:page"></div> 
+
+<!-- Privacy of Guest Information Document-->
+
+    <div class = "requiredgrid">
+            <div class = "hrheader">
+            <p>Suncor Energy Privacy of Guest Information</p>
+            
+            </div>
+                <div class = "hrheaderdata">
+                
+                <p>Effective Date:  October 16, 2015</p>
+                <p>Last Reviewed by Owner:  October 16, 2015</p>
+                </div>
+
+
+            <p>Purpose:  This package contains two Privacy of Guest Information Site Policy acknowledgements. Separate acknowledgements to be signed by all Associates and their Employees.   
+            </p>
+            <br/>
+            </p>Acknowledgements attached 
+            </p><br/>
+            <p>B.    Employee Site Policy Acknowledgement – to be signed by all Employees
+             </p><br/>
+        
+            <p>Schedule B
+            </p><br/>
+            <p>Suncor Energy Privacy of Guest Information Employee Site Policy Acknowledgement
+            </p><br/>
+            <p>The Employee acknowledges the critical importance of implementing procedures to ensure that the personal information of Guests is kept private and confidential in accordance with privacy legislation and Site Operating Procedures (SOPs). 
+            </p><br/>
+            <p>In the performance of this Employee Site Policy Acknowledgement and every activity connected with the protection of the personal information of Guests, the Employee shall comply fully with all applicable federal, provincial or municipal laws and SOPs as prepared by Suncor Energy.
+            </p><br/>
+            <p>Should the Employee not comply with such legislation and SOPs, this action may result in the termination of employment of the Employee and could lead to possible investigation and damages, where applicable. 
+            </p><br/>
+            <p>The Employee will comply with the Site Policies (rules and regulations) relating to privacy compliance at all times and after having the necessary skills and expertise the trained Employee shall use best efforts to adhere to performance standards and responsibilities as described in this Site Operating Procedure: 
+            </p><br/>
+            <ul>
+            <li>(a)	The Employee shall never record personal information about a Suncor Energy Guest unless it specifically relates to the completion of one of the following:
+            </li></ul>
+            <ul>
+            <li>	SOP ENMCFM090 - Identification Tracking for Guest with No Form of Payment </li>
+            <li>	SOP ENMCFM091- Promissory Note from Failure to Pay</li>
+            <li>	SOP ENMCFM061 - Fuel Theft (Drive-Off) Form</li>
+            <li>	SOP ENMCFM087 - Event Report Form, or</li>
+            <li>	SOP ENMCFM088 - Guest Resolution Form</li>
+            </ul><br/>
+            <p>The Employee is never to use a Guest’s personal information. 
+            </p><br/>
+            <p>It is never acceptable to photocopy a Guest’s personal information.
+            </p><br/>
+
+            <ul>
+            <li>(b)	The Employee may request identification from a Suncor Energy Guest for verification purposes only.  Situations where this policy applies are as follows:</li>
+            <ul>
+            <li>	Age verification for tobacco, lottery or alcohol sales;</li>
+            <li>	High value transactions that include lottery, tobacco or gift cards as per the Credit Card Fraud Prevention SOP </li>
+            <li>	Suspicious credit card transactions.</li>
+            </ul>
+
+            <p>When verifying a Suncor Energy Guest’s identification you are confirming:
+            </p><br/>
+            <li>	The age of the person (as it relates to tobacco, lottery or alcohol sales);</li>
+            <li>	The name listed on the identification compared against the name on a credit card;<li>
+            <li>	The name, address and driver’s license number against any of the completed forms listed in section (a).<li>
+            </ul>
+            <p>As previously stated, the Employee must never record personal information about a Suncor Energy Guest, except for the specific situations listed in section (a).
+            </p><br/>
+
+            <li>(c)	The Employee shall ensure that all Personal Information received, handled or processed; is protected by security safeguards as determined by the Associate.
+            </li>
+            <li>(d)	The Employee shall follow the Associate’s policies and procedures regarding Personal Information.  The Employee agrees to protect, and not disclose, Personal Information under any circumstances not described in this SOP.
+            </li>
+            <li>(e)	The Employee agrees to be bound by the provisions of this Employee Site Policy Acknowledgement and acknowledge that if the Employee has neglected to follow the terms and conditions outlined in the Site Operating Procedure, the Employee could be subject to termination of his/her employment. 
+            </li>
+            </ul>
+            <br/>
+            <p>Acknowledgement of receipt and agreement to the terms herein of this Site Policy Acknowledgment was made as of the 
+            </p><br/>
+
+                <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            {{gsa.manager}}
+                            </div>
+                    
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            Associate Signature 
+                            </div>
+                </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>                                                                                                     
+
+                        <footer class = "hrfooter"> 
+                    
+                    
+                        </footer>
+
+    </div>
+
+                <div style="break-after:page"></div>
+
+<!-- Serving Guests with Disabilities Document-->
+
+    <div class = "requiredgrid">
+            <div class = "hrheader">
+            <p>Site Staff Policy Acknowledgement on Serving Guests with Disabilities</p>
+            </div>
+                <div class = "hrheaderdata">
+                
+                <p>Last Updated:  August 19, 2011</p>
+                <p>Last Reviewed by Owner:  October 16, 2015</p>
+                </div>
+
+		
+	
+        <p>The Employee acknowledges the critical importance of following the general guidelines for serving Guests with disabilities, as outlined in the SOP ENMCDS090 - Suncor Policy for Serving Guests with Disabilities at Petro-Canada Sites.  
+        </p><br/>
+
+        <p>The Employee will comply with all Site Policies (rules and regulations) at all times and, after having the necessary skills and expertise, the trained Employee shall use best efforts to adhere to performance standards and responsibilities as described in this Site Operating Procedure under the Topic of “Serving Guests with Disabilities.”
+        </p><br/>
+        <p>I, the undersigned, hereby acknowledge the receipt of the Site Staff Policy Acknowledgement on serving Guests with disabilities and understand its content.
+        </p><br/>
+
+
+                    <div class = "sigcontainer">
+
+                                    <div class = "sig">
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                    </div>
+
+                                    <div class = "sig">	
+                                    <div class = "sigmarker"> X </div>
+                                    {{gsa.manager}}
+                                    </div>
+                            
+                                    <div class = "sig">	
+                                    <div class = "sigmarker"> X </div>
+                                    Associate Signature 
+                                    </div>
+                        </div>
+                                <div class = "sigdate">
+                                {{gsa.Startdate}}
+                                </div>                                                                                                     
+
+                                <footer class = "hrfooter"> 
+                            
+                            
+                                </footer>
+
+    </div>
+
+                <div style="break-after:page"></div>
+
+<!-- Zero Tolerance Policies-->
+
+    <div class = "requiredgrid">
+        <div class = "hrheader">
+        <p>Zero Tolerance Policies Checklist</p>
+        
+        </div>
+        <div class = "hrheaderdata">
+        
+        <p>Last Updated:  August 19, 2011</p>
+        <p>Last Reviewed by Owner:  October 16, 2015</p>
+        </div>
+
+            <p>(This is a SAMPLE checklist.  Ensure you are not going against employment standards or human rights legislation.  Ensure items on the checklist can be enforced.)
+            </p><br/>
+
+            <li>	THEFT = JOB LOSS + CRIMINAL CHARGES</li>
+                
+            <li>	FAILURE to show up for assigned shift</li>
+                
+            <li>	EXCESS money in till</li>
+                
+            <li>	NOT executing Petro-Canada's Service standards</li>
+                
+            <li>	NOT adhering to Site Operating Procedures</li>
+
+            <li>	FAILURE to wear the proper Petro-Canada uniform at work</li>
+                
+            <li>	SELLING tobacco products to a minor</li>
+                
+            <li>	SELLING alcohol products to a minor</li>
+                
+            <li>	COLLECTING Petro-Points from purchases other than your own</li>
+                
+            <li>	NOT handling cash procedures properly</li>
+
+
+
+            <p>I understand that breach of one or several of these items may result in the termination of my employment at the sole discretion of management or Petro-Canada site {{gsa.store}} appointed personnel.
+            </p><br/>
+
+                <div class = "sigcontainer">
+
+                                <div class = "sig">
+                                <div class = "sigmarker"> X </div>
+                                GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                </div>
+
+                                <div class = "sig">	
+                                <div class = "sigmarker"> X </div>
+                                {{gsa.manager}}
+                                </div>
+                        
+                                
+                    </div>
+                            <div class = "sigdate">
+                            {{gsa.Startdate}}
+                            </div>                                                                                                     
+
+                            <footer class = "hrfooter"> 
+                        
+                        
+                            </footer>
+
+    </div>
+
+                <div style="break-after:page"></div>
+
+<!-- Personal Petro Points Document-->
+
+    <div class = "requiredgrid">
+            <div class = "hrheader">
+                <p>Required Action Sheet for Personal Petro-Points Card</p>
+            
+            </div>
+                <div class = "hrheaderdata">
+                
+                    <p>Effective Date:  April 1, 2016</p>
+                    <p>Last Reviewed by Owner:  April 1, 2016</p>
+                </div>
+
+
+            <p>Purpose:  This site operating procedure (SOP) outlines the proper use of a Petro-Points card by any site Employee applying for this card.  The site Employee must sign at the bottom of this form to acknowledge he/she has read and understands the contents of this form.
+            </p><br/>
+            <li>	Site Staff may apply for a personal Petro-Points card for accumulation of points on PERSONAL PURCHASES ONLY. 
+            </li>
+            <li>	If a Guest, who is not collecting Petro-Points, offers Site Staff the points from their purchase, the Employee is NOT TO ACCEPT THE GUEST'S POINTS, AS THIS IS DEEMED TO BE A FRAUDULENT USE OF THE EMPLOYEE’S PETRO-POINTS CARD.
+            </li>
+            <li>	SITE STAFF IS NOT ENTITLED TO COLLECT PETRO-POINTS ON PURCHASES WHERE A GUEST DOES NOT PRESENT A PETRO-POINTS CARD, AS THIS IS DEEMED TO BE A FRAUDULENT USE OF THE STAFF EMPLOYEE’S PETRO-POINTS CARD.
+            </li>
+            <li>	Suncor Energy monitors Petro-Points usage.  Any Site Staff who uses their personal Petro-Points card fraudulently (on purchases other than their own) will have their Petro-Points card permanently revoked. 
+            </li>
+            <li>	Suncor Energy has zero tolerance for fraudulent use of Petro-Points by any Employee.
+            </li>
+            <li>	Facilitation of inappropriate or fraudulent use of Petro-Points for personal or Guest benefit will result in disciplinary action and may be deemed as grounds for dismissal.
+            </li>
+            <li>	The practice of keeping Guest Petro-Points cards on site is prohibited. Any cards currently at the site or in the possession of a Site Staff member must be immediately returned to protect against their fraudulent use.
+            </li>
+            <li>	The Instant enrollment program is for the exclusive use of Guests. The fictitious completion and subsequent use of collecting and redeeming points is considered fraudulent use of a Petro-Points card. Site staff found participating in this activity will expose themselves to disciplinary action and possible dismissal, as well as their Associate to chargebacks.
+            </li><br/>
+
+            <p>I have read and understand my role in complying with this required action sheet for personal use of Petro-Points cards.
+            </p><br/>
+
+                <div class = "sigcontainer">
+
+                        <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                        </div>
+
+                            
+                </div>        
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>                                                                                                     
+
+                        <footer class = "hrfooter"> 
+                    
+                    
+                        </footer>
+
+    </div>
+
+
+                <div style="break-after:page"></div>
+
+<!-- Robbery and Theft Do's and Dont's-->
+
+    <div class = "requiredgrid">
+            <div class = "hrheader">
+                <p>ROBBERY and Theft DO’s & DON’Ts Acknowledgement</p>
+            
+            </div>
+                <div class = "hrheaderdata">
+                
+                    <p>Effective Date: September 19, 2012</p>
+                    <p>Last Reviewed by Owner: June 9, 2015</p>
+                </div>
+
+            <br/>
+            <p>NOTE: The Law explicitly prohibits employers from deducting the cost of thefts from wages.
+            </p><br/>
+            <p>Purpose:  Each employee must acknowledge that the Do’s & Don’ts have been read and understood.  Please retain a signed acknowledgement in each employee’s file.  
+            </p><br/>
+                    <div class = "sigcontainer">
+
+                                <div class = "sig">
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                </div>
+
+                                    
+                        </div>        
+                                <div class = "sigdate">
+                                {{gsa.Startdate}}
+                                </div>              
+
+            <br/>
+
+
+            <img src="static/images/robdodont.jpg" class= "robbery"> 
+
+                    <div class = "sigcontainer">
+
+                                    <div class = "sig">
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                    </div>
+
+                                    
+                        </div>
+                                <div class = "sigdate">
+                                {{gsa.Startdate}}
+                                </div>                                                                                                     
+
+                                <footer class = "hrfooter"> 
+                            
+                            
+                                </footer>
+
+    </div>
+
+
+                <div style="break-after:page"></div>
+
+<!-- Uniform Guidelines-->
+
+    <div class = "requiredgrid">
+            <div class = "hrheader">
+                <p>Appearance Guidelines and Uniform Standards</p>
+            
+            </div>
+                <div class = "hrheaderdata">
+                
+                    <p>Effective Date:  August 7, 2012</p>
+                    <p>Last Reviewed by Owner:  May 1, 2015</p>
+                </div>
+
+
+
+            <p>Purpose: This site operating procedure is intended to provide guidance to Associates and their site staff relative to uniform standards and general appearance guidelines.
+            </p><br/>
+            <p>At locations operating under the 7-Eleven Performance Agent agreement, uniforms are to be worn as follows:
+            <li>	In-store Employee to wear 7-Eleven uniform
+            </li>
+            <li>	Full serve Employee to wear Petro-Canada uniform
+            </li></p><br/>
+            <p>Appearance Guidelines
+            </p>
+            </br>
+
+        <div class="appearancegrid"> 
+
+            <div>Recommended</div><div>	Not Recommended</div>
+
+
+            <div>Uniform
+            <li>	Must be clean and free of holes.	
+            </li></div><div></div>
+            <div>Hair
+            <li>	Hair colours should be conservative and natural looking.
+            </li>
+            <li>	Hair should be neat and clean.
+            </li>
+            <li>	Hair should be worn in styles that are appropriate for a business environment. 
+            </li>
+            <li>	Facial hair must be neatly trimmed and clean. 
+            </li>
+            <li>	Long hair should be pulled into a pony tail and shall be well groomed throughout the day.	
+            </li></div>
+            <div>Hair
+            <li>	Obtrusive, covers the face or is distracting. 
+            </li>
+            <li>	Extreme coloured streaks and sparkles.
+            </li></div>
+            <div>Jewellery / Accessories
+            <li>	Jewellery and accessories should be worn in moderation and should not distract from a professional image. 
+            </li>
+            <li>	Accessories that are part of religious preferences will be given appropriate consideration based on the nature of the job and management approval. 
+            </li>
+            <li>	Body piercing and tattoos should not be visible. 	
+            </li></div>
+            <div>Jewellery / Accessories
+            <li>	Earrings larger than a quarter.
+            </li>
+            <li>	Dangling earrings.
+            </li>
+            <li>	More than 2 pairs of earrings. 
+            </li>
+            <li>	More than one bracelet or wrist watch per arm.
+            </li>
+            <li>	More than two simple rings on each hand (wedding/engagement rings are considered one ring).
+            </li></div>
+            <div>Odours
+
+            <li>	Employees are expected to manage odours so that they do not distract or offend others. 	
+            </li></div>
+            <div>Odours
+            <li>	The use of heavy colognes, perfumes, aftershave, lotions or heavily scented lotions.
+            </li></div>
+            <div>Fingernails
+            <li>	Fingernails should be short, clean and appropriate for work settings.	
+            </li></div>
+            <div>Fingernails
+            <li>	Fingernails and toenails should not be overly-decorative and/or long.
+            </li></div>
+
+        </div>
+    </div>        
+
+        <div style="break-after:page"></div>
+
+<!-- Uniform Standards Cont'd-->
+
+    <div class = "requiredgrid">
+        <p>Uniform Standards (Continued)
+        </p><br/>
+
+    
+        <div class="appearancegrid"> 
+
+            <div>Approved</div><div>	Not Approved</div>
+                <div>Signature Pieces
+                <li>	Petro-Canada approved uniform golfshirt, long or short sleeve in red or black.
+                </li>
+                <li>	Plain black or white t-shirt under long sleeve shirt (optional).
+                </li>
+                <li>	Golfshirts do not have to be tucked in.
+                </li>
+                <li>	Golfshirts must be of the appropriate size. 
+                </li>
+                <li>	Approved uniforms are available from Unisync Group (see SOP ENMCCR029 - Uniform Program Catalogue).	
+                </li></div>
+                <div>Signature Pieces
+                <li>	Faded or discoloured shirts (not red anymore) and not have any holes.
+                </li>
+                <li>	Pants with holes in them.
+                </li>
+                <li>	Long sleeve shirts worn under short sleeve golfshirts.
+                </li></div>
+                <div>Male or Female Dress Shirts for Associates or Site Managers only: 
+                <li>	Petro-Canada white or blue shirt (short or long sleeves).
+                </li>
+                <li>Tie is optional for men.	
+                </li></div>
+                <div>Associates or Site Managers only - Male or Female Dress Shirts: 
+                <li>	Wearing ties when working in the car wash facility or with any machinery in which the ties can get caught.
+                </li></div>
+                <div>Pants/Skirts
+                <li>	Black pants, Bermuda length shorts, or skirt (knee-length or longer). 
+                </li>
+                <li>	For safety, fabric must not have synthetic fibre content higher than 65%. (I.e. 65% polyester, 35% cotton or wool).
+                </li></div>	
+                <div>Pants/Skirts
+                <li>	Jeans of any colour
+                </li>
+                <li>	Leggings
+                </li>
+                <li>	Sweat pants
+                </li>
+                <li>	Stretch pants
+                </li>
+                <li>	Lycra pants
+                </li>
+                <li>	Warm-up/track/wind pants
+                </li>
+                <li>	Sport shorts
+                </li>
+                <li>	Cut-offs
+                </li>
+                <li>	Pants made of leather, corduroy, velvet or nylon
+                </li></div>
+                <div>Accessories
+                <li>	Belts must be black or brown
+                </li>
+                <li>	Tie must be red or charcoal grey	
+                </li></div>
+                <div>Accessories
+                <li>	Oversized belt buckle.
+                </li>
+                <li>	Multi-coloured belts.
+                </li>
+                <li>	Suspenders.
+                </li></div>
+                <div>Outerwear
+                <li>	Petro-Canada fleece warmer or 3-in-1 winter jacket. 
+                </li>
+                <li>	Yellow rain coat at Full Serve
+                </li>
+                <li>	Safety vest (with tear aways) at all times at Full Service locations and during any outdoor activity at Self Serve locations.  	
+                </li></div>
+                <div>Safety vest worn at the paypoint (self serve)
+                </div>
+                <div>Headgear
+                <li>	Headgear is optional, except for food services, where cap MUST be worn.
+                </li>
+                <li>	Petro-Canada cap, toque or plain black toque.
+                </li>
+                <li>	Religious headgear is acceptable.	
+                </li></div>
+                <div>Headgear
+                <li>	Headgear worn backwards.
+                </li></div>
+        
+        </div>
+    </div>
+
+    <div style="break-after:page"></div>
+
+<!-- Uniform Standards Cont'd Cont'd-->
+
+    <div class = "requiredgrid">
+
+            <p>Uniform Standards (Continued)
+            </p><br/>
+
+    
+        <div class="appearancegrid"> 
+
+            <div>Approved</div><div>	Not Approved</div>
+
+            <div>Footwear
+            <li>	Black, brown or white running or walking shoes.
+            </li>
+            <li>	Back, brown or white boots in the winter.
+            </li>
+            <li>	Socks may be black, grey, white or red.
+            </li>
+            </li>	CSA approved safety boots at car wash sites.  A minimum of one employee must wear safety boots at all times (all day) to address any emergencies that could occur in the car wash.	
+            </li></div>
+            <div>Footwear
+            <li>Heals over one inch.
+            </li>
+            <li>	For safety reasons, sandals and open toe shoes.
+            </li></div>
+            <div>Food Services (Made-to-order sandwiches, bake-off, coffee bar)
+            <li>	Petro-Canada approved uniform golfshirt in red or black (short or long sleeve)
+            </li>
+            <li>	Petro-Canada black apron over shirt and tied in back
+            </li>
+            <li>	Petro-Canada cap is mandatory.	
+            </li></div>
+            <div>
+            </div>
+            <div>Name Badge
+            <li>	Name badge must be visible to the Guest
+            </li>
+            <li>	Name badge must be worn on the left hand side.
+            </li>
+            <li>	Name badge must be from Petro-Canada designated supplier.
+            </li></div>	
+            <div>Name Badge
+            <li>	Handwritten name badges.
+            </li></div>
+        </div>
+    </div>
+
+
+
+    <div style="break-after:page"></div>
+
+<!-- Uniform Standards Spring/Summer-->
+
+
+    <div class = "requiredgrid">
+
+            <div>Uniform Standards for the Spring / Summer – Pictures </div>
+            <br/>
+            <div>The following graphic displays what Site Staff should look like in the spring / summer:</div>
+            <br/>
+
+        <div class = "uniformimagegrid">
+            <div> <img src="static/images/uniformone.png" class= "muniform"> 
+            </div>
+            <div><img src="static/images/uniformtwo.png" class= "muniform"> 
+            </div>
+        </div>
+
+        <div>Uniform Standards for the Fall / Winter – Pictures
+        </div><br/>
+        <div>The following graphic displays what Site Staff should look like in the fall / winter:
+        </div><br/>
+    
+
+        <div class = "uniformimagegrid">
+            <div> <img src="static/images/uniformthree.png" class= "muniform"> 
+            </div>
+            <div><img src="static/images/uniformfour.png" class= "muniform"> 
+            </div>
+        </div>
+
+        <br/>
+
+        <div>I have read this Site Operating Procedure and agree to follow the Appearance Standards and Uniform Guidelines as described above.  
+        </div><br/>
+
+
+                <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+
+                            
+                </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>                                                                                                     
+
+                        <footer class = "hrfooter"> 
+                    
+                    
+                        </footer>
+
+    </div>        
+
+   
+
+                <div style="break-after:page"></div>
+
+<!-- Competition Law Document-->
+
+    <div class = "requiredgrid">
+                   
+                    <div class = "hrheader">
+                        <p>Competition Law</p>
+                    
+                    </div>
+                        <div class = "hrheaderdata">
+                        
+                            <p>Effective Date:  May 30, 2014</p>
+                            <p>Last Reviewed by Owner:  September 1, 2015</p>
+                        </div><br/>
+
+
+
+
+                <div>Purpose:  this SOP is a reminder that strict adherence with Canada's competition laws is mandatory and that non-compliance with the Competition Act may result in serious monetary and criminal penalties to you and your staff.  The Act is designed to protect and promote competition and ensure a marketplace which benefits consumers.
+                </div><br/>
+
+                <div>Suncor takes very seriously the need to ensure that all its employees and Associates comply with Canadian competition laws at all times. Failure to comply with the Competition Act in Canada may result in heavy fines, adverse publicity and civil suits by customers or suppliers seeking substantial damages. Furthermore, the Act specifies that the individuals involved may be personally liable to fines and terms of imprisonment; for example, a term of imprisonment of up to 14 years and/or a fine of up to $25 million for an offence under the provisions relating to arrangements between competitors and anti competitive conspiracies.
+                </div><br/>
+
+
+                <div>Commitments and Responsibilities </div>
+                <br/>
+
+                <div class = "competitiongrid">
+
+                <div class ="compone">From the Competition Act…</div><div class = "comptwo">	Suncor’s Commitment</div><div class = "compthree">	Associate's Responsibility</div>
+
+                    <div class = "one">To reference only the most serious matters, it is a criminal offence to get into any kind of arrangement (written or verbal) with competitors, which includes other Associates, suppliers or customers for any of the following:
+                    <li>	To fix prices 
+                    </li>
+                    <li>	To restrict the supply of products
+                    </li>
+                    <li>	To divide up customers or markets
+                    </li>
+                    <li>	To agree on bids
+                    </li>
+                    <li>	Engage in misleading or false representations to the public.
+                    </li>
+                    <p>Associates and their employees must never hold discussions with other competitors, which include other Associates, regarding price, or customers, limiting supply of products, bids, pricing policies and methods, terms of sale, costs, allocation of markets or boycotts of our petroleum products.	
+                    </p></div>
+
+                    <div class = "two">
+                    <li>	Remind Associates that it is their responsibility to understand and abide by the law.
+                    </li>
+                    <li>	Guide Associates on where and how to obtain information on the Competition Law.
+                    </li></div>	
+
+                    <div class = "three">
+                    <li>	Familiarize yourself and staff with the Competition Law.
+                    </li>
+                    <li>	Educate staff on proper behaviour and practices.
+                    </li>
+                    <li>	Monitor and enforce compliance at the site at all times
+                    </li>
+                    <li>	Seek legal advice if unsure of practices. 
+                    </li>
+                    <li>	Report concerns relating to the Competition Act, including possible violations of the Competition Act, to your Field Representative.
+                    </li>
+                </div>
+
+                </div><br/>
+
+                <p>For further information, please consult the Competition Bureau website at www.cb-bc.gc.ca or your legal counsel.
+                </p><br/>
+
+
+                    <div class = "sigcontainer">
+
+                                    <div class = "sig">
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                    </div>
+
+                                    
+                    </div>
+                                <div class = "sigdate">
+                                    {{gsa.Startdate}}
+                                </div>                                                                                                     
+
+                                <footer class = "hrfooter"> 
+                            
+                            
+                                </footer>
+
+        
+    </div>
+
+             <div style="break-after:page"></div>
+
+    <div class = "requiredgrid">
+                   
+                    <div class = "hrheader">
+                        <p>Competition Law</p>
+                    
+                    </div>
+                        <div class = "hrheaderdata">
+                        
+                            <p>Effective Date:  May 30, 2014</p>
+                            <p>Last Reviewed by Owner:  September 1, 2015</p>
+                        </div><br/>
+        
+        
+        
+            <img src="static/images/employmentstandards.png" class= "empstandards"> 
+
+                        <div class = "sigcontainer">
+
+                                    <div class = "sig">
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                    </div>
+
+                                    
+                        </div>
+                                <div class = "sigdate">
+                                {{gsa.Startdate}}
+                                </div>                                                                                                     
+
+                                <footer class = "hrfooter"> 
+                            
+                            
+                                </footer>
+    </div>
+
+                <div style="break-after:page"></div>
+<!-- Personal Property Protection Guidelines-->
+
+
+    <div class = "requiredgrid">
+        <div class = "hrheader">
+        <p>Personnel and Property Protection Guidelines</p>
+        
+        </div>
+        <div class = "hrheaderdata">
+        
+        <p>Effective Date: March 9, 2016</p>
+        <p>Last Reviewed by Owner: March 9, 2016</p>
+        </div>
+
+
+        <div>Purpose
+        </div><br/>
+
+        <p>Suncor Energy believes 'Crime Prevention Programs' designed to safe-guard people and property is essential. This Security Guidelines Booklet is for use by all Associates and terminal operators and it should be viewed as a tool to assist you in establishing and maintaining a secure environment for your employees and customers.
+        </p><br/>
+        <p>Security is not the responsibility of any one individual group; rather it requires the combined efforts of you, your staff, the Company and your local law enforcement agency. This united approach together with your leadership will go a long way toward achieving the ultimate in security protection.
+        </p><br/>
+        <p>All businesses are potential targets for criminals. Your approach to security can make your business less vulnerable to criminal acts. You should make every effort to identify problem areas and minimize opportunities for criminals.
+        </p><br/>
+        <p>In addition to describing security measures this booklet deals with fuel theft (drive-offs) and other criminal acts which may be directed against your business.
+        </p><br/>
+        <p>Through prevention programs such as this, we all hope to reduce, or entirely eliminate criminal attacks. Please read this booklet carefully; your time will be well spent.
+        </p><br/><br/>
+        <p>Security Services
+        </p>
+    </div>
+
+            <div style="break-after:page"></div>
+
+<!-- Robbery Document -->
+
+    <div class = "requiredgrid">
+
+
+
+        <div class = "hrheader">Robbery </div><br/>
+        <p>Robbery: is a theft accompanied by violence, threat of violence, use of a weapon or implied use of a weapon. We define robbery and an armed robbery as one in the same.Robbery Prevention MUST be a priority of your business practices. A well trained staff can greatly reduce the threat of robbery. The following preventative measures should become an operating standard of your business.
+        </p><br/>
+        <div class = "hrheadersmall">Preventative Measures</div><br/>
+        <div class = "security">
+            <ul class = "a">
+                <li>	NEVER keep large sums of money in the till ( See Cash Control section for recommended amounts) 
+                </li>
+                    <ul>
+                        <li>	Remove excess money and place it in a safe. 
+                        </li>
+                        <li>	Minimize the amount of readily available lottery and tobacco to just what you anticipate you will need after 11pm. The excess should be locked away and out of sight.
+                        </li>
+                    </ul>
+                <li>	DON'T clutter windows with displays or signs blocking the view. 
+                </li>
+                    <ul>
+                    <li>	Allow for a clear view by passing motorists, pedestrians and police patrols.
+                    </li></ul>
+                <li>	Keep your premises well lit at night (both inside and outside).
+                </li>
+                <li>	DON'T answer questions about your business asked by strangers - insist on identification before giving any answers.
+                </li>
+                <li>	Pay Attention to suspicious persons loitering around your business, particularly at opening and closing time.
+                </li>
+                <li>	Be cautious of anyone seeking entry when you are closed.
+                </li>
+                <li>	When making a bank deposit:
+                </li>
+                    <ul>
+                    <li>	DO NOT carry money in a canvas money bag with the bank's name on it.
+                    </li>
+                    <li>	If you must carry money, place the canvas bag inside an unmarked bag and keep it in the trunk of your car
+                    </li>
+                    <li>	Vary as much as you can, including time of day, routes, clothing worn, vehicle etc. when making bank deposits. DON'T get into an obvious routine.
+                    <li></ul>
+                <li>	If you are suspicious do not hesitate to call police
+                </li>
+            </ul>
+        </div>
+    </div>                    
+                        <div style="break-after:page"></div>
+    <div class = "requiredgrid">       
+        <div class = "hrheadersmall" >In the event of a robbery there are 4 things the victim should know: </div><br/>
+        <div class = "security">
+            <ul class = "a">
+                <li>	Remain calm
+                </li>
+                <ul>
+                <li>	Robbers are very tense and may be easily provoked. 
+                </li>
+                <li>	The longer a robbery takes the more nervous the robber will become.
+                </li>
+                <li>	DON'T ARGUE - once the robbery has started it's too late for robbers to change their minds.
+                </li>
+                <li>	DON'T FIGHT - the money / product / or vehicle are not worth the risk of someone being hurt
+                </li>
+                <li>	Attacking or resisting a robber does not make you a hero. NEVER try to be a hero.
+                </li>
+                <li>	Robbers may resort to violence when they are nervous or startled. Tell the robber about any potential surprises - if someone is in the backroom, or expected soon. 
+                </li>
+                <li>	If you must move in any way, tell the robber what you are about to do.
+                </li></ul>
+        
+
+            
+                <li> Identification
+                </li>
+                <ul>
+                <li>	Take a good look at the suspect(s), but try NOT to be obvious. Don’t stare. 
+                </li>
+                <li>	Notice any details, which will aid you in describing them and their mannerisms.
+                </li>
+                <li>	When trying to determine age, height, weight and appearance compare them to yourself or someone you know well.
+                </li>
+                <li>	Memorize peculiarities - tattoos, scars, rings, watches, shoes, left-handed or right-handed, and prominent physical features – THINGS THAT WILL NOT CHANGE!
+                </li>
+                <li>	Remember type and colour of clothing worn.
+                </li>
+                <li>	WEAPON: Describe type, colour and size.
+                </li>
+                <li>	If possible, note a full description of the vehicle, if any, and the license number.
+                </li>
+                <li>	Direct your employees not to discuss the crime amongst themselves or with witnesses until the police have arrived.
+                </li>
+                <li>	Suggest that your employees and any witnesses make notes while the information is still fresh in their minds.
+                </li></ul>
+        
+                <li> After the robber leaves:
+                </li>
+                <ul>
+                <li>•	Notify the police immediately by calling 911, or the Police Emergency number for your area.
+                </li>
+                <li>•	Give your address, telephone number and name.
+                </li>
+                <li>•	Remember the details and be as accurate as possible
+                </li>
+                <li>•	DON'T HANG UP UNTIL ALL THE INFORMATION HAS BEEN GIVEN. 
+                </li>
+                <li>•	Don't touch anything, stop all business and lock your doors. Preserve any items the suspect may have touched and prevent anyone from going into the area where the suspects were.
+                </li></ul>
+
+                <li>4. When the police arrive:
+                </li>
+                <ul>
+                <li>•	Answer their questions as accurately as possible. Tell them only what you saw or know.
+                </li>
+                <li>•	If you are not sure, say you are not.
+                </li>
+                <li>•	DON'T exaggerate when describing the suspect or what has been taken. Co-operate with police assigned to the case.
+                </li></ul>
+            </ul>
+        </div>
+                <p>Employees must notify their supervisor immediately following the robbery.
+                </p>
+                <p>NOTIFY YOUR SUNCOR ENERGY REPRESENTATIVE IMMEDIATELY FOLLOWING THE ROBBERY
+                </p>
+                <p>WHILE COOPERATION MAY NOT ALWAYS RESULT IN THE RECOVERY OF YOUR LOSSES, YOU MAY BE ABLE TO PREVENT OTHERS FROM BECOMING VICTIMS.
+                </p>
+
+    </div>
+
+                <div style="break-after:page"></div>
+
+    <div class = "requiredgrid">
+
+        <div class = "hrheader">How Best to Protect Your Property</div><br/>
+
+        <p>Clean and well lit premises will alter criminal activity'. Bright lights are a self-protection measure. Nothing deters robbers and burglars more than having to operate in bright light.
+        </p>
+        <div class = "security">
+            <ul class = "a">
+                <li>Lights
+                </li>
+                <ul>
+                <li>•	The ideal situation - both from a security standpoint and for customer appeal - would be to flood your whole business premises in a sea of light.
+                </li>
+                <li>•	The areas which are most vulnerable to the criminal and, therefore, should receive special lighting attention are:
+                </li></ul>
+                <ul>
+                <li>	Entrances - all entry points.
+                </li>
+                <li>	The yard.
+                </li>
+                <li>	Rear of the building.
+                </li>
+                <li>	Office - night light inside the building and over the safe.
+                </li></ul>
+                <li>Locks 
+                </li>
+                <p>Good locks will deter many potential break & enter (B&E) efforts'.
+                </p><br/>
+                <p>Break & Enter (B&E): is the unlawful entry into a premise for the purpose of committing an offence (usually theft or damage to property). This ONLY occurs in a site that is closed, i.e. a non 24 hr. site. Entry into a locked room such as an office or locked or open vehicle is NOT a Break in but a theft.
+                </p><br/>
+                <ul><li>•	Install one inch deadbolt locks on all outside doors, and double cylinder, long-throw deadbolts on doors with glass panels.
+                </li>
+                <li>•	Control of keys is important.
+                </li>
+                <li>•	Make sure padlocks are solidly mounted and never left open - even on an open door. This practice will prevent key duplication.
+                </li>
+                <li>•	Change locks when a key is lost.
+                </li>
+                <li>•	Don't lock a burglar inside when you leave. Inspect all closets, washrooms and other hiding places before locking your business up.
+                </li></ul>
+
+
+                <li>Doors 
+                </li>
+                <ul><li>•	Metal lining on exterior doors resists drilling and sawing.
+                </li>
+                <li>•	Bars in the inside of doors prevent breaking the entire door and thus easy entry.
+                </li>
+                <li>•	Check door frames for looseness, rotting, or expansion capabilities
+                </li>
+                <li>•	Install non-removable hinge pins on doors that swing outward
+                </li>
+                <li>•	Routinely ensure that all doors are locked at closing time.
+                </li>
+                <li>•	ALL 24 hr. self service locations MUST have the main entrance electronically controlled by means of a magnetic or striker type lock mechanism activated from the area of the point of sale 
+                </li></ul>
+
+                <li>Windows 
+                </li>Windows should offer light, ventilation and visibility. Not easy access.
+                <ul><li>•	Check window frames for looseness or rotting, and that the window locks work.
+                </li>
+                <li>•	All windows should be clear of obstruction, to allow for clear visibility into and out of the building.
+                </li></ul>
+                
+                <li>Alarms 
+                </li>
+                <p>For sites that operate less than 24 hrs a day, "An adequate alarm system provides constant attention".
+                </p><br/>
+                <ul><li>•	Alarms have a psychological value - they may scare the burglar or robber away. However, the installation of an alarm system can be expensive; the potential worth of an alarm system should be governed by the size of the inventory, location of the business, and the availability of local law enforcement people to answer the alarm.
+                </li>
+                <li>•	If your site has a history of Break ins, consideration should be given to a “cellular back up” alarm that will transmit the alarm even if telephone lines are cut.
+                </li>
+                <li>•	You might get a lower insurance rate if an alarm system is installed.
+                </li>
+                <li>•	Advertise that your station is equipped with an alarm.
+                </li>
+                <li>•	Ensure that all your staff are properly trained in alarm procedures. This will eliminate false alarms.
+                </li></ul>
+                
+                <li>Cash Registers / SAFES 
+                </li><ul>
+                <li>•	Minimize cash on hand with frequent, irregular safe drops
+                </li>
+                <li>•	All sites must now have 3  safe compartments, 2 of which have time delay opening (each with a MINIMUM 2 minute delay ) they are :
+                </li>
+                <li>•	1 -An approved time delay opening, drop safe is now mandatory at all sites
+                </li>
+                <li>•	2 - All sites MUST have a time delay “coin” safe or compartment for the storage of coin, small bills, lottery and the like. ALL staff members MUST have access to the “coin” safe. It is strongly recommended that no more than $500 in small bills or coin be kept in this safe.  This safe MUST be kept locked at all times when not in immediate use. Hiding money is NOT permitted under any circumstances.
+                </li>
+                <li>•	3 - All sites MUST now have a  “Cash In Transit” safe for use should the site opt for armoured car cash pick up. If the site does not opt for CIT, the compartment may be used to store other valuable items.
+                </li>
+                <li>•	 ALL safes must be securely anchored to the floor, wall, other solid structure or millwork and located as close to the Paypoint as possible.
+                </li>
+                <li>•	Strictly limit the number of people having access to the keys or the safe combination for the primary drop and CIT safes. In British Columbia and Saskatchewan when a GSA is working alone after 11PM, these keys and/or combination for the drop and CIT safes must NOT be available.
+                </li>
+                <li>•	After store hours, leave empty cash drawers open. This will prevent unnecessary damage from a burglar hunting for cash
+                </li></ul>
+
+                <li>These are recommended MAXIMUM amounts for Safe Drops and Cash Floats. Feel free to ‘drop’ smaller amounts. With the new “Coin safes” your site should be able to operate using lower amounts, please consider it for security and safety reasons.
+                </li><ul>
+                <li>•	Safe Drop - Day - $100.00
+                </li>
+                <li>•	Safe Drop - Night - $50.00
+                </li>
+                <li>•	Cash Float - $75.00
+                </li></ul>
+
+                <li>Closed Circuit Television (CCTV) 
+                </li>
+                <p>Each location should have a closed circuit television (CCTV) system. The objectives of such a system are:
+                </p><br/><ul>
+                <li>•	To deter a criminal.
+                </li>
+                <li>•	To capture an image of the criminal, should an incident occur.
+                </li>
+                <li>•	A CCTV system includes cameras (both internally and externally), monitors, and a DVR in a locked office or container.
+                </li>
+                <li>•	There are recommended specifications for the quantity and location of equipment at each size of store.
+                </li>
+                <li>•	Ensure that your DVR is recording and saving at least 30 days of footage.  If there are any issues with it contact your service provider for technical support.
+                </li></ul>
+                
+                <li>Theft Preventive Measures
+                </li>
+                <p>Theft: is the removal of property from its lawful owner without his/her consent and WITHOUT the use of a weapon, force or threat.
+                </p><br/>
+                <p>Theft can occur in various ways, ranging from bad cheques, use of stolen credit cards, card skimming, shoplifting, fuel theft (drive-off) occurrences and internal thefts (cash, inventory, etc.) This section will attempt to outline preventative measures against the various forms of theft.
+                </p><br/>
+                <p>Fuel Theft (Drive-off):  Driving away from the pump without paying is theft. 
+                </p><br/>
+                <p>In an accidental fuel theft (drive-off), the person believes they have paid for the transaction, but the transaction is incomplete. In an intentional fuel theft (drive-off), the person knows they are committing a crime, but feels there is little risk.
+                </p><br>
+                <p>The following measures can be taken to help reduce the incidence of this type of crime.
+                </p><br/>
+
+                <li>Fuel Theft (Drive-off) Prevention Measures 
+                </li><ul>
+                <li>•	Stay Alert. Maintain high visibility to pump island and driveways.
+                </li>
+                <li>•	Pay special attention to those Guests who approach the far pumps, especially when the station is busy.
+                </li>
+                <li>•	Make eye contact with the Guest when activating pumps and/or greet Guest at Paypoint. Being visible to all Guests and greeting them will discourage theft.
+                </li>
+                <li>•	Monitor the pump island for CRIND confusion. Guests may be uncomfortable with the CRIND and may not know if they have correctly completed a transaction. If they are confused or frustrated, they are your potential accidental fuel theft (drive-off) thief.
+                </li>
+                <li>•	Use intercom at self-serve, if appropriate, to help Guests having problem with the CRIND.
+                </li></ul>
+
+                <li>Fuel Theft (Drive-off) thief characteristics
+                </li><ul>
+                <li>•	The fuel thief will wait until the Paypoint operator is busy with other Guests on the site.
+                </li>
+                <li>•	The thief will usually drive up to the pumps which are furthest away from the view of Paypoint operator.
+                </li>
+                <li>•	The license plate on the car may be covered with a rag or black plastic garbage bag, which is partially sticking out from the closed trunk of the car. The plates could also be muddied to obscure the numbers.
+                </li>
+                <li>•	The thief may appear nervous, frequently glancing at the Paypoint operator to make sure they are not being given any special attention while at the pumps
+                </li></ul>    
+                
+                <li>When a Fuel Theft (Drive-off) occurs 
+                </li><ul>
+                <li>•	DO NOT under any circumstances chase after the vehicle.
+                </li>
+                <li>•	Attempt to get the license number.
+                </li>
+                <li>•	Get a full description of the vehicle and the operator.
+                </li>
+                <li>•	Note the time and direction the vehicle left the lot.
+                </li>
+                <li>•	Obtain names and addresses of witnesses (if possible).
+                </li>
+                <li>•	Immediately call the police
+                </li></ul>
+
+                <li>Shoplifting
+                </li>
+                <p>Shoplifting, in other words, is simply someone trying to take something from the store without actually paying for it.  In most cases, it is something easily concealed in a pocket or the like and is of limited value.  
+                </p><br/>
+                <p>I STRONGLY RECOMMEND you do NOT attempt to apprehend or detain the suspect. Should you do so, you not only do you put yourself at risk physically should the person become aggressive, you also put yourself at risk of being sued or worse should you be mistaken and / or injure/ assault the suspect in some way.
+                </p><br/>
+                <p>I recommend that if you observe someone hiding something on their person and they attempt to leave the store, you verbally (from behind the counter or from a safe distance) ask them if they have forgotten to pay for something. As with fuel theft (drive-offs), never chase or physically confront the thief. If the item taken is of some value or the suspect is a repeat offender, attempt to get a good description of the person, vehicle etc, retain the video footage and contact the police. Again NEVER chase or physically confront the suspect.
+                </p><br/>
+                <p>Conclusion
+                </p><br/>
+                <p>This booklet provides many ideas and suggestions on how to protect your business and your staff from the criminal. It is primarily designed to set you thinking about the problem of crime prevention and encourage you to take positive action toward formulating an effective crime prevention program for your business. 
+                </p><br/>
+                <p>Look around the premises and ask yourself: "How secure is it?" "Would it be an easy victim of the robber, the burglar or the thief?"
+                </p><br/>
+                <p>Asking questions like these is only the beginning. The right answers to these questions are evident in an effective program of crime prevention. Start today, work at it, improve it, and every day ask the question, "Can 1 do more?" You'll be glad you did.
+                </p><br/>
+                <p>For further information or assistance regarding "security matters" contact your Suncor Energy Field Representative.
+                </p><br/>
+
+            </ul>
+        </div>
+    </div>
+
+        <div style="break-after:page"></div>
+
+
+    <div class = "requiredgrid">
+        <div class = "hrheader">ALL NEW STAFF MUST READ AND SIGN THIS BOOKLET BEFORE STARTING WORK THE FIRST TIME.</div><br/>    
+            <p>ALL OTHER STAFF MUST READ AND SIGN THE ATTACHED SHEET A MINIMUM OF TWICE PER YEAR.
+            <p><Manager/Bookkeeper/Employee>
+
+                        <p> Security Action Plan </p><br/>
+                        <div class = "sigcontainer">
+
+                                    <div class = "sig">
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                    </div>
+
+                                    
+                        </div>
+                                <div class = "sigdate">
+                                {{gsa.Startdate}}
+                                </div>  <br/>
+
+        
+                    <div class = "security">
+                        <ul class = "a">
+
+                            <li>Robbery
+                                </li><ul>
+                                <li>Areas of Weakness:
+                                </li>
+                                <li>Immediate Action Plan:
+                                </li></ul>    
+
+                            <li>How Best to Protect your Property
+                            </li><ul>
+                            <ul>Areas of Weakness:
+                            </li>
+                            <li>Immediate Action Plan:
+                            </li></ul>
+
+                            <li>Fuel Theft (Drive-off) Prevention
+                            </li><ul>
+                            <li>Immediate Action Plan:
+                            </li>
+                            <li>Discuss with Employees:
+                            </li></ul>
+                            <li>Cheque, credit/debit card frauds and Shoplifting
+                            </li><ul>
+                            <li>Immediate Action Plan:
+                            </li>
+                            <li>Discuss with Employees:
+                            </li></ul>
+                            <li>Internal Theft
+                            </li><ul>
+                            <li>Avoid the problem before it happens. Careful screening of employees is the most effective way to reduce shortages
+                            </li>
+                            <li>Immediate Action Plan:
+                            </li>
+                            <li>Discuss with Employees:
+                            </li></ul>
+                        <ul>
+        
+                    </div>
+    </div>
+
+
+            <div style="break-after:page"></div>
+
+<!-- Personal Property and Protection Document-->
+
+    <div class = "requiredgrid">
+
+            
+                   
+                    <div class = "hrheader">
+                        <p>Acknowledgement of Personnel and Property Protection Guidelines</p>
+                    
+                    </div>
+                        <div class = "hrheaderdata">
+                        
+                            <p>Effective Date:  April 1, 2016</p>
+                            <p>Last Reviewed by Owner:  April 1, 2016</p>
+                        </div><br/>
+
+
+                    <p>This is to confirm that I, the undersigned, Amritpal Kaur, employee of Priyan Trivedi  have read, understand and agree to follow the Personnel and Property Protection Guidelines.
+                    </p><br/>
+
+                <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            {{gsa.manager}}
+                            </div>
+                    
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            Associate Signature 
+                            </div>
+                </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>                                                                                                     
+
+                        <footer class = "hrfooter"> 
+                    
+                    
+                        </footer>
+        
+    </div>
+
+            <div style="break-after:page"></div>
+
+<!-- Occupational Health and Safety Document-->
+
+    <div class = "requiredgrid">
+
+            
+                   
+                    <div class = "hrheader">
+                        <p>Occupational Health and Safety Awareness and Training Regulation and Acknowledgement Form – Ontario Only</p>
+                    
+                    </div>
+                        <div class = "hrheaderdata">
+                        
+                            <p>Effective Date: April 4, 2014</p>
+                            <p>Last Reviewed by Owner: May 1, 2015</p>
+                        </div><br/>
+
+
+                <p>Purpose:  This site operating procedure (SOP) gives a detailed account of the new regulation requiring health and safety awareness training for every worker and supervisor under Ontario’s Occupational Health and Safety Act (OHSA). The regulation comes into force July 1, 2014, allowing workplace parties the time to prepare. 
+                </p><br/>
+                <p>Beginning July 1, 2014, employers in Ontario must ensure that all their workers and supervisors complete a basic occupational health and safety awareness training program.  Besides these new requirements, employers continue to have on-going duties under the OHSA to inform workers about workplace-specific hazards. These include the general duty to “provide information, instruction and supervision to a worker to protect the health or safety of the worker.
+                </p><br/>
+                <p>Regulatory Requirements under the Occupational Health and Safety Awareness and Training Regulation
+                </p><br/>
+            
+                <div class = "security">
+                        <ul class = "a">
+
+                    <li>Employers must:
+                    </li><ul>
+                    <li>•	Ensure that workers complete a basic occupational health and safety awareness training program as soon as reasonably possible;
+                    </li> 
+                    <li>•	Ensure that supervisors complete a basic occupational health and safety awareness training program within one week of working as a supervisor;
+                    </li>
+                    <li>•	Maintain a record of the training completed by workers and supervisors (refer to the Occupational Health and Safety Awareness Training Acknowledgement Form found on the last page of this SOP). This form is to be kept in the Safety and Security section of the Site Actions and Communication Binder – Introduction and Contents;
+                    </li>
+                    <li>•	Provide a worker or supervisor with written proof of completion of the training, if requested by the worker or supervisor (up to six months after ceasing to work for the employer). 
+                    </li></ul>
+                    <li>Training for Workers
+                    <ul>
+                    <p>The training program for workers must include instruction on:
+                    </p>
+                    <li>•	The duties and rights of workers under OHSA;	
+                    </li>
+                    <li>•	The duties of employers and supervisors under OHSA;
+                    </li>
+                    <li>•	Common workplace hazards and occupational illnesses;
+                    </li>
+                    <li>•	The role of joint health and safety committees (JHSCs) and of health and safety representatives under OHSA;
+                    </li>
+                    <li>•	Roles of the ministry, Workplace Safety and Insurance Board (WSIB), and Health and Safety Associations; and
+                    
+                    Information on and instruction requirements set out in the Workplace Hazardous Materials Information System (WHMIS) Regulation.
+                    </li></ul>
+                    
+                    <li>Training for Supervisors
+                    </li><ul>
+                    <p>The training program for supervisors must include instruction on:
+                    </p>
+                    <li>•	The duties and rights of workers under OHSA; 
+                    </li>
+                    <li>•	The duties of employers and supervisors under OHSA; 
+                    </li>
+                    <li>•	How to identify, assess and manage workplace hazards, the role of joint health and safety committees (JHSCs), and of health and safety representatives under OHSA; 
+                    </li>
+                    <li>•	Roles of the ministry, Workplace Safety and Insurance Board (WSIB), and Health and Safety Associations; and 
+                    </li>
+                    <li>•	Sources of information on occupational health and safety.
+                    </li></ul>
+                    <li>Resources and Tools for Employers and other Workplace Parties
+                    </li><ul>
+                    <p>The Ministry of Labour provides a number of resources and tools to help employers and other workplace parties comply with the requirements of the Occupational Health and Safety Awareness and Training Regulation. 
+                    </p>
+                    <p>In addition, electronic (e-learning) training tools are available in English and French online for free to help employers comply with the regulation requirements:
+                    </p><br/>
+                    <li>•	Worker Health and Safety Awareness in 4 Steps 
+                    </li>
+                    <li>•	Supervisor Health and Safety Awareness in 5 Steps 
+                    </li>
+                    <p>The Worker and Supervisor modules above take 30 to 40 minutes to complete. They contain videos and simple quizzes that you cannot skip.  If you answer incorrectly, you will simply be provided with the correct answer and can move on to the next section. You will receive a "Proof of Completion" certificate once you complete the training. You must save and print the certificate before exiting the module. The Ministry of Labour will not store your certificate or keep a record of training. 
+                    </p><br/>
+                    <li>•	Please keep a copy of the certificate in your Employee File.
+                    </li>
+                    <li>•	Sign the Occupational Health and Safety Awareness Training Acknowledgement Form found on the last page of this SOP and store it in the Safety and Security section of the Site Actions and Communication Binder – Introduction and Contents
+                    </li></ul>
+
+                    <li>Next Steps for Associates
+                    </li><ul>
+                    <li>1.	Complete the training and print the certificate so you know the material and can answer any questions your staff and/or supervisors may have. 
+                    </li>
+                    <li>2.	Start training your existing staff and supervisors today and place their printed certificates in their Employee Files.
+                    </li>
+                    <li>3.	This has been added to the document, “New Hire CL” located on the Associate Portal under: Support>Associate Forms>New Hire Checklist and Acknowledgement Form 
+                    </li>
+                    <li>4.	Ensure the Occupational Health and Safety Awareness Training Acknowledgement Form has been signed by all staff and placed in the Site Actions and Communication Binder – Introduction and Contents
+                    </li><br>
+                    <p>Note:  This will be added to the next version of the Safety Evaluation Assessment and Food Service Advisors will be checking the Site Actions and Communication Binder – Introduction and Contents but ultimately, Associates are responsible for keeping up to date on labour and government legislation requirements.
+                    <p><br/>
+
+
+                        <div class = "sigcontainer">
+
+                                    <div class = "sig">
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                    </div>
+
+                                    
+                        </div>
+                                <div class = "sigdate">
+                                {{gsa.Startdate}}
+                                </div>                                                                                                     
+
+                                <div class = "sigdate">
+                                <p>Training Date</p>
+                                </div>
+
+                                <footer class = "hrfooter"> 
+                            
+                                    Occupational Health and Safety Awareness Training Acknowledgement Form – Ontario Only
+                                </footer>
+                </div>                	
+    </div>	
+                                <div style="break-after:page"></div>
+
+<!-- 1553690 Ontario Policies and Procedures Document-->
+
+    <div class = "requiredgrid">
+
+            
+                   
+                    <div class = "hrheader">
+                        <p>1553690 ONTARIO INC</p>
+                        <p>POLICIES AND PROCEDURES</p>
+                    </div>
+                        <div class = "hrheaderdata">
+                        
+                            <p>Employee Information</p>
+                            
+                        </div><br/>
+
+
+            
+                <div class = "security">
+                    <ul class = "a">
+
+                        <li>SAFETY
+                            </li>
+                            </li><ul>
+                            <li>-Safety is your top priority on your shift. You must never put yourself or your guests in harm’s way at any time. You are responsible for following all the safety policies and procedures guidelines at all times
+                            </li>
+                            <li>-there is a posted health and safety representative and you are responsible for reporting any unsafe conditions or issues on your shift
+                            </li>
+                            <li>Depending on the severity of the infraction related to section one of this document, the disciplinary reactions are 1st infraction-documented conversation with site manager and an offer of additional training. 2nd infraction-written warning stating that on the 3rd infraction and you will be terminated.
+                            <li></ul>
+
+                        <li>ATTENDANCE AND PAYROLL
+                            </li><ul>
+                            <li>Shifts and Scheduling
+                            </li><ul>
+                            <li>-1553960 Ontario Inc. DOES NOT OFFER set hours of work.  Your hours will be scheduled around the availability that you offered at the beginning of your employment however the hours and shifts can vary within your availability (as per availability sign off sheet in your employee file)
+                            </li>
+                            <li>-You are responsible to show up on time and ready for work for each of your scheduled shifts.
+                            </li>
+                            <li>-If you would like to change/switch a scheduled shift it is your responsibility to find another employee who is available and willing to take the shift and it MUST be cleared with the site manager by both the employee giving the shift and the employee taking the shift. It is at the discretion of the site manager to determine whether it is reasonable.
+                            </li>
+                            <li>-If you would like to request a day off, one week notice in writing must be submitted to the site manager. If you would like to request a period of time longer than 1 day including vacation it must be requested in writing to the site manager, three weeks notice is required
+                            </li>
+                            <li>-If you cannot attend a scheduled shift for due to illness or injury, it is your responsibility to attempt to cover the shift. If you have made a reasonable attempt to cover the shift and cannot, you must contact your site manager not less than five hours before your scheduled shift.  If you cannot attend a scheduled shift due to illness or injury, we may request a medical note to be provided within three business days from the day you reported the illness or injury to ensure clearance to return to work and/or expected date of return to work should the period of time off needed be longer than 3 days.
+                            </li>
+                            <li>-If an emergency situation arises that prevents you from being present for a scheduled shift, you must contact your site manager or company representative immediately to inform them of your absence and the reason for it. We may ask for documentation relating to the emergency that prevented you from attending your scheduled shift to retain in your employee file.
+                            </li>
+                            <li>-you will be required to attend meetings and training sessions outside of your scheduled shifts from, time to time. It is mandatory that you attend these as they are paid working hours.
+                            </li></ul>
+                            <li>Payroll
+                            </li></ul>
+                            <ul>
+                            <li>-You will be paid on a semi-monthly basis. You will be paid for the first to the fifteenth of the month on the 22nd and the sixteenth-month end on the 7th of the following month.
+                            </li>
+                            <li>-A work week is considered Friday to Thursday for the purposes of hours worked, overtime etc.
+                            </li>
+                            <li>-you will be paid an hourly wage plus four percent vacation paid out on each cheque.
+                            </li>
+                            <li>-1553690 Ontario Inc. will NEVER intentionally withhold monies for hours worked. If you feel there is a discrepancy or mistake, you should bring it to the attention of the site manager immediately for resolution.
+                            </li>
+                            <li>Depending on the severity of the infraction related to section two of this document, the disciplinary reactions are 1st infraction-documented conversation with site manager and an offer of additional training. 2nd infraction-written warning stating that after the 3rd infraction and you will be terminated.
+                            </li></ul>
+                        <li>STANDARDS OF SERVICE
+                            </li><ul>
+                            <li>Uniform<ul>
+                            <li>-You will show up for each and every shift in proper uniform wearing no unauthorized items of clothing or headwear. The Petro Canada name tag provided to you will be worn on the left hand side of your uniform shirt at all times.
+                            </li>
+                            <li>-You are responsible to cover the cost of your uniform. There is a uniform request and authorized deduction form that will be put in your employee file
+                            </li>
+                            <li>-The uniform consists of a Petro Canada shirt , black cotton pants(No cargo stile pants, sweat pants, cords, jeans, tights or wind pants) closed toe shoes (steel toe boots may be required at car wash locations) name tag worn on the left hand side of uniform shirt. There are other pieces of the uniform that may be purchased and worn.  
+                            </li>
+                            <li>-if you choose to wear another shirt under your uniform, it cannot be visible and must be black
+                            </li></ul>
+                            <li>Serving our guests<ul>
+                            <li>-You must provide the minimum standards of service as set out by Petro Canada and 1553690 Ontario Inc. to each and every guest that enters our locations
+                            </li>
+                            <li>-You must greet each and every guest in a friendly manner
+                            </li>
+                            <li>-You must ask each and every guest for their Petro Points Card
+                            </li>
+                            <li>-You must ask each and every guest for an add on sale
+                            </li>
+                            <li>-you must thank each and every guest
+                            </li>
+                            <li>-you must respond with my pleasure every time you are thanked by our guests
+                            </li></ul>
+                            <li>Telephones<ul>
+                            <li>-if you bring a cell phone to work with you, it must be on silent and under no circumstances is it acceptable to make any personal phone calls or texts. The phone must be out of view from our guests. 
+                            </li>
+                            <li>-No long distance phone calls are permitted on the station phone, with the exception of the “Midnight Check-In” between sites.
+                            </li>
+                            <li>-Personal phone calls must be kept short and at a minimum and should only be made for emergencies or pick up/drop off arrangements.
+                            </li></ul>
+                            <li>Site Image<ul>
+                            <li>-You will have tasks outside of serving guests such as but not limited to light housekeeping, preparing coffee and maintain the coffee counter, cleaning bathrooms and stocking the store.  These tasks will be communicated to you through your site manager or cleaning lists. You are to complete the tasks asked of you each and every shift you work.
+                            </li></ul>
+                            <li>Cash handling/paperwork<ul>
+                            <li>-you will be dealing with a large amount of cash throughout your shifts. You must always follow proper procedures as per your training.
+                            </li>
+                            <li>-you will complete all paperwork related to your shift every shift that you work, this will include but is not limited to end of shift paperwork, target sheets, cleaning lists and product tracking ledgers
+                            </li>
+                            <li>Depending on the severity of the infraction related to section three of this document, the disciplinary reactions are 1st infraction-documented conversation with site manager and an offer of additional training. 2nd infraction-written warning stating that after the 3rd infraction and you will be terminated
+                            </li></ul></ul>
+                        <li>TOBACCO AND LOTTERY POLICIES
+                            </li><ul>
+                            <li>-There is a zero tolerance policy with regards to tobacco.
+                            </li>
+                            <li>-you will never sell tobacco products to anyone under the age of 19
+                            </li>
+                            <li>-you will ask everyone who looks younger than 25 for proper ID to confirm their age
+                            </li>
+                            <li>-you will abide by all tobacco legislation
+                            </li>
+                            <li>-There is a zero tolerance policy with regards to Lottery.
+                            </li>
+                            <li>-you will never sell any lottery to those under the age of18
+                            </li>
+                            <li>-you will ask everyone for who looks younger than 25 for proper ID to confirm age
+                            </li>
+                            <li>-you will never buy, play or redeem lottery tickets at the location you work at.
+                            </li>
+                            <li>There is a Zero Tolerance policy when it comes to section 4 of this document and you will be terminated immediately should any violations take place.
+                            </li></ul>
+                        <li>ILLEGAL ACTIVITY: Fraud/theft
+                            </li><ul>
+                            <li>General<ul>
+                            <li>-if you are aware of any fraudulent activity or theft at the site, you must contact and advise your manager immediately.
+                            </li>
+                            <li>-if there is good reason to believe that there is fraudulent activity or theft happening at a location, we will call the police for a complete investigation and the employee will be removed from the schedule until the investigation is complete.
+                            </li>
+                            <li>There is a Zero Tolerance policy when it comes to section 5 of this document and the employee will be terminated immediately.
+                            </li></ul></ul>
+
+                        <li>Serving Guests with Disabilities
+                            </li><ul>
+                            <li>1553690 Ontario Inc., all employees and contractors will comply with the Accessibility for Ontarians with Disabilities Act 2005. You will use reasonable efforts to ensure that the service that you provide is consistent with the principles (dignity, independence, integration and equal opportunity) of the customer service standard. You will never deny access to any person with an assistive device, service animal or support person. If you cannot offer service to a person, you must be able to direct the person to a location that can. If a person would like to provide feedback in regards to our service, you are required to give the guest the opportunity to leave contact information and ensure a manager or company representative is aware.
+                            </li>
+                            <li>There is zero tolerance with regards to this section. If it is found that you have not adhered to these policies you will be terminated.
+                            </li></ul>
+                        <li>PUMP TAMPERING CHECKLIST AND INSPECTION
+                            </li><ul>
+                            <li>Pumps need to be visually inspected 3 times during each shift as per SOP ENMCLL 178.Should anything out of the ordinary be found, you are to contact your manager immediately and halt all activity at the pump. There is a checklist located in the communications binder that is to be completed each shift
+                            </li>
+                            <li>There may be changes or updates to our policies and procedures from time to time. You will receive the policy change in writing and it will be signed and put in your file.
+                            </li></ul>
+                    </ul>    
+                </div><br/>
+           
+                               
+
+
+                    <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            {{gsa.manager}}
+                            </div>
+                    
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            Associate Signature 
+                            </div>
+                    </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>   
+
+                                <footer class = "hrfooter"> 
+                            
+                                    By signing this document, you are stating that you have read and understand all of the above. You know what your responsibilities are and acknowledge that you have been trained in accordance with all the information in this document.
+                                </footer>
+    </div>
+
+                    <div style="break-after:page"></div>
+
+<!-- 1553690 Ontario Inc. Workplace Violence and Harrassment Policy Document-->
+
+    <div class = "requiredgrid">
+
+                                
+                                    
+                                        <div class = "hrheader">
+                                            <p>1553690 ONTARIO INC</p>
+                                            <p>Policy and Procedures for Preventing Violence in the Workplace</p>
+                                        </div>
+                                            <div class = "hrheaderdata">
+                                            
+                                                <p>Updated January 24, 2017</p>
+                                                
+                                            </div><br/>
+
+                    <p>Policy Statement 
+                    </p><br/>
+                    <p>We have conducted a risk assessment and recognized that this worksite has the potential of exposing workers to the risk of violence and the hazard of working alone.  Our Company is committed to minimize this risk to the lowest practical level and established the following procedures to prevent violence and promote safety.  All employees will be trained on the site specific procedures and must follow them. Failure to follow the procedures may result in disciplinary actions and/or dismissal. All safety incidents or injuries and any concerns regarding unsafe work or condition, must be reported to management immediately.  Management will investigate the incident or concern and ensure that all necessary action is taken and adequate controls are implemented. 
+                    </p><br/>
+            <div class = "security">
+                        <ul class = "a">
+
+                            <li>SITE SPECIFIC PROCEDURES
+                            </li><ul>
+                            <li>Dealing with loiterers
+                            </li><ul>
+                            <li>1.	Avoid making direct eye contact with suspicious persons, especially if they are in a group, as this may be perceived as a challenge and can escalate the situation.
+                            </li>
+                            <li>2.	Report these persons to the Associate or manager.
+                            </li>
+                            <li>3.	Ask the person(s) to leave the premises
+                            </li>
+                            <li>4.	Should the persons persist and you feel at all at risk, call the police.
+                            </li>
+                            <li>5.	Note the date and time so that management can view security footage.
+                            </li></ul></ul>
+                            <li>Dealing with irate or threatening Guests
+                            </li><ul>
+                            <li>1.	Remain calm.
+                            </li>2.	Listen carefully and try to put yourself in the Guest’s shoes, so you can better understand how to solve the problem.
+                            <li>3.	Do not argue, threaten or try to physically confront the Guest. 
+                            </li>
+                            <li>4.	If you cannot calm the person, ask for help.
+                            </li>
+                            <li>5.	If no help is available, offer to take their information and inform them a manger will call them back
+                            </li>
+                            <li>6.	If the guest is intimidating or threatening your safety be prepared to call police and do so
+                            </li>
+                            <li>7.	Fill out an incident form. This form is found in the site actions and communications binder. Include as many details as possible including description of individual, date and time. Management will review security footage to provide for police report.
+                            </li></ul>    
+                            <li>Dealing with Guests who refuse to pay 
+                            </li><ul>
+                            <li>1.	Follow the procedures above for irate Guests.
+                            </li>
+                            <li>2.	Do not argue, threaten or try to physically force payment from the Guest.
+                            </li>
+                            <li>3.	Once the Guest has left, try to note a description of the Guest and any other distinguishing features.  Record the detail of any witnesses.
+                            </li>
+                            <li>4.	Fill out drive off form. Record as many details as possible as per the form. Call police.
+                            </li>
+                            <li>5.	If manager is not available then include drive off form in paperwork and management will review the next morning.
+                            </li></ul>
+
+                            <li>Shoplifting
+                            </li><ul>
+                            <li>1.	Unless you are trained to intervene without risk to yourself or your co-workers, do not chase after or become physically involved with the shoplifter. Follow the procedures below, but don’t be a hero.
+                            </li>
+                            <li>2.	Record the date and time of the incident so that management can review security footage.
+                            </li>
+                            <li>3.	If you are convinced that the guest has shoplifted then ask them politely, if there are any items that they wish to pay for. Record their answer in the incident form.
+                            </li>
+                            <li>4.	Fill out an incident form. Report incident to manager.
+                            </li>
+                            <li>5.	Note. Your training included the basic of GROW. Greet, Read, make the Offer and Wrap up the sale. Greeting a guest is as simple as saying hello as they walk through the door. This accomplishes two things. First, we are welcoming them. Second, the eye contact can be enough to deter a shoplifter.
+                            </li></ul>
+                            <li>Drive-off
+                            </li><ul>
+                            <li>1.	A ‘Drive off’ is a kind of theft where an individual fills up the vehicle with gas and then drives away without paying for the fuel. These incidents can occur during the day or night.  Never chase after or confront in any way someone planning or doing a ‘drive-off”.  
+                            </li>
+                            <li>2.	Stay far away from the vehicle and if you are inside the store, do not go outside.
+                            </li>
+                            <li>3.	 If you are inside and can see and safely record the license plate of the vehicle – do so.  If not, try to remember and then record a description of the vehicle, e.g., colour, make, model, distinguishing features such as decals, dents or damage.
+                            </li>
+                            <li>4.	Fill out the drive off from found in the site actions and communications binder.
+                            </li>
+                            <li>5.	As soon as possible, once the ‘drive-off’ vehicle has left the site, call the police and provide the information you recorded.
+                            </li>
+                            <li>6.	Notify management as soon as possible so that they can retrieve security footage for the police.
+                            </li>
+                            <li>7.	Night shifts should be turning the pumps over to pre pay mode at midnight and returning the pumps to regular pay mode at about 5:00 am. This change can be made as follows: Select Menu, then Attendant Activities then Store Operation Mode. Once in store operations mode use the down arrow to move the cursor to pump 1. Hit the Y key. This turns pump 1 over to pre pay mode. Follow these steps for all  pumps then hit F10 to exit. Save changes. You are now in pre pay mode and have total control over the sale of fuel. Use the pay window to perform all transactions. If you do not have a pay window then you will have to let the guest into the store to prepay. Do this one guest at a time.
+                            </li>
+                            <li>8.	The night shift employee should be locking the door. You do not have to let anyone in the store.  Remember, you are in control of the store at night. Do not let someone into the store if you are concerned for your safety. 
+                            </li>
+                            <li>9.	You may have to use the intercom to communicate with guests. Use the phrase “Excuse me pump (), We are on prepaid hours. I need you to hang up the nozzle and pre pay at the pump or in the store first please. Thank you.”
+                            </li>
+                            <li>Drive off’s are a form of theft. The GSA is not financially responsible for a theft. This does not excuse a GSA from performing their duties. Forgetting to ask if the customer had gas is a failure of the GSA to perform their duties and may result in disciplinary actions. 
+                            </li></ul>
+                            <li>Preventing robberies
+                            </li><ul>
+                            <li>1.	Make the store attractive to Guests, unattractive to robbers:
+                            </li>
+                            <li>•	Keep the store clean, tidy, and well-lit.
+                            </li>
+                            <li>•	Keep active and alert. Don’t be a target.
+                            </li>
+                            <li>•	Get away from the sales counter when there are no Guests.
+                            </li>
+                            <li>2.	Ensure the sales counter is clearly visible from outside the store. A cash register location that is difficult to see clearly from the street helps a robbery to happen unnoticed. 
+                            </li>
+                            <li>3.	Keep alert at all times. 
+                            </li><ul>
+                            <li>•	Identify your escape routes
+                            </li>
+                            <li>•	Know the location of phones or assistance outside the premises.
+                            </li>
+                            <li>•	Be aware of areas with poor lighting.
+                            </li>
+                            <li>•	Avoid looking directly at suspicious loiterers. Prolonged eye-to-eye contact, especially if there is a group involved, may be seen as a challenge and possibly escalate the situation. Fill out a description sheet. If the loiterers don’t leave, call the police and ask for a patrol check.
+                            </li></ul>
+                            <li>4.	Greet everyone who enters the store. 
+                            </li><ul>
+                            <li>•	Be friendly and briefly look directly into their eyes.
+                            </li>
+                            <li>•	Ask the Guest ahead of someone suspicious, “Are you together?” The Guest will usually turn around to look at the person. This may deter the robber.
+                            </li></ul>
+                            <li>5.	Keep the cash register fund to a minimum: 
+                            </li><ul>
+                            <li>•	Remove all $50 and $100 bills from the cash register as soon as you receive them.
+                            </li>
+                            <li>•	Post signs advising “Minimum cash kept on premises.”
+                            </li>
+                            <li>•	Ask Guests for exact change or the smallest bills possible.  
+                            </li></ul>
+                            <li>6.	Take extra precautions after dark and during slow periods: 
+                            </li><ul>
+                            <li>•	Check each night to see that outside lights are on and working.
+                            </li>
+                            <li>•	Operate only one register late at night through early morning.
+                            </li>
+                            <li>•	Open the empty unused register drawer and tip it up for display.
+                            </li>
+                            <li>•	Run an “empty register” — just $5 bills and change. 
+                            </li></ul></ul>    
+                            <li>In the case of a robbery
+                            </li></ul>
+                            <li>1.	Remain cool and calm, and handle the entire procedure as if you were making a sale to a Guest. Most robberies last under two minutes. The longer the robbery takes, the more nervous the robber becomes, so keep it short and smooth.
+                            </li>
+                            <li>2.	Listen carefully to what the robbers say, and obey them. Don’t be a hero. 
+                            </li><ul>
+                            <li>•	Don’t fight. Don’t use weapons. Don’t jeopardize your own safety or that of other workers.
+                            </li>
+                            <li>•	Give the robbers all the cash and merchandise they want.
+                            </li>
+                            <li>•	Don’t delay or argue.
+                            </li></ul>
+                            <li>3.	Tell the robbers of any possible surprises: 
+                            </li><ul>
+                            <li>•	Tell the robbers if you must reach for something or move in any way. Ask them for their directions. 
+                            </li>
+                            <li>•	Tell the robbers if another employee is in the back room so they are not startled.
+                            </li></ul>
+                            <li>4.	Continue to remain cool and calm. 
+                            </li><ul>
+                            </li>•	Be careful not to stare or fix your gaze too long on the robbers, but observe what they look like, what they are wearing, their size, and the type and colour of weapons. Listen carefully to what they say.
+                            <li></li>
+                            <li>•	Note the robbers’ exact height against the height strip as they exit.
+                            </li>
+                            <li>•	Immediately after the robbers have left, record appearance, mannerisms, and any distinguishing characteristics on the description sheet.
+                            </li><ul>
+                            <li>5.	Do not chase the robber. 
+                            </li><ul>
+                            <li>6.	Call the police. 
+                            </li><ul>
+                            <li>•	Keep police numbers near the phone — 911 or your local emergency number
+                            </li>
+                            <li>•	Tell the police:
+                            </li>
+                            <li>– The direction robbers took when they left
+                            </li>
+                            <li>– The time of the robbery
+                            </li>
+                            <li>– The appearance of the robbers, and any weapon or vehicle used
+                            </li>
+                            <li>•	Stay on the phone until the police tell you they have all the information they need.
+                            </li>
+                            <li>•	Protect the crime scene. Ask any witnesses to wait for the police. Get names and addresses. Don’t touch the evidence.
+                            </li><ul>
+                            <li>Managers Making deposits
+                            </li><ul>
+                            <li>1.	Avoid making night deposits.
+                            </li>
+                            <li>2.	Vary time of deposit.
+                            </li>
+                            <li>3.	Do not make deposits alone.
+                            </li>
+                            <li>4.	When making deposits with a co-worker or trusted friend, have him or her face the other way to keep an eye on everything while you make the deposit.
+                            </li></ul></ul>
+                            <li>Procedures for working alone in the workplace
+                            </li><ul>
+                            <li>1.	We have established a system to regularly contact any worker working alone to check on the worker’s health and safety and make sure help is readily available. 
+                            </li>
+                            <li>2.	We have a night call sheet for the night staff. Every other hour you call the store identified on the call sheet. The GSA at the other store will call you on alternating hours. If you cannot contact the employee at the other store then follow the instructions on the call sheet. That is, we need you to try and communicate with the manager of the other location first, then your manager. If you cannot contact the manager then you are to call the ARL Terry Futher. His phone number is on the night call sheet. Last but not least, call the police. But please ensure that you have exhausted all efforts to contact the store before calling the police. Thank you.
+                            </li></ul>
+
+                            <li>Safety in the workplace
+                            </li><ul>
+                            <li>If the site has a carwash
+                            </li><ul>
+                            <li>•	All staff are required to wear steel toe boots that cover the ankle when entering the wash area. 
+                            </li>
+                            <li>•	If the carwash has no track then a steel toe boot that goes above the ankle is required.
+                            </li>
+                            <li>•	If the carwash has a track then a high cut steel toe boot is required.
+                            </li>
+                            <li>•	The proper PPE must be worn in the wash. This includes a hard hat, safety goggles, safety vest and ear protection.
+                            </li></ul>
+                            <li>4.	Outside Work.
+                            </li><ul>
+                            <li>•	A staff member that goes outside must wear a safety vest.
+                            </li></ul>
+                            <li>5.	We strive to provide a safe work environment for our employees. Although we cannot prevent bad acts by bad people, we can try to create an environment to discourage such behaviour. We do this by executing the following regularly:
+                            </li><ul>
+                            <li>•	Call the appropriate service provider to change burned out lights. A well lit location can help to create a safe environment.
+                            </li>
+                            <li>•	Maintain low cash in the till at all times.
+                            </li>
+                            <li>•	Regular safe drops.
+                            </li>
+                            <li>•	Time lock safes.
+                            </li>
+                            <li>•	Maintain a clean and organized store.
+                            </li>
+                            <li>•	Security cameras with digital pvr technology.
+                            </li>
+                            <li>•	Greet each guest as they enter the store.
+                            </li>
+                            <li>•	Stock the store such that we can see all areas of the store at all time.
+                            </li>
+                            <li>•	Make every effort to not change large bills.
+                            </li>
+                            <li>•	Keep back doors locked.
+                            </li>
+                            </li>•	Wear high visibility vest when working outside.
+                            </ul>
+                        </ul>
+                        <br/>
+            </div>        
+                            <p>Workplace Violence and Workplace Harassment
+                            </p><br/>
+                            <p>Ontario Workplace violence and workplace harassment are now recognized in the Occupational Health and Safety Act. (OHSA or the ACT). The amendments became law June 15, 2010.
+                            </p><br/>
+                            <p>Workplace harassment means engaging in a course of vexatious comment or conduct against a worker in a workplace that is known or ought reasonably to be known to be unwelcome.
+                            </p><br/>
+                            <p>Workplace violence means
+                            </p><br/>
+                            <ul>
+                            <li>•	The exercise of physical force by a person against a worker, in a workplace, that causes or could cause physical injury to the worker.
+                            </li>
+                            <li>•	An attempt to exercise physical force against a worker, in a workplace, that could cause physical injury to the worker.
+                            </li>
+                            <li>•	A statement or behaviour that it is reasonable for a worker to interpret as a threat to exercise physical force against the worker, in a workplace, that could cause physical injury to the worker.
+                            </li></ul>
+                            <br/>
+                            <p>1.	Violence and or Harassment of co-workers will not be tolerated in the workplace.
+                            </p><br/>
+                            <p>2.	We will investigate and deal with incidents or complaints within 72 hours of the date that a complaint has been filed. Within reason. Employees who feel that they have suffered violence or harassment in the workplace need to put the complaint in writing. It must be signed and dated then dropped into the safe.
+                            </p></br/>
+                            <p>3.	Complaints that are not put in writing and signed will not be addressed. Neither will gossip. Gossip is deemed to be the worst case of harassment as it has no origin, is generally not based on facts and creates damage in the workplace that is difficult to contain and control. Gossip will not be tolerated.
+                            </p>                        
+        
+    
+
+                            <br/>
+                            <div class = "sigcontainer">
+
+                            
+                                    <div class = "sig">
+                                    <p>Acknowledgement by the Employee:                            
+                                    </p><br/>
+                                    <p>“I have read these procedures and have received instruction and training on how to prevent violence and minimize the risk of working alone at this worksite. I understand these procedures and will follow them”.
+                                    </p>
+                                    <div class = "sigmarker"> X </div>
+                                    GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                                    </div>
+                                         
+                             
+                                    <div class = "sig">	
+                                    <p>Acknowledgement by the Manager:
+                                    </p><br/>
+                                    <p>“I have instructed and trained the above worker on these procedures on how to prevent violence and minimize the risk of working alone at this worksite. I understand and I will ensure the worker follows these procedures”.
+                                    </p>
+                                    <div class = "sigmarker"> X </div>
+                                    {{gsa.manager}}
+                                    </div>
+                                    <br/><br/>
+                                    <div class = "sig">	
+                                    <div class = "sigmarker"> X </div>
+                                    Associate Signature 
+                                    </div>
+                            </div>
+                                <div class = "sigdate">
+                                {{gsa.Startdate}}
+                                </div>   
+
+                                        <footer class = "hrfooter"> 
+                                    
+                                            By signing this document, you are stating that you have read and understand all of the above. You know what your responsibilities are and acknowledge that you have been trained in accordance with all the information in this document.
+                                        </footer>
+    </div>                             
+                        <div style="break-after:page"></div>
+
+<!-- Hours of Availability and Vacation Pay Document-->        
+        
+    <div class = "requiredgrid">    
+            
+            <div class = "hrheader">
+                <p>VACATION PAY</p>
+                
+            </div><br/>
+            <p> I, {{gsa.firstname}} {{gsa.lastname}} agree that my employer (1553690 Ontario Inc) issues my vacation pay each pay period.
+            </p>
+            <br/>
+        
+                    <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+                    
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            Associate Signature 
+                            </div>
+                    </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>   
+                        <br/>
+        
+
+            <div class = "hrheader">
+                <p>HOURS OF WORK</p>
+                <br/>
+            </div>
+           	<p> I, {{gsa.firstname}} {{gsa.lastname}} agree that my employer (1553690 Ontario Inc. may require me to work up to a maximum of 12/60 (hours never to exceed 13/60) per day/week as required. I am aware of the 8 hour daily/48hour weekly maximum. I have received a copy of the most recent information sheet on hours of work and overtime pay. I am aware that this agreement can be rescinded with 2 weeks written notice.
+            </p>
+            
+            <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+                    
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            Associate Signature 
+                            </div>
+            </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>   
+                <footer class = "hrfooter"> 
+                                    
+                *** Note: This has no bearing on overtime paid. You are entitled to overtime pay at 1.5 time if you work any hours over 44 per week. 
+                 </footer>
+              
+               
+                <div class = "hrheader">
+                <p>HOURS OF AVAILABILTY</p>
+                
+                </div>
+           		<br/>			
+
+
+                    <div class ="vacationpay">
+                       
+                            <div class = "mon">MONDAY</div>	
+                            <div class = "tue">TUESDAY</div>	
+                            <div class = "wed">WEDNESDAY</div>
+                            <div class = "thur">THURSDAY</div>
+                            <div class = "fri">FRIDAY	</div>
+                            <div class = "sat">SATURDAY</div>	
+                            <div class = "sun">SUNDAY</div>
+                      
+                            
+                            <div class = "hrs1"></div>
+                            <div class = "hrs2"></div>
+                            <div class = "hrs3"></div>
+                            <div class = "hrs4"></div>
+                            <div class = "hrs5"></div>
+                            <div class = "hrs6"></div>
+                            <div class = "hrs7"></div>
+                    </div>
+                   
+            <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+                    
+            
+            </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>   
+            
+
+    </div>
+
+                    <div style="break-after:page"></div>
+
+    <div class = "requiredgrid">
+     
+<!-- Food Incident Document-->    
+             
+                    <div class = "hrheader">
+                        <p>Food Incident Employee Guidelines - Acknowledgement</p>
+                    
+                    </div>
+                        <div class = "hrheaderdata">
+                        
+                            <p>Effective Date: April 23, 2013</p>
+                            <p>Last Reviewed by Owner: April 23, 2013</p>
+                        </div><br/>
+
+                        <p>Purpose: The Food Incident Acknowledgement is to be signed by all employees after the food incident guidelines and reports are read and understood.
+                        </p><br/>
+                        <p>As you have been instructed, please adhere to the following procedures:
+                        <p><br/>
+
+                        <div class = "security">
+                            <ul class = "a">
+
+                    
+                            <li> The product in question is to be removed and not served until further notice.
+                            </li>
+                            <li> All scheduled monitoring including sanitation procedures, product inspections, temperature guidelines and food rotations will continue to be strictly followed.
+                            </li>
+                            <li> With all customers, do not discuss or relate specifics of the product(s) involved including any conjecture or rumour you may have heard.
+                            </li>
+                            <li> Do not discuss any aspects of the investigation with anyone.
+                            </li>
+                            <li> Do not discuss or engage a customer in speculation stemming from media reports of the incident.
+                            </li>
+                            <li> It is extremely important not to divulge the identity of the affected customer, their family, their previous or current health condition or their location in the community due to the Privacy Act.
+                            </li>
+                            <li> Do not discuss the identity or information about any current or former employee of Petro Canada
+                            </li>
+                            <li> Do not discuss or give interviews to newspaper, radio or television stations.
+                            </li>
+                            <li> Any requests for media interviews should be directed to the Associate who will re-direct them to the Field Representative.
+                            </li>
+                            <li> Cooperate fully with credentialed government health inspectors and investigators and ask that the Associate be included in any interview.
+                            </li>
+                            <li> Any information or knowledge that would be helpful to finding the cause of the incident should be reported immediately to the store manager.
+                            </li>
+                        </div>
+                  
+
+
+                    <p>I {{gsa.firstname}} {{gsa.lastname}} have read the training materials on the Food Incident Report and I understand all of the actions that I must take in order to comply with the Food Incident Guidelines.
+                    </p>
+                    <br/>
+                      <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+                    
+                            <div class = "sig">	
+                            <div class = "sigmarker"> X </div>
+                            Associate Signature 
+                            </div>
+            </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>  
+                    
+                   
+    </div>            
+
+                <div style="break-after:page"></div>
+
+<!-- Training Requirements-->        
+        
+    <div class = "requiredgrid">    
+            
+                    <div class = "hrheader">
+                    <p>TRAINING REQUIREMENTS</p>
+                    <br/>
+                    </div>
+
+                    <p>Below you will find the links to the mandatory online training courses that need to be completed. You will need to print or email copies of each certificate to your manager and to steph.pchr@gmail.com immediately upon completion.
+                    </p><br/>
+                    <p>Petro Canada online web based training is ready for you to complete. Your user name and password are:
+                    </p><br/>
+
+                    <p>Go to www.petrocanadarso.com 
+                    </p><br/>
+
+                    <p>User Id: {{gsa.trainingid}} 
+                    </p>
+                    <p>Password: {{gsa.trainingpassword}}
+                    </p><br/>
+
+                    <p>Health and Safety Awareness training:
+                    </p>
+                    <p>https://www.labour.gov.on.ca/english/hs/elearn/worker/index.php
+                    </p><br/>
+                    <p>AODA Customer service training;
+                    </p><br/>
+                    <p>https://accessforward.ca/newado/csstandardmodule
+                    </p><br/>
+                    <p>*Violence In the workplace:
+                    </p><br/>
+                    <p>http://vubiz.com/Gold/vuSCORM/SCOContainer.aspx?cCustId=s
+                    </p><br/>
+                    <p>Smoke Free Ontario Act:
+                    </p><br/>
+                    <p>http://www.sfoa-training.com
+                    </p><br/>
+
+    
+
+                <p>I understand that all training must be required within 5 business days
+                </p><br/>
+                
+                <div class = "sigcontainer">
+
+                            <div class = "sig">
+                            <div class = "sigmarker"> X </div>
+                            GSA: {{gsa.firstname}}{{gsa.lastname}}    
+                            </div>
+                    
+                            
+                </div>
+                        <div class = "sigdate">
+                        {{gsa.Startdate}}
+                        </div>  
+                    
+            <div style="break-after:page"></div>
+    </div>
+
+<!-- Tax Documents-->
+
+   
+        <iframe src="static/TAXFORMS/td1on20e.pdf" width='100%' height='1000px'>
+        </iframe>
+        <br/>
+        <iframe src="static/TAXFORMS/td1fill0120e.pdf" width='100%' height='1000px'>
+        </iframe>
+
+
+
+
+{% endblock content %}
