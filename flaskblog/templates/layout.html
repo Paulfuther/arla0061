@@ -48,30 +48,21 @@
                   <a href="{{ url_for('home')}}"><img src="static/images/PaulFuther.jpg" class= "logo"> </a>
                   <ul class = "main-menu">
                       <li> <a href="{{ url_for('home')}}">Home</a></li>
-                      <li> <a href="{{ url_for('blog')}}">Blog</a></li>
+                      {% if current_user.is_authenticated %}
+                       <li> <a href="{{ url_for('logout')}}">Logout</a></li>
+                      {% else %}
+                      <li> <a href="{{ url_for('login')}}">Login</a></li>
+                     
+                      {% endif %} 
+                     
                       <li> <a href="{{ url_for('Applications')}}">Apps</a></li>
-                      <li> <a href="{{ url_for('dashboard')}}">Charts</a></li>
+                      <li> <a href="{{ url_for('home')}}">Charts</a></li>
                       <li> <a href="{{ url_for('hrhome')}}">HR</a></li>
                       
                   </ul>
 
                   <!-- Navbar Right Side -->
 
-                  <ul class = "right-menu"  >
-                    
-                      
-                      {% if current_user.is_authenticated %}
-                      <li> <a href="{{ url_for('new_post')}}">Post</a></li>
-                      <li> <a href="{{ url_for('account')}}">Account</a></li>
-                      <li> <a href="{{ url_for('logout')}}">Logout</a></li>
-                      {% else %}
-                      <li> <a href="{{ url_for('login')}}">Login</a></li>
-                      <li> <a href="{{ url_for('register')}}">Register</a></li>
-                      {% endif %} 
-                      <li> <a href="https://www.instagram.com/paul.futher/"><i class = "fab fa-instagram"></i></a></li>
-                      <li> <a href="https://www.facebook.com/paul.futher.7"><i class = "fab fa-facebook"></i></a></li>  
-                      <li> <a href="https://github.com/Paulfuther"><i class = "fab fa-github"></i></a></li>
-                  </ul>
               </nav>
     </div>  
 

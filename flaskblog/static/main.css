@@ -561,8 +561,8 @@ ul.a {
 
 }
 .formerror {
-  height: 10px;
-  font-size: 8px;
+  height: 12px;
+  font-size: 10px;
   text-align: center;
   color: red;
   padding-bottom: 5px;

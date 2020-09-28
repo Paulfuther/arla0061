@@ -1,8 +1,8 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort
 from flaskblog import app, db, Bcrypt
-from flaskblog.forms import EmployeeForm, LoginForm, PostForm, RegistrationForm, UpdateAccountForm, EmployeeUpdateForm, whmisForm, ppeForm, fireextinguishersForm, emergencyproceduresForm, firstaidForm, foodhandlingForm, propaneForm, healthandsafetyForm, fuelpumpshutoffForm, workingaloneForm, workplaceviolenceForm, jointhealthandsafetyForm, giantform
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, whmisForm, ppeForm, fireextinguishersForm, emergencyproceduresForm, firstaidForm, foodhandlingForm, propaneForm, healthandsafetyForm, fuelpumpshutoffForm, workingaloneForm, workplaceviolenceForm, jointhealthandsafetyForm, giantform
 
-from flaskblog.models import User, Post, Employee, whmis, ppe, fireextinguishers, emergencyresponseprocedures,firstaid, foodhandling,propane,healthandsafety,fuelpumpshutoff,workingalone,workplaceviolence,jointhealthandsafety
+from flaskblog.models import  User, Employee, whmis, ppe, fireextinguishers, emergencyresponseprocedures,firstaid, foodhandling,propane,healthandsafety,fuelpumpshutoff,workingalone,workplaceviolence,jointhealthandsafety
 from io import BytesIO
 import os
 from werkzeug.utils import secure_filename
@@ -34,20 +34,48 @@ engine = create_engine('mysql://root:root@localhost/work')
 def home():
     return render_template('home.html')
 
+@app.route("/login", methods = ['GET','POST'])
+def login():
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        user=User.query.filter_by(username=form.username.data).first()
+        if user:
+            if user.password == form.password.data:
+                login_user(user,remember=form.remember.data)
+                return redirect(url_for('hrhome'))
+        return '<h1> Invalid Credentials </h1>'
+        
+        
+        #return render_template('home.html')
+    
+    return render_template('login.html', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+    
+
 @app.route("/hrhome")
+@login_required
 def hrhome(): 
     return render_template('hrhome.html')
 
 @app.route("/hrfile<int:staff_id>")
+@login_required
 def hrfile(staff_id):
     gsa = Employee.query.get(staff_id)
     return render_template('hrfile.html', gsa=gsa)
 
 @app.route("/hrlist", methods =['GET', 'POST'])
+@login_required
 def hrlist():
     return render_template('hrlist.html')
 
 @app.route("/search", methods=['GET', 'POST'])
+@login_required
 def search():
     form=request.form  
     search_value=form['search_string']
@@ -99,6 +127,7 @@ def save_hrpicture(form_hrpicture):
     return hrpicture_fn
 
 @app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
+@login_required
 def updategsa(staff_id):
     
     # Here we are getting the row of data based on the index, which is staff_id and 
@@ -219,6 +248,7 @@ def updategsa(staff_id):
     return render_template('employeeupdate.html', image_file=image_file, form=form,gsa=gsa)
     
 @app.route("/hr", methods=['GET', 'POST'])
+@login_required
 def hr():
     
     form = giantform()    
@@ -379,22 +409,27 @@ def hr():
     return render_template('employee.html', title='Employee Information', form=form)
 
 @app.route("/applications")
+@login_required
 def Applications():
     return render_template('applications.html', title='Applications')
 
 @app.route("/kpiconvert")
+@login_required
 def Kpiconvert():
     return render_template('kpiconvert.html', title='KPI Converter')
 
 @app.route("/carwashkpiconvert")
+@login_required
 def CarwashKPIconvert():
     return render_template('carwashkpiconvert.html', title='Carwash KPI Converter')
 
 @app.route("/tpfileconvert")
+@login_required
 def TPFileconvert():
     return render_template('teamperformanceconvert.html', title='Team Performance File Converter')
 
 @app.route("/tpfileupload", methods=['POST'])
+@login_required
 def tpfileupload():
 
     if request.method == "POST":
@@ -455,10 +490,12 @@ def tpfileupload():
     return send_file(output, attachment_filename="sfoutput.xlsx", as_attachment=True)
 
 @app.route("/securityfileconvert")
+@login_required
 def SecurityFileconvert():
     return render_template('securityfileconvert.html', title='Security File Converter')
 
 @app.route("/securityfileupload", methods=['POST'])
+@login_required
 def securityfileupload():
 
     if request.method == "POST":
@@ -507,10 +544,12 @@ def securityfileupload():
     return send_file(output, attachment_filename="sfoutput.xlsx", as_attachment=True)
 
 @app.route("/securityfilenegconvert")
+@login_required
 def SecurityFilenegconvert():
     return render_template('securityfilenegconvert.html', title='Security File Negative Sales Converter')
 
 @app.route("/securityfilenegupload", methods=['POST'])
+@login_required
 def securityfilenegupload():
 
     if request.method == "POST":
@@ -557,6 +596,7 @@ def securityfilenegupload():
     return send_file(output, attachment_filename="sfoutput.xlsx", as_attachment=True)
 
 @app.route("/carwashkpiupload", methods=['POST'])
+@login_required
 def carwashkpiupload():
 
     if request.method == "POST":
@@ -673,6 +713,7 @@ def carwashkpiupload():
     return render_template("applications.html")
 
 @app.route("/upload", methods=['POST'])
+@login_required
 def upload():
 
     if request.method == "POST":
@@ -767,6 +808,7 @@ def upload():
 #This route used sql alchemy to access the grwothkpi tables in the MySql database
 
 @app.route("/cstoresales")
+@login_required
 def data():
     
     metadata = MetaData(engine)
@@ -794,6 +836,7 @@ def data():
     return jsonify(newdata)
 
 @app.route("/cstoremargin")
+@login_required
 def thirddata():
 
     metadata = MetaData(engine)
@@ -825,6 +868,7 @@ def thirddata():
 
 
 @app.route("/data")
+@login_required
 def seconddata():
     
     metadata = MetaData(engine)
@@ -848,6 +892,7 @@ def seconddata():
     return jsonify(newdata2)
 
 @app.route("/carwashmargin")
+@login_required
 def carwashmargin():
 
     metadata = MetaData(engine)
@@ -872,10 +917,12 @@ def carwashmargin():
     return jsonify(newdata4)
 
 @app.route("/charts")
+@login_required
 def charts():
     return render_template('charts.html')
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
     return render_template('dashboard.html')
 

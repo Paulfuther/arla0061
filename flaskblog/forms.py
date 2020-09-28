@@ -3,11 +3,15 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField
 from wtforms.fields.html5 import DateField, TelField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
-from flaskblog.models import User, Employee
+from flaskblog.models import  Employee
 from flask_login import current_user
 import wtforms
 
-
+class LoginForm(FlaskForm):
+    username = StringField('username', validators = [InputRequired(), Length(min=4, max=20)])
+    password = PasswordField('password', validators = [InputRequired(), Length(min=8, max=80)])
+    remember = BooleanField('remember me')
+    submit = SubmitField('Login')
 
     
 class TelephoneForm(FlaskForm):

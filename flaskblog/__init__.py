@@ -25,12 +25,13 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from flaskblog import config
-from flaskblog import MySQL
+#from flaskblog import MySQL
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from sqlalchemy.sql import text, select
 from sqlalchemy import *
 from flask_moment import Moment
+
 
 
 
@@ -72,3 +73,6 @@ Bootstrap(app)
 moment = Moment(app)
 
 from flaskblog import routes
+from flaskblog.errors.handlers import errors
+
+app.register_blueprint(errors)
