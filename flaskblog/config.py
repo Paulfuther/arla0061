@@ -1,6 +1,13 @@
+import os
 
-class Config(object):
-    DEBUG = False
+
+
+
+class Config:
+    
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLAlCHEMY_DATABASE_URI')
+    
 
 class ProductionConfig(Config):
     MYSQL_PASSWORD = 'root'

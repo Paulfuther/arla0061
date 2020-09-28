@@ -258,7 +258,7 @@ def hr():
         if form.about_you.hrpicture.data:
            picture_file = save_hrpicture(form.about_you.picture.data) 
             
-            #current_user.image_file = picture_file      
+        hashed_password = bcrypt.generate_password_hash(form.about_you.email.data).decode('utf-8')     
                 
                 
         emp = Employee(firstname=form.about_you.firstname.data,
@@ -270,7 +270,7 @@ def hr():
                        city=form.about_you.city.data,
                        province=form.about_you.province.data,
                        country=form.about_you.country.data,
-                       email=form.about_you.email.data,
+                       email=hashed_password,
                        mobilephone=form.about_you.mobilephone.data,
                        SIN=form.about_you.SIN.data,
                        Startdate=form.about_you.Startdate.data,

@@ -24,7 +24,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
-from flaskblog import config
+from flaskblog.config import Config
 #from flaskblog import MySQL
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
@@ -43,10 +43,10 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'Files')
 
 
 app = Flask(__name__)
+app.config.from_object(Config)
 
 
-app.config['SECRET_KEY'] = '302176f4723b5282ef5fbdfd77eccc50'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+
 #app.config.from_object("config.ProductionConfig")
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -63,10 +63,6 @@ login_manager.login_message_category = 'info'
 #print(engine.table_names())
 
      
-  
-  
-        
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 mysql = MySQL(app)
 Bootstrap(app)
