@@ -8,9 +8,9 @@
 
 
         <div  class="formtitle" >{{"Login:"}}</div>
-        <div> {{form.username(class = "form", placeholder="user name")}}  
-                     {% if form.username.errors %}
-                        {% for error in form.username.errors %}
+        <div> {{form.firstname(class = "form", placeholder="user name")}}  
+                     {% if form.firstname.errors %}
+                        {% for error in form.firstname.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}       
                     {% endif %}

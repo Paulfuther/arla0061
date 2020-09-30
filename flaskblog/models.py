@@ -1,16 +1,45 @@
 from flaskblog import db, login_manager
 from flaskblog import datetime
-from flask_login import UserMixin
+from flask_login import UserMixin, LoginManager, current_user
+
+
+
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(15), unique=True)
+    firstname = db.Column(db.String(15), unique=True)
+    lastname = db.Column(db.String(15), unique=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(80))
+    roles = db.relationship('Role',  secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+    
+    def __repr__(self):
+        return 'User %r' % (self.firstname)
+    
+class Role(db.Model):
+    id = db.Column(db.Integer(), primary_key = True)
+    name = db.Column(db.String(50), unique=True)
+    
+    def __repr__(self):
+        return 'Role %r' % (self.name)
+
+#class UserRoles(db.Model):
+ #   id=db.Column(db.Integer(), primary_key = True)
+ #   user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
+ #   role_id = db.Column(db.Integer(), db.ForeignKey('role.id'))
+
 
 
 class Employee(db.Model):

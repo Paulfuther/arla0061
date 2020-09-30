@@ -1,4 +1,4 @@
 -- SQLite
-select firstname, lastname, whmis.compliant
-from employee
-inner join whmis  on employee_id = Employee.id
+select firstname, lastname, role.name
+from user
+inner join role  on role.id = user.id

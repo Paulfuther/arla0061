@@ -8,7 +8,7 @@ from flask_login import current_user
 import wtforms
 
 class LoginForm(FlaskForm):
-    username = StringField('username', validators = [InputRequired(), Length(min=4, max=20)])
+    firstname = StringField('firstname', validators = [InputRequired(), Length(min=4, max=20)])
     password = PasswordField('password', validators = [InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('remember me')
     submit = SubmitField('Login')
@@ -57,8 +57,8 @@ class EmployeeForm(FlaskForm):
                           'Manager Name', 'Manager Name'), ('Terry', "Terry"),
         ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
         ('Paul', 'Paul')])
-    hrpicture = FileField(validators=[
-        FileAllowed(['jpg', 'png'])])
+    hrpicture = FileField(validators=[FileAllowed(['jpg', 'png'])])
+    
     active = SelectField('Active', choices=[
                          ('Active', 'Active'), ('Y', 'Y'), ('N', 'N')])
     iprismcode = StringField('Iprism Code', validators=[

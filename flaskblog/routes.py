@@ -2,7 +2,7 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, whmisForm, ppeForm, fireextinguishersForm, emergencyproceduresForm, firstaidForm, foodhandlingForm, propaneForm, healthandsafetyForm, fuelpumpshutoffForm, workingaloneForm, workplaceviolenceForm, jointhealthandsafetyForm, giantform
 
-from flaskblog.models import  User, Employee, whmis, ppe, fireextinguishers, emergencyresponseprocedures,firstaid, foodhandling,propane,healthandsafety,fuelpumpshutoff,workingalone,workplaceviolence,jointhealthandsafety
+from flaskblog.models import  User, Role, Employee, whmis, ppe, fireextinguishers, emergencyresponseprocedures,firstaid, foodhandling,propane,healthandsafety,fuelpumpshutoff,workingalone,workplaceviolence,jointhealthandsafety
 from io import BytesIO
 import os
 from werkzeug.utils import secure_filename
@@ -34,12 +34,14 @@ engine = create_engine('mysql://root:root@localhost/work')
 def home():
     return render_template('home.html')
 
+
+
 @app.route("/login", methods = ['GET','POST'])
 def login():
     form = LoginForm()
     
     if form.validate_on_submit():
-        user=User.query.filter_by(username=form.username.data).first()
+        user=User.query.filter_by(firstname=form.firstname.data).first()
         if user:
             if user.password == form.password.data:
                 login_user(user,remember=form.remember.data)
@@ -57,6 +59,7 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
     
+
 
 @app.route("/hrhome")
 @login_required
@@ -256,7 +259,7 @@ def hr():
     
     if form.validate_on_submit():
         if form.about_you.hrpicture.data:
-           picture_file = save_hrpicture(form.about_you.picture.data) 
+           picture_file = save_hrpicture(form.about_you.hrpicture.data) 
             
         hashed_password = bcrypt.generate_password_hash(form.about_you.email.data).decode('utf-8')     
                 

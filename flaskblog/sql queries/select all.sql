@@ -1,2 +1,2 @@
 -- SQLite
-select * from employee
+select * from role
