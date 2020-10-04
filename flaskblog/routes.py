@@ -1,8 +1,8 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort
 from flaskblog import app, db, Bcrypt
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, whmisForm, ppeForm, fireextinguishersForm, emergencyproceduresForm, firstaidForm, foodhandlingForm, propaneForm, healthandsafetyForm, fuelpumpshutoffForm, workingaloneForm, workplaceviolenceForm, jointhealthandsafetyForm, giantform
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
 
-from flaskblog.models import  User, Role, Employee, whmis, ppe, fireextinguishers, emergencyresponseprocedures,firstaid, foodhandling,propane,healthandsafety,fuelpumpshutoff,workingalone,workplaceviolence,jointhealthandsafety
+from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
 from werkzeug.utils import secure_filename
@@ -26,40 +26,22 @@ from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 
 
-chartstore = 48314
-engine = create_engine('mysql://root:root@localhost/work')
 
 @app.route("/")
 @app.route("/home")
+@login_required
 def home():
-    return render_template('home.html')
-
-
-
-@app.route("/login", methods = ['GET','POST'])
-def login():
-    form = LoginForm()
+    #return url_for('admin.index')
     
-    if form.validate_on_submit():
-        user=User.query.filter_by(firstname=form.firstname.data).first()
-        if user:
-            if user.password == form.password.data:
-                login_user(user,remember=form.remember.data)
-                return redirect(url_for('hrhome'))
-        return '<h1> Invalid Credentials </h1>'
-        
-        
-        #return render_template('home.html')
-    
-    return render_template('login.html', form=form)
+    return render_template('layout.html')
+    #return render_template('home.html')
+
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('home'))
-    
-
 
 @app.route("/hrhome")
 @login_required
@@ -143,7 +125,11 @@ def updategsa(staff_id):
     
     
     gsa = Employee.query.get(staff_id)
+    
     form = EmployeeUpdateForm(obj=gsa)
+    
+    #return render_template('employee.html', form=form, gsa=gsa)
+    
     image_file = url_for(
         'static', filename='empfiles/mobile/' + gsa.image_file)
     
@@ -163,7 +149,7 @@ def updategsa(staff_id):
     postal = form.postal.data
     trainingid = form.trainingid.data
     trainingpassword = form.trainingpassword.data
-    #iprismcodecheck = (form.updateabout_you.iprismcode.data)
+    iprismcodecheck = form.iprismcode.data
     
     #add a pciture
     #print(form.hrpicture.data)
@@ -174,7 +160,7 @@ def updategsa(staff_id):
     postalcheck = Employee.query.filter_by(postal=postal).first()
     trainingidcheck = Employee.query.filter_by(trainingid=trainingid).first()
     trainingpasswordcheck = Employee.query.filter_by(trainingpassword=trainingpassword).first()
-    #iprismcheck = Employee.query.filter_by(iprismcode=iprismcodecheck).first()
+    iprismcheck = Employee.query.filter_by(iprismcode=iprismcodecheck).first()
     
     if gsaphone == phone:
         print("same mobile")
@@ -183,12 +169,12 @@ def updategsa(staff_id):
             flash("mobile already used")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
         
-    #if gsaiprism == iprismcodecheck:
-     #       print("same iprism")
-    #else:
-      #  if iprismcheck:
-       #     flash("iprism code already used")
-        #    return render_template('employeeupdate.html', form=form, gsa=gsa)   
+    if gsaiprism == iprismcodecheck:
+            print("same iprism")
+    else:
+        if iprismcheck:
+            flash("iprism code already used")
+            return render_template('employeeupdate.html', form=form, gsa=gsa)   
     
 
     if gsasin == sin:
@@ -230,16 +216,25 @@ def updategsa(staff_id):
     if form.validate_on_submit():
         if form.submit.data:
             form.populate_obj(gsa)
+            
+            # An updated SIN and or Email Address needs to be hashed before adding to database
+            
+            hashed_password = bcrypt.generate_password_hash(
+                form.email.data).decode('utf-8')
+            
+            hashed_SIN = bcrypt.generate_password_hash(
+            form.SIN.data).decode('utf-8')
+           
             if form.hrpicture.data:
                 picture_file = save_hrpicture(form.hrpicture.data)
                 gsa.image_file = picture_file
         
-            
-            
-            
-        db.session.commit()
+        #add hashed data to database
         
-    
+        #gsa.SIN = hashed_SIN
+        #gsa.email = hashed_password
+           
+        db.session.commit()
         
         flash("info updated")
         return render_template('hrhome.html')
@@ -254,155 +249,97 @@ def updategsa(staff_id):
 @login_required
 def hr():
     
-    form = giantform()    
+    form = EmployeeForm()    
     
     
     if form.validate_on_submit():
-        if form.about_you.hrpicture.data:
-           picture_file = save_hrpicture(form.about_you.hrpicture.data) 
+        if form.hrpicture.data:
+           picture_file = save_hrpicture(form.hrpicture.data) 
             
-        hashed_password = bcrypt.generate_password_hash(form.about_you.email.data).decode('utf-8')     
+        hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')     
+        hashed_SIN = bcrypt.generate_password_hash(form.SIN.data).decode('utf-8')
                 
-                
-        emp = Employee(firstname=form.about_you.firstname.data,
-                       nickname=form.about_you.nickname.data,
-                       store=form.about_you.store.data,
-                       addressone=form.about_you.addressone.data,
-                       addresstwo=form.about_you.addresstwo.data,
-                       apt=form.about_you.apt.data,
-                       city=form.about_you.city.data,
-                       province=form.about_you.province.data,
-                       country=form.about_you.country.data,
-                       email=hashed_password,
-                       mobilephone=form.about_you.mobilephone.data,
-                       SIN=form.about_you.SIN.data,
-                       Startdate=form.about_you.Startdate.data,
-                       Enddate=form.about_you.Enddate.data,
-                       lastname=form.about_you.lastname.data,
-                       postal=form.about_you.postal.data,
-                       trainingid=form.about_you.trainingid.data,
-                       trainingpassword=form.about_you.trainingpassword.data,
-                       manager=form.about_you.manager.data,
-                       active=form.about_you.active.data,
-                       iprismcode=form.about_you.iprismcode.data)
-                                        
-                                        
+        emp = Employee(firstname=form.firstname.data,
+                       nickname=form.nickname.data,
+                       store=form.store.data,
+                       addressone=form.addressone.data,
+                       addresstwo=form.addresstwo.data,
+                       apt=form.apt.data,
+                       city=form.city.data,
+                       province=form.province.data,
+                       country=form.country.data,
+                       email=form.email.data,
+                       mobilephone=form.mobilephone.data,
+                       SIN=form.SIN.data,
+                       Startdate=form.Startdate.data,
+                       Enddate=form.Enddate.data,
+                       lastname=form.lastname.data,
+                       postal=form.postal.data,
+                       trainingid=form.trainingid.data,
+                       trainingpassword=form.trainingpassword.data,
+                       manager=form.manager.data,
+                       image_file=picture_file,
+                       active=form.active.data,
+                       iprismcode=form.iprismcode.data,
+                       tobstartdate=form.tobstartdate.data,
+                       tobcompleted=form.tobcompleteddate.data,
+                       tobexpireydate=form.tobexpirationdate.data,
+                       tobcompliant=form.tobcompliant.data,
+                       whmisstartdate=form.whmisstartdate.data,
+                       whmiscompleted=form.whmiscompleteddate.data,
+                       whmisexpireydate=form.whmisexpirationdate.data,
+                       whmiscompliant=form.whmiscompliant.data,
+                       ppestartdate=form.ppestartdate.data,
+                       ppecompleted=form.ppecompleteddate.data,
+                       ppeexpireydate=form.ppeexpirationdate.data,
+                       ppecompliant=form.ppecompliant.data,
+                       firestartdate=form.firestartdate.data,
+                       firecompleted=form.firecompleteddate.data,
+                       fireexpireydate=form.fireexpirationdate.data,
+                       firecompliant=form.firecompliant.data,
+                       emerstartdate=form.emerstartdate.data,
+                       emercompleted=form.emercompleteddate.data,
+                       emerexpireydate=form.emerexpirationdate.data,
+                       emercompliant=form.emercompliant.data,
+                       firstaidstartdate=form.firstaidstartdate.data,
+                       firstaidcompleted=form.firstaidcompleteddate.data,
+                       firstaidexpireydate=form.firstaidexpirationdate.data,
+                       firstaidcompliant=form.firstaidcompliant.data,
+                       foodstartdate=form.foodstartdate.data,
+                       foodcompleted=form.foodcompleteddate.data,
+                       foodexpireydate=form.foodexpirationdate.data,
+                       foodcompliant=form.foodcompliant.data,
+                       propanestartdate=form.propanestartdate.data,
+                       propanecompleted=form.propanecompleteddate.data,
+                       propaneexpireydate=form.propaneexpirationdate.data,
+                       propanecompliant=form.propanecompliant.data,
+                       hsstartdate=form.hsstartdate.data,
+                       hscompleted=form.hscompleteddate.data,
+                       hsexpireydate=form.hsexpirationdate.data,
+                       hscompliant=form.hscompliant.data,
+                       fuelstartdate=form.fuelstartdate.data,
+                       fuelcompleted=form.fuelcompleteddate.data,
+                       fuelexpireydate=form.fuelexpirationdate.data,
+                       fuelcompliant=form.fuelcompliant.data, 
+                       alonestartdate=form.alonestartdate.data,
+                       alonecompleted=form.alonecompleteddate.data,
+                       aloneexpireydate=form.aloneexpirationdate.data,
+                       alonecompliant=form.alonecompliant.data,
+                       violencestartdate=form.violencestartdate.data,
+                       violencecompleted=form.violencecompleteddate.data,
+                       violenceexpireydate=form.violenceexpirationdate.data,
+                       violencecompliant=form.violencecompliant.data,
+                       jointstartdate=form.jointstartdate.data,
+                       jointcompleted=form.jointcompleteddate.data,
+                       jointexpireydate=form.jointexpirationdate.data,
+                       jointcompliant=form.jointcompliant.data)
+                             
+                                     
         db.session.add(emp)
         db.session.commit()
         
         
-        trainingwhmis = whmis(startdate=form.training.startdate.data,
-                              completed=form.training.completeddate.data,
-                              datequalified=form.training.datequalified.data,
-                              expireydate=form.training.expirationdate.data,
-                              compliant=form.training.compliant.data,
-                        
-                              employee_id=emp.id)
-        db.session.add(trainingwhmis)
-        db.session.commit()
-        
-        
-        
-        trainingppe = ppe(startdate=form.training2.startdate.data,
-                              completed=form.training2.completeddate.data,
-                              datequalified=form.training2.datequalified.data,
-                              expireydate=form.training2.expirationdate.data,
-                              compliant=form.training2.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingppe)
-        db.session.commit()
-        
-        trainingfireextinguishers = fireextinguishers(startdate=form.training3.startdate.data,
-                              completed=form.training3.completeddate.data,
-                              datequalified=form.training3.datequalified.data,
-                              expireydate=form.training3.expirationdate.data,
-                              compliant=form.training3.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingfireextinguishers)
-        db.session.commit()
-        
-        trainingemergencyresponseprocedures = emergencyresponseprocedures(startdate=form.training4.startdate.data,
-                              completed=form.training4.completeddate.data,
-                              datequalified=form.training4.datequalified.data,
-                              expireydate=form.training4.expirationdate.data,
-                              compliant=form.training4.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingemergencyresponseprocedures)
-        db.session.commit()
-        
-        trainingfirstaid = firstaid(startdate=form.training5.startdate.data,
-                              completed=form.training5.completeddate.data,
-                              datequalified=form.training5.datequalified.data,
-                              expireydate=form.training5.expirationdate.data,
-                              compliant=form.training5.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingfirstaid)
-        db.session.commit()
-        
-        trainingfoodhandling = foodhandling(startdate=form.training6.startdate.data,
-                              completed=form.training6.completeddate.data,
-                              datequalified=form.training6.datequalified.data,
-                              expireydate=form.training6.expirationdate.data,
-                              compliant=form.training6.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingfoodhandling)
-        db.session.commit()
-        
-        trainingpropane = propane(startdate=form.training7.startdate.data,
-                              completed=form.training7.completeddate.data,
-                              datequalified=form.training7.datequalified.data,
-                              expireydate=form.training7.expirationdate.data,
-                              compliant=form.training7.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingpropane)
-        db.session.commit()
-        
-        traininghealthandsafety = healthandsafety(startdate=form.training8.startdate.data,
-                              completed=form.training8.completeddate.data,
-                              datequalified=form.training8.datequalified.data,
-                              expireydate=form.training8.expirationdate.data,
-                              compliant=form.training8.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(traininghealthandsafety)
-        db.session.commit()
-         
-        trainingfuelpumpshutoff = fuelpumpshutoff(startdate=form.training12.startdate.data,
-                              completed=form.training12.completeddate.data,
-                              datequalified=form.training12.datequalified.data,
-                              expireydate=form.training12.expirationdate.data,
-                              compliant=form.training12.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingfuelpumpshutoff)
-        db.session.commit()
-            
-        trainingworkingalone = workingalone(startdate=form.training9.startdate.data,
-                              completed=form.training9.completeddate.data,
-                              datequalified=form.training9.datequalified.data,
-                              expireydate=form.training9.expirationdate.data,
-                              compliant=form.training9.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingworkingalone)
-        db.session.commit()
-            
-        trainingworkplaceviolence = workplaceviolence(startdate=form.training10.startdate.data,
-                              completed=form.training10.completeddate.data,
-                              datequalified=form.training10.datequalified.data,
-                              expireydate=form.training10.expirationdate.data,
-                              compliant=form.training10.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingworkplaceviolence)
-        db.session.commit()
-        
-        trainingjointhealthandsafety = jointhealthandsafety(startdate=form.training11.startdate.data,
-                              completed=form.training11.completeddate.data,
-                              datequalified=form.training11.datequalified.data,
-                              expireydate=form.training11.expirationdate.data,
-                              compliant=form.training11.compliant.data,
-                              employee_id=emp.id)
-        db.session.add(trainingjointhealthandsafety)
-        db.session.commit()
-            
-            
+       
         flash('Employee has been added to the database', 'success')
                 
         return redirect(url_for('hrhome'))
@@ -436,54 +373,58 @@ def TPFileconvert():
 def tpfileupload():
 
     if request.method == "POST":
+        try:
+            files = request.files.getlist('tpfileinputFile[]')
 
-        files = request.files.getlist('tpfileinputFile[]')
+            newdf = []
 
-        newdf = []
+            for file in files:
+                input_filename = file
+                #print(x)
+                df_totalsheet = pd.read_excel(input_filename)
+                print(df_totalsheet.head)
+                tp_date = (df_totalsheet.iat[8, 0])
+                print(tp_date)
+                tp_store = (df_totalsheet.iat[6, 0])
+                a, b1, c, d = tp_date.split()
+                e, f, g = tp_store.split()
+                tp_storefinal = g[:5]
+                pd.to_datetime(b1)
+                print(b1)
+                b = datetime.strptime(b1, "%m/%d/%Y").strftime("%b-%Y")
+                pd.to_numeric(tp_storefinal)
+                df = pd.read_excel(input_filename, skiprows=14)
+                cols = list(df)
+                dropcols = [2, 3, 6, 7, 8, 13, 14]
+                df.drop(df.columns[dropcols], axis=1, inplace=True)
+                df = df.rename(columns={'Performance Measure': 'one'})
+                df.set_index('one', inplace=True)
+                df = df.T
+                df2 = df.index
+                df['Gsa'] = df.index
+                df['Store'] = tp_storefinal
+                df.reset_index(drop=True, inplace=True)
+                df.Gsa = df.Gsa.shift(1)
+                df['Store'] = tp_storefinal
+                df['date'] = b
+                df['date'] = pd.to_datetime(df['date'], format="%b-%Y")
+                df['date'] = df['date'].dt.date
+                df.dropna(subset=['Shift Count'], how='all', inplace=True)
+                print(df)
+                df = df[['date', 'Store', 'Gsa', 'Shift Count', 'Average Check',
+                        '2 Pack Ratio', 'Season Pass', 'Wash & Go', 'In-Store Premium Ratio',
+                        'Crind Ratio', 'Campaign Deals Total', 'Campaign Deals to In-Store Transaction Ratio',
+                        'Campaign Deals by Confectionery', 'Campaign Deals by Salty Snacks',
+                        'Campaign Deals by Alternative Beverages', 'Campaign Deals by Packaged Soft Drinks',
+                        'Hot Beverages', 'FSR Redemptions', '$1 Snack Redemptions']]
 
-        for file in files:
-            input_filename = file
-            #print(x)
-            df_totalsheet = pd.read_excel(input_filename)
-            print(df_totalsheet.head)
-            tp_date = (df_totalsheet.iat[8, 0])
-            print(tp_date)
-            tp_store = (df_totalsheet.iat[6, 0])
-            a, b1, c, d = tp_date.split()
-            e, f, g = tp_store.split()
-            tp_storefinal = g[:5]
-            pd.to_datetime(b1)
-            print(b1)
-            b = datetime.strptime(b1, "%m/%d/%Y").strftime("%b-%Y")
-            pd.to_numeric(tp_storefinal)
-            df = pd.read_excel(input_filename, skiprows=14)
-            cols = list(df)
-            dropcols = [2, 3, 6, 7, 8, 13, 14]
-            df.drop(df.columns[dropcols], axis=1, inplace=True)
-            df = df.rename(columns={'Performance Measure': 'one'})
-            df.set_index('one', inplace=True)
-            df = df.T
-            df2 = df.index
-            df['Gsa'] = df.index
-            df['Store'] = tp_storefinal
-            df.reset_index(drop=True, inplace=True)
-            df.Gsa = df.Gsa.shift(1)
-            df['Store'] = tp_storefinal
-            df['date'] = b
-            df['date'] = pd.to_datetime(df['date'], format="%b-%Y")
-            df['date'] = df['date'].dt.date
-            df.dropna(subset=['Shift Count'], how='all', inplace=True)
-            print(df)
-            df = df[['date', 'Store', 'Gsa', 'Shift Count', 'Average Check',
-                     '2 Pack Ratio', 'Season Pass', 'Wash & Go', 'In-Store Premium Ratio',
-                     'Crind Ratio', 'Campaign Deals Total', 'Campaign Deals to In-Store Transaction Ratio',
-                     'Campaign Deals by Confectionery', 'Campaign Deals by Salty Snacks',
-                     'Campaign Deals by Alternative Beverages', 'Campaign Deals by Packaged Soft Drinks',
-                     'Hot Beverages', 'FSR Redemptions', '$1 Snack Redemptions']]
+                newdf.append(df)
+            newdf = pd.concat(newdf)
 
-            newdf.append(df)
-        newdf = pd.concat(newdf)
-
+        except:
+            flash('Something went wrong')
+            return render_template('applications.html')
+            
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     newdf.to_excel(writer)
@@ -502,41 +443,46 @@ def SecurityFileconvert():
 def securityfileupload():
 
     if request.method == "POST":
+        try:
+            
+            start = datetime.strptime('05:15:00', '%H:%M:%S').time()
+            end = datetime.strptime('11:45:00', '%H:%M:%S').time()
 
-        start = datetime.strptime('05:15:00', '%H:%M:%S').time()
-        end = datetime.strptime('11:45:00', '%H:%M:%S').time()
+            files = request.files.getlist('securityfileinputFile[]')
+            newdf = []
 
-        files = request.files.getlist('securityfileinputFile[]')
-        newdf = []
+            for file in files:
+                inputfilename = file
+                excel_file = inputfilename
+                store_number = file
+                a = str(store_number)
+                b = re.search('\d+', a).group()
+                df = pd.read_csv(excel_file, sep='\t', header=None)
+                df.columns = ['Text']
 
-        for file in files:
-            inputfilename = file
-            excel_file = inputfilename
-            store_number = file
-            a = str(store_number)
-            b = re.search('\d+', a).group()
-            df = pd.read_csv(excel_file, sep='\t', header=None)
-            df.columns = ['Text']
+                #use regular expresssions re to find character sets in a string of data
+                #in a dataframe
 
-            #use regular expresssions re to find character sets in a string of data
-            #in a dataframe
-
-            df['Date'] = df['Text'].str.extract(
-                r"([\d]{1,2} [ADJFMNOS]\w* [\d]{2})").copy()
+                df['Date'] = df['Text'].str.extract(
+                    r"([\d]{1,2} [ADJFMNOS]\w* [\d]{2})").copy()
 
 
-            df2 = df[df['Text'].str.contains('Pump', na=False)].copy()
-            if df2.empty:
-                continue
-            df2['Store'] = b
-            newdf.append(df2)
+                df2 = df[df['Text'].str.contains('Pump', na=False)].copy()
+                if df2.empty:
+                    continue
+                df2['Store'] = b
+                newdf.append(df2)
 
-        newdf = pd.concat(newdf) 
-        newdf['Date'] = pd.to_datetime(newdf['Date'], dayfirst=True)
-        newdf['Time'] = newdf['Text'].str.extract(r"([\d]{1,2}\:[\d]{1,2}\:[\d]{1,2})")
-        newdf['Time'] = pd.to_datetime(newdf['Time'], format='%H:%M:%S').dt.time
-        newdf = newdf[newdf['Time'].between(start, end)]
-        newdf.set_index('Date', inplace=True) 
+            newdf = pd.concat(newdf) 
+            newdf['Date'] = pd.to_datetime(newdf['Date'], dayfirst=True)
+            newdf['Time'] = newdf['Text'].str.extract(r"([\d]{1,2}\:[\d]{1,2}\:[\d]{1,2})")
+            newdf['Time'] = pd.to_datetime(newdf['Time'], format='%H:%M:%S').dt.time
+            newdf = newdf[newdf['Time'].between(start, end)]
+            newdf.set_index('Date', inplace=True) 
+
+        except:
+            flash('Something went wrong')
+            return render_template('applications.html')
 
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -557,39 +503,42 @@ def securityfilenegupload():
 
     if request.method == "POST":
 
+        try:
+            files = request.files.getlist('securityfileneginputFile[]')
+            newdf = []
 
-        files = request.files.getlist('securityfileneginputFile[]')
-        newdf = []
+            for file in files:
+                inputfilename = file
+                excel_file = inputfilename
+                store_number = file
+                a = str(store_number)
+                b = re.search('\d+', a).group()
+                df = pd.read_csv(excel_file, sep='\t', header=None)
+                df.columns = ['Text']
+                df['Date'] = df['Text'].str.extract('(.. ... ..)', expand=False).copy()
 
-        for file in files:
-            inputfilename = file
-            excel_file = inputfilename
-            store_number = file
-            a = str(store_number)
-            b = re.search('\d+', a).group()
-            df = pd.read_csv(excel_file, sep='\t', header=None)
-            df.columns = ['Text']
-            df['Date'] = df['Text'].str.extract('(.. ... ..)', expand=False).copy()
+                df2 = df[df['Text'].str.contains('NEGATIVE', na=False)].copy()
 
-            df2 = df[df['Text'].str.contains('NEGATIVE', na=False)].copy()
+                if df2.empty:
+                    continue
 
-            if df2.empty:
-                continue
-
-            df2['Store'] = b
-            print(df2)
-            newdf.append(df2)
+                df2['Store'] = b
+                print(df2)
+                newdf.append(df2)
 
 
-        newdf = pd.concat(newdf)
+            newdf = pd.concat(newdf)
 
-        newdf['Date'] = pd.to_datetime(
-        newdf['Date'], dayfirst=True)  # .dt.strftime('%d %m %Y')
+            newdf['Date'] = pd.to_datetime(
+            newdf['Date'], dayfirst=True)  # .dt.strftime('%d %m %Y')
 
-        newdf['Time'] = newdf['Text'].str.extract(r"([\d]{1,2}\:[\d]{1,2}\:[\d]{1,2})")
-        newdf['Time'] = pd.to_datetime(newdf['Time'], format='%H:%M:%S').dt.time
-        newdf.set_index('Date', inplace=True)
-
+            newdf['Time'] = newdf['Text'].str.extract(r"([\d]{1,2}\:[\d]{1,2}\:[\d]{1,2})")
+            newdf['Time'] = pd.to_datetime(newdf['Time'], format='%H:%M:%S').dt.time
+            newdf.set_index('Date', inplace=True)
+        except:
+            flash('Something went wrong')
+            return render_template('applications.html')
+        
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     newdf.to_excel(writer)
@@ -603,107 +552,113 @@ def securityfilenegupload():
 def carwashkpiupload():
 
     if request.method == "POST":
+        
+        try:
+        
+            file = request.files['cwinputFile']
+            print(file)
+            filename = secure_filename(file.filename)
 
-        file = request.files['cwinputFile']
-        print(file)
-        filename = secure_filename(file.filename)
+            excel_file = file
 
-        excel_file = file
+            df = pd.read_excel(excel_file, skiprows=9, usecols=(3, 4, 5))
 
-        df = pd.read_excel(excel_file, skiprows=9, usecols=(3, 4, 5))
+            columnheaders = (df.columns.tolist())
+            current_cwdate = (columnheaders[1])
+            x = datetime.strptime(current_cwdate, "%Y/%b").strftime("%b-%Y")
+            previous_cwdate = (columnheaders[2])
+            px = datetime.strptime(previous_cwdate, "%Y/%b").strftime("%b-%Y")
 
-        columnheaders = (df.columns.tolist())
-        current_cwdate = (columnheaders[1])
-        x = datetime.strptime(current_cwdate, "%Y/%b").strftime("%b-%Y")
-        previous_cwdate = (columnheaders[2])
-        px = datetime.strptime(previous_cwdate, "%Y/%b").strftime("%b-%Y")
+            #get list of sheets
+            xls = pd.ExcelFile(excel_file)
+            res = len(xls.sheet_names)
+            nres = res-1
 
-         #get list of sheets
-        xls = pd.ExcelFile(excel_file)
-        res = len(xls.sheet_names)
-        nres = res-1
+            #get type for the tab names they are a list
+            #print(type(res))
 
-         #get type for the tab names they are a list
-         #print(type(res))
+            tabs = (xls.sheet_names)
+            #print(type(tabs))
+            newtabs = (tabs[0:-1])
 
-        tabs = (xls.sheet_names)
-         #print(type(tabs))
-        newtabs = (tabs[0:-1])
+            dffinal2 = []
 
-        dffinal2 = []
+            for line in newtabs:
 
-        for line in newtabs:
+                #first half of spreadsheet
 
-            #first half of spreadsheet
+                type = line.split("_")[1]
+                df = pd.read_excel(excel_file, sheet_name=line,
+                                skiprows=9, usecols=(3, 4, 5))
+                df.columns = ['a', x, px]
+                df['store'] = type
+                df['Date'] = x
+                df1 = df.iloc[1:3].copy()
+                df1['label'] = 'revenue'
+                df2 = df.iloc[4:14].copy()
+                df2['label'] = 'expense'
+                df3 = df.iloc[17:26].copy()
+                df3['label'] = 'operation performnce'
+                df4 = df.iloc[30:37].copy()
+                df4['label'] = 'sales performance'
+                df5 = df.iloc[40:45].copy()
+                df5['label'] = 'paid units %'
+                df6 = df.iloc[46:52].copy()
+                df6['label'] = 'paid units Instore and Crind'
+                df7 = df.iloc[54:68].copy()
+                df7['label'] = 'total units'
+                dfpartone = pd.concat([df1, df2, df3, df4, df5, df6, df7])
 
-            type = line.split("_")[1]
-            df = pd.read_excel(excel_file, sheet_name=line,
-                               skiprows=9, usecols=(3, 4, 5))
-            df.columns = ['a', x, px]
-            df['store'] = type
-            df['Date'] = x
-            df1 = df.iloc[1:3].copy()
-            df1['label'] = 'revenue'
-            df2 = df.iloc[4:14].copy()
-            df2['label'] = 'expense'
-            df3 = df.iloc[17:26].copy()
-            df3['label'] = 'operation performnce'
-            df4 = df.iloc[30:37].copy()
-            df4['label'] = 'sales performance'
-            df5 = df.iloc[40:45].copy()
-            df5['label'] = 'paid units %'
-            df6 = df.iloc[46:52].copy()
-            df6['label'] = 'paid units Instore and Crind'
-            df7 = df.iloc[54:68].copy()
-            df7['label'] = 'total units'
-            dfpartone = pd.concat([df1, df2, df3, df4, df5, df6, df7])
+                #second half of spreadsheet
 
-            #second half of spreadsheet
+                dftwo = pd.read_excel(
+                    excel_file, sheet_name=line, skiprows=9, usecols=(3, 8, 9))
+                dftwo.columns = ['a', x, px]
 
-            dftwo = pd.read_excel(
-                excel_file, sheet_name=line, skiprows=9, usecols=(3, 8, 9))
-            dftwo.columns = ['a', x, px]
+                dftwo['store'] = type
+                dftwo['Date'] = x
 
-            dftwo['store'] = type
-            dftwo['Date'] = x
+                df8 = dftwo.iloc[1:3].copy()
+                df8['label'] = 'revenue per car'
+                df9 = dftwo.iloc[4:14].copy()
+                df9['label'] = 'expense per car'
+                df10 = dftwo.iloc[40:45].copy()
+                df10['label'] = '% fullfillment per car'
+                df11 = dftwo.iloc[46:52].copy()
+                df11['label'] = 'paid fullfillments'
+                df12 = dftwo.iloc[54:68].copy()
+                df12['label'] = 'total fullfillments'
+                dfparttwo = pd.concat([df8, df9, df10, df11, df12])
 
-            df8 = dftwo.iloc[1:3].copy()
-            df8['label'] = 'revenue per car'
-            df9 = dftwo.iloc[4:14].copy()
-            df9['label'] = 'expense per car'
-            df10 = dftwo.iloc[40:45].copy()
-            df10['label'] = '% fullfillment per car'
-            df11 = dftwo.iloc[46:52].copy()
-            df11['label'] = 'paid fullfillments'
-            df12 = dftwo.iloc[54:68].copy()
-            df12['label'] = 'total fullfillments'
-            dfparttwo = pd.concat([df8, df9, df10, df11, df12])
+                dffinal = pd.concat([dfpartone, dfparttwo])
 
-            dffinal = pd.concat([dfpartone, dfparttwo])
+                #final table of data
 
-            #final table of data
+                dffinal2.append(dffinal)
 
-            dffinal2.append(dffinal)
+            #reorganise columns
 
-         #reorganise columns
+            dffinal2 = pd.concat(dffinal2)
+            dffinal2.columns = ['Item', 'Amount', px,
+                'Store', 'Date', 'Classification']
 
-        dffinal2 = pd.concat(dffinal2)
-        dffinal2.columns = ['Item', 'Amount', px,
-             'Store', 'Date', 'Classification']
+            dffinal2 = dffinal2[['Date', 'Store',
+                'Classification', 'Item', 'Amount', px]]
+            dffinal2['Amount'] = pd.to_numeric(
+                dffinal2['Amount'], errors='coerce')
+            dffinal2['Date'] = pd.to_datetime(dffinal2['Date'], format='%b-%Y')
+            dffinal2['Date'] = dffinal2['Date'].dt.date
 
-        dffinal2 = dffinal2[['Date', 'Store',
-             'Classification', 'Item', 'Amount', px]]
-        dffinal2['Amount'] = pd.to_numeric(
-             dffinal2['Amount'], errors='coerce')
-        dffinal2['Date'] = pd.to_datetime(dffinal2['Date'], format='%b-%Y')
-        dffinal2['Date'] = dffinal2['Date'].dt.date
+            #save final spreadsheet
 
-         #save final spreadsheet
+            #outputfilename = asksaveasfilename(filetypes=[("Excel files","*.xlsx")])
+            #dffinal2.to_excel(outputfilename + ".xlsx", engine='xlsxwriter')
 
-         #outputfilename = asksaveasfilename(filetypes=[("Excel files","*.xlsx")])
-         #dffinal2.to_excel(outputfilename + ".xlsx", engine='xlsxwriter')
+            #dffinal.to_excel("test.xlsx")
 
-         #dffinal.to_excel("test.xlsx")
+        except:
+            flash('Something went wrong')
+            return render_template('applications.html')
 
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -720,7 +675,7 @@ def carwashkpiupload():
 def upload():
 
     if request.method == "POST":
-
+        
         file = request.files['inputFile']
         print(file)
         filename = secure_filename(file.filename)

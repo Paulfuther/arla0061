@@ -1,4 +1,5 @@
 
+from flask_security import utils, SQLAlchemyUserDatastore
 from flask import Flask,  jsonify, request, send_file, flash, url_for, redirect
 from random import sample
 from flask_mysqldb import MySQL
@@ -34,6 +35,7 @@ from sqlalchemy import *
 from flask_moment import Moment
 
 from flask_admin import Admin
+
 from flask_admin.contrib.sqla import ModelView
 
 
@@ -47,6 +49,7 @@ UPLOAD_FOLDER = os.path.join(APP_ROOT, 'Files')
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
 
 
 
@@ -73,28 +76,56 @@ moment = Moment(app)
 
 from flaskblog import routes
 from flaskblog.errors.handlers import errors
-from flaskblog.models import User, Role,  Employee, current_user
+from flaskblog.models import User, Role,  Employee, current_user, Security
+from flask_security.utils import encrypt_password, hash_password
+from flask_admin.menu import MenuLink
 
-admin = Admin(app)
+user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, user_datastore)
 
+admin = Admin(app)#
+
+
+#@app.before_first_request
+#def create_user():
+    
+ #   user_datastore.create_user(email='admin', password='admin1234')#, firstname=" ", lastname=" ", active=" ", confirmed_at= " ")
+  #  db.session.commit()
+
+
+    
 
 class MyModelView(ModelView):
     can_export = True
     can_delete = False
+    column_exclude_list = ('password')
     def is_accessible(self):
-        
         return current_user.is_authenticated
-        
-    
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            model.password = hash_password(form.password.data)
+        else:
+            old_password = form.password.object_data
+            # If password has been changed, hash password
+            if not old_password == model.password:
+                model.password = hash_password(form.password.data)
+
+class OtherView(ModelView):
+    can_export = True
+    can_delete = False
+
 
 admin.add_view(MyModelView(User, db.session))
 #class PositionView(ModelView):
  #   form_columns = ['id', 'roles']
 
-admin.add_view(MyModelView(Employee, db.session))
+admin.add_view(OtherView(Employee, db.session))
 #admin.add_view(ModelView(User, db.session))
 #admin.add_view(ModelView(Employee, db.session))
-admin.add_view(MyModelView(Role, db.session))
+admin.add_view(OtherView(Role, db.session))
+#admin.add_view(OtherView(Course, db.session))
+#admin.add_view(OtherView(CourseDetails, db.session))
+#admin.add_link(MenuLink(name='Home', category='', url=url_for('/home')))
 app.register_blueprint(errors)

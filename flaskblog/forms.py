@@ -8,7 +8,7 @@ from flask_login import current_user
 import wtforms
 
 class LoginForm(FlaskForm):
-    firstname = StringField('firstname', validators = [InputRequired(), Length(min=4, max=20)])
+    email = StringField('email', validators = [InputRequired(), Length(min=4, max=200)])
     password = PasswordField('password', validators = [InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('remember me')
     submit = SubmitField('Login')
@@ -65,11 +65,180 @@ class EmployeeForm(FlaskForm):
                              DataRequired(), Length(min=1, max=9)])
     submit = SubmitField('Add Employee')
 
+   
+
+    tobstartdate = DateField('Start Date', format='%Y-%m-%d',
+                        validators=[Optional()])
+    tobcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    
+    tobexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    tobcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    whmisstartdate = DateField('Start Date', format='%Y-%m-%d',
+                        validators=[Optional()])
+    whmiscompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    
+    whmisexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    whmiscompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    ppestartdate = DateField('Start Date', format='%Y-%m-%d',
+                             validators=[Optional()])
+    ppecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                 validators=[Optional()])
+
+    ppeexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                  validators=[Optional()])
+    ppecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    
+            
+    firestartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    firecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    fireexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    firecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+        
+
+    emerstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    emercompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    emerexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    emercompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+
+
+    firstaidstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    firstaidcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    firstaidexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    firstaidcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+        
+    foodstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    foodcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    foodexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    foodcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+   
+
+
+    propanestartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    propanecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    propaneexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    propanecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+
+    hsstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    hscompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    hsexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    hscompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+
+    fuelstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    fuelcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    fuelexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    fuelcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+
+    alonestartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    alonecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    aloneexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    alonecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+    violencestartdate = DateField('Start Date', format='%Y-%m-%d',
+                        validators=[Optional()])
+    violencecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    
+    violenceexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    violencecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    
+
+    jointstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    jointcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    jointexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    jointcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+
+    def validate_jointcompliant(self, jointcompliant):
+
+        if jointcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+        
     def validate_mobilephone(self, mobilephone):
         user = Employee.query.filter_by(mobilephone=mobilephone.data).first()
         if user:
-            raise ValidationError(
-                'That mobile is Taken')
+            raise ValidationError( 'That mobile is Taken')
 
     def validate_email(self, email):
         emp = Employee.query.filter_by(email=email.data).first()
@@ -101,215 +270,82 @@ class EmployeeForm(FlaskForm):
         if active.data == "Manager Name":
             print("Manager Name")
             raise ValidationError('Must Select a Manager')
-  
-
-class whmisForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d', 
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                          validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class ppeForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class fireextinguishersForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not') 
-class emergencyproceduresForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class firstaidForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class foodhandlingForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?e', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class propaneForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class healthandsafetyForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class fuelpumpshutoffForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class workingaloneForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class workplaceviolenceForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
-            raise ValidationError('Must indicate compliant or not')
-class jointhealthandsafetyForm(FlaskForm):
-    startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[Optional()])
-    completeddate = DateField('Completed Date', format='%Y-%m-%d',
-                              validators=[Optional()])
-    datequalified = DateField('Date Qualified', format='%Y-%m-%d',
-                              validators=[Optional()])
-    expirationdate = DateField('Expiration Date', format='%Y-%m-%d',
-                               validators=[Optional()])
-    compliant = SelectField('Compliant ?', choices=[
-        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
-
-    def validate_compliant(self, compliant):
-
-        if compliant.data == "Compliant ?":
+   
+    def validate_tobcompliant(self, tobcompliant):
+    
+        if tobcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')  
+        
+    def validate_whmiscompliant(self, whmiscompliant):
+    
+        if whmiscompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')   
+        
+        
+    def validate_ppecompliant(self, ppecompliant):
+    
+        if ppecompliant.data == "Compliant ?":
             raise ValidationError('Must indicate compliant or not')
 
-class giantform(FlaskForm):
-    about_you = wtforms.FormField(EmployeeForm)
-    training = wtforms.FormField(whmisForm)
-    training2 = wtforms.FormField(ppeForm)
-    training3 = wtforms.FormField(fireextinguishersForm)
-    training4 = wtforms.FormField(emergencyproceduresForm)
-    training5 = wtforms.FormField(firstaidForm)
-    training6 = wtforms.FormField(foodhandlingForm)
-    training7 = wtforms.FormField(propaneForm)
-    training8 = wtforms.FormField(healthandsafetyForm)
-    training9 = wtforms.FormField(workingaloneForm)
-    training10 = wtforms.FormField(workplaceviolenceForm)
-    training11 = wtforms.FormField(jointhealthandsafetyForm)
-    training12 = wtforms.FormField(fuelpumpshutoffForm)
+    def validate_firecompliant(self, firecompliant):
+    
+        if firecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')     
+
+    def validate_emercompliant(self, emercompliant):
+    
+        if emercompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_firstaidcompliant(self, firstaidcompliant):
+    
+        if firstaidcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+        
+
+    def validate_foodcompliant(self, foodcompliant):
+    
+        if foodcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+        
+    def validate_propanecompliant(self, propanecompliant):
+    
+        if propanecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+        
+    def validate_hscompliant(self, hscompliant):
+    
+        if hscompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+        
+    def validate_fuelcompliant(self, fuelcompliant):
+    
+        if fuelcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+    def validate_alonecompliant(self, alonecompliant):
+    
+        if alonecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+    def validate_violencecompliant(self, violencecompliant):
+    
+        if violencecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+        
+
+#class giantform(FlaskForm):
+#    about_you = wtforms.FormField(EmployeeForm)
+#    training = wtforms.FormField(whmisForm)
+#    training2 = wtforms.FormField(ppeForm)
+#    training3 = wtforms.FormField(fireextinguishersForm)
+#    training4 = wtforms.FormField(emergencyproceduresForm)
+#    training5 = wtforms.FormField(firstaidForm)
+#    training6 = wtforms.FormField(foodhandlingForm)
+#    training7 = wtforms.FormField(propaneForm)
+#    training8 = wtforms.FormField(healthandsafetyForm)
+#    training9 = wtforms.FormField(workingaloneForm)
+#    training10 = wtforms.FormField(workplaceviolenceForm)
+#    training11 = wtforms.FormField(jointhealthandsafetyForm)
+#    training12 = wtforms.FormField(fuelpumpshutoffForm)
   
 class EmployeeUpdateForm(FlaskForm):
 
@@ -362,3 +398,218 @@ class EmployeeUpdateForm(FlaskForm):
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
     
+
+    tobstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    tobcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    tobexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    tobcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    whmisstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    whmiscompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    whmisexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+    whmiscompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    ppestartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    ppecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    ppeexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    ppecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    firestartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    firecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    fireexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    firecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    emerstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    emercompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    emerexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    emercompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    firstaidstartdate = DateField('Start Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    firstaidcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+
+    firstaidexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+    firstaidcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    foodstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    foodcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    foodexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    foodcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    propanestartdate = DateField('Start Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    propanecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+
+    propaneexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+    propanecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    hsstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    hscompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    hsexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    hscompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    fuelstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    fuelcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    fuelexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    fuelcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    alonestartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    alonecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+
+    aloneexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+    alonecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    violencestartdate = DateField('Start Date', format='%Y-%m-%d',
+                                validators=[Optional()])
+    violencecompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+
+    violenceexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+    violencecompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    jointstartdate = DateField('Start Date', format='%Y-%m-%d',
+                            validators=[Optional()])
+    jointcompleteddate = DateField('Completed Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+
+    jointexpirationdate = DateField('Expiration Date', format='%Y-%m-%d',
+                                    validators=[Optional()])
+    jointcompliant = SelectField('Compliant ?', choices=[
+        ('Compliant ?', 'Compliant ?'), ('Y', 'Y'), ('N', 'N')])
+
+    def validate_jointcompliant(self, jointcompliant):
+
+        if jointcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    
+
+   
+
+    def validate_store(self, store):
+        if store.data == "Home Store":
+            raise ValidationError('Please Enter a Store')
+
+    def validate_active(self, active):
+
+        if active.data == "Active":
+            print("homestore")
+            raise ValidationError('Must indicate active or not')
+
+    def validate_manager(self, active):
+
+        if active.data == "Manager Name":
+            print("Manager Name")
+            raise ValidationError('Must Select a Manager')
+
+    def validate_tobcompliant(self, tobcompliant):
+
+        if tobcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_whmiscompliant(self, whmiscompliant):
+
+        if whmiscompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_ppecompliant(self, ppecompliant):
+
+        if ppecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_firecompliant(self, firecompliant):
+
+        if firecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_emercompliant(self, emercompliant):
+
+        if emercompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_firstaidcompliant(self, firstaidcompliant):
+
+        if firstaidcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_foodcompliant(self, foodcompliant):
+
+        if foodcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_propanecompliant(self, propanecompliant):
+
+        if propanecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_hscompliant(self, hscompliant):
+
+        if hscompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_fuelcompliant(self, fuelcompliant):
+
+        if fuelcompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_alonecompliant(self, alonecompliant):
+
+        if alonecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')
+
+    def validate_violencecompliant(self, violencecompliant):
+
+        if violencecompliant.data == "Compliant ?":
+            raise ValidationError('Must indicate compliant or not')

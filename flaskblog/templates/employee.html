@@ -6,135 +6,123 @@
 <div   class="form-container">
     <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
     
-        {{form.about_you.hidden_tag()}}
-        {{form.training.hidden_tag()}}
-        {{form.training2.hidden_tag()}}
-        {{form.training3.hidden_tag()}}
-        {{form.training4.hidden_tag()}}
-        {{form.training5.hidden_tag()}}
-        {{form.training6.hidden_tag()}}
-        {{form.training7.hidden_tag()}}
-        {{form.training8.hidden_tag()}}
-        {{form.training9.hidden_tag()}}
-        {{form.training10.hidden_tag()}}
-        {{form.training11.hidden_tag()}}
-        {{form.training12.hidden_tag()}}
+        
         {{form.hidden_tag()}}
 
         <div> <img class="gsaupdateimage" src="{{ image_file }}">
         </div>
         <div></div>
         <div  class="formtitle" >{{"First Name:"}}</div>
-        <div> {{form.about_you.firstname(class = "form", placeholder="First Name")}}   
-                        {% if form.about_you.firstname.errors %}
-                        {% for error in form.about_you.firstname.errors %}
+        <div> {{form.firstname(class = "form", placeholder="First Name")}}   
+                        {% if form.firstnameerrors %}
+                        {% for error in form.firstnameerrors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
         </div> 
         <div  class="formtitle" >{{"NickName:"}}</div>          
-        <div> {{form.about_you.nickname(class = "form", placeholder="Nick Name")}}                   
+        <div> {{form.nickname(class = "form", placeholder="Nick Name")}}                   
         </div>           
         <div  class="formtitle" >{{"Last Name:"}}</div>
-        <div> {{form.about_you.lastname(class = "form" ,placeholder="Last Name")}} 
-                    {% if form.about_you.lastname.errors %}
-                        {% for error in form.about_you.lastname.errors %}
+        <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
+                    {% if form.lastname.errors %}
+                        {% for error in form.lastname.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}       
                     {% endif %}
         </div>           
         <div  class="formtitle" >{{"Home Store:"}}</div>
-        <div> {{form.about_you.store(class = "form", placeholder="Home Store")}} 
-                    {% if form.about_you.store.errors %}
-                        {% for error in form.about_you.store.errors %}
+        <div> {{form.store(class = "form", placeholder="Home Store")}} 
+                    {% if form.store.errors %}
+                        {% for error in form.store.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}       
                     {% endif %}
         </div>
         <div  class="formtitle" >{{"Phone Number:"}}</div>
-        <div> {{form.about_you.mobilephone(class = "form" ,placeholder="Phone Number")}} 
-                    {% if form.about_you.mobilephone.errors %}
-                        {% for error in form.about_you.mobilephone.errors %}
+        <div> {{form.mobilephone(class = "form" ,placeholder="Phone Number")}} 
+                    {% if form.mobilephone.errors %}
+                        {% for error in form.mobilephone.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}        
                     {% endif %}
         </div>
         <div  class="formtitle" >{{"Start Date:"}}</div>
-        <div> {{form.about_you.Startdate(class = "form" ,placeholder="Start Date")}} </div>
+        <div> {{form.Startdate(class = "form" ,placeholder="Start Date")}} </div>
         <div  class="formtitle" >{{"End Date:"}}</div>
-        <div> {{form.about_you.Enddate(class = "form" ,placeholder="End Date")}} </div>
+        <div> {{form.Enddate(class = "form" ,placeholder="End Date")}} </div>
         <div  class="formtitle" >{{"Address Line 1:"}}</div>
-        <div> {{form.about_you.addressone(class = "form" ,placeholder="Address Line 1")}} 
-                        {% if form.about_you.addressone.errors %}   
-                        {% for error in form.about_you.addressone.errors %}
+        <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}} 
+                        {% if form.addressone.errors %}   
+                        {% for error in form.addressone.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}       
                     {% endif %}
         </div>           
         <div  class="formtitle" >{{"Address Line 2:"}}</div>
-        <div> {{form.about_you.addresstwo(class = "form" ,placeholder="Address Line 2")}} 
-                        {% if form.about_you.addresstwo.errors %}
-                        {% for error in form.about_you.addresstwo.errors %}
+        <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} 
+                        {% if form.addresstwo.errors %}
+                        {% for error in form.addresstwo.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}       
                     {% endif %}
         </div>           
         <div  class="formtitle" >{{"Unit/Apt:"}}</div>
-        <div> {{form.about_you.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
+        <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
         <div  class="formtitle" >{{"City:"}}</div>
-        <div> {{form.about_you.city(class = "form" ,placeholder="City")}} 
-                        {% if form.about_you.city.errors %}
-                        {% for error in form.about_you.city.errors %}
+        <div> {{form.city(class = "form" ,placeholder="City")}} 
+                        {% if form.city.errors %}
+                        {% for error in form.city.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}           
                     {% endif %}
         </div>           
         <div  class="formtitle" >{{"Province:"}}</div>
-        <div> {{form.about_you.province(class = "form" ,placeholder="Province")}} 
-                        {% if form.about_you.province.errors %}
-                        {% for error in form.about_you.province.errors %}
+        <div> {{form.province(class = "form" ,placeholder="Province")}} 
+                        {% if form.province.errors %}
+                        {% for error in form.province.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}         
                     {% endif %}
         </div>     
         <div  class="formtitle" >{{"Postal Code:"}}</div>
-        <div> {{form.about_you.postal(class = "form", placeholder="Postal Code")}} 
-                    {% if form.about_you.postal.errors %}
-                        {% for error in form.about_you.postal.errors %}
+        <div> {{form.postal(class = "form", placeholder="Postal Code")}} 
+                    {% if form.postal.errors %}
+                        {% for error in form.postal.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
         </div>
 
         <div  class="formtitle" >{{"Country:"}}</div>
-        <div> {{form.about_you.country(class = "form" ,placeholder="Country")}} 
-                        {% if form.about_you.country.errors %}
-                        {% for error in form.about_you.country.errors %}
+        <div> {{form.country(class = "form" ,placeholder="Country")}} 
+                        {% if form.country.errors %}
+                        {% for error in form.country.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}           
                     {% endif %}
         </div>           
         <div  class="formtitle" >{{"SIN:"}}</div>
-        <div> {{form.about_you.SIN(class = "form", placeholder="SIN")}} 
-                    {% if form.about_you.SIN.errors %}
-                        {% for error in form.about_you.SIN.errors %}
+        <div> {{form.SIN(class = "form", placeholder="SIN")}} 
+                    {% if form.SIN.errors %}
+                        {% for error in form.SIN.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}           
                     {% endif %}
         </div>
         <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.about_you.email(class = "form", placeholder="E-Mail")}} 
-                    {% if form.about_you.email.errors %}
-                        {% for error in form.about_you.email.errors %}
+        <div> {{form.email(class = "form", placeholder="E-Mail")}} 
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
         </div>
         
         <div  class="formtitle" >{{"Manager:"}}</div>
-        <div> {{form.about_you.manager(class = "form", placeholder="Manager")}} 
-                    {% if form.about_you.manager.errors %}
-                        {% for error in form.about_you.manager.errors %}
+        <div> {{form.manager(class = "form", placeholder="Manager")}} 
+                    {% if form.manager.errors %}
+                        {% for error in form.manager.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
@@ -144,9 +132,9 @@
         <div  class="formtitle" >{{"Online Training User ID:"}}</div>
         
         
-        <div>{{form.about_you.trainingid(class = "form", placeholder="Training User ID")}} 
-                    {% if form.about_you.trainingid.errors %}
-                        {% for error in form.about_you.trainingid.errors %}
+        <div>{{form.trainingid(class = "form", placeholder="Training User ID")}} 
+                    {% if form.trainingid.errors %}
+                        {% for error in form.trainingid.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
@@ -154,9 +142,9 @@
         </div>
         <div  class="formtitle" >{{"Online Training Password:"}}</div>
         
-        <div>{{form.about_you.trainingpassword(class = "form", placeholder="Training Pasword")}} 
-                    {% if form.about_you.trainingpassword.errors %}
-                        {% for error in form.about_you.trainingpassword.errors %}
+        <div>{{form.trainingpassword(class = "form", placeholder="Training Pasword")}} 
+                    {% if form.trainingpassword.errors %}
+                        {% for error in form.trainingpassword.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
@@ -166,9 +154,9 @@
 
         <div  class="formtitle" >{{"Iprism Code:"}}</div>
         
-        <div>{{form.about_you.iprismcode(class = "form", placeholder="iprismcode")}} 
-                    {% if form.about_you.iprismcode.errors %}
-                        {% for error in form.about_you.iprismcode.errors %}
+        <div>{{form.iprismcode(class = "form", placeholder="iprismcode")}} 
+                    {% if form.iprismcode.errors %}
+                        {% for error in form.iprismcode.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
@@ -176,52 +164,78 @@
         </div>
 
         <div  class="formtitle" >{{"Active:"}}</div>
-        <div> {{form.about_you.active(class = "form", placeholder="Active")}} 
+        <div> {{form.active(class = "form", placeholder="Active")}} 
                     
-                    {% if form.about_you.active.errors %}
-                        {% for error in form.about_you.active.errors %}
+                    {% if form.active.errors %}
+                        {% for error in form.active.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
         </div>
          <div  class="formtitle" >{{"Profile Picture:"}}</div>
-         <div>  {{ form.about_you.hrpicture(class = "form")}}
+         <div>  {{ form.hrpicture(class = "form")}}
         </div>
 
 
+        <!-- test delte after use-->
 
 
 
-         <!-- ERP training -->
+
+         <!-- tobacco training -->
 
         <div  class="formtitle"></div><div></div>
-        <div  class="formtitle" >{{"WHMIS Training Information:"}}</div>
+        <div  class="formtitle" >{{"Tobacco Training Information:"}}</div>
         <div></div>
         <div  class="formtitle"></div><div></div>
 
-        <div  class="formtitle" >{{"WHMIS Compliant:"}}</div>
-        <div> {{form.training.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training.compliant.errors %}
-                        {% for error in form.training.compliant.errors %}
+        <div  class="formtitle" >{{"Tobacco Compliant:"}}</div>
+        <div> {{form.tobcompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.tobcompliant.errors %}
+                        {% for error in form.tobcompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
-        <div  class="formtitle" >{{"WHMIS Start Date:"}}</div>
-        <div> {{form.training.startdate(class = "form" ,placeholder="Start Date")}}
+        <div  class="formtitle" >{{"Tobacco Start Date:"}}</div>
+        <div> {{form.tobstartdate(class = "form" ,placeholder="Start Date")}}
+         </div>
+
+        <div  class="formtitle" >{{"Tobacco Completion Date:"}}</div>
+        <div> {{form.tobcompleteddate(class = "form" ,placeholder="Start Date")}}
+         </div>
+
+        <div  class="formtitle" >{{"Tobacco Expirey Date:"}}</div>
+        <div> {{form.tobexpirationdate(class = "form" ,placeholder="Start Date")}}
+         </div>
+
+        <!-- whmis training-->
+
+        <div  class="formtitle"></div><div></div>
+        <div  class="formtitle" >{{"WHMISTraining Information:"}}</div>
+        <div></div>
+        <div  class="formtitle"></div><div></div>
+
+        <div  class="formtitle" >{{"WHMIS Compliant:"}}</div>
+        <div> {{form.whmiscompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.whmiscompliant.errors %}
+                        {% for error in form.whmiscompliant.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}  
+                        {% endif %}
+         </div>
+
+        <div  class="formtitle" >{{"WHMISTraining Start Date:"}}</div>
+        <div> {{form.whmisstartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"WHMIS Completion Date:"}}</div>
-        <div> {{form.training.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"WHMIS Date Qualified:"}}</div>
-        <div> {{form.training.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.whmiscompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"WHMIS Expirey Date:"}}</div>
-        <div> {{form.training.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.whmisexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <!--ppe training-->
@@ -232,28 +246,24 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"PPE Compliant:"}}</div>
-        <div> {{form.training2.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training2.compliant.errors %}
-                        {% for error in form.training2.compliant.errors %}
+        <div> {{form.ppecompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.ppecompliant.errors %}
+                        {% for error in form.ppecompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"PPE Start Date:"}}</div>
-        <div> {{form.training2.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.ppestartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"PPE Completion Date:"}}</div>
-        <div> {{form.training2.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"PPE Date Qualified:"}}</div>
-        <div> {{form.training3.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.ppecompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"PPE Expirey Date:"}}</div>
-        <div> {{form.training3.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.ppeexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <!-- fire extinguisher training-->
@@ -264,28 +274,24 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"Fire Extinguisher Compliant:"}}</div>
-        <div> {{form.training3.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training3.compliant.errors %}
-                        {% for error in form.training3.compliant.errors %}
+        <div> {{form.firecompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.firecompliant.errors %}
+                        {% for error in form.firecompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
-        <div  class="formtitle" >{{"Fire Extinguiser Start Date:"}}</div>
-        <div> {{form.training.startdate(class = "form" ,placeholder="Start Date")}}
+        <div  class="formtitle" >{{"Tobacco Start Date:"}}</div>
+        <div> {{form.firestartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <div  class="formtitle" >{{"Fire Extinguiser Completion Date:"}}</div>
-        <div> {{form.training3.completeddate(class = "form" ,placeholder="Start Date")}}
+        <div  class="formtitle" >{{"Tobacco Completion Date:"}}</div>
+        <div> {{form.firecompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <div  class="formtitle" >{{"Fire Extinguiser Date Qualified:"}}</div>
-        <div> {{form.training3.datequalified(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"Fire Extinguiser Expirey Date:"}}</div>
-        <div> {{form.training3.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div  class="formtitle" >{{"Tobacco Expirey Date:"}}</div>
+        <div> {{form.fireexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         
@@ -297,60 +303,52 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"ERP Compliant:"}}</div>
-        <div> {{form.training4.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training4.compliant.errors %}
-                        {% for error in form.training4.compliant.errors %}
+        <div> {{form.emercompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.emercompliant.errors %}
+                        {% for error in form.emercompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"ERP Start Date:"}}</div>
-        <div> {{form.training4.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.emerstartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"ERP Completion Date:"}}</div>
-        <div> {{form.training4.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"ERP Date Qualified:"}}</div>
-        <div> {{form.training4.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.emercompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"ERP Expirey Date:"}}</div>
-        <div> {{form.training4.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.emerexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <!-- first aid training-->
+        <!-- firstaid aid training-->
 
         <div  class="formtitle"></div><div></div>
-        <div  class="formtitle" >{{"First Aid Training Information:"}}</div>
+        <div  class="formtitle" >{{"first Aid Training Information:"}}</div>
         <div></div>
         <div  class="formtitle"></div><div></div>
 
-        <div  class="formtitle" >{{"First Aid Compliant:"}}</div>
-        <div> {{form.training5.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training5.compliant.errors %}
-                        {% for error in form.training5.compliant.errors %}
+        <div  class="formtitle" >{{"first Aid Compliant:"}}</div>
+        <div> {{form.firstaidcompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.firstaidcompliant.errors %}
+                        {% for error in form.firstaidcompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
-        <div  class="formtitle" >{{"First Aid Start Date:"}}</div>
-        <div> {{form.training5.startdate(class = "form" ,placeholder="Start Date")}}
+        <div  class="formtitle" >{{"firstaid  Start Date:"}}</div>
+        <div> {{form.firstaidstartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <div  class="formtitle" >{{"First Aid Completion Date:"}}</div>
-        <div> {{form.training5.completeddate(class = "form" ,placeholder="Start Date")}}
+        <div  class="formtitle" >{{"firstaid Completion Date:"}}</div>
+        <div> {{form.firstaidcompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <div  class="formtitle" >{{"First Aid Date Qualified:"}}</div>
-        <div> {{form.training5.datequalified(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"First Aid Expirey Date:"}}</div>
-        <div> {{form.training5.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div  class="formtitle" >{{"firstaid Expirey Date:"}}</div>
+        <div> {{form.firstaidexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <!--food handling training-->
@@ -361,28 +359,24 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"Food Handling Compliant:"}}</div>
-        <div> {{form.training6.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training6.compliant.errors %}
-                        {% for error in form.training6.compliant.errors %}
+        <div> {{form.foodcompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.foodcompliant.errors %}
+                        {% for error in form.foodcompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"Food Handling Start Date:"}}</div>
-        <div> {{form.training6.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.foodstartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Food Handling Completion Date:"}}</div>
-        <div> {{form.training6.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"Food Handling Date Qualified:"}}</div>
-        <div> {{form.training6.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.foodcompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Food Handling Expirey Date:"}}</div>
-        <div> {{form.training6.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.foodexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <!--porpane training-->
@@ -393,28 +387,24 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"Propane Compliant:"}}</div>
-        <div> {{form.training7.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training7.compliant.errors %}
-                        {% for error in form.training7.compliant.errors %}
+        <div> {{form.propanecompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.propanecompliant.errors %}
+                        {% for error in form.propanecompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"Propane Start Date:"}}</div>
-        <div> {{form.training7.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.propanestartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Propane Completion Date:"}}</div>
-        <div> {{form.training7.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"Propane Date Qualified:"}}</div>
-        <div> {{form.training7.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.propanecompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Propane Expirey Date:"}}</div>
-        <div> {{form.training7.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.propaneexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <!-- health and safety training-->
@@ -425,31 +415,27 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"H and S Compliant:"}}</div>
-        <div> {{form.training8.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training8.compliant.errors %}
-                        {% for error in form.training8.compliant.errors %}
+        <div> {{form.hscompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.hscompliant.errors %}
+                        {% for error in form.hscompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"H and S Start Date:"}}</div>
-        <div> {{form.training8.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.hsstartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"H and S Completion Date:"}}</div>
-        <div> {{form.training8.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"H and S Date Qualified:"}}</div>
-        <div> {{form.training8.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.hscompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"H and S Expirey Date:"}}</div>
-        <div> {{form.training8.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.hsexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <!-- working along training-->
+         <!-- working along training-->
 
         <div  class="formtitle"></div><div></div>
         <div  class="formtitle" >{{"Working Alone Training Information:"}}</div>
@@ -457,31 +443,27 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"Working Alone Compliant:"}}</div>
-        <div> {{form.training9.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training9.compliant.errors %}
-                        {% for error in form.training9.compliant.errors %}
+        <div> {{form.alonecompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.alonecompliant.errors %}
+                        {% for error in form.alonecompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"Working Alone Start Date:"}}</div>
-        <div> {{form.training9.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.alonestartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Working Alone Completion Date:"}}</div>
-        <div> {{form.training9.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"Working Alone Date Qualified:"}}</div>
-        <div> {{form.training9.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.alonecompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Working Alone Expirey Date:"}}</div>
-        <div> {{form.training9.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.aloneexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <!-- workplace violence training-->
+         <!-- workplace violence training-->
 
         <div  class="formtitle"></div><div></div>
         <div  class="formtitle" >{{"Workplace Violence Training Information:"}}</div>
@@ -489,31 +471,27 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"Workplace Violence Compliant:"}}</div>
-        <div> {{form.training10.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training10.compliant.errors %}
-                        {% for error in form.training10.compliant.errors %}
+        <div> {{form.violencecompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.violencecompliant.errors %}
+                        {% for error in form.violencecompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"Workplace Violence Start Date:"}}</div>
-        <div> {{form.training10.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.violencestartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Workplace Violence Completion Date:"}}</div>
-        <div> {{form.training10.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"Workplace Violence Date Qualified:"}}</div>
-        <div> {{form.training10.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.violencecompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Workplace Violence Expirey Date:"}}</div>
-        <div> {{form.training10.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.violenceexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <!-- joint health and safety training-->
+         <!-- joint health and safety training-->
 
         <div  class="formtitle"></div><div></div>
         <div  class="formtitle" >{{"Joint Health and Safety Training Information:"}}</div>
@@ -521,31 +499,27 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"JHS Compliant:"}}</div>
-        <div> {{form.training11.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training11.compliant.errors %}
-                        {% for error in form.training11.compliant.errors %}
+        <div> {{form.jointcompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.jointcompliant.errors %}
+                        {% for error in form.jointcompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"JHS Start Date:"}}</div>
-        <div> {{form.training11.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.jointstartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"JHS Completion Date:"}}</div>
-        <div> {{form.training11.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"JHS Date Qualified:"}}</div>
-        <div> {{form.training11.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.jointcompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"JHS Expirey Date:"}}</div>
-        <div> {{form.training11.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.jointexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
-        <!-- fule pump shutoff -->
+         <!-- fule pump shutoff -->
 
         <div  class="formtitle"></div><div></div>
         <div  class="formtitle" >{{"Fuel Shutoff Training Information:"}}</div>
@@ -553,33 +527,30 @@
         <div  class="formtitle"></div><div></div>
 
         <div  class="formtitle" >{{"Fuel Shutoff Compliant:"}}</div>
-        <div> {{form.training12.compliant(class = "form" ,placeholder="Compliant")}}
-                    {% if form.training12.compliant.errors %}
-                        {% for error in form.training12.compliant.errors %}
+        <div> {{form.fuelcompliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.fuelcompliant.errors %}
+                        {% for error in form.fuelcompliant.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
          </div>
 
         <div  class="formtitle" >{{"Fuel Shutoff Start Date:"}}</div>
-        <div> {{form.training12.startdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.fuelstartdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Fuel Shutoff Completion Date:"}}</div>
-        <div> {{form.training12.completeddate(class = "form" ,placeholder="Start Date")}}
-         </div>
-
-        <div  class="formtitle" >{{"Fuel Shutoff Date Qualified:"}}</div>
-        <div> {{form.training12.datequalified(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.fuelcompleteddate(class = "form" ,placeholder="Start Date")}}
          </div>
 
         <div  class="formtitle" >{{"Fuel ShutoffExpirey Date:"}}</div>
-        <div> {{form.training12.expirationdate(class = "form" ,placeholder="Start Date")}}
+        <div> {{form.fuelexpirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
 
+
             <div>
-            {{form.about_you.submit(class_="hrbutton")}}
+            {{form.submit(class_="hrbutton")}}
             </div>
             <div>
             <!-- <a class = "hrbutton" <a href="{{ url_for('home')}}">Edit an Employee</a> -->

@@ -1,8 +1,11 @@
 from flaskblog import db, login_manager
 from flaskblog import datetime
 from flask_login import UserMixin, LoginManager, current_user
-
-
+from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, utils
+from flask_security.utils import hash_password, encrypt_password, verify_password
+from flask_bcrypt import bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
+#from flask.ext.bcrypt import generate_password_hash
 
 
 
@@ -17,29 +20,62 @@ roles_users = db.Table(
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
 
+#course_users = db.Table(
+ #   'course_users',
+ #   db.Column('employee_id', db.Integer(), db.ForeignKey('employee.id')),
+ #   db.Column('course_id', db.Integer(), db.ForeignKey('course.id')))
+    
+
+
+#course_data = db.Table(
+#    'course_data',
+#    db.Column('coursedetails_id', db.Integer(), db.ForeignKey('coursedetails.id')),
+#    db.Column('course_id', db.Integer(), db.ForeignKey('course.id'))
+#)
+
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(15), unique=True)
     lastname = db.Column(db.String(15), unique=True)
-    email = db.Column(db.String(50), unique=True)
-    password = db.Column(db.String(80))
+    email = db.Column(db.String(200), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean)
+    confirmed_at = db.Column(db.DateTime)
     roles = db.relationship('Role',  secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+       
     
-    def __repr__(self):
+    def __str__(self):
         return 'User %r' % (self.firstname)
     
-class Role(db.Model):
+    
+class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key = True)
     name = db.Column(db.String(50), unique=True)
+    description = db.Column(db.String(255))
     
     def __repr__(self):
-        return 'Role %r' % (self.name)
+        return '%r' % (self.name)
+    
+    def __hash__(self):
+        return hash(self.name)
 
-#class UserRoles(db.Model):
- #   id=db.Column(db.Integer(), primary_key = True)
- #   user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
- #   role_id = db.Column(db.Integer(), db.ForeignKey('role.id'))
+#class Course(db.Model, RoleMixin):
+#    id = db.Column(db.Integer(), primary_key = True)
+#    name = db.Column(db.String(50), unique=True)
+#    description = db.Column(db.String(255))
+#    startdate  = db.Column(db.DateTime(), nullable=False)
+    
+                             
+#   def __repr__(self):
+#         return ' %r' % (self.name)
 
+
+#class CourseDetails(db.Model):
+#    id = db.Column(db.Integer, primary_key=True)
+#    startdate = db.Column(db.DateTime(), nullable=False)
+#    course = db.Column(db.Integer, db.ForeignKey('course.id'))
 
 
 class Employee(db.Model):
@@ -68,180 +104,80 @@ class Employee(db.Model):
     image_file = db.Column(db.String(20), nullable=False,default='default.jpg')
     active = db.Column(db.String)
     iprismcode = db.Column(db.String(9), nullable=False)
-
+    #course = db.relationship('Course',  secondary=course_users,
+     #                       backref=db.backref('users', lazy='dynamic'))
     
-    #traiing#
+    # tobacco training#
+    tobstartdate = db.Column(db.DateTime(), nullable=True)
+    tobcompleted = db.Column(db.String)
+    tobexpireydate = db.Column(db.DateTime(), nullable=True)
+    tobcompliant = db.Column(db.String(), nullable=False)
+    #whmis training#
+    whmisstartdate = db.Column(db.DateTime(), nullable=True)
+    whmiscompleted = db.Column(db.String)
+    whmisexpireydate = db.Column(db.DateTime(), nullable=True)
+    whmiscompliant = db.Column(db.String(), nullable=False)
+    #ppe training#
+    ppestartdate = db.Column(db.DateTime(), nullable=True)
+    ppecompleted = db.Column(db.String)
+    ppeexpireydate = db.Column(db.DateTime(), nullable=True)
+    ppecompliant = db.Column(db.String(), nullable=False)
+    #fire extinguisher training#
+    firestartdate = db.Column(db.DateTime(), nullable=True)
+    firecompleted = db.Column(db.String)
+    fireexpireydate = db.Column(db.DateTime(), nullable=True)
+    firecompliant = db.Column(db.String(), nullable=False)
+    #emergency response procedures training#
+    emerstartdate = db.Column(db.DateTime(), nullable=True)
+    emercompleted = db.Column(db.String)
+    emerexpireydate = db.Column(db.DateTime(), nullable=True)
+    emercompliant = db.Column(db.String(), nullable=False)
+    #first aid training#
+    firstaidstartdate = db.Column(db.DateTime(), nullable=True)
+    firstaidcompleted = db.Column(db.String)
+    firstaidexpireydate = db.Column(db.DateTime(), nullable=True)
+    firstaidcompliant = db.Column(db.String(), nullable=False)
+    #food handling traning#
+    foodstartdate = db.Column(db.DateTime(), nullable=True)
+    foodcompleted = db.Column(db.String)
+    foodexpireydate = db.Column(db.DateTime(), nullable=True)
+    foodcompliant = db.Column(db.String(), nullable=False)
+    #propane handling training#
+    propanestartdate = db.Column(db.DateTime(), nullable=True)
+    propanecompleted = db.Column(db.String)
+    propaneexpireydate = db.Column(db.DateTime(), nullable=True)
+    propanecompliant = db.Column(db.String(), nullable=False)
+    #health and safety training#
+    hsstartdate = db.Column(db.DateTime(), nullable=True)
+    hscompleted = db.Column(db.String)
+    hsexpireydate = db.Column(db.DateTime(), nullable=True)
+    hscompliant = db.Column(db.String(), nullable=False)
+    #fule pump shut off training#
+    fuelstartdate = db.Column(db.DateTime(), nullable=True)
+    fuelcompleted = db.Column(db.String)
+    fuelexpireydate = db.Column(db.DateTime(), nullable=True)
+    fuelcompliant = db.Column(db.String(), nullable=False)
+    #work alone training#
+    alonestartdate = db.Column(db.DateTime(), nullable=True)
+    alonecompleted = db.Column(db.String)
+    aloneexpireydate = db.Column(db.DateTime(), nullable=True)
+    alonecompliant = db.Column(db.String(), nullable=False)
+    #workplace violence and harrassment traiing#
+    violencestartdate = db.Column(db.DateTime(), nullable=True)
+    violencecompleted = db.Column(db.String)
+    violenceexpireydate = db.Column(db.DateTime(), nullable=True)
+    violencecompliant = db.Column(db.String(), nullable=False)
+    #joint health and safety training#
+    jointstartdate = db.Column(db.DateTime(), nullable=True)
+    jointcompleted = db.Column(db.String)
+    jointexpireydate = db.Column(db.DateTime(), nullable=True)
+    jointcompliant = db.Column(db.String(), nullable=False)
     
-    whmis = db.relationship(
-        'whmis', backref='employee', uselist=False)  
-    ppe = db.relationship(
-        'ppe', backref='employee', uselist=False)
-    fireextinguishers = db.relationship(
-        'fireextinguishers', backref='employee', uselist=False)
-    emergencyresponseprocedures = db.relationship(
-        'emergencyresponseprocedures', backref='employee', uselist=False)
-    firstaid = db.relationship(
-        'firstaid', backref='employee', uselist=False)
-    foodhandling = db.relationship(
-        'foodhandling', backref='employee', uselist=False)
-    propane = db.relationship(
-        'propane', backref='employee', uselist=False)
-    healthandsafety = db.relationship(
-        'healthandsafety', backref='employee', uselist=False)
-    fuelpumpshutoff = db.relationship(
-        'fuelpumpshutoff', backref='employee', uselist=False)
-    workingalone = db.relationship(
-        'workingalone', backref='employee', uselist=False)
-    workplaceviolence = db.relationship(
-        'workplaceviolence', backref='employee', uselist=False)
-    jointhealthandsafety = db.relationship(
-        'jointhealthandsafety', backref='employee', uselist=False)
     
-    #def __repr__(self):
-     #   return f"Employee('{self.firstname}', '{self.SIN}')"
-
-class whmis(db.Model):
-    id=db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
+    #@hybrid_property
+    #def SIN(self):
+    #    return self._SIN
     
-class ppe(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class fireextinguishers(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class emergencyresponseprocedures(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class firstaid(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class foodhandling(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class propane(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class healthandsafety(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class fuelpumpshutoff(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class workingalone(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class workplaceviolence(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-
-class jointhealthandsafety(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(
-        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    completed = db.Column(db.String)
-    datequalified = db.Column(db.DateTime(), nullable=True)
-    expireydate = db.Column(db.DateTime(), nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    compliant = db.Column(db.String)
-    
-   
+    #@SIN.setter
+    #def SIN(self, plaintext):
+    #    self._SIN = bcrypt.generate_password_hash(plaintext).decode('utf-8')

@@ -1,2 +1,2 @@
 -- SQLite
-select * from role
+select * from user

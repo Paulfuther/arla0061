@@ -1062,3 +1062,115 @@ dflkgdkl
 
 
 <!--<li> <a href="{{ url_for('login')}}">Login</a></li> -->
+
+
+
+def password(self,password):
+        self.password_hash = bcrypt.hashpw('password', bcrypt.gensalt())
+
+
+
+# Executes before the first request is processed.
+@app.before_first_request
+def before_first_request():
+
+    # Create any database tables that don't exist yet.
+    db.create_all()
+
+    # Create the Roles "admin" and "end-user" -- unless they already exist
+    user_datastore.find_or_create_role(
+        name='admin', description='Administrator')
+    user_datastore.find_or_create_role(name='end-user', description='End user')
+
+    # Create two Users for testing purposes -- unless they already exists.
+    # In each case, use Flask-Security utility function to encrypt the password.
+    encrypted_password = utils.encrypt_password('password')
+    
+    if not user_datastore.get_user('someone@example.com'):
+        user_datastore.create_user(
+            email='someone@example.com', password=encrypted_password)
+            
+    
+    
+    if not user_datastore.get_user('admin@example.com'):
+        user_datastore.create_user(
+            email='admin@example.com', password=encrypted_password)
+
+    # Commit any database changes; the User and Roles must exist before we can add a Role to the User
+    db.session.commit()
+
+    # Give one User has the "end-user" role, while the other has the "admin" role. (This will have no effect if the
+    # Users already have these Roles.) Again, commit any database changes.
+    user_datastore.add_role_to_user('someone@example.com', 'end-user')
+    user_datastore.add_role_to_user('admin@example.com', 'admin')
+    db.session.commit()
+
+
+    @app.before_first_request
+def create_user():
+    db.create_all()
+    user_datastore.create_user(email='paul@gmail.com', password='password')
+    db.session.commit()
+
+
+
+
+    whmis = db.relationship(
+        'whmis', backref='employee', uselist=False)  
+    ppe = db.relationship(
+        'ppe', backref='employee', uselist=False)
+    fireextinguishers = db.relationship(
+        'fireextinguishers', backref='employee', uselist=False)
+    emergencyresponseprocedures = db.relationship(
+        'emergencyresponseprocedures', backref='employee', uselist=False)
+    firstaid = db.relationship(
+        'firstaid', backref='employee', uselist=False)
+    foodhandling = db.relationship(
+        'foodhandling', backref='employee', uselist=False)
+    propane = db.relationship(
+        'propane', backref='employee', uselist=False)
+    healthandsafety = db.relationship(
+        'healthandsafety', backref='employee', uselist=False)
+    fuelpumpshutoff = db.relationship(
+        'fuelpumpshutoff', backref='employee', uselist=False)
+    workingalone = db.relationship(
+        'workingalone', backref='employee', uselist=False)
+    workplaceviolence = db.relationship(
+        'workplaceviolence', backref='employee', uselist=False)
+    jointhealthandsafety = db.relationship(
+        'jointhealthandsafety', backref='employee', uselist=False)
+    
+
+    #def __repr__(self):
+    #   return f"Employee('{self.firstname}', '{self.SIN}')"
+
+
+
+   whmis, ppe, fireextinguishers, emergencyresponseprocedures,firstaid, foodhandling,propane,healthandsafety,fuelpumpshutoff,workingalone,workplaceviolence,jointhealthandsafety
+
+
+   @app.route("/login", methods = ['GET','POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    form = LoginForm()
+    
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        
+       # password = bcrypt.checkpw(user.password.encode(), user.passowrd.pwd.encode())
+        #print(user.password)
+        #print(password)
+        #hp = bcrypt.check_password_hash(user.password, password)
+        #print(hp)
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            
+                login_user(user,remember=form.remember.data)
+                return redirect(url_for('hrhome'))
+        return '<h1> Invalid Credentials </h1>'
+        
+        
+        #return render_template('home.html')
+    
+    return render_template('login.html', form=form)  
