@@ -103,6 +103,10 @@ class MyModelView(ModelView):
         return current_user.is_authenticated
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
     def on_model_change(self, form, model, is_created):
         if is_created:
             model.password = hash_password(form.password.data)
@@ -124,7 +128,7 @@ admin.add_view(MyModelView(User, db.session))
 admin.add_view(OtherView(Employee, db.session))
 #admin.add_view(ModelView(User, db.session))
 #admin.add_view(ModelView(Employee, db.session))
-admin.add_view(OtherView(Role, db.session))
+admin.add_view(MyModelView(Role, db.session))
 #admin.add_view(OtherView(Course, db.session))
 #admin.add_view(OtherView(CourseDetails, db.session))
 #admin.add_link(MenuLink(name='Home', category='', url=url_for('/home')))

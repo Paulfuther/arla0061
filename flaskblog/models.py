@@ -45,9 +45,13 @@ class User(UserMixin, db.Model):
     confirmed_at = db.Column(db.DateTime)
     roles = db.relationship('Role',  secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
        
+    def has_roles(self, *args):
+        return set(args).issubset({role.name for role in self.roles})
     
     def __str__(self):
         return 'User %r' % (self.firstname)
+    
+    
     
     
 class Role(db.Model, RoleMixin):
