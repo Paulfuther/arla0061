@@ -13,13 +13,11 @@ import xlrd
 import xlwt
 import xlsxwriter
 from flaskblog import datetime
-from flaskblog import MySQL
 from flaskblog import bcrypt
 from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 from PIL import Image
 import re
-import mysql
 from sqlalchemy.sql import text, select
 from sqlalchemy import *
 from sqlalchemy import extract

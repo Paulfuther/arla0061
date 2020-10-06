@@ -2,7 +2,6 @@
 from flask_security import utils, SQLAlchemyUserDatastore
 from flask import Flask,  jsonify, request, send_file, flash, url_for, redirect
 from random import sample
-from flask_mysqldb import MySQL
 from flask_moment import Moment
 from datetime import time, datetime
 import os
@@ -27,15 +26,12 @@ from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from flaskblog.config import Config
-#from flaskblog import MySQL
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from sqlalchemy.sql import text, select
 from sqlalchemy import *
 from flask_moment import Moment
-
 from flask_admin import Admin
-
 from flask_admin.contrib.sqla import ModelView
 
 

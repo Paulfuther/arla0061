@@ -3,7 +3,7 @@ from flaskblog import datetime
 from flask_login import UserMixin, LoginManager, current_user
 from flask_security import Security, SQLAlchemyUserDatastore, RoleMixin, utils
 from flask_security.utils import hash_password, encrypt_password, verify_password
-from flask_bcrypt import bcrypt
+from flask_bcrypt import Bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
 #from flask.ext.bcrypt import generate_password_hash
 
