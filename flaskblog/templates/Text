@@ -1150,7 +1150,7 @@ def create_user():
 
 
    @app.route("/login", methods = ['GET','POST'])
-def login():
+    def login():
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     
@@ -1174,3 +1174,28 @@ def login():
         #return render_template('home.html')
     
     return render_template('login.html', form=form)  
+
+
+
+    @app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+
+    class GSAView(ModelView):
+    can_export = True
+    can_delete = False
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
+    def is_accessible(self):
+        return current_user.has_roles('Manager')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
