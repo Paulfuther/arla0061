@@ -1,116 +1,200 @@
-
-from flask_security import utils, SQLAlchemyUserDatastore
-from flask import Flask,  jsonify, request, send_file, flash, url_for, redirect
-from random import sample
-from flask_moment import Moment
-from datetime import time, datetime
-import os
-from werkzeug.utils import secure_filename
-import pandas as pd
-import numpy
-import openpyxl
-import xlrd
-import xlwt
-import xlsxwriter
-from datetime import datetime
-from io import BytesIO
-from openpyxl.reader.excel import load_workbook
-from os import environ
-import re
-import datetime as dt
-import glob
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
-from flask_bootstrap import Bootstrap
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine
-from flaskblog.config import Config
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
-from sqlalchemy.sql import text, select
-from sqlalchemy import *
-from flask_moment import Moment
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
-
-
-
-
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-
-UPLOAD_FOLDER = os.path.join(APP_ROOT, 'Files')
-
-#print(UPLOAD_FOLDER)
+from flask import Flask
 
 app = Flask(__name__)
-app.config.from_object(Config)
 
+#from flaskblog import config
+import os
+from datetime import datetime
 
+from flask import render_template_string, url_for, redirect
+from flask_admin import Admin
+from flask_sqlalchemy import SQLAlchemy
 
-
-
-#app.config.from_object("config.ProductionConfig")
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-moment = Moment(app)
-login_manager=LoginManager(app)
-login_manager.login_view = 'login'
-login_manager.login_message_category = 'info'
-
-
-
-     
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-Bootstrap(app)
-moment = Moment(app)
-
-from flaskblog import routes
-from flaskblog.errors.handlers import errors
-from flaskblog.models import User, Role,  Employee, current_user, Security
-from flask_security.utils import encrypt_password, hash_password
-from flask_admin.menu import MenuLink
+from sqlalchemy.ext.hybrid import hybrid_property
+from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin
+from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
+#from flaskblog.config import Config
+from flask_bcrypt import Bcrypt
+import flask_login
+
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy import Boolean, DateTime, Column, Integer, \
+    String, ForeignKey
+
+# Flask and Flask-SQLAlchemy initialization here
+
+#app = Flask(__name__)
+#app=app.config.from_object(config)
+app.config['SECRET_KEY'] = 'mysecret'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SECURITY_PASSWORD_SALT'] = 'none'
+db = SQLAlchemy(app)
+
+
+admin = Admin(app, name='Dashboard')
+    
+bcrypt = Bcrypt(app)
+#def create_app(config_class=Config):
+#    app.config.from_object(Config)
+#    return app
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+#user_manager = UserManager(app, db, User)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    firstname = db.Column(db.String(15), unique=True)
+    lastname = db.Column(db.String(15), unique=True)
+    email = db.Column(db.String(200), unique=True)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean)
+    confirmed_at = db.Column(db.DateTime)
+    roles = db.relationship('Role',  secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
+
+    def has_roles(self, *args):
+        return set(args).issubset({role.name for role in self.roles})
+
+    def __str__(self):
+        return 'User %r' % (self.firstname)
+
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    description = db.Column(db.String(255))
+
+    def __repr__(self):
+        return '%r' % (self.name)
+
+    def __hash__(self):
+        return hash(self.name)
+
+
+class Employee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    firstname = db.Column(db.String(20), nullable=False)
+    nickname = db.Column(db.String(20), nullable=True)
+    lastname = db.Column(db.String(20), nullable=False)
+    store = db.Column(db.Integer)
+    addressone = db.Column(db.String(20), nullable=False)
+    addresstwo = db.Column(db.String(20), nullable=True)
+    apt = db.Column(db.String(20), nullable=True)
+    city = db.Column(db.String(20), nullable=False)
+    province = db.Column(db.String(20), nullable=False)
+    country = db.Column(db.String(20), nullable=False)
+    mobilephone = db.Column(db.String(10), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    SIN = db.Column(db.Integer, unique=True, nullable=False)
+    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
+    updated_on = db.Column(
+        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    Startdate = db.Column(db.DateTime(), nullable=True)
+    Enddate = db.Column(db.DateTime(), nullable=True)
+    postal = db.Column(db.String(6), nullable=False)
+    trainingid = db.Column(db.String(), nullable=False)
+    trainingpassword = db.Column(db.String(), nullable=False)
+    manager = db.Column(db.String)
+    image_file = db.Column(db.String(20), nullable=False,
+                           default='default.jpg')
+    active = db.Column(db.String)
+    iprismcode = db.Column(db.String(9), nullable=False)
+    #course = db.relationship('Course',  secondary=course_users,
+    #                       backref=db.backref('users', lazy='dynamic'))
+
+    # tobacco training#
+    tobstartdate = db.Column(db.DateTime(), nullable=True)
+    tobcompleted = db.Column(db.String)
+    tobexpireydate = db.Column(db.DateTime(), nullable=True)
+    tobcompliant = db.Column(db.String(), nullable=False)
+    #whmis training#
+    whmisstartdate = db.Column(db.DateTime(), nullable=True)
+    whmiscompleted = db.Column(db.String)
+    whmisexpireydate = db.Column(db.DateTime(), nullable=True)
+    whmiscompliant = db.Column(db.String(), nullable=False)
+    #ppe training#
+    ppestartdate = db.Column(db.DateTime(), nullable=True)
+    ppecompleted = db.Column(db.String)
+    ppeexpireydate = db.Column(db.DateTime(), nullable=True)
+    ppecompliant = db.Column(db.String(), nullable=False)
+    #fire extinguisher training#
+    firestartdate = db.Column(db.DateTime(), nullable=True)
+    firecompleted = db.Column(db.String)
+    fireexpireydate = db.Column(db.DateTime(), nullable=True)
+    firecompliant = db.Column(db.String(), nullable=False)
+    #emergency response procedures training#
+    emerstartdate = db.Column(db.DateTime(), nullable=True)
+    emercompleted = db.Column(db.String)
+    emerexpireydate = db.Column(db.DateTime(), nullable=True)
+    emercompliant = db.Column(db.String(), nullable=False)
+    #first aid training#
+    firstaidstartdate = db.Column(db.DateTime(), nullable=True)
+    firstaidcompleted = db.Column(db.String)
+    firstaidexpireydate = db.Column(db.DateTime(), nullable=True)
+    firstaidcompliant = db.Column(db.String(), nullable=False)
+    #food handling traning#
+    foodstartdate = db.Column(db.DateTime(), nullable=True)
+    foodcompleted = db.Column(db.String)
+    foodexpireydate = db.Column(db.DateTime(), nullable=True)
+    foodcompliant = db.Column(db.String(), nullable=False)
+    #propane handling training#
+    propanestartdate = db.Column(db.DateTime(), nullable=True)
+    propanecompleted = db.Column(db.String)
+    propaneexpireydate = db.Column(db.DateTime(), nullable=True)
+    propanecompliant = db.Column(db.String(), nullable=False)
+    #health and safety training#
+    hsstartdate = db.Column(db.DateTime(), nullable=True)
+    hscompleted = db.Column(db.String)
+    hsexpireydate = db.Column(db.DateTime(), nullable=True)
+    hscompliant = db.Column(db.String(), nullable=False)
+    #fule pump shut off training#
+    fuelstartdate = db.Column(db.DateTime(), nullable=True)
+    fuelcompleted = db.Column(db.String)
+    fuelexpireydate = db.Column(db.DateTime(), nullable=True)
+    fuelcompliant = db.Column(db.String(), nullable=False)
+    #work alone training#
+    alonestartdate = db.Column(db.DateTime(), nullable=True)
+    alonecompleted = db.Column(db.String)
+    aloneexpireydate = db.Column(db.DateTime(), nullable=True)
+    alonecompliant = db.Column(db.String(), nullable=False)
+    #workplace violence and harrassment traiing#
+    violencestartdate = db.Column(db.DateTime(), nullable=True)
+    violencecompleted = db.Column(db.String)
+    violenceexpireydate = db.Column(db.DateTime(), nullable=True)
+    violencecompliant = db.Column(db.String(), nullable=False)
+    #joint health and safety training#
+    jointstartdate = db.Column(db.DateTime(), nullable=True)
+    jointcompleted = db.Column(db.String)
+    jointexpireydate = db.Column(db.DateTime(), nullable=True)
+    jointcompliant = db.Column(db.String(), nullable=False)
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
+#create a user to test with
 
-#@app.before_first_request
-#def create_user():
-    #db.drop_all()
-    #db.create_all()
-#    user_datastore.create_role(name='Admin')
-#    user_datastore.create_user(email='admin@admin', password='adminadmin', roles=['Admin'])
-    
-#    db.session.commit()
-
-
-admin = Admin(app)#
-
-
-#@app.before_first_request
-#def create_user():
-    
- #   user_datastore.create_user(email='admin', password='admin1234')#, firstname=" ", lastname=" ", active=" ", confirmed_at= " ")
-  #  db.session.commit()
-
-
-    
 
 class MyModelView(ModelView):
     can_export = True
     can_delete = False
-    column_exclude_list = ('password')
-    def is_accessible(self):
-        return current_user.is_authenticated
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('home'))
+
     def is_accessible(self):
         return current_user.has_roles('Admin')
+
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+
     def on_model_change(self, form, model, is_created):
         if is_created:
             model.password = hash_password(form.password.data)
@@ -121,31 +205,34 @@ class MyModelView(ModelView):
                 model.password = hash_password(form.password.data)
 
 
-class OtherView(ModelView):
+class MyModelView2(ModelView):
     can_export = True
     can_delete = False
-    column_exclude_list = ('password')
 
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.has_roles('Admin')
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
-    
 
 
+class MyModelView3(ModelView):
+    can_export = True
+    can_delete = False
+
+    def is_accessible(self):
+        return current_user.has_roles('Manager')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
 
 
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Role, db.session))
-admin.add_view(ModelView(Employee, db.session))
+admin.add_view(MyModelView(Employee, db.session))
+#admin.add_view(MyModelView3(Employee, db.session))
 
 
+from flaskblog import routes
 
 
-
-
-#admin.add_view(OtherView(Employee, db.session))
-#admin.add_view(OtherView(CourseDetails, db.session))
-#admin.add_link(MenuLink(name='Home', category='', url=url_for('/home')))
-app.register_blueprint(errors)

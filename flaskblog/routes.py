@@ -1,8 +1,10 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort
-from flaskblog import app, db, Bcrypt
+#from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
+from flaskblog import app, Employee, User, Role, bcrypt, db
+from flask_user import roles_required
 
-from flaskblog.models import  User, Role, Employee
+#from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
 from werkzeug.utils import secure_filename
@@ -13,7 +15,7 @@ import xlrd
 import xlwt
 import xlsxwriter
 from flaskblog import datetime
-from flaskblog import bcrypt
+from flask_moment import Moment
 from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 from PIL import Image
@@ -23,6 +25,7 @@ from sqlalchemy import *
 from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 
+moment = Moment(app)
 
 
 @app.route("/")
@@ -35,6 +38,30 @@ def home():
     #return render_template('home.html')
 
 
+#@app.route("/login", methods=['GET', 'POST'])
+#def login():
+ #   if current_user.is_authenticated:
+ #       return redirect(url_for('home'))
+
+  #  form = LoginForm()
+
+   # if form.validate_on_submit():
+   #     user = User.query.filter_by(email=form.email.data).first()
+
+    #    password = bcrypt.checkpw(user.password.encode(), user.passowrd.pwd.encode())
+        #print(user.password)
+        #print(password)
+        #hp = bcrypt.check_password_hash(user.password, password)
+        #print(hp)
+    #    if user and bcrypt.check_password_hash(user.password, form.password.data):
+
+     #       login_user(user, remember=form.remember.data)
+      #      return redirect(url_for('hrhome'))
+      #  return '<h1> Invalid Credentials </h1>'
+
+        #return render_template('home.html')
+
+   # return render_template('login.html', form=form)
 
 
 
@@ -343,8 +370,11 @@ def hr():
     #print("did not work")
     return render_template('employee.html', title='Employee Information', form=form)
 
+
+@roles_required('Admin')
 @app.route("/applications")
 @login_required
+
 def Applications():
     return render_template('applications.html', title='Applications')
 
