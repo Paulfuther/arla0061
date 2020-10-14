@@ -208,6 +208,7 @@
 
         <div  class="formtitle" >{{"Tobacco Expirey Date:"}}</div>
         <div> {{form.tobexpirationdate(class = "form" ,placeholder="Start Date")}}
+
          </div>
 
         <!-- whmis training-->
@@ -545,6 +546,35 @@
 
         <div  class="formtitle" >{{"Fuel ShutoffExpirey Date:"}}</div>
         <div> {{form.fuelexpirationdate(class = "form" ,placeholder="Start Date")}}
+         </div>
+
+
+        <!-- co2 training -->
+
+        <div  class="formtitle"></div><div></div>
+        <div  class="formtitle" >{{"CO2 Alarm Training Information:"}}</div>
+        <div></div>
+        <div  class="formtitle"></div><div></div>
+
+        <div  class="formtitle" >{{"CO2 Alarm Compliant:"}}</div>
+        <div> {{form.co2compliant(class = "form" ,placeholder="Compliant")}}
+                    {% if form.co2compliant.errors %}
+                        {% for error in form.co2compliant.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}  
+                        {% endif %}
+         </div>
+
+        <div  class="formtitle" >{{"CO2 Alarm Start Date:"}}</div>
+        <div> {{form.co2startdate(class = "form" ,placeholder="Start Date")}}
+         </div>
+
+        <div  class="formtitle" >{{"CO2 Alarm Completion Date:"}}</div>
+        <div> {{form.co2completeddate(class = "form" ,placeholder="Start Date")}}
+         </div>
+
+        <div  class="formtitle" >{{"CO 2Expirey Date:"}}</div>
+        <div> {{form.co2expirationdate(class = "form" ,placeholder="Start Date")}}
          </div>
 
 

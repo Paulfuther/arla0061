@@ -26,9 +26,9 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, \
 
 #app = Flask(__name__)
 #app=app.config.from_object(config)
-app.config['SECRET_KEY'] = 'mysecret'
+app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-app.config['SECURITY_PASSWORD_SALT'] = 'none'
+app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
 db = SQLAlchemy(app)
 
 
@@ -115,69 +115,75 @@ class Employee(db.Model):
 
     # tobacco training#
     tobstartdate = db.Column(db.DateTime(), nullable=True)
-    tobcompleted = db.Column(db.String)
+    tobcompleted = db.Column(db.DateTime(), nullable=True)
     tobexpireydate = db.Column(db.DateTime(), nullable=True)
     tobcompliant = db.Column(db.String(), nullable=False)
     #whmis training#
     whmisstartdate = db.Column(db.DateTime(), nullable=True)
-    whmiscompleted = db.Column(db.String)
+    whmiscompleted = db.Column(db.DateTime(), nullable=True)
     whmisexpireydate = db.Column(db.DateTime(), nullable=True)
     whmiscompliant = db.Column(db.String(), nullable=False)
     #ppe training#
     ppestartdate = db.Column(db.DateTime(), nullable=True)
-    ppecompleted = db.Column(db.String)
+    ppecompleted = db.Column(db.DateTime(), nullable=True)
     ppeexpireydate = db.Column(db.DateTime(), nullable=True)
     ppecompliant = db.Column(db.String(), nullable=False)
     #fire extinguisher training#
     firestartdate = db.Column(db.DateTime(), nullable=True)
-    firecompleted = db.Column(db.String)
+    firecompleted = db.Column(db.DateTime(), nullable=True)
     fireexpireydate = db.Column(db.DateTime(), nullable=True)
     firecompliant = db.Column(db.String(), nullable=False)
     #emergency response procedures training#
     emerstartdate = db.Column(db.DateTime(), nullable=True)
-    emercompleted = db.Column(db.String)
+    emercompleted = db.Column(db.DateTime(), nullable=True)
     emerexpireydate = db.Column(db.DateTime(), nullable=True)
     emercompliant = db.Column(db.String(), nullable=False)
     #first aid training#
     firstaidstartdate = db.Column(db.DateTime(), nullable=True)
-    firstaidcompleted = db.Column(db.String)
+    firstaidcompleted = db.Column(db.DateTime(), nullable=True)
     firstaidexpireydate = db.Column(db.DateTime(), nullable=True)
     firstaidcompliant = db.Column(db.String(), nullable=False)
     #food handling traning#
     foodstartdate = db.Column(db.DateTime(), nullable=True)
-    foodcompleted = db.Column(db.String)
+    foodcompleted = db.Column(db.DateTime(), nullable=True)
     foodexpireydate = db.Column(db.DateTime(), nullable=True)
     foodcompliant = db.Column(db.String(), nullable=False)
     #propane handling training#
     propanestartdate = db.Column(db.DateTime(), nullable=True)
-    propanecompleted = db.Column(db.String)
+    propanecompleted = db.Column(db.DateTime(), nullable=True)
     propaneexpireydate = db.Column(db.DateTime(), nullable=True)
     propanecompliant = db.Column(db.String(), nullable=False)
     #health and safety training#
     hsstartdate = db.Column(db.DateTime(), nullable=True)
-    hscompleted = db.Column(db.String)
+    hscompleted = db.Column(db.DateTime(), nullable=True)
     hsexpireydate = db.Column(db.DateTime(), nullable=True)
     hscompliant = db.Column(db.String(), nullable=False)
     #fule pump shut off training#
     fuelstartdate = db.Column(db.DateTime(), nullable=True)
-    fuelcompleted = db.Column(db.String)
+    fuelcompleted = db.Column(db.DateTime(), nullable=True)
     fuelexpireydate = db.Column(db.DateTime(), nullable=True)
     fuelcompliant = db.Column(db.String(), nullable=False)
     #work alone training#
     alonestartdate = db.Column(db.DateTime(), nullable=True)
-    alonecompleted = db.Column(db.String)
+    alonecompleted = db.Column(db.DateTime(), nullable=True)
     aloneexpireydate = db.Column(db.DateTime(), nullable=True)
     alonecompliant = db.Column(db.String(), nullable=False)
     #workplace violence and harrassment traiing#
     violencestartdate = db.Column(db.DateTime(), nullable=True)
-    violencecompleted = db.Column(db.String)
+    violencecompleted = db.Column(db.DateTime(), nullable=True)
     violenceexpireydate = db.Column(db.DateTime(), nullable=True)
     violencecompliant = db.Column(db.String(), nullable=False)
     #joint health and safety training#
     jointstartdate = db.Column(db.DateTime(), nullable=True)
-    jointcompleted = db.Column(db.String)
+    jointcompleted = db.Column(db.DateTime(), nullable=True)
     jointexpireydate = db.Column(db.DateTime(), nullable=True)
     jointcompliant = db.Column(db.String(), nullable=False)
+    #co2 alarm training#
+    co2startdate = db.Column(db.DateTime(), nullable=True)
+    co2completed = db.Column(db.DateTime(), nullable=True)
+    co2expireydate = db.Column(db.DateTime(), nullable=True)
+    co2compliant = db.Column(db.String(), nullable=False)
+    
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)

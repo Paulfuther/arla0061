@@ -19,7 +19,7 @@ from flask_moment import Moment
 from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 from PIL import Image
-import re
+import re, base64
 from sqlalchemy.sql import text, select
 from sqlalchemy import *
 from sqlalchemy import extract
@@ -241,11 +241,11 @@ def updategsa(staff_id):
             
             # An updated SIN and or Email Address needs to be hashed before adding to database
             
-            hashed_password = bcrypt.generate_password_hash(
-                form.email.data).decode('utf-8')
+            #hashed_password = bcrypt.generate_password_hash(
+            #    form.email.data).decode('utf-8')
             
-            hashed_SIN = bcrypt.generate_password_hash(
-            form.SIN.data).decode('utf-8')
+            #hashed_SIN = bcrypt.generate_password_hash(
+            #form.SIN.data).decode('utf-8')
            
             if form.hrpicture.data:
                 picture_file = save_hrpicture(form.hrpicture.data)
@@ -277,9 +277,10 @@ def hr():
     if form.validate_on_submit():
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
-            
-        hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')     
-        hashed_SIN = bcrypt.generate_password_hash(form.SIN.data).decode('utf-8')
+        else:
+            picture_file = '3d611379cfdf5a89.jpg'
+        #hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')     
+        #hashed_SIN = bcrypt.generate_password_hash(form.SIN.data).decode('utf-8')
                 
         emp = Employee(firstname=form.firstname.data,
                        nickname=form.nickname.data,
@@ -354,8 +355,11 @@ def hr():
                        jointstartdate=form.jointstartdate.data,
                        jointcompleted=form.jointcompleteddate.data,
                        jointexpireydate=form.jointexpirationdate.data,
-                       jointcompliant=form.jointcompliant.data)
-                             
+                       jointcompliant=form.jointcompliant.data,
+                       co2startdate = form.jointstartdate.data,
+                       co2completed = form.jointcompleteddate.data,
+                       co2expireydate = form.jointexpirationdate.data,
+                       co2compliant = form.jointcompliant.data)
                                      
         db.session.add(emp)
         db.session.commit()
