@@ -2,8 +2,8 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
 from flaskblog import app, Employee, User, Role, bcrypt, db
-from flask_user import roles_required
-
+#from flask_user import roles_required
+from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
@@ -16,7 +16,8 @@ import xlwt
 import xlsxwriter
 from flaskblog import datetime
 from flask_moment import Moment
-from flask_login import login_user, current_user, logout_user, login_required
+#from flask_login import login_user, current_user, logout_user, login_required
+#from flask_user import roles_required
 import secrets
 from PIL import Image
 import re, base64
@@ -375,10 +376,10 @@ def hr():
     return render_template('employee.html', title='Employee Information', form=form)
 
 
-@roles_required('Admin')
-@app.route("/applications")
-@login_required
 
+@app.route("/applications")
+#@login_required
+@roles_required('Admin')
 def Applications():
     return render_template('applications.html', title='Applications')
 

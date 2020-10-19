@@ -1,7 +1,9 @@
 from flask import Flask
-
+#import flask_login
 app = Flask(__name__)
 
+
+#from flask_user import roles_required, UserManager, SQLAlchemyAdapter
 #from flaskblog import config
 import os
 from datetime import datetime
@@ -11,12 +13,13 @@ from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin
+from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin, login_required, roles_required
 from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.menu import MenuLink
 #from flaskblog.config import Config
 from flask_bcrypt import Bcrypt
-import flask_login
+
 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
@@ -30,21 +33,18 @@ app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
 db = SQLAlchemy(app)
+#USER_APP_NAME ="app"
 
 
 admin = Admin(app, name='Dashboard')
     
 bcrypt = Bcrypt(app)
-#def create_app(config_class=Config):
-#    app.config.from_object(Config)
-#    return app
-login_manager = flask_login.LoginManager()
-login_manager.init_app(app)
-#user_manager = UserManager(app, db, User)
+#login_manager = flask_login.LoginManager()
+#login_manager.init_app(app)
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+#@login_manager.user_loader
+#def load_user(user_id):
+#    return User.query.get(int(user_id))
 
 roles_users = db.Table(
     'roles_users',
@@ -188,6 +188,9 @@ class Employee(db.Model):
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
+#db_adapter = SQLAlchemyAdapter(db, User)
+#user_manager = UserManager(db_adapter,app)
+
 #create a user to test with
 
 
@@ -237,6 +240,7 @@ admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView(Role, db.session))
 admin.add_view(MyModelView(Employee, db.session))
 #admin.add_view(MyModelView3(Employee, db.session))
+admin.add_link(MenuLink(name='Public Site', url='/', category = "Links"))
 
 
 from flaskblog import routes

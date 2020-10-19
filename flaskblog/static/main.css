@@ -98,6 +98,14 @@ ul {
 
 /*--- Login Form --*/
 
+.loginform {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  margin: auto;
+  width: 80%;
+  margin-top: 20px;
+}
+
 .login {
   display: grid;
   align-content: center;
