@@ -1,3 +1,4 @@
+
 from flask import Flask
 #import flask_login
 app = Flask(__name__)
@@ -42,7 +43,9 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, \
 
 #delte next three lines on server
 
-
+app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
 
 #delte above three on server
 
@@ -199,6 +202,29 @@ class Employee(db.Model):
     co2compliant = db.Column(db.String(), nullable=False)
     
 
+task_store = db.Table(
+    'task_store',
+    db.Column('todo_id', db.Integer(), db.ForeignKey('todo.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
+    
+    
+class Store(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.Integer)
+    
+    def __repr__(self):
+        return '%r' % (self.number)
+    
+class Todo(db.Model):
+    id=db.Column(db.Integer, primary_key=True)
+    task = db.Column(db.String(200))
+    store = db.relationship('Store',  secondary=task_store,
+                            backref=db.backref('users', lazy='dynamic'))
+    
+    def __repr__(self):
+           return '%r' % (self.task)
+
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
@@ -242,9 +268,6 @@ class MyModelView2(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
     
-    
-        
-
 
 class MyModelView3(ModelView):
     can_export = True
@@ -255,12 +278,40 @@ class MyModelView3(ModelView):
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+    
+
+class MyModelView4(ModelView):
+    can_export = True
+    can_delete = True
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
+
+class MyModelView5(ModelView):
+    can_export = True
+    can_delete = True
+    column_select_related_list = (Todo.store, Todo.task)
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
+class MyModelView6(ModelView):
+    column_searchable_list = (Todo.task, Store.number)
+        
+    
 
 
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView2(Role, db.session))
 admin.add_view(MyModelView2(Employee, db.session))
-#admin.add_view(MyModelView3(Employee, db.session))
+admin.add_view(MyModelView6(Todo, db.session))
+admin.add_view(MyModelView4(Store, db.session))
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 
 
