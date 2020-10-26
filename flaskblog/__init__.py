@@ -197,9 +197,12 @@ security = Security(app, user_datastore)
 class MyModelView(ModelView):
     can_export = True
     can_delete = False
+    #column_sortable_list = ['lastname']
 
     def is_accessible(self):
-        return current_user.has_roles('Admin')
+        return current_user.has_roles('Admin' , 'Manager')
+    
+    
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
@@ -217,12 +220,16 @@ class MyModelView(ModelView):
 class MyModelView2(ModelView):
     can_export = True
     can_delete = False
+    
 
     def is_accessible(self):
         return current_user.has_roles('Admin')
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+    
+    
+        
 
 
 class MyModelView3(ModelView):
@@ -237,10 +244,10 @@ class MyModelView3(ModelView):
 
 
 admin.add_view(MyModelView(User, db.session))
-admin.add_view(MyModelView(Role, db.session))
-admin.add_view(MyModelView(Employee, db.session))
+admin.add_view(MyModelView2(Role, db.session))
+admin.add_view(MyModelView2(Employee, db.session))
 #admin.add_view(MyModelView3(Employee, db.session))
-admin.add_link(MenuLink(name='Public Site', url='/', category = "Links"))
+admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 
 
 from flaskblog import routes

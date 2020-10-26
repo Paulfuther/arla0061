@@ -100,10 +100,15 @@ ul {
 
 .loginform {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
-  margin: auto;
-  width: 80%;
-  margin-top: 20px;
+  grid-template-columns: 250px;
+  justify-content: center;
+  justify-items: start;
+  margin-top: 100px;
+  font-size: 25px;
+}
+
+.securityform {
+  font-size: 25px;
 }
 
 .login {
@@ -112,6 +117,29 @@ ul {
   padding-top: 20px;
 
 }
+
+.formscontrol {
+  width:250px;
+  height: 40px;
+  border-radius: 12px;
+  
+
+}
+
+.formscontrol:focus {
+   width:250px;
+   height: 40px;
+   border-radius: 12px;
+   outline-style: none;
+}
+
+.loginheader {
+  width: 250px;
+  text-align: center;
+}
+
+/* -- */
+
 
 .logincard {
   display: grid;

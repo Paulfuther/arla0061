@@ -8,21 +8,52 @@
 
   {% include "security/_messages.html" %}
 
-    <link rel="stylesheet" href="/static/main.css">
+    {% block head %}
+    {{ super() }}
+
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'main.css') }}" ></link> 
+              <style>
+
+              input[type=text] , input[type=password] {
+                font-size: 20px;
+                padding: 12px;
+                border-radius: 12px;
+              }
+
+              input[type=submit] {
+                font-size: 20px;
+                
+              }
+
+              h1 {
+                font-family: "Comic Sans MS", Sans, Arial;
+                text-align:center;
+              }
+
+              </style>
+    {% endblock %}
+
 
     <div class = "loginform">
 
-       <div><h1>{{ _('Login') }}</h1></div><div></div>
+       <div class = "loginheader"><h1>{{ _('Login') }}</h1></div>
+       </br>
+       
 
               <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
-                {{ login_user_form.hidden_tag() }}
-                {{ render_field_with_errors(login_user_form.email)  }}
-                {{ render_field_with_errors(login_user_form.password) }}
-                {{ render_field_with_errors(login_user_form.remember) }}
-                {{ render_field(login_user_form.submit) }}
 
+                  <div class ="securityform">
+                    {{ login_user_form.hidden_tag() }}
+                    {{ render_field_with_errors(login_user_form.email, class="formscontrol")  }}
+                    {{ render_field_with_errors(login_user_form.password, class="formscontrol") }}
+                    {{ render_field_with_errors(login_user_form.remember) }}
+                    <div>
+                    {{ render_field(login_user_form.submit, class = "formscontrol") }} 
+                    </div>
+
+                  </div>
               </form>
-          </div>
+      </div>
 
   {% include "security/_menu.html" %}
   {% endblock %}
