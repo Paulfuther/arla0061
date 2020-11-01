@@ -1,4 +1,10 @@
 -- SQLite
-select firstname, lastname, role.name
+select firstname, role.name
+
 from user
-inner join role  on role.id = user.id
+inner join roles_users  on user_id = user.id
+inner join role on role.id = role_id
+
+order by firstname
+
+

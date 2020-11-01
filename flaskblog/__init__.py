@@ -3,26 +3,18 @@ from flask import Flask
 #import flask_login
 app = Flask(__name__)
 
-
-#from flask_user import roles_required, UserManager, SQLAlchemyAdapter
-#from flaskblog import config
 import os
 import json
 from datetime import datetime
-
 from flask import render_template_string, url_for, redirect
 from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
-
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin, login_required, roles_required
 from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.menu import MenuLink
-#from flaskblog.config import Config
 from flask_bcrypt import Bcrypt
-
-
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
@@ -71,8 +63,8 @@ roles_users = db.Table(
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    firstname = db.Column(db.String(15), unique=True)
-    lastname = db.Column(db.String(15), unique=True)
+    firstname = db.Column(db.String(15), unique=False)
+    lastname = db.Column(db.String(15), unique=False)
     email = db.Column(db.String(200), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean)
@@ -86,7 +78,6 @@ class User(UserMixin, db.Model):
     def __str__(self):
         return 'User %r' % (self.firstname)
 
-
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
@@ -98,6 +89,17 @@ class Role(db.Model, RoleMixin):
     def __hash__(self):
         return hash(self.name)
 
+course_employee = db.Table(
+    'course_employee',
+    db.Column('employee_id', db.Integer(), db.ForeignKey('employee.id')),
+    db.Column('course_id', db.Integer(), db.ForeignKey('course.id'))
+)
+
+course_complete = db.Table(
+    'course_complete',
+    db.Column('completed_id', Boolean(), db.ForeignKey('course.Completed')),
+    db.Column('course_id', db.Integer(), db.ForeignKey('course.id'))
+)
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -127,88 +129,23 @@ class Employee(db.Model):
                            default='default.jpg')
     active = db.Column(db.String)
     iprismcode = db.Column(db.String(9), nullable=False)
-    #course = db.relationship('Course',  secondary=course_users,
-    #                       backref=db.backref('users', lazy='dynamic'))
-
-    # tobacco training#
-    tobstartdate = db.Column(db.DateTime(), nullable=True)
-    tobcompleted = db.Column(db.DateTime(), nullable=True)
-    tobexpireydate = db.Column(db.DateTime(), nullable=True)
-    tobcompliant = db.Column(db.String(), nullable=False)
-    #whmis training#
-    whmisstartdate = db.Column(db.DateTime(), nullable=True)
-    whmiscompleted = db.Column(db.DateTime(), nullable=True)
-    whmisexpireydate = db.Column(db.DateTime(), nullable=True)
-    whmiscompliant = db.Column(db.String(), nullable=False)
-    #ppe training#
-    ppestartdate = db.Column(db.DateTime(), nullable=True)
-    ppecompleted = db.Column(db.DateTime(), nullable=True)
-    ppeexpireydate = db.Column(db.DateTime(), nullable=True)
-    ppecompliant = db.Column(db.String(), nullable=False)
-    #fire extinguisher training#
-    firestartdate = db.Column(db.DateTime(), nullable=True)
-    firecompleted = db.Column(db.DateTime(), nullable=True)
-    fireexpireydate = db.Column(db.DateTime(), nullable=True)
-    firecompliant = db.Column(db.String(), nullable=False)
-    #emergency response procedures training#
-    emerstartdate = db.Column(db.DateTime(), nullable=True)
-    emercompleted = db.Column(db.DateTime(), nullable=True)
-    emerexpireydate = db.Column(db.DateTime(), nullable=True)
-    emercompliant = db.Column(db.String(), nullable=False)
-    #first aid training#
-    firstaidstartdate = db.Column(db.DateTime(), nullable=True)
-    firstaidcompleted = db.Column(db.DateTime(), nullable=True)
-    firstaidexpireydate = db.Column(db.DateTime(), nullable=True)
-    firstaidcompliant = db.Column(db.String(), nullable=False)
-    #food handling traning#
-    foodstartdate = db.Column(db.DateTime(), nullable=True)
-    foodcompleted = db.Column(db.DateTime(), nullable=True)
-    foodexpireydate = db.Column(db.DateTime(), nullable=True)
-    foodcompliant = db.Column(db.String(), nullable=False)
-    #propane handling training#
-    propanestartdate = db.Column(db.DateTime(), nullable=True)
-    propanecompleted = db.Column(db.DateTime(), nullable=True)
-    propaneexpireydate = db.Column(db.DateTime(), nullable=True)
-    propanecompliant = db.Column(db.String(), nullable=False)
-    #health and safety training#
-    hsstartdate = db.Column(db.DateTime(), nullable=True)
-    hscompleted = db.Column(db.DateTime(), nullable=True)
-    hsexpireydate = db.Column(db.DateTime(), nullable=True)
-    hscompliant = db.Column(db.String(), nullable=False)
-    #fule pump shut off training#
-    fuelstartdate = db.Column(db.DateTime(), nullable=True)
-    fuelcompleted = db.Column(db.DateTime(), nullable=True)
-    fuelexpireydate = db.Column(db.DateTime(), nullable=True)
-    fuelcompliant = db.Column(db.String(), nullable=False)
-    #work alone training#
-    alonestartdate = db.Column(db.DateTime(), nullable=True)
-    alonecompleted = db.Column(db.DateTime(), nullable=True)
-    aloneexpireydate = db.Column(db.DateTime(), nullable=True)
-    alonecompliant = db.Column(db.String(), nullable=False)
-    #workplace violence and harrassment traiing#
-    violencestartdate = db.Column(db.DateTime(), nullable=True)
-    violencecompleted = db.Column(db.DateTime(), nullable=True)
-    violenceexpireydate = db.Column(db.DateTime(), nullable=True)
-    violencecompliant = db.Column(db.String(), nullable=False)
-    #joint health and safety training#
-    jointstartdate = db.Column(db.DateTime(), nullable=True)
-    jointcompleted = db.Column(db.DateTime(), nullable=True)
-    jointexpireydate = db.Column(db.DateTime(), nullable=True)
-    jointcompliant = db.Column(db.String(), nullable=False)
-    #co2 alarm training#
-    co2startdate = db.Column(db.DateTime(), nullable=True)
-    co2completed = db.Column(db.DateTime(), nullable=True)
-    co2expireydate = db.Column(db.DateTime(), nullable=True)
-    co2compliant = db.Column(db.String(), nullable=False)
+    course = db.relationship('Course',  secondary=course_employee,
+                           backref=db.backref('employees', lazy='dynamic'))
     
+class Course(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    Completed = db.Column(Boolean(), nullable=False, default=False)
+
+    def __str__(self):
+        return '%r' % (self.name)
 
 task_store = db.Table(
     'task_store',
     db.Column('todo_id', db.Integer(), db.ForeignKey('todo.id')),
     db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
 )
-    
-    
+       
 class Store(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer)
@@ -238,9 +175,11 @@ class MyModelView(ModelView):
     can_export = True
     can_delete = False
     #column_sortable_list = ['lastname']
+    column_hide_backrefs = False
+    column_list = ('firstname', 'roles')
 
     def is_accessible(self):
-        return current_user.has_roles('Admin' , 'Manager')
+        return current_user.has_roles('Admin' )
     
     
 
@@ -256,11 +195,11 @@ class MyModelView(ModelView):
             if not old_password == model.password:
                 model.password = hash_password(form.password.data)
 
-
 class MyModelView2(ModelView):
     can_export = True
     can_delete = False
-    
+    column_hide_backrefs = False
+    column_list = ('firstname', 'course', 'Completed')
 
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -268,7 +207,6 @@ class MyModelView2(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
     
-
 class MyModelView3(ModelView):
     can_export = True
     can_delete = False
@@ -279,7 +217,6 @@ class MyModelView3(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
     
-
 class MyModelView4(ModelView):
     can_export = True
     can_delete = True
@@ -290,29 +227,54 @@ class MyModelView4(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
-
 class MyModelView5(ModelView):
     can_export = True
     can_delete = True
-    column_select_related_list = (Todo.store, Todo.task)
+    column_hide_backrefs = False
+    column_list = ('store', 'task')
+    
+    
+    
+    #column_select_related_list = (Todo.store, Todo.task)
     def is_accessible(self):
         return current_user.has_roles('Admin')
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
-class MyModelView6(ModelView):
-    column_searchable_list = (Todo.task, Store.number)
-        
+class AdminViewStore(ModelView):
     
+    column_sortable_list = ['number']
+    
+    def is_accessible(self):
+            return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))   
+    
+class AdminViewClass(ModelView):
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
 
 
 admin.add_view(MyModelView(User, db.session))
+#admin.add_view(NewView(User, db.session))
+
 admin.add_view(MyModelView2(Role, db.session))
+
 admin.add_view(MyModelView2(Employee, db.session))
-admin.add_view(MyModelView6(Todo, db.session))
-admin.add_view(MyModelView4(Store, db.session))
+
+admin.add_view(MyModelView5(Todo, db.session))
+
+admin.add_view(AdminViewStore(Store, db.session))
+
+admin.add_view(AdminViewClass(Course, db.session))
+
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
+
 
 
 from flaskblog import routes
