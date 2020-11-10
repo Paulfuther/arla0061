@@ -1276,3 +1276,15 @@ def logout():
     co2completed = db.Column(db.DateTime(), nullable=True)
     co2expireydate = db.Column(db.DateTime(), nullable=True)
     co2compliant = db.Column(db.String(), nullable=False)
+
+
+
+
+    
+
+
+#course_complete = db.Table(
+#    'course_complete',
+#    db.Column('completed_id', Boolean(), db.ForeignKey('course.Completed')),
+#    db.Column('course_id', db.Integer(), db.ForeignKey('course.id'))
+#)

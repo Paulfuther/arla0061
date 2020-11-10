@@ -57,6 +57,7 @@ bcrypt = Bcrypt(app)
 
 roles_users = db.Table(
     'roles_users',
+    
     db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
 )
@@ -91,14 +92,10 @@ class Role(db.Model, RoleMixin):
 
 course_employee = db.Table(
     'course_employee',
+    db.Column('id', db.Integer(), primary_key=True),
     db.Column('employee_id', db.Integer(), db.ForeignKey('employee.id')),
-    db.Column('course_id', db.Integer(), db.ForeignKey('course.id'))
-)
-
-course_complete = db.Table(
-    'course_complete',
-    db.Column('completed_id', Boolean(), db.ForeignKey('course.Completed')),
-    db.Column('course_id', db.Integer(), db.ForeignKey('course.id'))
+    db.Column('course_id', db.Integer(), db.ForeignKey('course.id')),
+    db.Column('grade_id', db.Integer(), db.ForeignKey('grade.id')),
 )
 
 class Employee(db.Model):
@@ -129,17 +126,32 @@ class Employee(db.Model):
                            default='default.jpg')
     active = db.Column(db.String)
     iprismcode = db.Column(db.String(9), nullable=False)
-    course = db.relationship('Course',  secondary=course_employee,
-                           backref=db.backref('employees', lazy='dynamic'))
     
+    course = db.relationship('Course',  secondary=course_employee,
+                         backref=db.backref('employees', lazy='dynamic'))
+    #grade = db.relationship('Grade', secondary = course_employee,
+    #                        backref = db.backref('grades', lazy = 'dynamic'))
+    #course_id2 = db.Column(db.Integer(), ForeignKey('course.id'))
+    #course = db.relationship('Course', secondary = course_employee, backref='gradess')
+    
+    def __str__(self):
+        return (self.firstname)
+
 class Course(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    Completed = db.Column(Boolean(), nullable=False, default=False)
-
+    name = db.Column(db.String(100), nullable=False)  
+    
     def __str__(self):
         return '%r' % (self.name)
-
+   
+class Grade(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    value = db.Column(db.Integer())
+    employee_id = db.Column(Integer(), ForeignKey('employee.id'))
+    employee = db.relationship('Employee', backref = 'grades')
+    course_id = db.Column(db.Integer(), ForeignKey('course.id'))
+    course = db.relationship('Course', backref='grade')
+    
 task_store = db.Table(
     'task_store',
     db.Column('todo_id', db.Integer(), db.ForeignKey('todo.id')),
@@ -164,9 +176,6 @@ class Todo(db.Model):
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
-
-#db_adapter = SQLAlchemyAdapter(db, User)
-#user_manager = UserManager(db_adapter,app)
 
 #create a user to test with
 
@@ -199,7 +208,18 @@ class MyModelView2(ModelView):
     can_export = True
     can_delete = False
     column_hide_backrefs = False
-    column_list = ('firstname', 'course', 'Completed')
+    column_list = ('firstname', 'course', 'grades')
+    #column_list = ('employee_id', 'course_id')
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+    
+class MyModelView6(ModelView):
+    can_export = True
+    can_delete = False
 
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -259,11 +279,19 @@ class AdminViewClass(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
+#class GradeView(ModelView):
+    #form_columns = ('course',)
+#    inline_models = ((
+#        course_employee,
+#        {
+#            'form_columns': ('id', 'Employee_id', 'Course_id', 'Completed'),
+#        }
+#    ),)
+
 
 admin.add_view(MyModelView(User, db.session))
-#admin.add_view(NewView(User, db.session))
 
-admin.add_view(MyModelView2(Role, db.session))
+admin.add_view(MyModelView6(Role, db.session))
 
 admin.add_view(MyModelView2(Employee, db.session))
 
@@ -271,7 +299,10 @@ admin.add_view(MyModelView5(Todo, db.session))
 
 admin.add_view(AdminViewStore(Store, db.session))
 
+#admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass(Course, db.session))
+
+admin.add_view(AdminViewClass(Grade, db.session))
 
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 
