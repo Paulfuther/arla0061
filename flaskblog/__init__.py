@@ -90,13 +90,13 @@ class Role(db.Model, RoleMixin):
     def __hash__(self):
         return hash(self.name)
 
-course_employee = db.Table(
-    'course_employee',
-    db.Column('id', db.Integer(), primary_key=True),
-    db.Column('employee_id', db.Integer(), db.ForeignKey('employee.id')),
-    db.Column('course_id', db.Integer(), db.ForeignKey('course.id')),
-    db.Column('grade_id', db.Integer(), db.ForeignKey('grade.id')),
-)
+#course_employee = db.Table(
+#    'course_employee',
+#    db.Column('id', db.Integer(), primary_key=True),
+#    db.Column('employee_id', db.Integer(), db.ForeignKey('employee.id')),
+#    db.Column('course_id', db.Integer(), db.ForeignKey('course.id')),
+#    db.Column('grade_id', db.Integer(), db.ForeignKey('grade.id')),
+#)
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -127,10 +127,11 @@ class Employee(db.Model):
     active = db.Column(db.String)
     iprismcode = db.Column(db.String(9), nullable=False)
     
-    course = db.relationship('Course',  secondary=course_employee,
-                         backref=db.backref('employees', lazy='dynamic'))
+    
+    #course = db.relationship('Course',  secondary=course_employee,
+    #                     backref=db.backref('employees', lazy='dynamic'))
     #grade = db.relationship('Grade', secondary = course_employee,
-    #                        backref = db.backref('grades', lazy = 'dynamic'))
+    #                          backref = db.backref('grades', lazy = 'dynamic'))
     #course_id2 = db.Column(db.Integer(), ForeignKey('course.id'))
     #course = db.relationship('Course', secondary = course_employee, backref='gradess')
     
@@ -208,7 +209,7 @@ class MyModelView2(ModelView):
     can_export = True
     can_delete = False
     column_hide_backrefs = False
-    column_list = ('firstname', 'course', 'grades')
+    column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
 
     def is_accessible(self):

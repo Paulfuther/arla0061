@@ -102,6 +102,85 @@ def search():
     return render_template('hrlist.html', gsa=gsa)
 
 
+@app.route("/employeetest", methods=['GET', 'POST'])
+def employeetest():
+    
+    if request.method == "POST":
+    
+        first_name = request.form['firstname']
+        nick_name = request.form['nickname']
+        store_number = request.form['store']
+        address_one = request.form['addressone']
+        address_two = request.form['addresstwo']
+        apt_number = request.form['apt']
+        city_city = request.form['city']
+        province_province = request.form['province']
+        country_country = request.form["country"]
+        email_email = request.form["email"]
+        mobile_phone = request.form["mobilephone"]
+        SIN_number = request.form["SIN"]
+        
+        
+        sd = datetime.strptime(request.form["Startdate"] , '%Y-%m-%d')
+        start_date = sd.date()
+        
+        ed = datetime.strptime(request.form["Enddate"], '%Y-%m-%d')
+        end_date = ed.date()
+        
+        
+        
+        last_name = request.form["lastname"]
+        postal_code = request.form["postal"]
+        training_id = request.form["trainingid"]
+        training_password = request.form["trainingpassword"]
+        manager_name = request.form["manager"]
+        active_yn = request.form["active"]
+        iprism_code = request.form["iprismcode"]
+    
+        print(first_name)
+        print(iprism_code)
+        print(start_date)
+
+    
+        picture_file = '3d611379cfdf5a89.jpg'
+        #hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')
+        #hashed_SIN = bcrypt.generate_password_hash(form.SIN.data).decode('utf-8')
+
+        emp = Employee(firstname=first_name, \
+                        nickname=nick_name,\
+                        store=store_number, \
+                        addressone= address_one, \
+                        addresstwo=address_two, \
+                        apt= apt_number, \
+                        city= city_city, \
+                        province= province_province, \
+                        country= country_country, \
+                        email= email_email, \
+                        mobilephone= mobile_phone, \
+                        SIN= SIN_number,\
+                        Startdate= start_date,\
+                        Enddate= end_date,\
+                        lastname= last_name,\
+                        postal = postal_code,\
+                        trainingid= training_id,\
+                        trainingpassword= training_password,\
+                        manager= manager_name,\
+                        image_file=picture_file,\
+                        active= active_yn,\
+                        iprismcode= iprism_code)
+
+        print(emp.apt)
+
+        db.session.add(emp)
+        db.session.commit()
+
+        flash('Employee has been added to the database', 'success')
+
+        return redirect(url_for('hrhome'))
+    
+    
+    return render_template('employeetest.html')
+
 def save_hrpicture(form_hrpicture):
     
     thumb = 30,30

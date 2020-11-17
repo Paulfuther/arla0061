@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+<div   class="form-container">
+    <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+    
+        
+        
+
+        <div> <img class="gsaupdateimage" src="{{ image_file }}">
+        </div>
+        <div></div>
+
+        
+            <label>First Name</label>
+            <input type="text" name = "firstname">
+         
+
+            <label>Nickname</label>
+            <input type="text" name = "nickname">
+           
+
+            <label>Store</label>
+            <input type="text" name = "store">
+          
+
+            <label>Address One</label>
+            <input type="text" name = "addressone">
+        
+
+            <label>Address Two</label>
+            <input type="text" name = "addresstwo">
+   
+            <label>Apt</label>
+            <input type="text" name = "apt">
+      
+
+            <label>City</label>
+            <input type="text" name = "city">
+       
+
+            <label>Province</label>
+            <input type="text" name = "province">
+        
+
+            <label>Country</label>
+            <input type="text" name = "country">
+        
+
+            <label >Email</label>
+            <input type="email" name = "email">
+        
+
+            <label>Mobile Phone</label>
+            <input type="tel" name = "mobilephone">
+          
+
+            <label>SIN</label>
+            <input type="text" name = "SIN">
+     
+
+            <label>Start Date</label>
+            <input type="datetime-local" name = "Startdate">
+
+            <label>End Date</label>
+            <input type="datetime-local" name = "Enddate">
+
+            <label>Last Name</label>
+            <input type="text" name = "lastname">
+
+            <label>Postal Code</label>
+            <input type="text" name = "postal">
+
+            <label>Online Training ID</label>
+            <input type="text" name = "trainingid">
+
+            <label>Online Training PWD</label>
+            <input type="text" name = "trainingpassword">
+
+            <label>Mananger</label>
+            <input type="text" name = "manager">
+
+            <label>Active</label>
+            <input type="text" name = "active">
+
+            <label>Bulloch Code</label>
+            <input type="text" name = "iprismcode">
+         
+            <button type = "submit" class = "button">Submit </button>
+
+
+    </form>
+</div>
+      
+{% endblock content %}
+
