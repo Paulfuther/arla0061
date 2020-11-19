@@ -577,6 +577,7 @@ ul.a {
   width: 95%;
   padding: 15px 15px 15px 15px;
   border-radius: 8px;
+  font-size: 24px;
 
 }
 .form2 {
@@ -607,10 +608,10 @@ ul.a {
 
 .formtitle {
   height: 10px;
-  font-size: 14px;
+  font-size: 24px;
   text-align: left;
   color: black;
-  padding-bottom: 30px;
+  padding-bottom: 50px;
   padding-left: 10px;
   
 
@@ -967,10 +968,10 @@ a.hrbutton {
 
   .formtitle {
     height: 10px;
-    font-size: 14px;
+    font-size: 24px;
     text-align: center;
     color: black;
-    padding-bottom: 30px;
+    padding-bottom: 50px;
     padding-left: 10px;
 
 

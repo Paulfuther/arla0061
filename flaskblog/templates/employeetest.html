@@ -14,80 +14,90 @@
         <div></div>
 
         
-            <label>First Name</label>
-            <input type="text" name = "firstname">
+            <label class="formtitle">First Name  </label>
+            <input type="text"  class="form" name = "firstname">
          
 
-            <label>Nickname</label>
-            <input type="text" name = "nickname">
+            <label class="formtitle" >Nickname</label>
+            <input type="text" class="form"name = "nickname">
            
+            <label class="formtitle" >Last Name</label>
+            <input type="text" class="form"name = "lastname">
 
-            <label>Store</label>
-            <input type="text" name = "store">
+            <label class="formtitle" >Store</label>
+            <input type="text" class="form"name = "store">
           
 
-            <label>Address One</label>
-            <input type="text" name = "addressone">
+            <label class="formtitle" >Address One</label>
+            <input type="text" class="form" name = "addressone">
         
 
-            <label>Address Two</label>
-            <input type="text" name = "addresstwo">
+            <label class="formtitle" >Address Two</label>
+            <input type="text" class="form"name = "addresstwo">
    
-            <label>Apt</label>
-            <input type="text" name = "apt">
+            <label class="formtitle" >Apt</label>
+            <input type="text" class="form"name = "apt">
       
 
-            <label>City</label>
-            <input type="text" name = "city">
+            <label class="formtitle">City</label>
+            <input type="text" class="form"name = "city">
        
 
-            <label>Province</label>
-            <input type="text" name = "province">
+            <label class="formtitle"  >Province</label>
+            <input type="text" class="form"name = "province">
         
 
-            <label>Country</label>
-            <input type="text" name = "country">
+            <label class="formtitle"  >Country</label>
+            <input type="text" class="form"name = "country">
         
 
-            <label >Email</label>
-            <input type="email" name = "email">
+            <label class="formtitle">Email</label>
+            <input type="email" class="form"name = "email">
         
 
-            <label>Mobile Phone</label>
-            <input type="tel" name = "mobilephone">
+            <label class="formtitle">Mobile Phone</label>
+            <input type="tel" class="form"name = "mobilephone">
           
 
-            <label>SIN</label>
-            <input type="text" name = "SIN">
+            <label class="formtitle">SIN</label>
+            <input type="text" class="form"name = "SIN">
      
 
-            <label>Start Date</label>
-            <input type="datetime-local" name = "Startdate">
+            <label class="formtitle">Start Date</label>
+            <input type="date" class="form"name = "Startdate">
 
-            <label>End Date</label>
-            <input type="datetime-local" name = "Enddate">
+            <label class="formtitle">End Date</label>
+            <input type="date" class="form"name = "Enddate">
 
-            <label>Last Name</label>
-            <input type="text" name = "lastname">
+            
 
-            <label>Postal Code</label>
-            <input type="text" name = "postal">
+            <label class="formtitle">Postal Code</label>
+            <input type="text" class="form"name = "postal">
 
-            <label>Online Training ID</label>
-            <input type="text" name = "trainingid">
+            <label class="formtitle" >Online Training ID</label>
+            <input type="text" class="form"name = "trainingid">
 
-            <label>Online Training PWD</label>
-            <input type="text" name = "trainingpassword">
+            <label class="formtitle" >Online Training PWD</label>
+            <input type="text" class="form"name = "trainingpassword">
 
-            <label>Mananger</label>
-            <input type="text" name = "manager">
+            <label class="formtitle" >Mananger</label>
+            <input type="text" class="form"name = "manager">
 
-            <label>Active</label>
-            <input type="text" name = "active">
+            <label class="formtitle" >Active</label>
+            <input type="text" class="form"name = "active">
 
-            <label>Bulloch Code</label>
-            <input type="text" name = "iprismcode">
+            <label class="formtitle">Bulloch Code</label>
+            <input type="text" class="form"name = "iprismcode">
          
+            
+            
+            {% for course in course %}
+            <div class = "formtitle"> {{  course }}  </div>
+            <input type = "text" class="form" name = "completed"> 
+            
+            {% endfor %}
+
+
             <button type = "submit" class = "button">Submit </button>
 
 

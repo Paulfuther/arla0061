@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
-from flaskblog import app, Employee, User, Role, bcrypt, db
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
@@ -105,6 +105,9 @@ def search():
 @app.route("/employeetest", methods=['GET', 'POST'])
 def employeetest():
     
+    course = Course.query.all()
+    
+    
     if request.method == "POST":
     
         first_name = request.form['firstname']
@@ -141,6 +144,24 @@ def employeetest():
         print(iprism_code)
         print(start_date)
 
+        #for course in course:
+        #print(request.form.getlist("completed[]"))
+        #print(request.form.getlist("course"))
+
+        y=1
+        for x in request.form.getlist("completed"):
+            x2 = int(x)
+           # print ((x2))
+            id = x2
+            #print(id, type(id))
+            yy=Course.query.get(y)
+            print(yy, x2)
+            y +=1
+          
+            
+        #for course in course:
+         #   print (type(course.id))
+         
     
         picture_file = '3d611379cfdf5a89.jpg'
         #hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')
@@ -171,15 +192,15 @@ def employeetest():
 
         print(emp.apt)
 
-        db.session.add(emp)
-        db.session.commit()
+        #db.session.add(emp)
+        #db.session.commit()
 
         flash('Employee has been added to the database', 'success')
 
         return redirect(url_for('hrhome'))
     
     
-    return render_template('employeetest.html')
+    return render_template('employeetest.html', course=course)
 
 def save_hrpicture(form_hrpicture):
     
