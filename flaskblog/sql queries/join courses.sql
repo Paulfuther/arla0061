@@ -1,8 +1,8 @@
-select firstname, course.name, completedcourse.score
+select firstname, lastname, course.name, value
 
 from employee
-    inner join course_employee on employee_id = employee.id
-    inner join course on course.id = course_id
-    inner join course_complete on course_id = course_employee.id
+    inner join grade on employee_id = employee.id
+    inner join course on course_id = course.id
+    
 
 order by firstname

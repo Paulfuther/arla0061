@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
@@ -106,9 +106,15 @@ def search():
 def employeetest():
     
     course = Course.query.all()
+    storelist = Store.query.order_by('number')
+    mgr = User.query.order_by('firstname')
     
     
     if request.method == "POST":
+    
+        req=request.form
+    
+        print(req['firstname'])
     
         first_name = request.form['firstname']
         nick_name = request.form['nickname']
@@ -123,6 +129,8 @@ def employeetest():
         mobile_phone = request.form["mobilephone"]
         SIN_number = request.form["SIN"]
         
+        sed = datetime.strptime(request.form["sinexpire"], '%Y-%m-%d')
+        sin_expire = sed.date()
         
         sd = datetime.strptime(request.form["Startdate"] , '%Y-%m-%d')
         start_date = sd.date()
@@ -143,20 +151,17 @@ def employeetest():
         print(first_name)
         print(iprism_code)
         print(start_date)
+        print(store_number)
 
         #for course in course:
         #print(request.form.getlist("completed[]"))
         #print(request.form.getlist("course"))
 
-        y=1
-        for x in request.form.getlist("completed"):
-            x2 = int(x)
-           # print ((x2))
-            id = x2
-            #print(id, type(id))
-            yy=Course.query.get(y)
-            print(yy, x2)
-            y +=1
+        user = Employee.query.filter_by(mobilephone=mobile_phone).first()
+        if user:
+            print("done")
+            #raise ValidationError('That mobile is Taken')
+            return redirect(url_for('employeetest' ,firstname=first_name))
           
             
         #for course in course:
@@ -179,8 +184,9 @@ def employeetest():
                         email= email_email, \
                         mobilephone= mobile_phone, \
                         SIN= SIN_number,\
-                        Startdate= start_date,\
-                        Enddate= end_date,\
+                        sinexpire = sin_expire, \
+                        startdate= start_date,\
+                        enddate= end_date,\
                         lastname= last_name,\
                         postal = postal_code,\
                         trainingid= training_id,\
@@ -190,9 +196,28 @@ def employeetest():
                         active= active_yn,\
                         iprismcode= iprism_code)
 
-        print(emp.apt)
+     
 
-        #db.session.add(emp)
+        db.session.add(emp)
+        db.session.flush()
+        #print(emp.id)
+        f=emp.id
+        
+        y = 1
+        for x in request.form.getlist("completed"):
+            #x2 = int(x)
+            #id = x2
+            print(f,y, x)
+            
+            empgrade = Grade(value=x, \
+                       employee_id = f, \
+                        course_id = y)
+            db.session.add(empgrade)
+            y += 1
+        db.session.commit()
+        
+        
+        
         #db.session.commit()
 
         flash('Employee has been added to the database', 'success')
@@ -200,7 +225,7 @@ def employeetest():
         return redirect(url_for('hrhome'))
     
     
-    return render_template('employeetest.html', course=course)
+    return render_template('employeetest.html', course=course, storelist=storelist, mgr=mgr)
 
 def save_hrpicture(form_hrpicture):
     

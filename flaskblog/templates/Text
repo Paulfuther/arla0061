@@ -1911,3 +1911,22 @@ if form.validate_on_submit():
         flash('Employee has been added to the database', 'success')
 
         return redirect(url_for('hrhome'))
+
+
+
+
+
+         <option value = "396">396</option>
+                <option value = "398">398</option>
+                <option value = "402">402</option>
+                <option value = "414">414</option>
+                <option value = "1616">1616</option>
+                <option value = "8156">8156</option>
+                <option value = "8435">8435</option>
+                <option value = "33410">33410</option>
+                <option value = "33485">33485</option>
+                <option value = "48314">48314</option>
+                <option value = "65077">65077</option>
+                <option value = "65231">65231</option>
+
+                <select class="form"name = "store"required >

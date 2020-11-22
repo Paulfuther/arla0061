@@ -15,21 +15,25 @@
 
         
             <label class="formtitle">First Name  </label>
-            <input type="text"  class="form" name = "firstname">
+            <input type="text"  class="form" name = "firstname" required>
          
 
             <label class="formtitle" >Nickname</label>
             <input type="text" class="form"name = "nickname">
            
             <label class="formtitle" >Last Name</label>
-            <input type="text" class="form"name = "lastname">
+            <input type="text" class="form"name = "lastname"required >
 
             <label class="formtitle" >Store</label>
-            <input type="text" class="form"name = "store">
-          
+            <select name = "store" class = "form"> 
+            {% for store in storelist %}
+            <option value="{{ store.number }}" > {{ store.number}} </option> 
+            {% endfor%}
+            </select>
+            
 
             <label class="formtitle" >Address One</label>
-            <input type="text" class="form" name = "addressone">
+            <input type="text" class="form" name = "addressone" required >
         
 
             <label class="formtitle" >Address Two</label>
@@ -40,60 +44,73 @@
       
 
             <label class="formtitle">City</label>
-            <input type="text" class="form"name = "city">
+            <input type="text" class="form"name = "city" required>
        
 
             <label class="formtitle"  >Province</label>
-            <input type="text" class="form"name = "province">
+            <input type="text" class="form"name = "province"required >
         
 
             <label class="formtitle"  >Country</label>
             <input type="text" class="form"name = "country">
         
+            <label class="formtitle">Postal Code</label>
+            <input type="text" class="form"name = "postal" required>
 
             <label class="formtitle">Email</label>
-            <input type="email" class="form"name = "email">
+            <input type="email" class="form"name = "email"required >
         
 
             <label class="formtitle">Mobile Phone</label>
-            <input type="tel" class="form"name = "mobilephone">
+            <input type="tel" class="form"name = "mobilephone"required >
           
 
             <label class="formtitle">SIN</label>
-            <input type="text" class="form"name = "SIN">
-     
+            <input type="text" class="form"name = "SIN"  >
+      
+            <label class="formtitle">SIN Expiration Date</label>
+            <input type="date" class="form"name = "sinexpire" value = "1900-01-01">
 
             <label class="formtitle">Start Date</label>
-            <input type="date" class="form"name = "Startdate">
+            <input type="date" class="form"name = "Startdate"required >
 
             <label class="formtitle">End Date</label>
-            <input type="date" class="form"name = "Enddate">
-
-            
-
-            <label class="formtitle">Postal Code</label>
-            <input type="text" class="form"name = "postal">
+            <input type="date" class="form"name = "Enddate" value = "1900-01-01" >
 
             <label class="formtitle" >Online Training ID</label>
-            <input type="text" class="form"name = "trainingid">
+            <input type="text" class="form"name = "trainingid" required>
 
             <label class="formtitle" >Online Training PWD</label>
-            <input type="text" class="form"name = "trainingpassword">
+            <input type="text" class="form"name = "trainingpassword"required >
 
-            <label class="formtitle" >Mananger</label>
-            <input type="text" class="form"name = "manager">
+            <label class="formtitle" >Manager</label>
+            <select name = "manager" class = "form"> 
+            {% for mgr in mgr %}
+            <option value="{{ mgr.firstname }}" > {{ mgr.firstname}} </option> 
+            {% endfor%}
+            </select>
 
             <label class="formtitle" >Active</label>
-            <input type="text" class="form"name = "active">
+             <select class="form" name = "active" required>
+                <option value = "y">Y</option>
+                <option value = "n">N</option>
+            </select>
+
+
 
             <label class="formtitle">Bulloch Code</label>
-            <input type="text" class="form"name = "iprismcode">
+            <input type="text" class="form"name = "iprismcode"required >
          
-            
+        
             
             {% for course in course %}
             <div class = "formtitle"> {{  course }}  </div>
-            <input type = "text" class="form" name = "completed"> 
+            
+             <select class="form"name = "completed">
+                <option value = "n">N</option>
+                <option value = "y">Y</option>
+            </select>
+
             
             {% endfor %}
 

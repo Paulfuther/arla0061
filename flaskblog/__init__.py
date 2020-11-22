@@ -90,13 +90,6 @@ class Role(db.Model, RoleMixin):
     def __hash__(self):
         return hash(self.name)
 
-#course_employee = db.Table(
-#    'course_employee',
-#    db.Column('id', db.Integer(), primary_key=True),
-#    db.Column('employee_id', db.Integer(), db.ForeignKey('employee.id')),
-#    db.Column('course_id', db.Integer(), db.ForeignKey('course.id')),
-#    db.Column('grade_id', db.Integer(), db.ForeignKey('grade.id')),
-#)
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,18 +106,19 @@ class Employee(db.Model):
     mobilephone = db.Column(db.String(10), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     SIN = db.Column(db.Integer, unique=True, nullable=False)
+    sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
         db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    Startdate = db.Column(db.DateTime(), nullable=True)
-    Enddate = db.Column(db.DateTime(), nullable=True)
+    startdate = db.Column(db.DateTime(), nullable=True)
+    enddate = db.Column(db.DateTime(), nullable=True)
     postal = db.Column(db.String(6), nullable=False)
     trainingid = db.Column(db.String(), nullable=False)
     trainingpassword = db.Column(db.String(), nullable=False)
     manager = db.Column(db.String)
     image_file = db.Column(db.String(20), nullable=False,
                            default='default.jpg')
-    active = db.Column(db.String)
+    active = db.Column(db.String(), nullable = False)
     iprismcode = db.Column(db.String(9), nullable=False)
     
     
@@ -147,7 +141,7 @@ class Course(db.Model):
    
 class Grade(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    value = db.Column(db.Integer())
+    value = db.Column(db.String(), default="n")
     employee_id = db.Column(Integer(), ForeignKey('employee.id'))
     employee = db.relationship('Employee', backref = 'grades')
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
@@ -274,11 +268,26 @@ class AdminViewStore(ModelView):
         return redirect(url_for('home'))   
     
 class AdminViewClass(ModelView):
+    
+   
+    
     def is_accessible(self):
         return current_user.has_roles('Admin')
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+
+
+class AdminViewClass4(ModelView):
+
+    #column_sortable_list = ['Grade.employee']
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
 
 #class GradeView(ModelView):
     #form_columns = ('course',)
@@ -303,7 +312,7 @@ admin.add_view(AdminViewStore(Store, db.session))
 #admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass(Course, db.session))
 
-admin.add_view(AdminViewClass(Grade, db.session))
+admin.add_view(AdminViewClass4(Grade, db.session))
 
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 
