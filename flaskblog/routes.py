@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
@@ -64,7 +64,12 @@ def home():
 
    # return render_template('login.html', form=form)
 
-
+@app.route("/hrtester", methods = ['GET', 'POST'])
+def hrtester():
+    
+    hrpage = hrfiles.query.all()
+  
+    return render_template('ckfile.html', hrpage=hrpage)
 
 @app.route("/hrhome")
 @login_required
@@ -100,7 +105,6 @@ def search():
     #for staff in gsa:
         #print(staff.firstname)
     return render_template('hrlist.html', gsa=gsa)
-
 
 @app.route("/employeetest", methods=['GET', 'POST'])
 def employeetest():
@@ -196,8 +200,6 @@ def employeetest():
                         active= active_yn,\
                         iprismcode= iprism_code)
 
-     
-
         db.session.add(emp)
         db.session.flush()
         #print(emp.id)
@@ -223,7 +225,6 @@ def employeetest():
         flash('Employee has been added to the database', 'success')
 
         return redirect(url_for('hrhome'))
-    
     
     return render_template('employeetest.html', course=course, storelist=storelist, mgr=mgr)
 
@@ -499,7 +500,6 @@ def hr():
     print(form.errors.items())
     #print("did not work")
     return render_template('employee.html', title='Employee Information', form=form)
-
 
 
 @app.route("/applications")

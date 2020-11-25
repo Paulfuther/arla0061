@@ -3,6 +3,7 @@ from flask import Flask
 #import flask_login
 app = Flask(__name__)
 
+from flask_ckeditor import CKEditor, CKEditorField
 import os
 import json
 from datetime import datetime
@@ -18,6 +19,7 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
+
 
 # Flask and Flask-SQLAlchemy initialization here
 #get variables
@@ -43,6 +45,7 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
 
 db = SQLAlchemy(app)
 #USER_APP_NAME ="app"
+ckeditor = CKEditor(app)
 
 
 admin = Admin(app, name='Dashboard')
@@ -54,6 +57,13 @@ bcrypt = Bcrypt(app)
 #@login_manager.user_loader
 #def load_user(user_id):
 #    return User.query.get(int(user_id))
+
+class hrfiles(db.Model):
+    id = db.Column(db.Integer(), primary_key= True)
+    title = db.Column(db.String(120))
+    text = db.Column(db.Text)
+
+
 
 roles_users = db.Table(
     'roles_users',
@@ -279,7 +289,7 @@ class AdminViewClass(ModelView):
 
 
 class AdminViewClass4(ModelView):
-
+    can_export = True
     #column_sortable_list = ['Grade.employee']
 
     def is_accessible(self):
@@ -287,6 +297,11 @@ class AdminViewClass4(ModelView):
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+
+class hreditor(ModelView):
+    form_overrides = dict(text=CKEditorField)
+    create_template = 'edit.html'
+    edit_tmeplate = 'edit.html'
 
 
 #class GradeView(ModelView):
@@ -315,6 +330,7 @@ admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass4(Grade, db.session))
 
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
+admin.add_view(hreditor(hrfiles, db.session))
 
 
 

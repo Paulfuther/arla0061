@@ -35,6 +35,22 @@ body {
   align-items: center;
 }  */
 
+
+.newfiles {
+  display: grid;
+  
+  justify-content: center;
+  
+  width: 100%;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-left: 50px;
+  padding-right: 50px;
+  
+  font-size: 15px;
+
+}
+
 .alerts {
   width: 50%;
   height: 50%;

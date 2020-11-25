@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+  
+{{ ckeditor.load() }}
+    
+{{ ckeditor.config(name='text') }}
+
+    
+        <div class = "newfiles">        
+
+
+            {% for page in hrpage %}
+            <div>
+            {{ page.title|safe}}
+            {{ page.text|safe}}
+            </div>
+            <div style="break-after:page"></div>
+
+
+            {% endfor %}
+        </div>
+   
+
+{% endblock content %}
