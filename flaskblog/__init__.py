@@ -3,11 +3,11 @@ from flask import Flask
 #import flask_login
 app = Flask(__name__)
 
-from flask_ckeditor import CKEditor, CKEditorField
+from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os
 import json
 from datetime import datetime
-from flask import render_template_string, url_for, redirect
+from flask import render_template_string, url_for, redirect, send_from_directory
 from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -20,6 +20,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
 
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Flask and Flask-SQLAlchemy initialization here
 #get variables
@@ -40,6 +41,10 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, \
 app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
+
+app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
+# app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
+app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 #delte above three on server
 
@@ -300,8 +305,10 @@ class AdminViewClass4(ModelView):
 
 class hreditor(ModelView):
     form_overrides = dict(text=CKEditorField)
-    create_template = 'edit.html'
-    edit_tmeplate = 'edit.html'
+    
+    column_exclude_list = ('text')
+    create_template = 'create.html'
+    edit_template = 'edit.html'
 
 
 #class GradeView(ModelView):
@@ -330,6 +337,7 @@ admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass4(Grade, db.session))
 
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
+
 admin.add_view(hreditor(hrfiles, db.session))
 
 

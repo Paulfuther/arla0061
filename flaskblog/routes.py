@@ -1,7 +1,7 @@
-from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort
+from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
@@ -825,9 +825,11 @@ def carwashkpiupload():
 
     return render_template("applications.html")
 
-@app.route("/upload", methods=['POST'])
+# upload had to be changed to upload2 due to ckeditor in admin
+
+@app.route("/upload2", methods=['POST'])
 @login_required
-def upload():
+def upload2():
 
     if request.method == "POST":
         
@@ -919,6 +921,23 @@ def upload():
         return render_template("applications.html")
 
 #This route used sql alchemy to access the grwothkpi tables in the MySql database
+
+
+@app.route('/files/<filename>')
+def uploaded_files(filename):
+    path = app.config['UPLOADED_PATH']
+    return send_from_directory(path, filename)
+
+@app.route('/upload', methods=['POST'])
+
+def upload():
+    f = request.files.get('upload')
+    extension = f.filename.split('.')[-1].lower()
+    if extension not in ['jpg', 'gif', 'png', 'jpeg']:
+        return upload_fail(message='Image only!')
+    f.save(os.path.join(app.config['UPLOADED_PATH'], f.filename))
+    url = url_for('uploaded_files', filename=f.filename)
+    return upload_success(url=url)
 
 @app.route("/cstoresales")
 @login_required
