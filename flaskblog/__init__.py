@@ -66,9 +66,12 @@ bcrypt = Bcrypt(app)
 class hrfiles(db.Model):
     id = db.Column(db.Integer(), primary_key= True)
     title = db.Column(db.String(120))
+    effective_date = db.Column(db.DateTime(), nullable=True)
+    date_of_review = db.Column(db.DateTime(), nullable=True)
     text = db.Column(db.Text)
-
-
+    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
+    updated_on = db.Column(
+        db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
 roles_users = db.Table(
     'roles_users',
@@ -161,6 +164,14 @@ class Grade(db.Model):
     employee = db.relationship('Employee', backref = 'grades')
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
     course = db.relationship('Course', backref='grade')
+ 
+class Empfile(db.Model):
+    id = db.Column(db.Integer(), primary_key = True)
+    employee2_id = db.Column(Integer(), ForeignKey('employee.id'))
+    employee2 = db.relationship('Employee', backref = 'files')
+    file_id = db.Column(db.Integer(), ForeignKey('hrfiles.id'))
+    file = db.relationship('hrfiles', backref = 'filess') 
+
     
 task_store = db.Table(
     'task_store',

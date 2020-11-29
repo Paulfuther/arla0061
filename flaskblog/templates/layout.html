@@ -18,6 +18,11 @@
    
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css" integrity="sha256-ybRkN9dBjhcS2qrW1z+hfCxq+1aBdwyQM5wlQoQVt/0=" crossorigin="anonymous" />
    <link rel = "stylesheet" href="/static/main.css">
+
+     <link href="../static/jquery.signaturepad.css" rel="stylesheet">
+    <!--[if lt IE 9]><script src="../assets/flashcanvas.js"></script><![endif]-->
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+
    
    <!-- <link rel = "stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}"> -->
   
@@ -60,6 +65,7 @@
                       <li> <a href="{{ url_for('hrhome')}}">HR</a></li>
                       <li> <a href="{{ url_for('admin.index')}}">Admin</a></li>
                       <li> <a href="{{ url_for('employeetest')}}">Employee Test</a></li>
+                      <li> <a href="{{ url_for('hrtester')}}">New File</a></li>
                   </ul>
 
                   <!-- Navbar Right Side -->

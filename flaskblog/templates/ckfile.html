@@ -1,24 +1,90 @@
 {% extends "layout.html" %}
 {% block content %}
   
-{{ ckeditor.load() }}
-    
-{{ ckeditor.config(name='text') }}
 
-    
-        <div class = "newfiles">        
 
+<head>
+  <meta charset="utf-8">
+  
+  <style>
+    body { font: normal 100.01%/1.375 "Helvetica Neue",Helvetica,Arial,sans-serif; }
+  </style>
+  <link href="../static/jquery.signaturepad.css" rel="stylesheet">
+  <!--[if lt IE 9]><script src="../assets/flashcanvas.js"></script><![endif]-->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+</head>
+    
+<body>           
+    <form method = "POST" action  = "" enctype="multipart/form-data" >     
 
             {% for page in hrpage %}
-            <div>
-            {{ page.title|safe}}
-            {{ page.text|safe}}
+
+            <div class = "requiredgrid">
+
+                <div>{{ page.title|safe}}
+                </div>
+                <br/>
+                <div class = "hrheaderdata">
+                <p>Effective Date:    {{page.effective_date|safe}}
+                <p>Last Reviewed by Owner:    {{page.date_of_review|safe}}
+                </div><br/>
+
+                {{ page.text|safe}}
+            
+
+                    <div class = "sigcontainer">
+                        <div class = "sig">
+                        <div class = "sigmarker"> X </div>
+                        {{gsa.firstname}}{{gsa.lastname}}    
+                        </div>
+                        </div>
+
+                        <div class = "sigdate">
+                        {{gsa.startdate}}
+                        </div>                                                                                                     
+                    </div>
+                            <!-- <form method="post" action="" class="sigPad"> -->
+                            
+                            <div>
+                            <form class = sigPad>
+
+                            <input type="text" name="name" id="name" class="name">  
+                        
+
+                            <div class = "sigPad">
+
+                            <ul class="sigNav">
+                            <li class="drawIt"><a href="#draw-it" >Draw It</a></li>
+                            <li class="clearButton"><a href="#clear">Clear</a></li>
+                            </ul>
+                            <div class="sig sigWrapper">
+                            <div class="typed"></div>
+                            <canvas class="pad" width="198" height="55"></canvas>
+                            <input type="hidden" name="output" class="output">
+                            </div>
+                            <button type="submit">I accept the terms of this agreement.</button>
+                        
+                            </form>
+                           
+                            <script src="../static/jquery.signaturepad.js"></script>
+                            <script>
+                                $(document).ready(function() {
+                                $('.sigPad').signaturePad({drawOnly:true});
+                                });
+                            </script>
+                            <script src="../static/json2.min.js"></script>
+                            </div>
             </div>
+
             <div style="break-after:page"></div>
 
+            
 
             {% endfor %}
-        </div>
-   
+
+                    <footer class = "hrfooter">For protection of both the Employee and Associate, once you have read the above required actions please have the Employee sign this document in understanding and acceptance of the above mentioned guidelines.  Please file this form in the Employee file for future reference or upon request from a provincial tobacco inspector.
+                    </footer>    
+   </form>
+</body>
 
 {% endblock content %}

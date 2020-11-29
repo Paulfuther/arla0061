@@ -1,8 +1,8 @@
-select firstname, lastname, course.name, value
+select firstname, lastname, hrfiles.text
 
 from employee
-    inner join grade on employee_id = employee.id
-    inner join course on course_id = course.id
+    inner join hrfiles on employee_id = employee.id
+    
     
 
 order by firstname

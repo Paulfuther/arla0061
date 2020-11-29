@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
@@ -66,10 +66,29 @@ def home():
 
 @app.route("/hrtester", methods = ['GET', 'POST'])
 def hrtester():
-    
+    gsa = Employee.query.get(1)
     hrpage = hrfiles.query.all()
+    
+    f=1
+    y = 1
+    for x in hrpage:
+            #x2 = int(x)
+            #id = x2
+            #print(f, y, x)
+
+            empfile = Empfile(employee2_id= f,
+                             file_id= y)
+                             
+            db.session.add(empfile)
+            y += 1
+    db.session.commit()
   
-    return render_template('ckfile.html', hrpage=hrpage)
+  
+    return render_template('ckfile.html', hrpage=hrpage, gsa=gsa)
+
+@app.route("/sig")
+def sig():
+    return render_template ('sig.html')
 
 @app.route("/hrhome")
 @login_required
@@ -921,6 +940,11 @@ def upload2():
         return render_template("applications.html")
 
 #This route used sql alchemy to access the grwothkpi tables in the MySql database
+
+@app.route("/newfile")
+def newfile():
+    return render_template('ckfile.html')
+    
 
 
 @app.route('/files/<filename>')
