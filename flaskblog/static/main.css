@@ -22,6 +22,12 @@ body {
   
 }
 
+/* Signature CSS */
+
+
+
+
+
 /* .messagescontainer {
   display: grid;
   padding-top: 30px;
@@ -34,6 +40,13 @@ body {
   justify-content: center;
   align-items: center;
 }  */
+
+
+.signatures {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  width: 90%;
+}
 
 
 .newfiles {
@@ -404,7 +417,7 @@ ul.a {
   padding-bottom: 10px;
   padding-top: 10px;
 }
-.sig {
+.signame {
   padding-bottom: 5px;
   padding-top: 15px;
 }
@@ -1011,7 +1024,7 @@ a.hrbutton {
 
 .sigWrapper {
   clear: both;
-  height: 55px;
+  height: 65px;
 
   border: 1px solid #ccc;
 }

@@ -1930,3 +1930,17 @@ if form.validate_on_submit():
                 <option value = "65231">65231</option>
 
                 <select class="form"name = "store"required >
+
+
+
+
+                <footer class = "hrfooter">For protection of both the Employee and Associate, once you have read the above required actions please have the Employee sign this document in understanding and acceptance of the above mentioned guidelines.  Please file this form in the Employee file for future reference or upon request from a provincial tobacco inspector.
+                    </footer>
+
+
+
+
+hr file signature jsquery stuff goes at the top...
+<!--[if lt IE 9]><script src="../assets/flashcanvas.js"></script><![endif]-->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script> -->
+  <!-- <script src = "../static/jquery.min.js"> -->

@@ -68,7 +68,7 @@ def home():
 def hrtester():
     gsa = Employee.query.get(1)
     hrpage = hrfiles.query.all()
-    
+    print(gsa.firstname)
     f=1
     y = 1
     for x in hrpage:
@@ -81,8 +81,9 @@ def hrtester():
                              
             db.session.add(empfile)
             y += 1
-    db.session.commit()
+    #db.session.commit()
   
+    print("success")
   
     return render_template('ckfile.html', hrpage=hrpage, gsa=gsa)
 

@@ -135,7 +135,7 @@
 
 .sigWrapper {
     clear: both;
-    height: 55px;
+    height: 65px;
 
     border: 1px solid #ccc;
 }
@@ -207,4 +207,11 @@ p.error {
 
     color: #fff;
     font-weight: bold;
+}
+
+.signatures {
+    display: grid;
+    grid-template-columns: 1fr, 1fr;
+    width: 50%;
+    align-self: center;
 }
