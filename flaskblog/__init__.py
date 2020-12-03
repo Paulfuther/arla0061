@@ -171,7 +171,7 @@ class Empfile(db.Model):
     employee2 = db.relationship('Employee', backref = 'files')
     file_id = db.Column(db.Integer(), ForeignKey('hrfiles.id'))
     file = db.relationship('hrfiles', backref = 'filess') 
-
+    sig_data = db.Column(db.Integer())
     
 task_store = db.Table(
     'task_store',

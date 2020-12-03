@@ -47,7 +47,7 @@
                           <div class="sig sigWrapper">
                           <!-- <div class="typed"></div> -->
                             <canvas class="pad" width="198" height="55"></canvas>
-                            <input type="hidden" name="output" class="output">
+                            <input type="hidden" name="output" id="output" class="output">
                           </div>
                           <button type="submit">Submit.</button>
                           <button class="clearButton"><a href="#clear">Clear</a> </button>
@@ -64,20 +64,22 @@
                           </div> 
                        
                         </div>
-
-
+                
+        
+                        
                             <script src="../static/jquery.signaturepad.js"></script>
                               <script>
                                 $(document).ready(function() {
-                                  $('.sigPad').signaturePad({drawOnly:true});
+                                  var num = $('.sigPad').signaturePad({drawOnly:true});
+                                
                                 });
                               </script>
-                              <script src="../static/json2.min.js"></script>
 
-                  {% endfor %} 
-                 
-                             <div style="break-after:page"></div>
+                              <script src="../static/json2.min.js"></script>
+                                <div style="break-after:page"></div>
+              {% endfor %}
+        </form>                   
       
-   </form>
+   
 </body> 
 {% endblock content %}

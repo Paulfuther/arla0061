@@ -7,6 +7,7 @@ from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
+import json
 from werkzeug.utils import secure_filename
 import pandas as pd
 import numpy
@@ -67,21 +68,46 @@ def home():
 @app.route("/hrtester", methods = ['GET', 'POST'])
 def hrtester():
     gsa = Employee.query.get(1)
-    hrpage = hrfiles.query.all()
+    hrpage = hrfiles.query.limit(3).all()
     print(gsa.firstname)
-    f=1
-    y = 1
-    for x in hrpage:
-            #x2 = int(x)
-            #id = x2
-            #print(f, y, x)
+    
+    if request.method == "POST":
+        sigs = request.form.getlist('output')
+        #print(f[0])
+        #print("hello")
+        #print(f[1])
+        #print("hello")
+        #print(f[2])
+        f = 1
+        y = 1
+        z = 0
+        for x in hrpage:
+                #x2 = int(x)
+                #id = x2
+                #print(f, y, x)
+                #print(sigs[z])
+                empfile = Empfile(employee2_id= f,
+                                file_id= y,
+                                sig_data = sigs[z])
+                
+                
+                
+                
+                #data = request.form['output[x]']
+                #print(data)
+                #print("hello")               
+                db.session.add(empfile)
+                y += 1
+                z += 1
+                
+        db.session.commit()
+    
+    #print(f)
+    #for key in f.keys():
+    #    for value in f.getlist(key):
+            
+    #        print (key, ":", value)
 
-            empfile = Empfile(employee2_id= f,
-                             file_id= y)
-                             
-            db.session.add(empfile)
-            y += 1
-    #db.session.commit()
   
     print("success")
   
