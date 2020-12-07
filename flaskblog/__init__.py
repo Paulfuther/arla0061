@@ -6,6 +6,7 @@ app = Flask(__name__)
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os
 import json
+import pdfkit
 from datetime import datetime
 from flask import render_template_string, url_for, redirect, send_from_directory
 from flask_admin import Admin
@@ -121,8 +122,8 @@ class Employee(db.Model):
     city = db.Column(db.String(20), nullable=False)
     province = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(20), nullable=False)
-    mobilephone = db.Column(db.String(10), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    mobilephone = db.Column(db.String(10), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
     SIN = db.Column(db.Integer, unique=True, nullable=False)
     sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
@@ -138,6 +139,7 @@ class Employee(db.Model):
                            default='default.jpg')
     active = db.Column(db.String(), nullable = False)
     iprismcode = db.Column(db.String(9), nullable=False)
+    dob = db.Column(db.DateTime(), nullable=True)
     
     
     #course = db.relationship('Course',  secondary=course_employee,
@@ -229,7 +231,7 @@ class MyModelView2(ModelView):
     can_export = True
     can_delete = False
     column_hide_backrefs = False
-    column_list = ('firstname', 'course', 'value')
+    #column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
 
     def is_accessible(self):

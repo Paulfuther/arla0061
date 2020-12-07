@@ -3,19 +3,36 @@
 
 {% block content%}
 
+
+ <div class= "container">
+
+            <!-- Applications Nav Bar -->       
+
+            <nav class="app-nav">
+
+                  <ul class = "app-menu">
+                        <ul>
+                              <li> <a href="hrhome">HR Main Page</a></li>
+                        </ul>
+                        
+                  </ul>
+            </nav>
+
+      </div>  
+
+
+
 <div   class="form-container">
     <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
     
         
-        
-
         <div> <img class="gsaupdateimage" src="{{ image_file }}">
         </div>
         <div></div>
 
         
             <label class="formtitle">First Name  </label>
-            <input type="text"  class="form" name = "firstname" required>
+            <input type="text"  class="form" name = "firstname"  required>
          
 
             <label class="formtitle" >Nickname</label>
@@ -23,6 +40,9 @@
            
             <label class="formtitle" >Last Name</label>
             <input type="text" class="form"name = "lastname"required >
+
+            <label class="formtitle" >Date of Birth</label>
+            <input type="date" class="form"name = "dob"required >
 
             <label class="formtitle" >Store</label>
             <select name = "store" class = "form"> 

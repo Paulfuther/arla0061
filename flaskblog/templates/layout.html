@@ -49,8 +49,9 @@
               <nav class="main-nav" >
                 
                   <!-- <img src="/static/images/PaulFuther.jpg" > -->
-                  <a href="{{ url_for('home')}}"><img src="static/images/PaulFuther.jpg" class= "logo"> </a>
+                  
                   <ul class = "main-menu">
+                    <li> <a href="{{ url_for('home')}}">ARL A0061</a></li>
                       <li> <a href="{{ url_for('home')}}">Home</a></li>
                       {% if current_user.is_authenticated %}
                        <li> <a href="{{ url_for('security.logout')}}">Logout</a></li>
@@ -63,8 +64,8 @@
                       <li> <a href="{{ url_for('home')}}">Charts</a></li>
                       <li> <a href="{{ url_for('hrhome')}}">HR</a></li>
                       <li> <a href="{{ url_for('admin.index')}}">Admin</a></li>
-                      <li> <a href="{{ url_for('employeetest')}}">Employee Test</a></li>
-                      <li> <a href="{{ url_for('hrtester')}}">New File</a></li>
+                      
+                      
                   </ul>
 
                   <!-- Navbar Right Side -->

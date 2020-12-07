@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+        <div class= "container">
+
+            <!-- Applications Nav Bar -->       
+
+            <nav class="app-nav">
+
+                  <ul class = "app-menu">
+                        <ul>
+                              <li> <a href="hrhome">HR Main Page</a></li>
+                        </ul>
+                        
+                  </ul>
+            </nav>
+
+      </div>  
+  
+                <div class = "comptableheader">
+
+                       
+                        <div> Store</div>
+                        <div> Frist Name</div>
+            
+                        <div> Last Name</div>
+                        <div> Course</div>
+                      
+                        <div> Completed</div>
+                        
+                       
+                   
+                </div>
+                          
+
+                        {% for staff in compliance %}
+
+                        <div class = "comptablecard">
+
+                        <div class = "comphritem1"> {{staff.store}}</div> 
+                       
+                        <div class = "comphritem2"> {{staff.firstname}}</div> 
+                        <div class = "comphritem3"> {{staff.lastname}}</div> 
+                        <div class = "comphritem4"> {{staff.name}}</div>
+                        <div class = "comphritem5"> {{staff.value}}</div>
+                        </div>
+
+                        {% endfor %}
+
+{% endblock content %}
+
+

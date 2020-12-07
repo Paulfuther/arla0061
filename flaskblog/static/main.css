@@ -22,6 +22,20 @@ body {
   
 }
 
+/* hr file table */
+
+.table {
+  width: 80%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+
+
 /* Signature CSS */
 
 
@@ -204,6 +218,50 @@ ul {
 .upload p {
   text-align: left;
   padding: 0px 30px 0px 30px;
+}
+
+/* Compliance List Table */
+
+.comptableheader {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin: auto;
+  padding-top: 30px;
+  padding-bottom: 5px;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-right: 20px;
+  margin-left: 20px;
+  height: 100%;
+  border-radius: 15px;
+  margin-bottom: 20px;
+
+}
+
+.comptablecard {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 30px;
+  padding-right: 30px;
+  margin-right: 20px;
+  margin-left: 20px;
+  height: 100%;
+  border-radius: 15px;
+  margin-bottom: 5px;
+  justify-items: start;
+  align-items: center;
+}
+
+.comptableheader>div {
+  border-bottom: solid;
+  padding-bottom: 5px;
+}
+
+
+.comptablecard:nth-child(odd) {
+  background: #eee;
 }
 
 /* Hr List Table */
@@ -1527,8 +1585,77 @@ p.error {
     
   }
 
-  
+  .comptableheader {
+    display: none;
 
+  }
+
+  .comptablecard {
+    display: grid;
+    width: 90%;
+    justify-items: center;
+    align-items: start;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas:
+      'a b b '
+      'd e f'
+      'g h i';
+
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin: 10px 10px 10px 15px;
+    height: 100%;
+    box-shadow: 5px 5px lightgray;
+    border-radius: 15px;
+    font-size: 12px;
+  }
+  
+  .comphritem1 {
+    grid-area: a;
+    padding-top: 0px;
+    padding-right: 20px;
+    padding-left: 30px;
+    justify-self: left;
+    align-self: end;
+  }
+
+  .comphritem2 {
+     grid-area: d;
+     padding-top: 0px;
+     padding-right: 20px;
+     padding-left: 30px;
+     justify-self:left;
+     align-self: end;
+   }
+
+  .comphritem3 {
+     grid-area: g;
+     padding-top: 0px;
+     padding-right: 20px;
+     padding-left: 30px;
+     justify-self: left;
+     align-self: end;
+   }
+
+  .comphritem4 {
+   grid-area: b ;
+   padding-top: 0px;
+   padding-right: 20px;
+   justify-self: left;
+   padding-left: 30px;
+   align-self: end;
+ }
+   .comphritem5 {
+   grid-area: h;
+   padding-top: 0px;
+   padding-right: 20px;
+   padding-left: 30px;
+   justify-self: left;
+   align-self: end;
+ }
 
 }
 

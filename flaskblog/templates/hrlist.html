@@ -3,33 +3,42 @@
 
 {% block content%}
 
-    <div class="hr-container">   
-                <div>
-                <a class = "hrbutton" <a href="{{ url_for('hrlist')}}">List of Employees</a>
-                </div>
-                <div>
-                <a class = "hrbutton" <a href="{{ url_for('hrhome')}}">HR Main Page</a>
-                </div>
-                <div>
-                <form method="POST">
-                    <!--<input type ="text" autofocus="autofocus" name="search_string">-->
-                    <select id="search_string" class = "hrbutton3" name = "search_string">
-                        <option value="all">All</options>
-                        <option value="396">396</options>
-                        <option value="398">398</options>
-                        <option value="402">402</options>
-                        <option value="414">414</options>
-                        <option value="1616">1616</options>
-                        <option value="8156">8156</options>
-                        <option value="8435">8435</options>
-                        <option value="33410">33410</options>
-                        <option value="33485">33485</options>
-                        <option value="48314">48314</options>
-                        <option value="65231">65231</options>
-                        <option value="65077">65077</options>
-                    <input type ="submit" class="hrbutton2" formaction="/search" value = "Search"> 
-                </form>
-                </div>
+    <div class="container">  
+
+                <nav class="app-nav">
+
+                  <ul class = "app-menu">
+                        <ul>
+                              <li> <a href="hrlist">List of Employess</a></li>
+                        </ul>
+                        <ul>
+                              <li> <a href="hrhome">HR Main Page</a></li>
+                        </ul>
+                       
+                  
+                        <ul>
+                        <form method="POST">
+                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
+                            <select id="search_string"  name = "search_string">
+                                <option value="all">Seelct Store</options>
+                                <option value="all">All</options>
+                                <option value="396">396</options>
+                                <option value="398">398</options>
+                                <option value="402">402</options>
+                                <option value="414">414</options>
+                                <option value="1616">1616</options>
+                                <option value="8156">8156</options>
+                                <option value="8435">8435</options>
+                                <option value="33410">33410</options>
+                                <option value="33485">33485</options>
+                                <option value="48314">48314</options>
+                                <option value="65231">65231</options>
+                                <option value="65077">65077</options>
+                            <input type ="submit"  formaction="/search" value = "Search"> 
+                        </form>
+                        </ul>
+                    </ul>
+                </nav>
     </div>    
                 <div class = "tableheader">
 

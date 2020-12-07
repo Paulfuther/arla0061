@@ -16,6 +16,25 @@
 
 </head>
  {% block content %}   
+
+<div class= "container">
+
+            <!-- Applications Nav Bar -->       
+
+            <nav class="app-nav">
+
+                  <ul class = "app-menu">
+                        <ul>
+                              <li> <a href="hrhome">HR Main Page</a></li>
+                        </ul>
+                        
+                  </ul>
+            </nav>
+
+      </div>  
+
+
+
 <body>           
     <form method = "POST" action  = "" enctype="multipart/form-data" >     
 
@@ -78,6 +97,49 @@
                               <script src="../static/json2.min.js"></script>
                                 <div style="break-after:page"></div>
               {% endfor %}
+
+                        <div class = "requiredgrid">
+                            <h2> Payroll Information </h2>
+                            <br/>
+                            <table>
+                            <div class = "hrheaderdata">
+                            <tr>
+                            <td>First Name   </td><td> {{gsa.firstname}}</td>
+                            </tr>
+                            <tr>
+                            <td>Nick Name   </td><td> {{gsa.nickname}} </td>
+                            </tr>
+                            <tr>
+                            <td>Last Name   </td><td> {{gsa.lastname}} </td>
+                            </tr>
+                            <tr>
+                            <td>Address Line One </td><td>  {{gsa.addressone}} </td>
+                            </tr>
+                            <tr>
+                            <td>Address Line Two</td><td>   {{gsa.addresstwo}} </td>
+                            </tr>
+                            <tr>
+                            <td>City </td><td>   {{gsa.city}} </td>
+                            </tr>
+                            <tr>
+                            <td>Province   </td><td> {{gsa.province}} </td>
+                            </tr>
+                            <tr>
+                            <td>Country   </td><td> {{gsa.country}} </td>
+                            </tr>
+                            <tr>
+                            <td>Postal Code </td><td>   {{gsa.postal}} </td>
+                            </tr>
+                            <tr>
+                            <td>Date of Birth </td><td>   {{gsa.dob}} </td>
+                            </tr>
+                            <tr>
+                            <td>Start Date  </td><td>  {{gsa.startdate}} </td>
+                            </tr>
+             
+                            </table>
+                            
+                        </div>
         </form>                   
       
    

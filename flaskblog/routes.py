@@ -8,6 +8,7 @@ from flask_security import roles_required, login_required
 from io import BytesIO
 import os
 import json
+import pdfkit
 from werkzeug.utils import secure_filename
 import pandas as pd
 import numpy
@@ -65,10 +66,12 @@ def home():
 
    # return render_template('login.html', form=form)
 
-@app.route("/hrtester", methods = ['GET', 'POST'])
-def hrtester():
-    gsa = Employee.query.get(1)
-    hrpage = hrfiles.query.limit(3).all()
+@app.route("/hrfile<int:staff_id>", methods=['GET', 'POST'])
+@login_required
+def hrfile(staff_id):
+    gsa = Employee.query.get(staff_id)
+    #hrpage = hrfiles.query.limit(3).all()
+    hrpage = hrfiles.query.all()
     print(gsa.firstname)
     
     if request.method == "POST":
@@ -122,16 +125,42 @@ def sig():
 def hrhome(): 
     return render_template('hrhome.html')
 
-@app.route("/hrfile<int:staff_id>")
+@app.route("/employeefile", methods = ['GET', 'POST'])
 @login_required
-def hrfile(staff_id):
-    gsa = Employee.query.get(staff_id)
-    return render_template('hrfile.html', gsa=gsa)
+def employeefile():
+    
+    sig = Empfile.query.with_entities(Empfile.sig_data)
+    
+    
+    hrpage = hrfiles.query.all()
+    
+    print(sig)
+    
+    return render_template('employeecompletedfile.html', hrpage = hrpage, sig=sig)
+
+
 
 @app.route("/hrlist", methods =['GET', 'POST'])
 @login_required
 def hrlist():
     return render_template('hrlist.html')
+
+
+@app.route("/trainingcompliance", methods=['GET', 'POST'])
+@login_required
+def trainingcompliance():
+    
+    compliance = Grade.query\
+            .filter_by(value="n")\
+            .join(Employee, Employee.id==Grade.employee_id)\
+            .join(Course, Course.id == Grade.course_id)\
+            .add_columns(Grade.employee_id, Employee.firstname\
+            ,Employee.lastname, Employee.store\
+            , Course.name, Grade.value)\
+                .order_by(Employee.store)
+
+    
+    return render_template('trainingcompliance.html', compliance = compliance)
 
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
@@ -139,7 +168,8 @@ def search():
     form=request.form  
     search_value=form['search_string']
     if search_value == "all":
-        gsa = Employee.query.order_by(Employee.store).all()
+        gsa = Employee.query\
+            .order_by(Employee.store).all()
         
         #for staff in gsa:
          #   print(staff.id)
@@ -162,9 +192,9 @@ def employeetest():
     
     if request.method == "POST":
     
-        req=request.form
+        form=request.form
     
-        print(req['firstname'])
+        print(form['firstname'])
     
         first_name = request.form['firstname']
         nick_name = request.form['nickname']
@@ -188,6 +218,8 @@ def employeetest():
         ed = datetime.strptime(request.form["Enddate"], '%Y-%m-%d')
         end_date = ed.date()
         
+        d_o_b = datetime.strptime(request.form["dob"], '%Y-%m-%d')
+        date_of_birth = d_o_b.date()
         
         
         last_name = request.form["lastname"]
@@ -201,17 +233,18 @@ def employeetest():
         print(first_name)
         print(iprism_code)
         print(start_date)
+        print(date_of_birth)
         print(store_number)
 
         #for course in course:
         #print(request.form.getlist("completed[]"))
         #print(request.form.getlist("course"))
 
-        user = Employee.query.filter_by(mobilephone=mobile_phone).first()
-        if user:
-            print("done")
+        #user = Employee.query.filter_by(mobilephone=mobile_phone).first()
+        #if user:
+        #    print("done")
             #raise ValidationError('That mobile is Taken')
-            return redirect(url_for('employeetest' ,firstname=first_name))
+        #    return redirect(url_for('employeetest' , form = form))
           
             
         #for course in course:
@@ -221,7 +254,7 @@ def employeetest():
         picture_file = '3d611379cfdf5a89.jpg'
         #hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')
         #hashed_SIN = bcrypt.generate_password_hash(form.SIN.data).decode('utf-8')
-
+        
         emp = Employee(firstname=first_name, \
                         nickname=nick_name,\
                         store=store_number, \
@@ -244,11 +277,13 @@ def employeetest():
                         manager= manager_name,\
                         image_file=picture_file,\
                         active= active_yn,\
-                        iprismcode= iprism_code)
+                        iprismcode= iprism_code, \
+                        dob = d_o_b)
 
         db.session.add(emp)
         db.session.flush()
-        #print(emp.id)
+        
+        print(emp.id)
         f=emp.id
         
         y = 1
@@ -262,9 +297,11 @@ def employeetest():
                         course_id = y)
             db.session.add(empgrade)
             y += 1
+            
+        
         db.session.commit()
         
-        
+        #pdfkit.from_url('127.0.0.1:5000/hrfile6' , 'out.pdf')
         
         #db.session.commit()
 
@@ -310,67 +347,65 @@ def save_hrpicture(form_hrpicture):
 @login_required
 def updategsa(staff_id):
     
-    # Here we are getting the row of data based on the index, which is staff_id and 
-    #generatating a query under gsa  
-    #form is then populated with that data and published  
-    
-    #when changes are made the form.data attribut is changed also      
-    #you can then compare the new form data using .data with old data use gsa.data    
+    # Here we are getting the row of data based on the index, which is staff_id and
+    #generatating a query under gsa
+    #form is then populated with that data and published
+
+    #when changes are made the form.data attribut is changed also
+    #you can then compare the new form data using .data with old data use gsa.data
     #note below that some data is int and some is text. they need to be the same for the compares
-    
-    
+  
     gsa = Employee.query.get(staff_id)
-    
+    print(gsa.SIN)
     form = EmployeeUpdateForm(obj=gsa)
+
     
-    #return render_template('employee.html', form=form, gsa=gsa)
+
     
+
     image_file = url_for(
         'static', filename='empfiles/mobile/' + gsa.image_file)
-    
-    
+
     gsaphone = gsa.mobilephone
-    gsasin = gsa.SIN  
+    gsasin = gsa.SIN
     gsaemail = gsa.email
     gsapostal = gsa.postal
     gsatrainingid = gsa.trainingid
     gsatrainingpassword = gsa.trainingpassword
     gsaiprism = gsa.iprismcode
-    
-    
-    
+
     phone = form.mobilephone.data
     sin = int(form.SIN.data)
     postal = form.postal.data
     trainingid = form.trainingid.data
     trainingpassword = form.trainingpassword.data
     iprismcodecheck = form.iprismcode.data
-    
+
     #add a pciture
     #print(form.hrpicture.data)
-    
+
     emp = Employee.query.filter_by(mobilephone=text(phone)).first()
     emailcheck = Employee.query.filter_by(email=form.email.data).first()
     sincheck = Employee.query.filter_by(SIN=sin).first()
     postalcheck = Employee.query.filter_by(postal=postal).first()
     trainingidcheck = Employee.query.filter_by(trainingid=trainingid).first()
-    trainingpasswordcheck = Employee.query.filter_by(trainingpassword=trainingpassword).first()
+    trainingpasswordcheck = Employee.query.filter_by(
+        trainingpassword=trainingpassword).first()
     iprismcheck = Employee.query.filter_by(iprismcode=iprismcodecheck).first()
-    
+
     if gsaphone == phone:
         print("same mobile")
     else:
         if emp:
             flash("mobile already used")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
-        
-    if gsaiprism == iprismcodecheck:
-            print("same iprism")
-    else:
-        if iprismcheck:
-            flash("iprism code already used")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)   
-    
+
+    #if gsaiprism == iprismcodecheck:
+    #    print("same iprism")
+    #else:
+    #    if iprismcheck:
+    #        flash("iprism code already used")
+    #        return render_template('employeeupdate.html', form=form, gsa=gsa)
 
     if gsasin == sin:
        print("same sin")
@@ -378,74 +413,76 @@ def updategsa(staff_id):
         if sincheck:
             flash("sin already used")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
-        
+
     if gsa.email == form.email.data:
        print("same email")
     else:
         if emailcheck:
             flash("email already used")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
-        
+
     if gsa.postal == form.postal.data:
         print("same postal code")
     else:
         if postalcheck:
             flash("postal already exists")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
-    
+
     if gsa.trainingid == form.trainingid.data:
-            print("same user id ")
+        print("same user id ")
     else:
         if trainingidcheck:
             flash("user id already exists")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
-    
+
     if gsa.trainingpassword == form.trainingpassword.data:
-            print("same training password")
+        print("same training password")
     else:
         if trainingpasswordcheck:
             flash("training password already exists")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
-    
-    
+
     if form.validate_on_submit():
+        print('vlaidate')
         if form.submit.data:
             form.populate_obj(gsa)
-            
+
             # An updated SIN and or Email Address needs to be hashed before adding to database
-            
+
             #hashed_password = bcrypt.generate_password_hash(
             #    form.email.data).decode('utf-8')
-            
+
             #hashed_SIN = bcrypt.generate_password_hash(
             #form.SIN.data).decode('utf-8')
-           
+
             if form.hrpicture.data:
                 picture_file = save_hrpicture(form.hrpicture.data)
                 gsa.image_file = picture_file
-        
+
         #add hashed data to database
-        
+
         #gsa.SIN = hashed_SIN
         #gsa.email = hashed_password
-           
+
         db.session.commit()
-        
+
         flash("info updated")
         return render_template('hrhome.html')
-    
-    elif form.delete.data:
-            
-            Employee.query.filter_by(id=staff_id).delete()
-            db.session.commit()
-    return render_template('employeeupdate.html', image_file=image_file, form=form,gsa=gsa)
+
+        #elif form.delete.data:
+
+        #Employee.query.filter_by(id=staff_id).delete()
+        #db.session.commit()
+        
+    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa)
+
     
 @app.route("/hr", methods=['GET', 'POST'])
 @login_required
 def hr():
     
     form = EmployeeForm()    
-    
+    course = Course.query.all()
     
     if form.validate_on_submit():
         if form.hrpicture.data:
@@ -467,8 +504,8 @@ def hr():
                        email=form.email.data,
                        mobilephone=form.mobilephone.data,
                        SIN=form.SIN.data,
-                       Startdate=form.Startdate.data,
-                       Enddate=form.Enddate.data,
+                       startdate=form.Startdate.data,
+                       enddate=form.Enddate.data,
                        lastname=form.lastname.data,
                        postal=form.postal.data,
                        trainingid=form.trainingid.data,
@@ -477,66 +514,29 @@ def hr():
                        image_file=picture_file,
                        active=form.active.data,
                        iprismcode=form.iprismcode.data,
-                       tobstartdate=form.tobstartdate.data,
-                       tobcompleted=form.tobcompleteddate.data,
-                       tobexpireydate=form.tobexpirationdate.data,
-                       tobcompliant=form.tobcompliant.data,
-                       whmisstartdate=form.whmisstartdate.data,
-                       whmiscompleted=form.whmiscompleteddate.data,
-                       whmisexpireydate=form.whmisexpirationdate.data,
-                       whmiscompliant=form.whmiscompliant.data,
-                       ppestartdate=form.ppestartdate.data,
-                       ppecompleted=form.ppecompleteddate.data,
-                       ppeexpireydate=form.ppeexpirationdate.data,
-                       ppecompliant=form.ppecompliant.data,
-                       firestartdate=form.firestartdate.data,
-                       firecompleted=form.firecompleteddate.data,
-                       fireexpireydate=form.fireexpirationdate.data,
-                       firecompliant=form.firecompliant.data,
-                       emerstartdate=form.emerstartdate.data,
-                       emercompleted=form.emercompleteddate.data,
-                       emerexpireydate=form.emerexpirationdate.data,
-                       emercompliant=form.emercompliant.data,
-                       firstaidstartdate=form.firstaidstartdate.data,
-                       firstaidcompleted=form.firstaidcompleteddate.data,
-                       firstaidexpireydate=form.firstaidexpirationdate.data,
-                       firstaidcompliant=form.firstaidcompliant.data,
-                       foodstartdate=form.foodstartdate.data,
-                       foodcompleted=form.foodcompleteddate.data,
-                       foodexpireydate=form.foodexpirationdate.data,
-                       foodcompliant=form.foodcompliant.data,
-                       propanestartdate=form.propanestartdate.data,
-                       propanecompleted=form.propanecompleteddate.data,
-                       propaneexpireydate=form.propaneexpirationdate.data,
-                       propanecompliant=form.propanecompliant.data,
-                       hsstartdate=form.hsstartdate.data,
-                       hscompleted=form.hscompleteddate.data,
-                       hsexpireydate=form.hsexpirationdate.data,
-                       hscompliant=form.hscompliant.data,
-                       fuelstartdate=form.fuelstartdate.data,
-                       fuelcompleted=form.fuelcompleteddate.data,
-                       fuelexpireydate=form.fuelexpirationdate.data,
-                       fuelcompliant=form.fuelcompliant.data, 
-                       alonestartdate=form.alonestartdate.data,
-                       alonecompleted=form.alonecompleteddate.data,
-                       aloneexpireydate=form.aloneexpirationdate.data,
-                       alonecompliant=form.alonecompliant.data,
-                       violencestartdate=form.violencestartdate.data,
-                       violencecompleted=form.violencecompleteddate.data,
-                       violenceexpireydate=form.violenceexpirationdate.data,
-                       violencecompliant=form.violencecompliant.data,
-                       jointstartdate=form.jointstartdate.data,
-                       jointcompleted=form.jointcompleteddate.data,
-                       jointexpireydate=form.jointexpirationdate.data,
-                       jointcompliant=form.jointcompliant.data,
-                       co2startdate = form.jointstartdate.data,
-                       co2completed = form.jointcompleteddate.data,
-                       co2expireydate = form.jointexpirationdate.data,
-                       co2compliant = form.jointcompliant.data)
+                       )
                                      
         db.session.add(emp)
-        db.session.commit()
         
+        
+        db.session.flush()
+
+        print(emp.id)
+        f = emp.id
+
+        y = 1
+        for x in request.form.getlist("completed"):
+            #x2 = int(x)
+            #id = x2
+            print(f, y, x)
+
+            empgrade = Grade(value=x,
+                             employee_id=f,
+                             course_id=y)
+            db.session.add(empgrade)
+            y += 1
+
+        db.session.commit()
         
        
         flash('Employee has been added to the database', 'success')
@@ -545,7 +545,7 @@ def hr():
     
     print(form.errors.items())
     #print("did not work")
-    return render_template('employee.html', title='Employee Information', form=form)
+    return render_template('employee.html', title='Employee Information', form=form, course=course)
 
 
 @app.route("/applications")

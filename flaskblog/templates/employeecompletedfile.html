@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+  
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <style>
+    body { font: normal 100.01%/1.375 "Helvetica Neue",Helvetica,Arial,sans-serif; }
+  </style>
+  <link href="../static/jquery.signaturepad.css" rel="stylesheet">
+  
+  
+
+
+</head>
+ {% block content %}   
+<body>           
+    <form method = "POST" action  = "" enctype="multipart/form-data" >     
+
+                   {% for sigs in sig %}
+                
+                                      <div class="sigPad signed">
+                                      <div class="sigWrapper">
+                                        
+                                        <canvas class="pad" width="200" height="55"></canvas>
+                                      </div>
+                                      <p>Sir John A. Macdonald<br>July 1, 1867</p>
+                                      </div>
+                        
+                              <script src="../static/jquery.signaturepad.js"></script>
+                              <script src="../static/sample-signature-output.js"></script>
+                              <script>
+                                $(document).ready(function() {
+                                  $('.sigPad').signaturePad({displayOnly:true}).regenerate(sigs);
+                                
+                                });
+                              </script>
+
+                              <script src="../static/json2.min.js"></script>
+
+                  {% endfor %}     
+        </form>                   
+      
+   
+</body> 
+{% endblock content %}

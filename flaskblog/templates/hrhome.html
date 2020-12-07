@@ -4,21 +4,35 @@
 {% block content%}
 
 
-<div class="hr-container">
+<div class="container">
 
 
     
 
-            <div>
-            <a class = "hrbutton" <a href="{{ url_for('hrlist')}}">List of Employees</a>
-            </div>
-            <div>
-            <a class = "hrbutton" <a href="{{ url_for('hrhome')}}">HR Main Page</a>
-            </div>
-            <div>
-            <a class = "hrbutton" <a href="{{ url_for('hr')}}">Add Employee</a>
-            </div>
-    
+            
+           
+             <nav class="app-nav">
+
+                  <ul class = "app-menu">
+                        <ul>
+                              <li> <a href="hrlist">List of Employees</a></li>
+                        </ul>
+                        <ul>
+                              <li> <a href="hrhome">HR Main Page</a></li>
+                        </ul>
+                        <ul>      
+                              <li> <a href="hr">Add Employee</a></li>
+                        </ul>
+                        <ul>
+                              <li> <a href="trainingcompliance">Training Non Compliance</a></li>
+                        </ul>
+                       
+                  </ul>
+            </nav>
+
+
+
+
 </div>
 
 
