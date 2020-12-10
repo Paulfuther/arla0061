@@ -3295,4 +3295,24 @@ tobstartdate=form.tobstartdate.data,
             <input type="text" class="form"name = "iprismcode" value={{gsa.iprismcode}} required >
          
         
-            
+            app.route("/updatetrainingsearch", methods=['GET', 'POST'])
+@login_required
+def updatetrainingsearch():
+    
+    form=request.form
+    search_string =form['search_string']
+    if search_string == "all":
+        gsa = Employee.query\
+            .order_by(Employee.store).all()
+
+        #for staff in gsa:
+        #   print(staff.id)
+        return render_template('updategsatraining.html', gsa=gsa)
+
+    gsa1 = Employee.query.filter_by(store=search_string)
+    gsa = gsa1.order_by(Employee.store).all()
+
+    #for staff in gsa:
+    #print(staff.firstname)
+    return render_template('updategsatraining.html', gsa=gsa)
+    

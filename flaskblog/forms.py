@@ -3,9 +3,16 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField
 from wtforms.fields.html5 import DateField, TelField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
-from flaskblog import  Employee
+from flaskblog import  Employee, db, Store
 from flask_login import current_user
 import wtforms
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+import phonenumbers
+import re
+
+
+def storelist():
+    return Store.query.order_by('number')
 
 class LoginForm(FlaskForm):
     email = StringField('email', validators = [InputRequired(), Length(min=4, max=200)])
@@ -22,11 +29,8 @@ class EmployeeForm(FlaskForm):
     firstname = StringField('Firstname', validators= [DataRequired(), Length(min=2, max=20)])
     nickname = StringField('Nickname', validators=[Optional()])
     lastname = StringField('Lastname', validators=[DataRequired(), Length(min=2, max=20)])
-    store = SelectField('Store', choices=[('Home Store', 'HomeStore'), ("396", "396"), ('398', '398'),
-                                          ('402', '402'), ('414', '414'), ('1616','1616'), ('8156', '8156'),
-                                          ('8435', '8435'), ('33410', '33410'),
-                                          ('33485', '33485'), ('48314', '48314'),
-                                          ('65077', '65077'), ('65231', '65231')])
+    store = QuerySelectField(query_factory = storelist, allow_blank = False)
+                        
     addressone = StringField('Address Line 1', validators=[
                              DataRequired(), Length(min=2, max=100)])
     addresstwo = StringField('Address Line 2', validators=[
@@ -110,21 +114,6 @@ class EmployeeForm(FlaskForm):
             raise ValidationError('Must Select a Manager')
    
     
-
-#class giantform(FlaskForm):
-#    about_you = wtforms.FormField(EmployeeForm)
-#    training = wtforms.FormField(whmisForm)
-#    training2 = wtforms.FormField(ppeForm)
-#    training3 = wtforms.FormField(fireextinguishersForm)
-#    training4 = wtforms.FormField(emergencyproceduresForm)
-#    training5 = wtforms.FormField(firstaidForm)
-#    training6 = wtforms.FormField(foodhandlingForm)
-#    training7 = wtforms.FormField(propaneForm)
-#    training8 = wtforms.FormField(healthandsafetyForm)
-#    training9 = wtforms.FormField(workingaloneForm)
-#    training10 = wtforms.FormField(workplaceviolenceForm)
-#    training11 = wtforms.FormField(jointhealthandsafetyForm)
-#    training12 = wtforms.FormField(fuelpumpshutoffForm)
   
 class EmployeeUpdateForm(FlaskForm):
 
@@ -135,12 +124,7 @@ class EmployeeUpdateForm(FlaskForm):
                            DataRequired(), Length(min=2, max=20)])
     dob = DateField('DOB', format='%Y-%m-%d',
                     validators=[DataRequired()])
-    store = SelectField('Store', choices=[('Home Store', 'HomeStore'), ("396", "396"), ('398', '398'),
-                                          ('402', '402'), ('414', '414'), ('1616',
-                                                                           '1616'), ('8156', '8156'),
-                                          ('8435', '8435'), ('33410', '33410'),
-                                          ('33485', '33485'), ('48314', '48314'),
-                                          ('65077', '65077'), ('65231', '65231')])
+    store = StringField()
     addressone = StringField('Address Line 1', validators=[
                              DataRequired(), Length(min=2, max=100)])
     addresstwo = StringField('Address Line 2', validators=[
@@ -155,7 +139,7 @@ class EmployeeUpdateForm(FlaskForm):
     email = StringField('Email', validators=[
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
-                              DataRequired(), Length(min=9, max=12)])
+                              DataRequired(), Length(min=9, max=12) ])
     SIN = StringField('sin', validators=[DataRequired(), Length(min=9, max=9)])
     startdate = DateField('Start Date', format='%Y-%m-%d',
                           validators=[DataRequired()])
@@ -179,6 +163,12 @@ class EmployeeUpdateForm(FlaskForm):
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
     
+    
+class grade_form(FlaskForm):
+    
+    coursename = StringField()
+    coursegrade = StringField()
+    
 
     
     
@@ -200,7 +190,9 @@ class EmployeeUpdateForm(FlaskForm):
             print("Manager Name")
             raise ValidationError('Must Select a Manager')
 
-   
     
+      
+       
+
  
  

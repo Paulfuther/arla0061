@@ -7,17 +7,24 @@
 
             <!-- Applications Nav Bar -->       
 
-            <nav class="app-nav">
+           <nav class="app-nav">
 
                   <ul class = "app-menu">
                         <ul>
+                              <li> <a href="hrlist">List of Employees</a></li>
+                        </ul>
+                        <ul>
                               <li> <a href="hrhome">HR Main Page</a></li>
                         </ul>
-                        
+                        <ul>      
+                              <li> <a href="hr">Add Employee</a></li>
+                        </ul>
+                        <ul>
+                              <li> <a href="trainingcompliance">Training Non Compliance</a></li>
+                        </ul>
+                       
                   </ul>
             </nav>
-
-      </div>  
 
 
 <div   class="form-container">
@@ -61,14 +68,16 @@
                         {% endif %}
         </div> 
 
-        <div  class="formtitle" >{{"Home Store:"}}</div>
-        <div> {{form.store(class = "form", placeholder="Home Store")}} 
-                    {% if form.store.errors %}
-                        {% for error in form.store.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}       
-                    {% endif %}
-        </div>
+
+            <label class="formtitle" >Store</label>
+            <select name = "store" class = "form"> 
+            <option value ="{{ gsa.store }}" > {{ gsa.store}} </option>
+            {% for store in storelist2 %}
+            <option value="{{ store.number }}" > {{ store.number}} </option> 
+            {% endfor%}
+            </select>
+
+       
         <div  class="formtitle" >{{"Phone Number:"}}</div>
         <div> {{form.mobilephone(class = "form" ,placeholder="Phone Number")}} 
                     {% if form.mobilephone.errors %}
@@ -209,36 +218,33 @@
          <div>  {{ form.hrpicture(class = "form")}}
         </div>
 
-        <!-- tobacco training -->
+     
 
-       
-        
-            <div>
-            {{form.submit(class_="hrbutton")}}
-            </div>
+            
+                        {% for x in gradelist %}
+                        <div class = "formtitle"> {{ x.name }}  
+                        </div> 
+                              
+                              <select class="form"name = "completed">
+                              <option value="{{ x.value }}" > {{ x.value}} </option> 
+                              <option value = "n">N</option>
+                              <option value = "y">Y</option>
+                              </select>
+
+                        
+                        {% endfor %}
+                  
+
+                        <div>
+                  
+                        {{form.submit(class_="hrbutton")}}
+                        </div>
+
+            
+
             <div>
             <!-- <a class = "hrbutton" <a href="{{ url_for('home')}}">Edit an Employee</a> -->
             </div>
-
-               
-               
-    </form>
-
-            {% for grades in grade %}
-            <div class = "formtitle"> {{  grades.name }}  </div>
-            
-             <select class="form" name = "completed" >
-                <option value = "{{grades.value}}"> {{grades.value}}</option>
-                <option value = "n">N</option>
-                <option value = "y">Y</option>
-            </select>
-
-            
-            {% endfor %}
-
-
-            <button type = "submit" class = "button">Submit </button>
-
 
     </form>
 </div>

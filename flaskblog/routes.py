@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form
 from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
@@ -41,6 +41,8 @@ def home():
     #return render_template('home.html')
 
 
+def storelist():
+    return db.session.query(Store).all.order_by('number')
 #@app.route("/login", methods=['GET', 'POST'])
 #def login():
  #   if current_user.is_authenticated:
@@ -116,9 +118,10 @@ def hrfile(staff_id):
   
     return render_template('ckfile.html', hrpage=hrpage, gsa=gsa)
 
-@app.route("/sig")
-def sig():
-    return render_template ('sig.html')
+#@app.route("/sig")
+#@login_required
+#def sig():
+#    return render_template ('sig.html')
 
 @app.route("/hrhome")
 @login_required
@@ -162,6 +165,54 @@ def trainingcompliance():
     
     return render_template('trainingcompliance.html', compliance = compliance)
 
+
+@app.route("/updategsatraining<int:staff_id>", methods=['GET', 'POST'])
+@login_required
+def updategsatraining(staff_id):
+    
+    gsa = Employee.query.get(staff_id)
+    store = Store.query.all()
+    course = Course.query.all()
+    
+    gradelist = Grade.query\
+        .filter_by(employee_id=staff_id)\
+        .join(Employee, Employee.id == Grade.employee_id)\
+        .join(Course, Course.id == Grade.course_id)\
+        .add_columns(Course.name, Grade.value)
+    
+    # here we are updating the training grade information
+    # we get an object that we can alter. Use the .first to do this
+    # we need two parameter though, the emp id and the course id
+    # that will lead us to one result (assuming only one course per emp by course number)
+    # we then loop over the POST values using form.getlist for the variable "completed"
+    # then increment course by 1
+    # then commit
+    
+    if request.method == "POST":
+    
+        form = request.form 
+        f=staff_id
+        y = 1
+        z=1
+        for x in request.form.getlist("completed"):
+                t=Grade.query.filter_by(employee_id=staff_id).filter_by(course_id=y).first()
+                t.value = x
+                #print(t.__dict__)
+                y+=1 
+        db.session.commit()
+
+            #pdfkit.from_url('127.0.0.1:5000/hrfile6' , 'out.pdf')
+
+            #db.session.commit()
+
+        flash('Employee Training Compliance Has Been Updated', 'success')
+
+        return redirect(url_for('hrhome'))
+    
+    
+    return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
+
+
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
 def search():
@@ -183,6 +234,7 @@ def search():
     return render_template('hrlist.html', gsa=gsa)
 
 @app.route("/employeetest", methods=['GET', 'POST'])
+@login_required
 def employeetest():
     
     course = Course.query.all()
@@ -290,7 +342,7 @@ def employeetest():
         for x in request.form.getlist("completed"):
             #x2 = int(x)
             #id = x2
-            print(f,y, x)
+            print("tester",f,y, x)
             
             empgrade = Grade(value=x, \
                        employee_id = f, \
@@ -343,6 +395,7 @@ def save_hrpicture(form_hrpicture):
     
     return hrpicture_fn
 
+
 @app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
 @login_required
 def updategsa(staff_id):
@@ -355,13 +408,33 @@ def updategsa(staff_id):
     #you can then compare the new form data using .data with old data use gsa.data
     #note below that some data is int and some is text. they need to be the same for the compares
   
+    gradelist = Grade.query\
+        .filter_by(employee_id = staff_id)\
+        .join(Employee, Employee.id == Grade.employee_id)\
+        .join(Course, Course.id == Grade.course_id)\
+        .add_columns(Course.name, Grade.value)
+  
+    #gradelist2 = Grade.query.filter_by(employee_id = staff_id)
+  
     gsa = Employee.query.get(staff_id)
     print(gsa.SIN)
+    
     form = EmployeeUpdateForm(obj=gsa)
-
     
-
+    form2 = grade_form(obj=gradelist)
     
+    for x in form2:
+        print("test",x)
+    #print(form2)
+    
+    storelist2 = Store.query.order_by('number')
+
+    mgr = User.query.order_by('firstname')
+
+    course = Course.query.all()
+    grade = Grade.query.get(staff_id)
+
+    print(grade)
 
     image_file = url_for(
         'static', filename='empfiles/mobile/' + gsa.image_file)
@@ -446,8 +519,19 @@ def updategsa(staff_id):
         print('vlaidate')
         if form.submit.data:
             form.populate_obj(gsa)
+            
+        
+        y = 1
+        for x in gradelist:
+                #update_grade = form.grade.data
+                 print( x)
 
-            # An updated SIN and or Email Address needs to be hashed before adding to database
+        empgrade = Grade(value=x,
+                                 employee_id=staff_id,
+                                 course_id=y)
+        print(staff_id,x,y)
+        #db.session.add(empgrade)
+        y += 1
 
             #hashed_password = bcrypt.generate_password_hash(
             #    form.email.data).decode('utf-8')
@@ -455,14 +539,12 @@ def updategsa(staff_id):
             #hashed_SIN = bcrypt.generate_password_hash(
             #form.SIN.data).decode('utf-8')
 
-            if form.hrpicture.data:
+        if form.hrpicture.data:
                 picture_file = save_hrpicture(form.hrpicture.data)
                 gsa.image_file = picture_file
 
-        #add hashed data to database
+                
 
-        #gsa.SIN = hashed_SIN
-        #gsa.email = hashed_password
 
         db.session.commit()
 
@@ -473,8 +555,12 @@ def updategsa(staff_id):
 
         #Employee.query.filter_by(id=staff_id).delete()
         #db.session.commit()
+       
+    
         
-    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa)
+    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa, 
+                                            storelist2=storelist2, gradelist = gradelist,
+                                            form2 = form2)
 
     
 @app.route("/hr", methods=['GET', 'POST'])
@@ -968,9 +1054,10 @@ def upload2():
 
 #This route used sql alchemy to access the grwothkpi tables in the MySql database
 
-@app.route("/newfile")
-def newfile():
-    return render_template('ckfile.html')
+#@app.route("/newfile")
+#@login_required
+#def newfile():
+#    return render_template('ckfile.html')
     
 
 

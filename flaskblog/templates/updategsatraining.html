@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+<div class= "container">
+
+            <!-- Applications Nav Bar -->       
+
+            <nav class="app-nav">
+
+                  <ul class = "app-menu">
+                        <ul>
+                              <li> <a href="hrhome">HR Main Page</a></li>
+                        </ul>
+                        <ul>
+                        
+                        
+            </nav>
+
+    <div   class="form-container">
+
+                  <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+                  
+                        
+                        <div> <img class="gsaupdateimage" src="{{ image_file }}">
+                        </div>
+                        <div></div>
+
+                        
+                              <label class="formtitle">First Name  </label>
+                              <input type="text"  class="form" name = "firstname"  value = {{gsa.firstname}} required>
+                        
+
+                              <label class="formtitle" >Nickname</label>
+                              <input type="text" class="form"name = "nickname">
+                        
+                              <label class="formtitle" >Last Name</label>
+                              <input type="text" class="form"name = "lastname" value = {{gsa.lastname}} required >
+
+                             
+                              {% for x in gradelist %}
+                                          <div class = "formtitle"> {{ x.name }}  
+                                          </div> 
+                                                
+                                                <select class="form"name = "completed">
+
+                                                <option value="{{ x.value }}" > {{ x.value}} </option> 
+                                                <option value = "n">N</option>
+                                                <option value = "y">Y</option>
+                                                </select>
+
+                                          
+                                          {% endfor %}
+                                    
+                                          <div>
+                                          <button type = "submit" class = "button">Submit </button>
+                                          </div>
+                  </form>
+      </div>
+</div>
+      
+
+ 
+
+
+
+
+
+
+{% endblock content %}
+

@@ -115,7 +115,7 @@ class Employee(db.Model):
     firstname = db.Column(db.String(20), nullable=False)
     nickname = db.Column(db.String(20), nullable=True)
     lastname = db.Column(db.String(20), nullable=False)
-    store = db.Column(db.Integer)
+    store = db.Column(db.String)
     addressone = db.Column(db.String(20), nullable=False)
     addresstwo = db.Column(db.String(20), nullable=True)
     apt = db.Column(db.String(20), nullable=True)
@@ -187,6 +187,8 @@ class Store(db.Model):
     
     def __repr__(self):
         return '%r' % (self.number)
+    
+   
     
 class Todo(db.Model):
     id=db.Column(db.Integer, primary_key=True)

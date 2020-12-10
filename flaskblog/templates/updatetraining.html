@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+{% block content %}
+  
+
+
+<div class= "container">
+
+            <!-- Applications Nav Bar -->       
+
+            <nav class="app-nav">
+
+                  <ul class = "app-menu">
+                        <ul>
+                              <li> <a href="hrhome">HR Main Page</a></li>
+                        </ul>
+                        
+                  </ul>
+            </nav>
+
+      </div>  
+
+
+<div   class="form-container">
+    <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+    
+        
+        
+
+        
+           {{form.hidden_tag()}}
+      
+
+        <div> <img class="gsaupdateimage" src="{{ image_file }}">
+        </div>
+        <div></div>
+        <div  class="formtitle" >{{"First Name:"}}</div>
+        <div> {{form.firstname(class = "form", placeholder="First Name")}}   
+                        {% if form.firstname.errors %}
+                        {% for error in form.firstname.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}  
+                        {% endif %}
+        </div> 
+        <div  class="formtitle" >{{"NickName:"}}</div>          
+        <div> {{form.nickname(class = "form", placeholder="Nick Name")}}                   
+        </div>           
+        <div  class="formtitle" >{{"Last Name:"}}</div>
+        <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
+                    {% if form.lastname.errors %}
+                        {% for error in form.lastname.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}       
+                    {% endif %}
+        </div>      
+        
+
+     
+
+            
+                        {% for x in gradelist %}
+                        <div class = "formtitle"> {{ x.name }}  
+                        </div> 
+                              
+                              <select class="form"name = "completed">
+                              <option value="{{ x.value }}" > {{ x.value}} </option> 
+                              <option value = "n">N</option>
+                              <option value = "y">Y</option>
+                              </select>
+
+                        
+                        {% endfor %}
+                  
+
+                        <div>
+                  
+                        {{form.submit(class_="hrbutton")}}
+                        </div>
+
+            
+
+            <div>
+            <!-- <a class = "hrbutton" <a href="{{ url_for('home')}}">Edit an Employee</a> -->
+            </div>
+
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}
