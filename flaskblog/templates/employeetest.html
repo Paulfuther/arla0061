@@ -32,7 +32,7 @@
 
         
             <label class="formtitle">First Name  </label>
-            <input type="text"  class="form" name = "firstname"  value = {{gsa.firstname}} required>
+            <input type="text"  class="form" name = "firstname"   required>
          
 
             <label class="formtitle" >Nickname</label>
@@ -45,10 +45,11 @@
             <input type="date" class="form"name = "dob"required >
 
             <label class="formtitle" >Store</label>
+
             <select name = "store" class = "form"> 
-        
-            <option value="{{ store.number }}" > {{ store.number}} </option> 
-         
+            {% for storelist in storelist %}
+            <option value="{{ storelist.number }}" > {{ storelist.number}} </option> 
+            {% endfor %}
             </select>
             
 
@@ -121,8 +122,33 @@
             <label class="formtitle">Bulloch Code</label>
             <input type="text" class="form"name = "iprismcode"required >
          
-        
+            <label class="formtitle">Monday Availability</label>
+            <input type="text" class="form"name = "mon_avail"required >
+
+            <label class="formtitle">Tuesday Availability</label>
+            <input type="text" class="form"name = "tue_avail"required >
+
+            <label class="formtitle">Wednesday Availability</label>
+            <input type="text" class="form"name = "wed_avail"required >
+
+            <label class="formtitle">Thursday Availability</label>
+            <input type="text" class="form"name = "thu_avail"required >
+
+            <label class="formtitle">Friday Availability</label>
+            <input type="text" class="form"name = "fri_avail"required >
+
+            <label class="formtitle">Saturday Availability</label>
+            <input type="text" class="form"name = "sat_avail"required >
+
+            <label class="formtitle">Sunday Availability</label>
+            <input type="text" class="form"name = "sun_avail"required >
+
             
+            <div class = "formtitle" >Training Information   </div>
+            <div></div>
+            
+
+
             {% for course in course %}
             <div class = "formtitle"> {{  course }}  </div>
             

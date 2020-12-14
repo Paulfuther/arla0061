@@ -3316,3 +3316,110 @@ def updatetrainingsearch():
     #print(staff.firstname)
     return render_template('updategsatraining.html', gsa=gsa)
     
+
+
+     try:
+            emp = Grade.query.all()
+            for x in emp:
+                print(x.employee_id, x.value)
+            for x in emp:
+                query = Grade.query.filter_by(employee_id=x)
+                
+                print (x)
+                
+        except:
+            print("nice try")
+
+
+
+
+  #emps = Grade.query.all()
+        #for value in  Grade.query.distinct(Grade.course_id):
+         #   check = Grade.query.filter_by(course_id=id4).first()
+
+         #   if not check:
+          #      print("nope")
+           #     print(value.employee_id, value.course_id)
+        #try:
+         #   for emp in emps:
+          #      emp2 = emp.employee_id
+           #     emp3 = Grade.query.filter_by(employee_id = emp2).filter_by(course_id=id4).first()
+            #    if not emp3:    
+             #           print("emp" , emp2, "does not have course", id4 )
+                        
+              #  else:
+               #         print("emp", emp2, "does have course" , id4)
+                
+                #print(emp2, emp3)
+                #values = Grade.query.fitler_by(employee_id = emp2)
+                #print(values.value)
+                
+                #check = Grade.query.filter_by(employee_id=emp2)
+                #print(check.value)
+                
+                #checks = Grade.query.filter_by( =Grade.course_id).first()
+                #if not check:
+                #    print("course not here")
+        #except:
+         #   print("wow")  
+                
+        
+        #try:
+        #    courses = Course.query.all()
+        
+        #    for course in courses:
+        #        #print(course.id, course.name)
+        #        if course.id == id4:
+        #            print("course")
+                
+                    
+        #except:
+        #    print("nop")
+            
+        
+        
+                 <div class = "requiredgrid">
+
+                          <div class="sigPad">
+    
+                          <!--  <input type="text" name="name" id="name" class="name">  I do not want this but may need the id of name -->
+                        
+                          <ul class="sigNav">
+                            <!--<li class="drawIt"><a href="#draw-it" >Draw It</a></li>-->
+                            <li </li>
+                          </ul>
+                          <div class="sig sigWrapper">
+                          <!-- <div class="typed"></div> -->
+                            <canvas class="pad" width="198" height="55"></canvas>
+                            <input type="hidden" name="output" id="output" class="output">
+                          </div>
+                          <button type="submit">Submit.</button>
+                          <button class="clearButton"><a href="#clear">Clear</a> </button>
+                        </div>
+                        <div class = "sigcontainer">
+                                  <div class = "signame">
+                                      
+                                      {{gsa.firstname }} {{""}} {{gsa.lastname}}    
+                                  </div>
+                           </div>
+
+                          <div class = "sigdate">
+                              {{gsa.startdate}}
+                          </div> 
+                       
+                        
+                
+        
+                        
+                            <script src="../static/jquery.signaturepad.js"></script>
+                              <script>
+                                $(document).ready(function() {
+                                  var num = $('.sigPad').signaturePad({drawOnly:true});
+                                
+                                });
+                              </script>
+
+                              <script src="../static/json2.min.js"></script>
+                                <div style="break-after:page"></div>
+                      </div>
+                      </div>

@@ -8,8 +8,9 @@ import os
 import json
 import pdfkit
 from datetime import datetime
-from flask import render_template_string, url_for, redirect, send_from_directory
+from flask import render_template_string, url_for, redirect, send_from_directory, request
 from flask_admin import Admin
+from flask_admin.actions import action
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin, login_required, roles_required
@@ -140,17 +141,19 @@ class Employee(db.Model):
     active = db.Column(db.String(), nullable = False)
     iprismcode = db.Column(db.String(9), nullable=False)
     dob = db.Column(db.DateTime(), nullable=True)
+    #active2 = db.Column(db.Boolean)
+    mon_avail = db.Column(db.String(100), nullable=False)
+    tue_avail = db.Column(db.String(100), nullable=False)
+    wed_avail = db.Column(db.String(100), nullable=False)
+    thu_avail = db.Column(db.String(100), nullable=False)
+    fri_avail = db.Column(db.String(100), nullable=False)
+    sat_avail = db.Column(db.String(100), nullable=False)
+    sun_avail = db.Column(db.String(100), nullable=False)
     
-    
-    #course = db.relationship('Course',  secondary=course_employee,
-    #                     backref=db.backref('employees', lazy='dynamic'))
-    #grade = db.relationship('Grade', secondary = course_employee,
-    #                          backref = db.backref('grades', lazy = 'dynamic'))
-    #course_id2 = db.Column(db.Integer(), ForeignKey('course.id'))
-    #course = db.relationship('Course', secondary = course_employee, backref='gradess')
+   
     
     def __str__(self):
-        return (self.firstname)
+        return (self.firstname) 
 
 class Course(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -232,7 +235,7 @@ class MyModelView(ModelView):
 class MyModelView2(ModelView):
     can_export = True
     can_delete = False
-    column_hide_backrefs = False
+    #column_hide_backrefs = False
     #column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
 
@@ -264,7 +267,7 @@ class MyModelView3(ModelView):
     
 class MyModelView4(ModelView):
     can_export = True
-    can_delete = True
+    can_delete = False
 
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -299,7 +302,28 @@ class AdminViewStore(ModelView):
     
 class AdminViewClass(ModelView):
     
-   
+    can_delete = False
+    
+    @action('publish to all staff', 'Approve', 'Are you sure you want to add this course toa ll')
+    def action_approve(self, ids):
+        id3 = request.form.get('rowid')
+        id4 = int(id3) 
+        print(id4)
+        
+        emps = Grade.query.all()
+        gsa = Employee.query.all()
+        for gsas in gsa:
+            check = Grade.query.filter_by(employee_id=gsas.id, course_id = id4, ).first()
+            if not check:
+                print("emp" ,gsas.firstname, "nope")
+                newcourse = Grade(value="n", employee_id = gsas.id, course_id = id4)
+                db.session.add(newcourse)
+                
+            else:
+                print("emp", check.employee_id, "success")
+        db.session.commit()    
+        
+        
     
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -307,9 +331,9 @@ class AdminViewClass(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
-
 class AdminViewClass4(ModelView):
     can_export = True
+    can_delete = False
     #column_sortable_list = ['Grade.employee']
 
     def is_accessible(self):
@@ -337,22 +361,13 @@ class hreditor(ModelView):
 
 
 admin.add_view(MyModelView(User, db.session))
-
 admin.add_view(MyModelView6(Role, db.session))
-
 admin.add_view(MyModelView2(Employee, db.session))
-
 admin.add_view(MyModelView5(Todo, db.session))
-
 admin.add_view(AdminViewStore(Store, db.session))
-
-#admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass(Course, db.session))
-
 admin.add_view(AdminViewClass4(Grade, db.session))
-
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
-
 admin.add_view(hreditor(hrfiles, db.session))
 
 

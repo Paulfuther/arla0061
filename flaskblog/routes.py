@@ -74,31 +74,21 @@ def hrfile(staff_id):
     gsa = Employee.query.get(staff_id)
     #hrpage = hrfiles.query.limit(3).all()
     hrpage = hrfiles.query.all()
-    print(gsa.firstname)
+    #print(gsa.firstname)
     
     if request.method == "POST":
         sigs = request.form.getlist('output')
-        #print(f[0])
-        #print("hello")
-        #print(f[1])
-        #print("hello")
-        #print(f[2])
-        f = 1
+       
+        f = (staff_id)
         y = 1
         z = 0
         for x in hrpage:
-                #x2 = int(x)
-                #id = x2
-                #print(f, y, x)
-                #print(sigs[z])
+              
                 empfile = Empfile(employee2_id= f,
                                 file_id= y,
                                 sig_data = sigs[z])
-                
-                
-                
-                
-                #data = request.form['output[x]']
+          
+                data = request.form['output']
                 #print(data)
                 #print("hello")               
                 db.session.add(empfile)
@@ -106,15 +96,9 @@ def hrfile(staff_id):
                 z += 1
                 
         db.session.commit()
-    
-    #print(f)
-    #for key in f.keys():
-    #    for value in f.getlist(key):
-            
-    #        print (key, ":", value)
-
   
-    print("success")
+  
+    #print("success")
   
     return render_template('ckfile.html', hrpage=hrpage, gsa=gsa)
 
@@ -233,11 +217,13 @@ def search():
         #print(staff.firstname)
     return render_template('hrlist.html', gsa=gsa)
 
-@app.route("/employeetest", methods=['GET', 'POST'])
+@app.route("/addemployee", methods=['GET', 'POST'])
 @login_required
-def employeetest():
+def addemployee():
     
     course = Course.query.all()
+    course_count = Course.query.count()
+    print(course_count)
     storelist = Store.query.order_by('number')
     mgr = User.query.order_by('firstname')
     
@@ -281,6 +267,14 @@ def employeetest():
         manager_name = request.form["manager"]
         active_yn = request.form["active"]
         iprism_code = request.form["iprismcode"]
+        
+        monavail = request.form["mon_avail"]
+        tueavail = request.form["tue_avail"]
+        wedavail = request.form["wed_avail"]
+        thuavail = request.form["thu_avail"]
+        friavail = request.form["fri_avail"]
+        satavail = request.form["sat_avail"]
+        sunavail = request.form["sun_avail"]
     
         print(first_name)
         print(iprism_code)
@@ -330,7 +324,14 @@ def employeetest():
                         image_file=picture_file,\
                         active= active_yn,\
                         iprismcode= iprism_code, \
-                        dob = d_o_b)
+                        dob = d_o_b, \
+                        mon_avail = monavail, \
+                        tue_avail = tueavail, \
+                        wed_avail = wedavail, \
+                        thu_avail = thuavail, \
+                        fri_avail = friavail, \
+                        sat_avail = satavail, 
+                        sun_avail = sunavail )
 
         db.session.add(emp)
         db.session.flush()
@@ -599,11 +600,11 @@ def hr():
                        manager=form.manager.data,
                        image_file=picture_file,
                        active=form.active.data,
-                       iprismcode=form.iprismcode.data,
-                       )
+                       iprismcode=form.iprismcode.data)
                                      
         db.session.add(emp)
         
+        print(emp.firstname, emp.lastname, emp.image_file)
         
         db.session.flush()
 
