@@ -97,7 +97,7 @@ class User(UserMixin, db.Model):
         return set(args).issubset({role.name for role in self.roles})
 
     def __str__(self):
-        return 'User %r' % (self.firstname)
+        return '%r' % (self.firstname)
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
@@ -125,7 +125,7 @@ class Employee(db.Model):
     country = db.Column(db.String(20), nullable=False)
     mobilephone = db.Column(db.String(10), nullable=False)
     email = db.Column(db.String(120), nullable=False)
-    SIN = db.Column(db.Integer, unique=True, nullable=False)
+    SIN = db.Column(db.Integer, unique=True, nullable=True)
     sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
@@ -133,7 +133,7 @@ class Employee(db.Model):
     startdate = db.Column(db.DateTime(), nullable=True)
     enddate = db.Column(db.DateTime(), nullable=True)
     postal = db.Column(db.String(6), nullable=False)
-    trainingid = db.Column(db.String(), nullable=False)
+    trainingid = db.Column(db.String(),unique=True, nullable=False)
     trainingpassword = db.Column(db.String(), nullable=False)
     manager = db.Column(db.String)
     image_file = db.Column(db.String(20), nullable=False,

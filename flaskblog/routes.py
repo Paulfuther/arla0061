@@ -217,152 +217,6 @@ def search():
         #print(staff.firstname)
     return render_template('hrlist.html', gsa=gsa)
 
-@app.route("/addemployee", methods=['GET', 'POST'])
-@login_required
-def addemployee():
-    
-    course = Course.query.all()
-    course_count = Course.query.count()
-    print(course_count)
-    storelist = Store.query.order_by('number')
-    mgr = User.query.order_by('firstname')
-    
-    
-    if request.method == "POST":
-    
-        form=request.form
-    
-        print(form['firstname'])
-    
-        first_name = request.form['firstname']
-        nick_name = request.form['nickname']
-        store_number = request.form['store']
-        address_one = request.form['addressone']
-        address_two = request.form['addresstwo']
-        apt_number = request.form['apt']
-        city_city = request.form['city']
-        province_province = request.form['province']
-        country_country = request.form["country"]
-        email_email = request.form["email"]
-        mobile_phone = request.form["mobilephone"]
-        SIN_number = request.form["SIN"]
-        
-        sed = datetime.strptime(request.form["sinexpire"], '%Y-%m-%d')
-        sin_expire = sed.date()
-        
-        sd = datetime.strptime(request.form["Startdate"] , '%Y-%m-%d')
-        start_date = sd.date()
-        
-        ed = datetime.strptime(request.form["Enddate"], '%Y-%m-%d')
-        end_date = ed.date()
-        
-        d_o_b = datetime.strptime(request.form["dob"], '%Y-%m-%d')
-        date_of_birth = d_o_b.date()
-        
-        
-        last_name = request.form["lastname"]
-        postal_code = request.form["postal"]
-        training_id = request.form["trainingid"]
-        training_password = request.form["trainingpassword"]
-        manager_name = request.form["manager"]
-        active_yn = request.form["active"]
-        iprism_code = request.form["iprismcode"]
-        
-        monavail = request.form["mon_avail"]
-        tueavail = request.form["tue_avail"]
-        wedavail = request.form["wed_avail"]
-        thuavail = request.form["thu_avail"]
-        friavail = request.form["fri_avail"]
-        satavail = request.form["sat_avail"]
-        sunavail = request.form["sun_avail"]
-    
-        print(first_name)
-        print(iprism_code)
-        print(start_date)
-        print(date_of_birth)
-        print(store_number)
-
-        #for course in course:
-        #print(request.form.getlist("completed[]"))
-        #print(request.form.getlist("course"))
-
-        #user = Employee.query.filter_by(mobilephone=mobile_phone).first()
-        #if user:
-        #    print("done")
-            #raise ValidationError('That mobile is Taken')
-        #    return redirect(url_for('employeetest' , form = form))
-          
-            
-        #for course in course:
-         #   print (type(course.id))
-         
-    
-        picture_file = '3d611379cfdf5a89.jpg'
-        #hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')
-        #hashed_SIN = bcrypt.generate_password_hash(form.SIN.data).decode('utf-8')
-        
-        emp = Employee(firstname=first_name, \
-                        nickname=nick_name,\
-                        store=store_number, \
-                        addressone= address_one, \
-                        addresstwo=address_two, \
-                        apt= apt_number, \
-                        city= city_city, \
-                        province= province_province, \
-                        country= country_country, \
-                        email= email_email, \
-                        mobilephone= mobile_phone, \
-                        SIN= SIN_number,\
-                        sinexpire = sin_expire, \
-                        startdate= start_date,\
-                        enddate= end_date,\
-                        lastname= last_name,\
-                        postal = postal_code,\
-                        trainingid= training_id,\
-                        trainingpassword= training_password,\
-                        manager= manager_name,\
-                        image_file=picture_file,\
-                        active= active_yn,\
-                        iprismcode= iprism_code, \
-                        dob = d_o_b, \
-                        mon_avail = monavail, \
-                        tue_avail = tueavail, \
-                        wed_avail = wedavail, \
-                        thu_avail = thuavail, \
-                        fri_avail = friavail, \
-                        sat_avail = satavail, 
-                        sun_avail = sunavail )
-
-        db.session.add(emp)
-        db.session.flush()
-        
-        print(emp.id)
-        f=emp.id
-        
-        y = 1
-        for x in request.form.getlist("completed"):
-            #x2 = int(x)
-            #id = x2
-            print("tester",f,y, x)
-            
-            empgrade = Grade(value=x, \
-                       employee_id = f, \
-                        course_id = y)
-            db.session.add(empgrade)
-            y += 1
-            
-        
-        db.session.commit()
-        
-        #pdfkit.from_url('127.0.0.1:5000/hrfile6' , 'out.pdf')
-        
-        #db.session.commit()
-
-        flash('Employee has been added to the database', 'success')
-
-        return redirect(url_for('hrhome'))
-    
-    return render_template('employeetest.html', course=course, storelist=storelist, mgr=mgr)
 
 def save_hrpicture(form_hrpicture):
     
@@ -418,24 +272,14 @@ def updategsa(staff_id):
     #gradelist2 = Grade.query.filter_by(employee_id = staff_id)
   
     gsa = Employee.query.get(staff_id)
-    print(gsa.SIN)
     
     form = EmployeeUpdateForm(obj=gsa)
-    
-    form2 = grade_form(obj=gradelist)
-    
-    for x in form2:
-        print("test",x)
-    #print(form2)
-    
-    storelist2 = Store.query.order_by('number')
 
-    mgr = User.query.order_by('firstname')
+    #storelist2 = Store.query.order_by('number')
+    #mgr = User.query.order_by('firstname')
+    #course = Course.query.all()
+    #grade = Grade.query.get(staff_id)
 
-    course = Course.query.all()
-    grade = Grade.query.get(staff_id)
-
-    print(grade)
 
     image_file = url_for(
         'static', filename='empfiles/mobile/' + gsa.image_file)
@@ -517,56 +361,25 @@ def updategsa(staff_id):
             return render_template('employeeupdate.html', form=form, gsa=gsa)
 
     if form.validate_on_submit():
-        print('vlaidate')
+        print('validate')
         if form.submit.data:
             form.populate_obj(gsa)
-            
-        
-        y = 1
-        for x in gradelist:
-                #update_grade = form.grade.data
-                 print( x)
-
-        empgrade = Grade(value=x,
-                                 employee_id=staff_id,
-                                 course_id=y)
-        print(staff_id,x,y)
-        #db.session.add(empgrade)
-        y += 1
-
-            #hashed_password = bcrypt.generate_password_hash(
-            #    form.email.data).decode('utf-8')
-
-            #hashed_SIN = bcrypt.generate_password_hash(
-            #form.SIN.data).decode('utf-8')
-
         if form.hrpicture.data:
                 picture_file = save_hrpicture(form.hrpicture.data)
                 gsa.image_file = picture_file
-
-                
-
 
         db.session.commit()
 
         flash("info updated")
         return render_template('hrhome.html')
 
-        #elif form.delete.data:
-
-        #Employee.query.filter_by(id=staff_id).delete()
-        #db.session.commit()
-       
-    
         
-    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa, 
-                                            storelist2=storelist2, gradelist = gradelist,
-                                            form2 = form2)
+    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa)
 
     
-@app.route("/hr", methods=['GET', 'POST'])
+@app.route("/addemployee", methods=['GET', 'POST'])
 @login_required
-def hr():
+def addemployee():
     
     form = EmployeeForm()    
     course = Course.query.all()
@@ -581,42 +394,44 @@ def hr():
                 
         emp = Employee(firstname=form.firstname.data,
                        nickname=form.nickname.data,
+                       lastname=form.lastname.data,
                        store=form.store.data,
+                       dob=form.dob.data,
                        addressone=form.addressone.data,
                        addresstwo=form.addresstwo.data,
                        apt=form.apt.data,
                        city=form.city.data,
                        province=form.province.data,
                        country=form.country.data,
+                       postal=form.postal.data,
                        email=form.email.data,
                        mobilephone=form.mobilephone.data,
                        SIN=form.SIN.data,
+                       sinexpire=form.sinexpire.data,
                        startdate=form.Startdate.data,
                        enddate=form.Enddate.data,
-                       lastname=form.lastname.data,
-                       postal=form.postal.data,
                        trainingid=form.trainingid.data,
                        trainingpassword=form.trainingpassword.data,
                        manager=form.manager.data,
                        image_file=picture_file,
                        active=form.active.data,
-                       iprismcode=form.iprismcode.data)
+                       iprismcode=form.iprismcode.data,
+                       mon_avail=form.monavail.data,
+                       tue_avail=form.tueavail.data,
+                       wed_avail=form.wedavail.data,
+                       thu_avail=form.thuavail.data,
+                       fri_avail=form.friavail.data,
+                       sat_avail=form.satavail.data,
+                       sun_avail=form.sunavail.data)
                                      
-        db.session.add(emp)
-        
-        print(emp.firstname, emp.lastname, emp.image_file)
-        
+        db.session.add(emp)  
+        # flush will get the id of the pending user so that
+        # we can add the raining information     
         db.session.flush()
-
-        print(emp.id)
         f = emp.id
-
         y = 1
         for x in request.form.getlist("completed"):
-            #x2 = int(x)
-            #id = x2
             print(f, y, x)
-
             empgrade = Grade(value=x,
                              employee_id=f,
                              course_id=y)
@@ -630,8 +445,7 @@ def hr():
                 
         return redirect(url_for('hrhome'))
     
-    print(form.errors.items())
-    #print("did not work")
+    #print(form.errors.items())
     return render_template('employee.html', title='Employee Information', form=form, course=course)
 
 

@@ -40,6 +40,11 @@
         <div> <img class="gsaupdateimage" src="{{ image_file }}">
         </div>
         <div></div>
+
+        
+
+
+
         <div  class="formtitle" >{{"First Name:"}}</div>
         <div> {{form.firstname(class = "form", placeholder="First Name")}}   
                         {% if form.firstname.errors %}
@@ -69,13 +74,14 @@
         </div> 
 
 
-            <label class="formtitle" >Store</label>
-            <select name = "store" class = "form"> 
-            <option value ="{{ gsa.store }}" > {{ gsa.store}} </option>
-            {% for store in storelist2 %}
-            <option value="{{ store.number }}" > {{ store.number}} </option> 
-            {% endfor%}
-            </select>
+            <div  class="formtitle" >{{"Home Store:"}}</div>
+            <div> {{form.store(class = "form", value=gsa.store)}} 
+                    {% if form.store.errors %}
+                        {% for error in form.store.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}       
+                    {% endif %}
+             </div>
 
        
         <div  class="formtitle" >{{"Phone Number:"}}</div>
@@ -159,10 +165,7 @@
         </div>
         
         <div  class="formtitle" >{{"Manager:"}}</div>
-        <div> {{form.manager(class = "form", placeholder="Manager")}} 
-         {% for mgr in mgr %}
-            <option value="{{ mgr.firstname }}" > {{ mgr.firstname}} </option> 
-            {% endfor%}
+        <div> {{form.manager(class = "form", value=gsa.manager)}} 
                     {% if form.manager.errors %}
                         {% for error in form.manager.errors %}
                         <div class = "formerror">{{ error }}</div>
@@ -218,7 +221,77 @@
          <div>  {{ form.hrpicture(class = "form")}}
         </div>
 
-     
+        <div  class="formtitle" >{{"Monday Availability:"}}</div>
+        <div> {{form.mon_avail(class = "form", value = gsa.mon_avail)}}
+       
+                    
+                    {% if form.mon_avail.errors %}
+                        {% for error in form.mon_avail.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+        
+
+        <div  class="formtitle" >{{"Tuesday Availability:"}}</div>
+        <div> {{form.tue_avail(class = "form", value=gsa.tue_avail)}} 
+                    
+                    {% if form.tue_avail.errors %}
+                        {% for error in form.tue_avail.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+
+        <div  class="formtitle" >{{"Wednesday Availability"}}</div>
+        <div> {{form.wed_avail(class = "form", value=gsa.wed_avail)}} 
+                    
+                    {% if form.wed_avail.errors %}
+                        {% for error in form.wed_avail.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+
+        <div  class="formtitle" >{{"Thursday Availability"}}</div>
+        <div> {{form.thu_avail(class = "form", value=gsa.thu_avail)}} 
+                    
+                    {% if form.thu_avail.errors %}
+                        {% for error in form.thu_avail.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+
+        <div  class="formtitle" >{{"Friday Availability"}}</div>
+        <div> {{form.fri_avail(class = "form", value=gsa.fri_avail)}} 
+                    
+                    {% if form.fri_avail.errors %}
+                        {% for error in form.fri_avail.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+
+        <div  class="formtitle" >{{"Saturday Availability"}}</div>
+        <div> {{form.sat_avail(class = "form", value=gsa.sat_avail)}} 
+                    
+                    {% if form.sat_avail.errors %}
+                        {% for error in form.sat_avail.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+
+        <div  class="formtitle" >{{"Sunday Availability"}}</div>
+        <div> {{form.sun_avail(class = "form", value=gsa.sun_avail)}} 
+                    
+                    {% if form.sun_avail.errors %}
+                        {% for error in form.sun_avail.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
 
             
                   
