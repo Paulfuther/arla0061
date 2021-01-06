@@ -359,7 +359,7 @@ def updategsa(staff_id):
         if trainingpasswordcheck:
             flash("training password already exists")
             return render_template('employeeupdate.html', form=form, gsa=gsa)
-
+    print(form)
     if form.validate_on_submit():
         print('validate')
         if form.submit.data:

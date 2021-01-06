@@ -172,7 +172,7 @@ class EmployeeUpdateForm(FlaskForm):
     SIN = StringField('sin', validators=[DataRequired(), Length(min=9, max=9)])
     startdate = DateField('Start Date', format='%Y-%m-%d',
                           validators=[DataRequired()])
-    enddate = DateField('End Date', format='%m/%d/%Y', validators=[Optional()])
+    enddate = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])
     postal = StringField('Postal Code', validators=[
                          DataRequired(), Length(min=6, max=6)])
     manager = SelectField('manager', choices=[(
