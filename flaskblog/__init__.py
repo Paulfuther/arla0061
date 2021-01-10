@@ -183,6 +183,18 @@ task_store = db.Table(
     db.Column('todo_id', db.Integer(), db.ForeignKey('todo.id')),
     db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
 )
+     
+incident_store = db.Table(
+    'incident_store',
+    db.Column('incidentnumbers_id', db.Integer(), db.ForeignKey('incidentnumbers.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)     
+      
+salt_store = db.Table(
+    'salt_store',
+    db.Column('saltlog_id', db.Integer(),db.ForeignKey('saltlog.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
        
 class Store(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -192,7 +204,7 @@ class Store(db.Model):
         return '%r' % (self.number)
     
    
-    
+# To do list 
 class Todo(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     task = db.Column(db.String(200))
@@ -202,10 +214,42 @@ class Todo(db.Model):
     def __repr__(self):
            return '%r' % (self.task)
 
+ # ticket numbers
+ 
+class Incidentnumbers(db.Model):
+     id = db.Column(db.Integer, primary_key = True)
+     incstore = db.relationship('Store', secondary = incident_store,
+                             backref=db.backref('incusers', lazy='dynamic'))
+     incident = db.Column(db.String(100))
+     details = db.Column(db.String(500))
+     
+     def __repr__(self):
+         return '%r' % (self.details)
+       
+# salt log
+       
+class Saltlog(db.Model):
+     id = db.Column(db.Integer, primary_key = True)
+     saltdate = db.Column(db.DateTime(), nullable=True)
+     saltstore = db.relationship('Store', secondary = salt_store,
+                             backref=db.backref('saltusers', lazy='dynamic'))
+     
+     area = db.Column(db.String(100))
+     gsa = db.Column(db.String(500))
+     
+     def __repr__(self):
+         return '%r' % (self.area)      
+
+
+# here we initiate the datastore which is used in the Admin model
+
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
 #create a user to test with
+
+
+
 
 
 class MyModelView(ModelView):
@@ -290,6 +334,35 @@ class MyModelView5(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
+class MyModelView8(ModelView):
+    can_export = True
+    can_delete = True
+    column_hide_backrefs = False
+    
+    column_list = ('incstore', 'incident', 'details')
+    #column_select_related_list = (Todo.store, Todo.task)
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
+class MyModelView9(ModelView):
+    can_export = True
+    can_delete = False
+    column_hide_backrefs = False
+    column_default_sort = ('saltdate', True)
+
+    column_list = ('saltstore','saltdate', 'area', 'gsa')
+    #column_select_related_list = (Todo.store, Todo.task)
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
 class AdminViewStore(ModelView):
     
     column_sortable_list = ['number']
@@ -350,15 +423,10 @@ class hreditor(ModelView):
     edit_template = 'edit.html'
 
 
-#class GradeView(ModelView):
-    #form_columns = ('course',)
-#    inline_models = ((
-#        course_employee,
-#        {
-#            'form_columns': ('id', 'Employee_id', 'Course_id', 'Completed'),
-#        }
-#    ),)
 
+
+
+# these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
 admin.add_view(MyModelView6(Role, db.session))
@@ -369,8 +437,8 @@ admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass4(Grade, db.session))
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 admin.add_view(hreditor(hrfiles, db.session))
-
-
+admin.add_view(MyModelView8(Incidentnumbers, db.session))
+admin.add_view(MyModelView9(Saltlog, db.session))
 
 from flaskblog import routes
 
