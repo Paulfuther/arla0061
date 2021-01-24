@@ -23,7 +23,7 @@ from flask_moment import Moment
 import secrets
 from PIL import Image
 import re, base64
-from sqlalchemy.sql import text, select
+from sqlalchemy.sql import text, select, exists
 from sqlalchemy import *
 from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -37,6 +37,7 @@ moment = Moment(app)
 def home():
     #return url_for('admin.index')
     
+    #return render_template('testsig.html')
     return render_template('layout.html')
     #return render_template('home.html')
 
@@ -112,18 +113,37 @@ def hrfile(staff_id):
 def hrhome(): 
     return render_template('hrhome.html')
 
-@app.route("/employeefile", methods = ['GET', 'POST'])
+@app.route("/existingemployeefile<int:staff_id>", methods = ['GET', 'POST'])
 @login_required
-def employeefile():
+def employeefile(staff_id):
     
-    sig = Empfile.query.with_entities(Empfile.sig_data)
+    # here we need to get the signatures for each file and pass to html 
+    # we alos need the employee name which is stored in gsa variable
+    # we also need the list of files which are stored in the hr page varaible
+    # and we need to test if a file even exists 
+    # if not we need to return with and error message
+    
+    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
+    if exists:
+        print("yes")
+    else:
+        print("no")
+        flash("no file exists")
+        return redirect(url_for("hrlist"))
+    
+    signatures = Empfile.query.filter_by(employee2_id = staff_id)
     
     
+    x=signatures
     hrpage = hrfiles.query.all()
+    gsa = Employee.query.get(staff_id)
+    #for x in signatures:
+        #print (type(x.sig_data))
+        #print(x.file_id, x)
+        #print(x.sig_data)
+   
     
-    print(sig)
-    
-    return render_template('employeecompletedfile.html', hrpage = hrpage, sig=sig)
+    return render_template('employeecompletedfile.html', hrpage = hrpage, signatures=signatures, gsa=gsa)
 
 
 

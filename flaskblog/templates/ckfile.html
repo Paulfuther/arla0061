@@ -17,7 +17,7 @@
 </head>
  {% block content %}   
 
-<div class= "container">
+      <div class= "container">
 
             <!-- Applications Nav Bar -->       
 
@@ -61,7 +61,7 @@
                         
                           <ul class="sigNav">
                             <!--<li class="drawIt"><a href="#draw-it" >Draw It</a></li>-->
-                            <li </li>
+                            <li> </li>
                           </ul>
                           <div class="sig sigWrapper">
                           <!-- <div class="typed"></div> -->
@@ -90,13 +90,17 @@
                               <script>
                                 $(document).ready(function() {
                                   var num = $('.sigPad').signaturePad({drawOnly:true});
-                                
+                                console.log(num)
                                 });
                               </script>
 
                               <script src="../static/json2.min.js"></script>
                                 <div style="break-after:page"></div>
               {% endfor %}
+
+
+              <!--    end of formal list of hr files     -->
+
 
                         <div class = "requiredgrid">
                             <h2> Payroll Information </h2>
@@ -215,65 +219,31 @@
 
                         </div>
 
-                    <div class = "requiredgrid">
-
-                          <div class="sigPad">
-    
-                          <!--  <input type="text" name="name" id="name" class="name">  I do not want this but may need the id of name -->
-                        
-                          <ul class="sigNav">
-                            <!--<li class="drawIt"><a href="#draw-it" >Draw It</a></li>-->
-                            <li </li>
-                          </ul>
-                          <div class="sig sigWrapper">
-                          <!-- <div class="typed"></div> -->
-                            <canvas class="pad" width="198" height="55"></canvas>
-                            <input type="hidden" name="output" id="output" class="output">
-                          </div>
-                          <button type="submit">Submit.</button>
-                          <button class="clearButton"><a href="#clear">Clear</a> </button>
-                        </div>
-                        <div class = "sigcontainer">
-                                  <div class = "signame">
-                                      
-                                      {{gsa.firstname }} {{""}} {{gsa.lastname}}    
-                                  </div>
-                           </div>
-
-                          <div class = "sigdate">
-                              {{gsa.startdate}}
-                          </div> 
-                       
-                        
-                
-        
-                        
-                            <script src="../static/jquery.signaturepad.js"></script>
-                              <script>
-                                $(document).ready(function() {
-                                  var num = $('.sigPad').signaturePad({drawOnly:true});
-                                
-                                });
-                              </script>
-
-                              <script src="../static/json2.min.js"></script>
-                                <div style="break-after:page"></div>
-                      </div>
-                      </div>
-
+                   
         </form>                   
       <div  style="text-align:center; padding-bottom:50px">
-           <input class= "hrbutton" value = "Print Employee File" onclick="printFunction()">
-          </div>
-          </br>
-          </br>
-          </br>
-   
-      <script>
-      function printFunction(){
-        window.print();
-      }
-      </script>
+                  <button class= "hrbutton" onclick="printFunction()"> Print   File</button>
+                  </div>
+
+                  <div style="text-align:center; padding-bottom:50px">
+                 <button onclick="topFunction()" id="myBtn" class ="hrbutton" >Top Of Page</button>
+                 <script>
+                  mybutton = document.getElementById("myBtn")
+                  function topFunction() {
+                  document.body.scrollTop = 0; // For Safari
+                  document.documentElement.scrollTop = 0;
+                  } // For Chrome, Firefox, IE and Opera
+
+                  </script>
+                  </div>
+                 
+                  </br>
+                  </br>
+                   <script>
+                    function printFunction(){
+                    window.print();
+                  }
+                  </script>
 
 </body> 
 {% endblock content %}

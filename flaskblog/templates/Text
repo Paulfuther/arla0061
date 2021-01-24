@@ -3621,3 +3621,143 @@ def addemployee():
 app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
+
+
+
+
+
+
+  <div class="sigPad signed">
+                                      <div class="sigWrapper">
+                                        
+                                        <canvas class="pad" width="200" height="55"></canvas>
+                                      </div>
+                                      <p>Sir John A. Macdonald<br>July 1, 1867</p>
+                                      </div>
+                        
+                              <script src="../static/jquery.signaturepad.js"></script>
+                              <script src="../static/sample-signature-output.js"></script>
+                              <script>
+                                $(document).ready(function() {
+                                  $('.sigPad').signaturePad({displayOnly:true}).regenerate(sigs);
+                                
+                                });
+                              </script>
+
+                              <script src="../static/json2.min.js"></script>
+
+
+//var sigdata = {{signatures.sig_data[1] | tojson}}//
+
+ var sigdata = {{sigs.sig_data | tojson}}
+
+
+
+
+  <div  class="sigPad2" id = "sigs">
+                                      <div class="sigWrapper">
+                                        
+                                          <canvas  class"sig"  width="200" height="55"></canvas>
+                                      </div>
+                                      <p>Sir John A. Macdonald<br>July 1, 1867</p>
+                  </div>
+                                
+                             <script src="../static/jquery.signaturepad.js"></script>
+                              
+                              <script>
+                               
+                               
+                                  $(document).ready(function() {
+                                  var sigdata2 = {{signatures[1].sig_data | tojson}}
+                                  console.log(sigdata2);
+                                  $('.sigPad2').signaturePad({displayOnly:true}).regenerate(sigdata2);
+                                  
+                                  //console.log(num)
+                                  //console.log(sigdata)
+                                  console.log("hello")
+                                  });
+                               
+                              </script>
+
+                              <script src="../static/json2.min.js" ></script>
+                             
+                            </br>
+
+         <div  class="sigPad3" id = "sigs">
+                                      <div class="sigWrapper">
+                                        
+                                          <canvas  class"sig"  width="200" height="55"></canvas>
+                                      </div>
+                                      <p>Sir John A. Macdonald<br>July 1, 1867</p>
+                  </div>
+                                
+                             <script src="../static/jquery.signaturepad.js"></script>
+                              
+                              <script>
+                               
+                               
+                                  $(document).ready(function() {
+                                  var sigdata3 = {{signatures[2].sig_data | tojson}}
+                                  console.log(sigdata3);
+                                  $('.sigPad3').signaturePad({displayOnly:true}).regenerate(sigdata3);
+                                  
+                                  //console.log(num)
+                                  //console.log(sigdata)
+                                  console.log("hello")
+                                  });
+                               
+                              </script>
+
+                              <script src="../static/json2.min.js" ></script>
+
+
+
+
+
+
+   <div class = "requiredgrid">
+
+                          <div class="sigPad">
+    
+                          <!--  <input type="text" name="name" id="name" class="name">  I do not want this but may need the id of name -->
+                        
+                          <ul class="sigNav">
+                            <!--<li class="drawIt"><a href="#draw-it" >Draw It</a></li>-->
+                            <li </li>
+                          </ul>
+                          <div class="sig sigWrapper">
+                          <!-- <div class="typed"></div> -->
+                            <canvas class="pad" width="198" height="55"></canvas>
+                            <input type="hidden" name="output" id="output" class="output">
+                          </div>
+                          <button type="submit">Submit.</button>
+                          <button class="clearButton"><a href="#clear">Clear</a> </button>
+                        </div>
+                        <div class = "sigcontainer">
+                                  <div class = "signame">
+                                      
+                                      {{gsa.firstname }} {{""}} {{gsa.lastname}}    
+                                  </div>
+                           </div>
+
+                          <div class = "sigdate">
+                              {{gsa.startdate}}
+                          </div> 
+                       
+                        
+                
+        
+                        
+                            <script src="../static/jquery.signaturepad.js"></script>
+                              <script>
+                                $(document).ready(function() {
+                                  var num = $('.sigPad').signaturePad({drawOnly:true});
+                                
+                                });
+                              </script>
+
+                              <script src="../static/json2.min.js"></script>
+                                <div style="break-after:page"></div>
+                      </div>
+                      </div>
+                            

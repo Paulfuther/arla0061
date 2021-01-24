@@ -74,7 +74,7 @@ class EmployeeForm(FlaskForm):
                           'Manager Name', 'Manager Name'), ('Terry', "Terry"),
         ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
         ('Paul', 'Paul')])
-    hrpicture = FileField(validators=[FileAllowed(['jpg', 'png'])])
+    hrpicture = FileField(validators=[FileAllowed(['jpg', 'png', 'HEIC'])])
     
     active = SelectField('Active', choices=[
                          ('Active?', 'Active?'), ('Y', 'Y'), ('N', 'N')])
@@ -184,7 +184,7 @@ class EmployeeUpdateForm(FlaskForm):
     trainingpassword = StringField(
         'Training Password', validators=[DataRequired()])
     hrpicture = FileField(validators=[
-        FileAllowed(['jpg', 'png'])])
+        FileAllowed(['jpg', 'png', 'HEIC'])])
     active = SelectField('Active', choices=[
                          ('Active', 'Active'), ('Y', 'Y'), ('N', 'N')])
     iprismcode = StringField('Iprism Code', validators=[

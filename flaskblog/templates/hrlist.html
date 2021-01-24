@@ -48,11 +48,12 @@
                         <div> Frist Name</div>
                         <!--<div> Nickname</div>-->
                         <div> Last Name</div>
-                        <div> Mobile Phone</div>
+                       
                       
                         <div> Update Staff Information</div>
                         <div> Update Staff Training</div>
-                        <div> File </div>
+                        <div> Create File </div>
+                        <div> View File</div>
                        
                         <!-- </div> -->
                 </div>
@@ -68,13 +69,13 @@
                         <div class = "hritem2"> {{staff.firstname}}</div>
                         <div class = "hritemactive">Active: {{staff.active}}</div>
                         <div class = "hritem3"> {{staff.lastname}}</div> 
-                        <div class = "hritem4"> {{staff.mobilephone}}</div> 
+                        
                         
                        
-                        <a class = "hrbutton2" <a href="/updategsa{{staff.id}}">Update Staff Information</a>
-                        
-                        <a class = "hrbutton4" <a href="/updategsatraining{{staff.id}}">Update Staff Training</a>
-                        <a class = "hrbutton5" <a href="/hrfile{{staff.id}}"><i class="far fa-file-alt"></i></a>
+                        <a class = "hrbutton2" id ="b1" <a href="/updategsa{{staff.id}}"><i class="fas fa-user-edit"></i></a>
+                        <a class = "hrbutton3" id="b2" <a href="/updategsatraining{{staff.id}}"><i class="fas fa-user-graduate"></i></a>
+                        <a class = "hrbutton4" id="b3" <a href="/hrfile{{staff.id}}"><i class="far fa-file-image"></i></a>
+                        <a class = "hrbutton5" id="b4" <a href="/existingemployeefile{{staff.id}}"><i class="far fa-file-archive"></i></a>
                         </div>
 
                         {% endfor %}

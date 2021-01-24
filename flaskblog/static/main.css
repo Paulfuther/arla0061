@@ -286,26 +286,17 @@ ul {
   border-bottom: solid;
   padding-bottom: 5px;
 }
+
 .hrbutton2 {
   align-items: center;
   border-radius: 20px;
   border: none;
-  font-size: 12px;
-  padding: 10px 10px;
-  
-
-}
-
-.hrbutton2:active {
-  transform: scale(0.75);
-}
-
-.hrbutton2:focus {
-  outline: black;
+  font-size: 20px;
+  padding: 10px 20px;
 }
 
 .hrbutton2:hover {
-  background: darkolivegreen;
+  background: rgb(217, 217, 248);
   color: #ffffff;
 }
 
@@ -313,41 +304,36 @@ ul {
   align-items: center;
   border-radius: 20px;
   border: none;
-  background: #eee;
-  font-size: 12px;
-  padding:  10px 10px 10px 10px;
-  margin-top: 20px;
-  margin-right: 10px;
+  font-size: 20px;
+  padding: 10px 20px;
 }
 
-.hrbutton3:active {
-  border: none;
-  outline-color: white;
+.hrbutton3:hover {
+  background: rgb(217, 217, 248);
+  color: #ffffff;
 }
-
-.hrbutton4 {
+.hrbutton4{
   align-items: center;
   border-radius: 20px;
   border: none;
-  font-size: 12px;
+  font-size: 20px;
   padding: 10px 20px;
 }
 
 .hrbutton4:hover {
-  background: red;
+  background: rgb(217, 217, 248);
   color: #ffffff;
 }
-
 .hrbutton5 {
   align-items: center;
   border-radius: 20px;
   border: none;
-  font-size: 12px;
+  font-size: 20px;
   padding: 10px 20px;
 }
 
 .hrbutton5:hover {
-  background: blue;
+  background: rgb(217, 217, 248);
   color: #ffffff;
 }
 
@@ -1386,16 +1372,20 @@ p.error {
     display: block;
   }
 
-  .hrbutton2 {
+  .hrbutton2  {
     grid-area: j;
   }
-  .hrbutton4 {
+  .hrbutton3 {
     grid-area: k;
   }
-  .hrbutton5 {
+  .hrbutton4 {
     grid-area: l;
   }
+  .hrbutton5 {
+    grid-area: m;
+  }
 
+  
 
 
 
