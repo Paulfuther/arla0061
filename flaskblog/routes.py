@@ -182,7 +182,7 @@ def updategsatraining(staff_id):
         .filter_by(employee_id=staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value)
+        .add_columns(Course.name, Grade.value, Grade.completeddate)
     
     # here we are updating the training grade information
     # we get an object that we can alter. Use the .first to do this
@@ -504,20 +504,21 @@ def tpfileupload():
                 input_filename = file
                 #print(x)
                 df_totalsheet = pd.read_excel(input_filename)
-                print(df_totalsheet.head)
+                #print(df_totalsheet.head)
                 tp_date = (df_totalsheet.iat[8, 0])
-                print(tp_date)
+                #print(tp_date)
                 tp_store = (df_totalsheet.iat[6, 0])
                 a, b1, c, d = tp_date.split()
                 e, f, g = tp_store.split()
                 tp_storefinal = g[:5]
                 pd.to_datetime(b1)
-                print(b1)
+                #print(b1)
                 b = datetime.strptime(b1, "%m/%d/%Y").strftime("%b-%Y")
                 pd.to_numeric(tp_storefinal)
                 df = pd.read_excel(input_filename, skiprows=14)
                 cols = list(df)
-                dropcols = [2, 3, 6, 7, 8, 13, 14]
+                #print(cols)
+                dropcols = [2, 3, 6, 7, 8]
                 df.drop(df.columns[dropcols], axis=1, inplace=True)
                 df = df.rename(columns={'Performance Measure': 'one'})
                 df.set_index('one', inplace=True)
@@ -532,7 +533,7 @@ def tpfileupload():
                 df['date'] = pd.to_datetime(df['date'], format="%b-%Y")
                 df['date'] = df['date'].dt.date
                 df.dropna(subset=['Shift Count'], how='all', inplace=True)
-                print(df)
+                #print(df)
                 df = df[['date', 'Store', 'Gsa', 'Shift Count', 'Average Check',
                         '2 Pack Ratio', 'Season Pass', 'Wash & Go', 'In-Store Premium Ratio',
                         'Crind Ratio', 'Campaign Deals Total', 'Campaign Deals to In-Store Transaction Ratio',
@@ -631,6 +632,7 @@ def securityfilenegupload():
 
             for file in files:
                 inputfilename = file
+                print(inputfilename)
                 excel_file = inputfilename
                 store_number = file
                 a = str(store_number)
@@ -638,16 +640,16 @@ def securityfilenegupload():
                 df = pd.read_csv(excel_file, sep='\t', header=None)
                 df.columns = ['Text']
                 df['Date'] = df['Text'].str.extract('(.. ... ..)', expand=False).copy()
-
                 df2 = df[df['Text'].str.contains('NEGATIVE', na=False)].copy()
-
-                if df2.empty:
-                    continue
+                #if df2.empty:
+                #    flash('No Negative Sales')
+                #    return render_template('applications.html') 
 
                 df2['Store'] = b
                 print(df2)
                 newdf.append(df2)
 
+                print(newdf)
 
             newdf = pd.concat(newdf)
 
@@ -800,80 +802,91 @@ def upload2():
 
     if request.method == "POST":
         
-        file = request.files['inputFile']
-        print(file)
-        filename = secure_filename(file.filename)
+        try:
+        
+            file = request.files['inputFile']
+            print(file)
+            filename = secure_filename(file.filename)
 
-           #this will save file to folder in root named Files
-           #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            #this will save file to folder in root named Files
+            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-        def convert_amount(val):
+            def convert_amount(val):
+                    """
+                    Convert the string number value to a float
+                    - Remove $
+                    - Remove commas
+                    - Convert to float type
+                    """
+                    new_val = val.replace(',', '').replace(
+                        '%', '').replace('/0', '')
+                    return pd.to_numeric(new_val)
+
+            excel_file = file
+            df = pd.read_excel(excel_file, header=3)
+
+                #print (df)
+
+            xls = pd.ExcelFile(excel_file)
+            res = len(xls.sheet_names)
+            tabs = (xls.sheet_names)
+            
+            print(tabs)
+            newtabs = (tabs)
+            columnheaders = (df.columns.tolist())
+            print (columnheaders)
+            kpidate = (columnheaders[2])
+
+            current_kpidate = datetime.strptime(
+            kpidate, "%Y-%m").strftime("%b-%Y")
+                    #print (current_kpidate)
+            newkpi = []
+            finalkpi = []
+
+            print("ready to loop")
+            for x in newtabs:
+                type = x[:5]
+                        #print(type)
+                data = pd.read_excel(
+                excel_file, sheet_name=x, skiprows=3, usecols=range(8))
+                data['store'] = type
+                data['Date'] = current_kpidate
+                finalkpi.append(data)
+
+            finalkpi = pd.concat(finalkpi)
+
+            print(finalkpi)
+
+                    #name columns
+
+            finalkpi.columns = ['Category1', 'Category2', kpidate, 'Value2', 'value3','value4','value5','Rolling','Store','Date']
+                        #reorder columns
+
+            finalkpi = finalkpi[['Date', 'Store', 'Category1', 'Category2',kpidate,'Value2','value3','value4','value5','Rolling']]
+
+            """combine two columns
                 """
-                Convert the string number value to a float
-                - Remove $
-                - Remove commas
-                - Convert to float type
-                """
-                new_val = val.replace(',', '').replace(
-                    '%', '').replace('/0', '')
-                return pd.to_numeric(new_val)
+            finalkpi['Category'] = finalkpi.Category2.combine_first(
+            finalkpi.Category1)
 
-    excel_file = file
-    df = pd.read_excel(excel_file, header=3)
+            finalkpi = finalkpi[['Date', 'Store', 'Category', kpidate,'Value2','value3','value4','value5','Rolling']]
 
-            #print (df)
+            finalkpi['Date'] = pd.to_datetime((finalkpi['Date']), format='%b-%Y')
 
-    xls = pd.ExcelFile(excel_file)
-    res = len(xls.sheet_names)
-    tabs = (xls.sheet_names)
-    newtabs = (tabs)
-    columnheaders = (df.columns.tolist())
-            #print (columnheaders)
-    kpidate = (columnheaders[2])
+            finalkpi[kpidate] = finalkpi[kpidate].apply(convert_amount)
+            finalkpi['Value2'] = finalkpi['Value2'].apply(convert_amount)
+            finalkpi['value3'] = finalkpi['value3'].apply(convert_amount)
+            finalkpi['value4'] = finalkpi['value4'].apply(convert_amount)
+            finalkpi['value5'] = finalkpi['value5'].apply(convert_amount)
+            finalkpi['Rolling'] = finalkpi['Rolling'].apply(convert_amount)
 
-    current_kpidate = datetime.strptime(
-    kpidate, "%Y-%m").strftime("%b-%Y")
-            #print (current_kpidate)
-    newkpi = []
-    finalkpi = []
+            print(finalkpi)
 
-    for x in newtabs:
-        type = x[:5]
-                  #print(type)
-        data = pd.read_excel(
-        excel_file, sheet_name=x, skiprows=3, usecols=range(8))
-        data['store'] = type
-        data['Date'] = current_kpidate
-        finalkpi.append(data)
+                    #create output stream
 
-        finalkpi = pd.concat(finalkpi)
-
-            #print(finalkpi)
-
-            #name columns
-
-        finalkpi.columns = ['Category1', 'Category2', kpidate, 'Value2', 'value3','value4','value5','Rolling','Store','Date']
-            #reorder columns
-
-        finalkpi = finalkpi[['Date', 'Store', 'Category1', 'Category2',kpidate,'Value2','value3','value4','value5','Rolling']]
-
-        """combine two columns
-        """
-        finalkpi['Category'] = finalkpi.Category2.combine_first(
-        finalkpi.Category1)
-
-        finalkpi = finalkpi[['Date', 'Store', 'Category', kpidate,'Value2','value3','value4','value5','Rolling']]
-
-        finalkpi['Date'] = pd.to_datetime((finalkpi['Date']), format='%b-%Y')
-
-        finalkpi[kpidate] = finalkpi[kpidate].apply(convert_amount)
-        finalkpi['Value2'] = finalkpi['Value2'].apply(convert_amount)
-        finalkpi['value3'] = finalkpi['value3'].apply(convert_amount)
-        finalkpi['value4'] = finalkpi['value4'].apply(convert_amount)
-        finalkpi['value5'] = finalkpi['value5'].apply(convert_amount)
-        finalkpi['Rolling'] = finalkpi['Rolling'].apply(convert_amount)
-
-            #create output stream
+        except:
+            flash('Something went wrong')
+            return render_template('applications.html')
 
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')
@@ -885,7 +898,7 @@ def upload2():
 
         print(finalkpi)
 
-        return render_template("applications.html")
+    return render_template("applications.html")
 
 #This route used sql alchemy to access the grwothkpi tables in the MySql database
 

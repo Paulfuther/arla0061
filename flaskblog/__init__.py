@@ -169,6 +169,8 @@ class Grade(db.Model):
     employee = db.relationship('Employee', backref = 'grades')
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
     course = db.relationship('Course', backref='grade')
+    completeddate = db.Column(db.DateTime(), nullable = True )
+    
  
 class Empfile(db.Model):
     id = db.Column(db.Integer(), primary_key = True)
@@ -422,7 +424,9 @@ class hreditor(ModelView):
     create_template = 'create.html'
     edit_template = 'edit.html'
 
-
+    can_delete = False
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
 
 
 

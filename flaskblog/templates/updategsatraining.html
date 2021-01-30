@@ -48,9 +48,16 @@
                                                 <option value="{{ x.value }}" > {{ x.value}} </option> 
                                                 <option value = "n">N</option>
                                                 <option value = "y">Y</option>
+                                                
+                                                
                                                 </select>
-
+                                                <div class = "formtitle"> {{ x.name}} Completed  
+                                                </div> 
+                                                <option class ="form" value="{{x.completeddate}}"> {{x.completeddate}} </option>
                                           
+
+                                                
+
                                           {% endfor %}
                                     
                                           <div>
