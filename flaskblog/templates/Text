@@ -3761,3 +3761,7 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
                       </div>
                       </div>
                             
+
+                            <div class = "formtitle"> {{ x.name}} Completed  
+                                                </div> 
+                                                <option class ="form" value="{{x.completeddate}}"> {{x.completeddate}} </option>

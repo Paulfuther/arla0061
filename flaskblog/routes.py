@@ -177,12 +177,17 @@ def updategsatraining(staff_id):
     gsa = Employee.query.get(staff_id)
     store = Store.query.all()
     course = Course.query.all()
-    
+    for x in course:
+        print(x.id, x.name)
     gradelist = Grade.query\
         .filter_by(employee_id=staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value, Grade.completeddate)
+        .add_columns(Course.name, Grade.value, Grade.completeddate)\
+        .order_by(Grade.course_id)
+    
+    for x in gradelist:
+        print(x.name,x.value)
     
     # here we are updating the training grade information
     # we get an object that we can alter. Use the .first to do this
@@ -240,6 +245,8 @@ def search():
 
 def save_hrpicture(form_hrpicture):
     
+    #image = form_hrpicture
+    
     thumb = 30,30
     medium = 150,150
     large = 250,250
@@ -255,18 +262,20 @@ def save_hrpicture(form_hrpicture):
     output_size = (150, 150)
     
     i = Image.open(form_hrpicture)
-    i.thumbnail(output_size, Image.LANCZOS)
-    i.save(picture_paththumb)
-    print (i.size)
+    #i.thumbnail(output_size, Image.LANCZOS)
+    newi = i.resize((150,150))
+    newi.save(picture_paththumb)
+    print (newi.size)
     
     picture_pathmobile = os.path.join(
         app.root_path, 'static/empfiles/mobile', hrpicture_fn)
     output_size2 = (250, 250)
 
     i2 = Image.open(form_hrpicture)
-    i2.thumbnail(output_size2, Image.LANCZOS)
-    
-    i2.save(picture_pathmobile)
+    #i2.thumbnail(output_size2, Image.LANCZOS)
+    newi2 = i2.resize((250,250))
+    newi2.save(picture_pathmobile)
+    print(newi2.size)
     
     return hrpicture_fn
 

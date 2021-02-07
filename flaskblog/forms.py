@@ -56,7 +56,7 @@ class EmployeeForm(FlaskForm):
                           DataRequired(), Length(min=2, max=20)])
 
     postal = StringField('Postal Code', validators=[
-                         DataRequired(), Length(min=6, max=6)])
+                         DataRequired(), Length(min=6, max=7)])
     email = StringField('Email', validators=[
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
@@ -174,7 +174,7 @@ class EmployeeUpdateForm(FlaskForm):
                           validators=[DataRequired()])
     enddate = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])
     postal = StringField('Postal Code', validators=[
-                         DataRequired(), Length(min=6, max=6)])
+                         DataRequired(), Length(min=6, max=7)])
     manager = SelectField('manager', choices=[(
                           'Manager Name', 'Manager Name'), ('Terry', "Terry"),
         ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
