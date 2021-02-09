@@ -147,14 +147,7 @@
                         {% endfor %}           
                     {% endif %}
         </div>           
-        <div  class="formtitle" >{{"SIN:"}}</div>
-        <div> {{form.SIN(class = "form", placeholder="SIN")}} 
-                    {% if form.SIN.errors %}
-                        {% for error in form.SIN.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}           
-                    {% endif %}
-        </div>
+     
         <div  class="formtitle" >{{"Email:"}}</div>
         <div> {{form.email(class = "form", placeholder="E-Mail")}} 
                     {% if form.email.errors %}

@@ -61,7 +61,7 @@ class EmployeeForm(FlaskForm):
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
                               DataRequired(), Length(min=9, max=12)])
-    SIN = StringField('sin', validators = [Length(min=9, max=9)])
+    
     sinexpire = DateField('Sin Expire', format='%Y-%m-%d', validators=[Optional()])
     Startdate = DateField('Start Date', format='%Y-%m-%d',
                           validators=[DataRequired()])
@@ -109,10 +109,7 @@ class EmployeeForm(FlaskForm):
         if emp:
             raise ValidationError('That email is Taken')
 
-    def validate_SIN(self, SIN):
-        user = Employee.query.filter_by(SIN=SIN.data).first()
-        if user:
-            raise ValidationError('That SIN is Taken')
+    
 
     
         
@@ -169,7 +166,7 @@ class EmployeeUpdateForm(FlaskForm):
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
                               DataRequired(), Length(min=9, max=12) ])
-    SIN = StringField('sin', validators=[DataRequired(), Length(min=9, max=9)])
+    
     startdate = DateField('Start Date', format='%Y-%m-%d',
                           validators=[DataRequired()])
     enddate = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])

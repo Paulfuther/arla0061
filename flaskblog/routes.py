@@ -244,8 +244,10 @@ def search():
 
 
 def save_hrpicture(form_hrpicture):
-    
-    #image = form_hrpicture
+    # uses PIL from Pillow
+    # saving to two places. thumbnales for the list and mobile for the phone
+    # image = form_hrpicture
+    # read the miage but then create a new variable to modify size of image
     
     thumb = 30,30
     medium = 150,150
@@ -314,7 +316,7 @@ def updategsa(staff_id):
         'static', filename='empfiles/mobile/' + gsa.image_file)
 
     gsaphone = gsa.mobilephone
-    gsasin = gsa.SIN
+    
     gsaemail = gsa.email
     gsapostal = gsa.postal
     gsatrainingid = gsa.trainingid
@@ -322,7 +324,7 @@ def updategsa(staff_id):
     gsaiprism = gsa.iprismcode
 
     phone = form.mobilephone.data
-    sin = int(form.SIN.data)
+    
     postal = form.postal.data
     trainingid = form.trainingid.data
     trainingpassword = form.trainingpassword.data
@@ -333,7 +335,7 @@ def updategsa(staff_id):
 
     emp = Employee.query.filter_by(mobilephone=text(phone)).first()
     emailcheck = Employee.query.filter_by(email=form.email.data).first()
-    sincheck = Employee.query.filter_by(SIN=sin).first()
+   
     postalcheck = Employee.query.filter_by(postal=postal).first()
     trainingidcheck = Employee.query.filter_by(trainingid=trainingid).first()
     trainingpasswordcheck = Employee.query.filter_by(
@@ -354,12 +356,7 @@ def updategsa(staff_id):
     #        flash("iprism code already used")
     #        return render_template('employeeupdate.html', form=form, gsa=gsa)
 
-    if gsasin == sin:
-       print("same sin")
-    else:
-        if sincheck:
-            flash("sin already used")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
+  
 
     if gsa.email == form.email.data:
        print("same email")
@@ -435,7 +432,7 @@ def addemployee():
                        postal=form.postal.data,
                        email=form.email.data,
                        mobilephone=form.mobilephone.data,
-                       SIN=form.SIN.data,
+                       
                        sinexpire=form.sinexpire.data,
                        startdate=form.Startdate.data,
                        enddate=form.Enddate.data,

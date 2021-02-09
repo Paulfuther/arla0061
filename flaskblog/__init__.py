@@ -125,7 +125,7 @@ class Employee(db.Model):
     country = db.Column(db.String(20), nullable=False)
     mobilephone = db.Column(db.String(10), nullable=False)
     email = db.Column(db.String(120), nullable=False)
-    SIN = db.Column(db.Integer, unique=True, nullable=True)
+   
     sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
