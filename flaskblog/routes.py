@@ -16,7 +16,7 @@ import openpyxl
 import xlrd
 import xlwt
 import xlsxwriter
-from flaskblog import datetime
+from flaskblog import datetime, mail
 from flask_moment import Moment
 #from flask_login import login_user, current_user, logout_user, login_required
 #from flask_user import roles_required
@@ -27,6 +27,7 @@ from sqlalchemy.sql import text, select, exists
 from sqlalchemy import *
 from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from flask_mail import Message
 
 moment = Moment(app)
 
@@ -40,6 +41,14 @@ def home():
     #return render_template('testsig.html')
     return render_template('layout.html')
     #return render_template('home.html')
+
+@app.route("/email")
+@login_required
+def email():
+    msg = Message('Testing', sender='me@demo.com', recipients=['paul.futher@gmail.com'])
+    msg.body = '''Hello'''
+    mail.send(msg)
+    return "sent"
 
 
 def storelist():

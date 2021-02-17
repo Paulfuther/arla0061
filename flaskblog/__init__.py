@@ -21,6 +21,7 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
+from flask_mail import Mail
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -33,16 +34,18 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 #app=app.config.from_object(config) --not needed
 
-#app.config['SECRET_KEY'] = config.get('SECRET_KEY')
-#app.config['SQLALCHEMY_DATABASE_URI'] = config.get('SQLALCHEMY_DATABASE_URI')
-#app.config['SECURITY_PASSWORD_SALT'] = config.get('SECURITY_PASSWORD_SALT')
 
 
-#delte next three lines on server
-app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
-#secrety keys are in secret palce
+# use evnironment variables while building
+app.config['SECRET_KEY'] =os.environ.get('SECRET_KEY') 
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT')
+app.config['MAIL_SERVER']= 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+
 
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 # app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
@@ -53,7 +56,7 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 db = SQLAlchemy(app)
 #USER_APP_NAME ="app"
 ckeditor = CKEditor(app)
-
+mail = Mail(app)
 
 admin = Admin(app, name='Dashboard')
     
