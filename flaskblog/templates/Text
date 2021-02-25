@@ -3764,4 +3764,78 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
 
                             <div class = "formtitle"> {{ x.name}} Completed  
                                                 </div> 
-                                                <option class ="form" value="{{x.completeddate}}"> {{x.completeddate}} </option>
+                                                <option class ="form" value="{{x.completeddate}}"> {{x.completeddate}} </option> <script>  
+              
+              const app = document.querySelector('.app-btn');
+
+              function menus(){
+                document.querySelector('.app-menu').classList.toggle('show');
+                document.querySelector('.main-menu').classList.toggle('hide');
+                
+
+               
+              }
+              
+              app.addEventListener('click',menus);
+              
+              
+              
+              </script>  
+
+
+              
+
+
+               <div class="app-btn">
+      <i class="fas fa-bars fa-1x"></i>
+    </div>
+
+    .app-nav ul.app-menu {
+    display: block;
+    position: absolute;
+    top:0;
+    left:0;
+    background: #f2f2f2;
+    width: 50%;
+    height: 100%;
+    border-right: #ccc 1px solid;
+    opacity: 0.9;
+    padding: 30px;
+    z-index: 2;
+    transform: translateX(-500px);
+    /*transition: transform 0.5s ease-in-out;*/
+  }
+
+
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #f2f2f2;
+  width: 50%;
+  height: 100%;
+  border-right: #ccc 1px solid;
+  opacity: 0.9;
+  padding: 30px;
+  z-index: 2;
+  transform: translateX(-500px);
+}
+
+
+
+  .main-nav ul.main-menu {
+    display: block;
+    position: absolute;
+    top:0;
+    left:0;
+    background: #f2f2f2;
+    width: 50%;
+    height: 100%;
+    border-right: #ccc 1px solid;
+    opacity: 0.9;
+    padding: 30px;
+    z-index: 2;
+    transform: translateX(-500px);
+    
+    /*transition: transform 0.5s ease-in-out;*/
+  }

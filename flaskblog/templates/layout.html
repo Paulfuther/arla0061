@@ -33,9 +33,7 @@
         <i class="fas fa-bars fa-1x"></i>
     </div>   
 
-    <div class="app-btn">
-      <i class="fas fa-bars fa-1x"></i>
-    </div>
+   
 
       
       
@@ -45,8 +43,7 @@
 
       <!--  Nave bar -->
         
-   
-              <nav class="main-nav" >
+               <nav class="main-nav" >
                 
                   <!-- <img src="/static/images/PaulFuther.jpg" > -->
                   
@@ -71,7 +68,75 @@
                   <!-- Navbar Right Side -->
 
               </nav>
-    </div>  
+
+      </div>
+
+      <div class = "container" > 
+      
+              <nav class = "mobile-nav">
+
+              <ul class = "mobile-menu">
+              <li> <a href="{{ url_for('home')}}">ARL A0061</a></li>
+                      <li> <a href="{{ url_for('home')}}">Home</a></li>
+                      {% if current_user.is_authenticated %}
+                       <li> <a href="{{ url_for('security.logout')}}">Logout</a></li>
+                      {% else %}
+                      <li> <a href="{{ url_for('login')}}">Login</a></li>
+                     
+                      {% endif %} 
+                     
+                      <li> <a href="{{ url_for('home')}}">Charts</a></li>
+
+                      <li class="dropdown-btn">Apps</li>
+                      <div class = "dropdown-container">
+                        <a href="kpiconvert">Growth KPI Converter</a>
+                        <a href="carwashkpiconvert">Carwash KPI Converter </a>
+                        <a  href="tpfileconvert">Team Performance Converter </a>
+                        <a href="securityfileconvert">Security Log Converter</a>
+                        <a href="securityfilenegconvert">Security Log Negative Sales Converter</a>
+                      </div>
+
+                      
+
+                      <li class = "dropdown-btn">HR Main</li>
+                      <div class= "dropdown-container">
+                         
+                         <li class = "dropdown-btn">List of Employess</li>
+                          <div class = "dropdown-container">
+                              <form method="POST">
+                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
+                            <select id="search_string"  name = "search_string">
+                                <option value="all">Seelct Store</options>
+                                <option value="all">All</options>
+                                <option value="396">396</options>
+                                <option value="398">398</options>
+                                <option value="402">402</options>
+                                <option value="414">414</options>
+                                <option value="1616">1616</options>
+                                <option value="8156">8156</options>
+                                <option value="8435">8435</options>
+                                <option value="33410">33410</options>
+                                <option value="33485">33485</options>
+                                <option value="48314">48314</options>
+                                <option value="65231">65231</options>
+                                <option value="65077">65077</options>
+                            <input type ="submit"  formaction="/search" value = "Search"> 
+                        </form>
+                       
+
+
+
+
+                          </div>
+                         <a href="addemployee">Add Employee</a>
+                         <a href="trainingcompliance">Training Non Compliance</a>
+                      </div>
+
+                       <li><a href="{{ url_for('admin.index')}}">Admin</a></li>
+              </ul>
+              </nav>
+
+      </div>  
 
             <main role="main" class="container">
                 <div class="row">
@@ -118,8 +183,9 @@
               const btn = document.querySelector('.menu-btn');
 
               function menus(){
-                document.querySelector('.main-menu').classList.toggle('show');
-                document.querySelector('.right-menu').classList.toggle('show');
+                document.querySelector('.mobile-menu').classList.toggle('show');
+              
+               
               }
               
               btn.addEventListener('click',menus);
@@ -128,20 +194,23 @@
               
               </script>  
 
-              <script>  
-              
-              const app = document.querySelector('.app-btn');
+             <script>
+              /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+              var dropdown = document.getElementsByClassName("dropdown-btn");
+              var i;
 
-              function menus(){
-                document.querySelector('.app-menu').classList.toggle('show');
-               
+              for (i = 0; i < dropdown.length; i++) {
+                dropdown[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var dropdownContent = this.nextElementSibling;
+                if (dropdownContent.style.display === "block") {
+                dropdownContent.style.display = "none";
+                } else {
+                dropdownContent.style.display = "block";
+                }
+                });
               }
-              
-              app.addEventListener('click',menus);
-              
-              
-              
-              </script>  
+              </script>
 
               
 
