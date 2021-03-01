@@ -45,9 +45,9 @@
                         <!-- <div class = "tableheader"> -->
                         <div> Image </div>
                         <div> Store</div>
-                        <div> Frist Name</div>
+                        <div> Name</div>
                         <!--<div> Nickname</div>-->
-                        <div> Last Name</div>
+                       
                        
                       
                         <div> Update Staff Information</div>
@@ -61,24 +61,40 @@
 
                         {% for staff in gsa %}
 
+                        <div class = "border-top" ></div>
+                      
+                    
+
                         <div class = "tablecard">
 
-                        <img class="hrlistimage" src= {{url_for('static', filename='empfiles/thumb/') + staff.image_file}}>
-                       
-                        <div class = "hritem1"> {{staff.store}}</div>   
-                        <div class = "hritem2"> {{staff.firstname}}</div>
-                        <div class = "hritemactive">Active: {{staff.active}}</div>
-                        <div class = "hritem3"> {{staff.lastname}}</div> 
-                        
-                        
-                       
-                        <a class = "hrbutton2" id ="b1" <a href="/updategsa{{staff.id}}"><i class="fas fa-id-card"></i></a>
-                        <a class = "hrbutton3" id="b2" <a href="/updategsatraining{{staff.id}}"><i class="fas fa-user-graduate"></i></a>
-                        <a class = "hrbutton4" id="b3" <a href="/hrfile{{staff.id}}"><i class="far fa-file-image"></i></a>
-                        <a class = "hrbutton5" id="b4" <a href="/existingemployeefile{{staff.id}}"><i class="far fa-file-archive"></i></a>
-                        </div>
+                                <div class = "tablecard-image">
 
+                                    <img class="hrlistimage" src= {{url_for('static', filename='empfiles/thumb/') + staff.image_file}}>
+                               
+                                </div>
+
+                            <div class = "tablecard-inner">
+
+                                <div class = "hritem1"> {{staff.store}}</div>   
+                                <div class = "hritem2"> {{staff.firstname}} {{ staff.lastname}}</div>
+                                <div class = "hritem3"> {{staff.email}} </div>
+                       
+                                    <div class = "tablecard-links">
+
+                                    <a   href="/updategsa{{staff.id}}"><i class="fas fa-id-card"></i></a>
+                                    <a   href="/updategsatraining{{staff.id}}"><i class="fas fa-user-graduate"></i></a>
+                                    <a   href="/hrfile{{staff.id}}"><i class="far fa-file-image"></i></a>
+                                    <a   href="/existingemployeefile{{staff.id}}"><i class="far fa-file-archive"></i></a>
+                                    </div> 
+                            
+                            </div> 
+                     
+                        </div>
                         {% endfor %}
+
+                    
+
+
 
 {% endblock content %}
 

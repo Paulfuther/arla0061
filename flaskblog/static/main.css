@@ -232,11 +232,164 @@ ul {
   background: #eee;
 }
 
-/* Hr List Table */
+/* Hr List Table *//
 
+ .hrlist {
+   display: flex;
+   grid-template-columns: repeat(1, 1fr);
+   margin: auto;
+   justify-content: center;
+ }
+
+ .hr-container {
+   display: grid;
+   width: 90%;
+   grid-template-columns: repeat(1, 1fr);
+   justify-items: center;
+   padding-top: 30px;
+   padding-bottom: 5px;
+
+   height: 100%;
+   box-shadow: 5px 5px lightgray;
+   border-radius: 15px;
+
+   margin: 10px 10px 10px 15px;
+ }
+
+ .hr-container>div {
+   padding-bottom: 30px;
+ }
+
+ .tableheader {
+   display: none;
+
+ }
+
+ .tablecard {
+   display: grid;
+   grid-template-columns: 75px 1fr;
+   width: 70%;
+   margin:auto;
+   margin-top: 10px;
+   padding-top: 10px;
+
+   border-top: solid;
+   border-width: 1px;
+   border-color: #818181;
+ }
+
+
+
+ .tablecard-image {
+   display: flex;
+   align-items: flex-start;
+   padding: 0px 0px 0px 10px;
+
+
+ }
+
+
+ .tablecard-inner {
+   display: grid;
+   grid-template-columns: repeat(4, 1fr);
+   grid-template-rows: auto;
+   height: 100%;
+   width: 90%;
+
+
+   font-size: 14px;
+
+ }
+
+ .tablecard-links {
+   display: flex;
+   justify-content: space-between;
+   grid-column-start: 2;
+   grid-column-end: 4;
+   grid-row-start: 3;
+   padding: 20px 0px 20px 0px;
+ }
+
+ .hrlistimage {
+   border-radius: 50%;
+   width: 48x;
+   height: 48px;
+  
+ }
+
+ .hritem1 {
+   grid-column-start: 4;
+   grid-column-end: 5;
+   grid-row-start: 1;
+   grid-row-end: 1;
+   padding-left: 10px;
+   justify-self: end;
+ }
+
+ .hritem2 {
+   grid-column-start: 1;
+   grid-column-end: 4;
+   grid-row-start: 1;
+   grid-row-end: 1;
+   padding-left: 10px;
+ }
+
+ .hritem3 {
+   grid-column-start: 1;
+   grid-column-end: 4;
+   grid-row-start: 2;
+   grid-row-end: 2;
+   padding-left: 10px;
+ }
+
+ .hritem4 {
+   grid-area: g;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   padding-left: 0px;
+   justify-self: start;
+ }
+
+ .tablecard-links>a {
+   opacity: 0.5;
+   font-size: 20px;
+ }
+
+ .tablecard-links>a:hover {
+   color: black;
+   opacity:1.5;
+ }
+
+ .tablecard:hover   {
+   background-color:rgb(211,211,211);
+   opacity:0.5;
+   color:black;
+   font-weight:800;
+   
+ }
+
+
+ .hrbutton-updates {
+   display: flex;
+   grid-area: k;
+ }
+
+
+
+ .hrbutton-updates>div {
+   display: inline-block;
+   margin-left: 20px;
+   margin-right: 20px;
+   padding-top: 10px;
+   font-size: 15px;
+   opacity: 0.5;
+
+ }
+
+/*=====
 .tableheader {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   margin: auto;
   padding-top: 30px;
   padding-bottom: 5px;
@@ -248,6 +401,22 @@ ul {
   border-radius: 15px;
   margin-bottom: 20px;
   
+}
+
+.hrbutton-updates {
+ 
+   display: flex;
+  
+ 
+}
+
+.hritem3 {
+  visibility: hidden;
+}
+
+.hritem2 {
+ 
+  justify-self: start;
 }
 
 .tableheader >div {
@@ -312,8 +481,9 @@ ul {
 
 .tablecard {
   display: grid;
-  grid-template-columns: repeat(8, 1fr );
-  padding-top: 5px;
+  grid-template-columns: repeat(7, 1fr);
+  margin: auto;
+  padding-top: 30px;
   padding-bottom: 5px;
   padding-left: 30px;
   padding-right: 30px;
@@ -321,10 +491,11 @@ ul {
   margin-left: 20px;
   height: 100%;
   border-radius: 15px;
-  margin-bottom: 5px;
-  justify-items: start;
-  align-items: center;
+  margin-bottom: 20px;
+ 
 }
+
+
 
 .hritemactive {
   display: none;
@@ -335,8 +506,10 @@ ul {
   border-radius: 50%;
 }
 
-.tablecard:nth-child(odd) {
-  background: #eee;
+.tablecard {
+  border-bottom: solid;
+  border-bottom-color: #666;
+  border-bottom-width: thin;
 }
 
 .hr-container {
@@ -353,6 +526,8 @@ ul {
   border-radius: 15px;
   margin-bottom: 50px;
 }
+
+**/
 
 /* Hr file */
 
@@ -1293,7 +1468,7 @@ p.error {
  /* HR List on mobile */
 
   .hrlist {
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(1, 1fr);
     margin: auto;
     justify-content: center;
@@ -1325,58 +1500,76 @@ p.error {
 
   .tablecard {
     display: grid;
-    width: 90%;
-    justify-items: center;
-    align-items: start;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-areas: 
-    'a b c'
-    'a e f'
-    'h g g'
-    'j k l' 
-    'm n o';
-
+    grid-template-columns: 75px 1fr;
+    width:95%;
+    margin-left: 10px;
+    margin-right:10px;
+    margin-top: 10px;
+    padding-top: 10px;
     
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
-    margin: 10px 10px 10px 15px;
-    height: 100%;
-    box-shadow: 5px 5px lightgray;
-    border-radius: 15px;
-    font-size: 12px;
+    border-top:solid;
+    border-width: 1px;
+    border-color: #818181;
   }
 
   
 
-  .hrlistimage {
-    grid-area: a;
-    align-self: start;
-    width: 70%;
-    padding-top: 5px;
-    padding-bottom: 5px;
+  .tablecard-image {
+    display:flex;
+    align-items:flex-start;
+    padding: 0px 0px 0px 10px;
+
+   
+  }
+
+  
+  .tablecard-inner {
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+    height: 100%;
+    width: 90%;
     
+   
+    font-size: 14px;
+    
+  }
+
+  .tablecard-links {
+    display:flex;
+    justify-content: space-between;
+    grid-column-start: 2;
+    grid-column-end: 4;
+    grid-row-start: 3;
+    padding: 20px 0px 20px 0px;
+  }
+
+  .hrlistimage {
+    border-radius: 50%;
+    width:48x;
+    height:48px;
   }
   .hritem1 {
-    grid-area: c;
-    padding-top: 0px;
-    padding-right: 20px;
+    grid-column-start: 4;
+    grid-column-end: 5;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    padding-left: 10px;
     justify-self: end;
-    align-self: end;
   }
   .hritem2 {
-    grid-area: b;
-    font-size: 12px;
-    justify-self: start;
-    align-self: end;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    padding-left: 10px;
   }
   .hritem3 {
-    grid-area: e;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    
-    justify-self: start;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    grid-row-start: 2;
+    grid-row-end: 2;
+    padding-left: 10px;
   }
 
   .hritem4 {
@@ -1387,29 +1580,31 @@ p.error {
     justify-self: start;
   }
 
-  .hritemactive {
-    grid-area: f;
-    justify-self: end;
-    padding-right: 20px;
-    display: block;
-  }
-
-  .hrbutton2  {
-    grid-area: j;
-  }
-  .hrbutton3 {
-    grid-area: k;
-  }
-  .hrbutton4 {
-    grid-area: l;
-  }
-  .hrbutton5 {
-    grid-area: m;
+  .tablecard-links >a {
+    opacity: 0.5;
+    font-size: 15px;
   }
 
   
 
+  .hrbutton-updates {
+    display:flex;
+    grid-area: k;
+  }
 
+ 
+
+  .hrbutton-updates >div {
+    display:inline-block;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-top: 10px;
+    font-size: 15px;
+    opacity: 0.5;
+    
+  }
+
+  
 
  /* New Hire File */
 
