@@ -51,6 +51,34 @@ def email():
     return "sent"
 
 
+@app.route("/schedule", methods = ['GET', 'POST'])
+@login_required
+def schedule():
+    
+    
+    return render_template('schedule.html')
+
+
+@app.route("/searchschedule", methods=['GET', 'POST'])
+@login_required
+def searchschedule():
+    form = request.form
+    search_value = form['search_string']
+    if search_value == "all":
+            gsa = Employee.query\
+                .order_by(Employee.store).all()
+
+            #for staff in gsa:
+            #   print(staff.id)
+            return render_template('schedule.html', gsa=gsa)
+
+    gsa1 = Employee.query.filter_by(store=search_value)
+    gsa = gsa1.order_by(Employee.store).all()
+
+        #for staff in gsa:
+        #print(staff.firstname)
+    return render_template('schedule.html', gsa=gsa)
+
 def storelist():
     return db.session.query(Store).all.order_by('number')
 #@app.route("/login", methods=['GET', 'POST'])

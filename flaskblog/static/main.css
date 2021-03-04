@@ -34,6 +34,72 @@ td, th {
   padding: 8px;
 }
 
+/*------------------------------*/
+/* Schedule */
+
+.schedulecontainer {
+  display:grid;
+  grid-template-columns:  200px 1fr;
+  grid-template-areas: "a b";
+}
+
+.schedulename {
+  display:flex;
+  grid-area: a;
+  align-items: center;
+  justify-items: center;
+}
+
+.schedulenamesidebar {
+  display:flex;
+  align-items: center;
+  justify-items: center;
+}
+
+
+.schedule {
+   display: grid;
+   grid-area: b;
+   grid-template-columns: repeat(7, 1fr);
+   border: 1px solid black;
+   align-items: center;
+   justify-items: center;
+   margin-right: 20px;
+   margin-bottom: 20px;
+   
+}
+
+.weeklyhours {
+  display:grid;
+  grid-column-start: 2;
+  grid-template-columns: repeat(7,1fr);
+  border: 1px solid lightgray;
+  padding: 10px 0px 0px 10px;
+  
+}
+
+.hours {
+  width: 100px;
+  height: 25px;
+  margin-bottom: 10px;
+}
+
+.hours::placeholder {
+  text-align: center;
+  text-justify: center;
+}
+
+
+.writtenhours {
+  height:25px;
+  width: 100px;
+  margin-bottom: 5px;
+}
+
+.writtenhours::placeholder {
+  text-align: center;
+  text-justify: center;
+}
 
 
 /* Signature CSS */
@@ -1021,7 +1087,10 @@ a.hrbutton {
 }
 
 
-
+.menu-container {
+  display:flex;
+  justify-content: center;
+}
 
 .main-nav{
   display: flex;
@@ -1058,7 +1127,7 @@ a.hrbutton {
 }
 .main-nav ul.main-menu {
   flex:1;
-  margin-left: 20px;
+  
 }
 
 
@@ -1863,6 +1932,32 @@ p.error {
    justify-self: left;
    align-self: end;
  }
+
+/* schedule */ 
+
+.schedule {
+  display: grid;
+  grid-area: b;
+  grid-template-columns: repeat(1, 1fr);
+  border: 1px solid black;
+  align-items: center;
+  justify-items: center;
+  margin-right: 20px;
+  margin-bottom: 20px;
+
+}
+
+.weeklyhours {
+  display: grid;
+  grid-column-start: 2;
+  grid-template-columns: repeat(1, 1fr);
+  border: 1px solid lightgray;
+  padding: 10px 0px 0px 10px;
+
+}
+
+
+
 
 }
 

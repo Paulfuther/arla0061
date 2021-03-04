@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+
+                        <ul>
+                        <form method="POST">
+                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
+                            <select id="search_string"  name = "search_string">
+                                <option value="all">Seelct Store</options>
+                                <option value="all">All</options>
+                                <option value="396">396</options>
+                                <option value="398">398</options>
+                                <option value="402">402</options>
+                                <option value="414">414</options>
+                                <option value="1616">1616</options>
+                                <option value="8156">8156</options>
+                                <option value="8435">8435</options>
+                                <option value="33410">33410</options>
+                                <option value="33485">33485</options>
+                                <option value="48314">48314</options>
+                                <option value="65231">65231</options>
+                                <option value="65077">65077</options>
+                            <input type ="submit"  formaction="/searchschedule" value = "Search"> 
+                        </form>
+                        </ul>
+
+    <div class ="schedulecontainer">
+           
+            <div class ="schedulename"> name </div>
+
+            <div class = "schedule" >
+                <div>Friday</div>
+                <div>Saturday</div>
+                <div>Sunday</div>
+                <div>Monday</div>
+                <div>Tuesday</div>
+                <div>Wednesday</div>
+                <div>Thursday</div>
+
+            </div>
+    </div>
+
+    <div class ="schedulecontainer">
+
+                {% for staff in gsa %}
+
+                  <div class = "schedulenamesidebar">  {{staff.firstname}} </div>
+
+                    <div class = "weeklyhours">
+                        {% for x in range(7) %}
+                        
+                        <input type="text" class="writtenhours" placeholder = "Shift">
+
+                        {% endfor %}
+
+                            {% for x in range(7) %}
+                            <input type="text" class = "hours" placeholder = "Hours">
+                            {% endfor %}
+                
+                    </div>
+
+                {% endfor %}
+
+
+            
+
+
+    </div>
+
+{% endblock %}
