@@ -689,11 +689,24 @@ ul.a {
   display: grid;
   grid-template-columns: 1fr;
   width: 90%;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding: 20px 20px 20px 20px;
   font-size: 10px;
   margin-left: 50px;
+  background: lightcyan;
+  border-color: black;
+  border-style: solid;
+  border-width: thin;
 }
+
+.requiredgrid table {
+  border-color: white;
+  border: none;
+}
+
+.requiredgrid table td,th {
+  border: none;
+}
+
 .requiredgrid div p li {
   padding-top: 10px;
   padding-bottom: 10px;
