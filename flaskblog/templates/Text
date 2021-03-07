@@ -3839,3 +3839,122 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
     
     /*transition: transform 0.5s ease-in-out;*/
   }
+
+
+
+  
+.robbery {
+  align-items: center;
+  width:80%;
+  height: 35pc;
+}
+.hrheading {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+.hrfooter {
+  font-style: italic;
+  font-size: 8px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: center;
+  text-justify: inter-word;
+}
+.payrollgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  width: 90%;
+  grid-auto-rows: 50px;
+  
+  
+}
+.payrollgrid div {
+  padding-top: 15px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  border-style: solid;
+  border-width: 1px;
+  
+}
+.competitiongrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 80%;
+  margin: auto;
+  
+
+}
+.competitiongrid div {
+  border: solid;
+  border-width: 1px;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+.empstandardsgrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 80%;
+  margin: auto;
+  
+}
+.empstandards {
+  align-items: center;
+  width: 80%;
+  
+  
+}
+.sitesecuritygrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  grid-auto-rows: 50px;
+  width: 80%;
+  margin: auto;
+}
+.sitesecuritygrid div {
+  border:  solid;
+  border-width: 1px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  
+}
+.muniform {
+  align-items: center;
+  width: 80%;
+  height: 16pc;
+}
+.uniformimagegrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 80%;
+  margin: auto;
+}
+.vacationpay {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 80%;
+  grid-auto-rows: 50px 200px;
+  margin: auto;
+  border: solid;
+}
+.vacationpay div {
+  border: solid;
+  border-width: 1px;
+  text-align: center;
+}
+.voidcheck {
+  display:grid;
+  
+  width: 90%;
+  height:150px;
+  border-width: 5px;
+  border-style: solid;
+}
