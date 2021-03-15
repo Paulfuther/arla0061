@@ -40,7 +40,18 @@ td, th {
 .schedulecontainer {
   display:grid;
   grid-template-columns:  200px 1fr;
+  grid-template-areas: 
+  "a b"
+  "c d"
+  "e f";
+  margin-top: 10px;
+}
+
+.schedulecontainer2 {
+  display: grid;
+  grid-template-columns: 200px 1fr;
   grid-template-areas: "a b";
+  margin-top: 10px;
 }
 
 .schedulename {
@@ -48,6 +59,66 @@ td, th {
   grid-area: a;
   align-items: center;
   justify-items: center;
+}
+
+.scheduledates {
+  display: flex;
+  grid-area: f;
+  align-items: center;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  
+}
+
+.scheduledaynames {
+  display: flex;
+  grid-area: b;
+  align-items: center;
+  justify-content: space-around;
+  
+}
+
+.schedulemenu {
+  display: flex;
+  display: flex;
+  justify-content: space-evenly;
+  width: 50%;
+  height: 50px;
+  margin: auto;
+  align-items: center;
+}
+
+.day,  .date  {
+  padding-right: 5px;
+  font-size: 12px;
+}
+
+.previous, .next{
+  font-size: 24px;
+}
+
+.previous .tooltiptext {
+  visibility: hidden;
+  font-size: 12px;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+}
+
+.previous:hover .tooltiptext{
+  visibility: visible;
+ 
+}
+
+.next .tooltiptext {
+  visibility: hidden;
+  font-size: 12px;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+}
+
+.next:hover .tooltiptext {
+  visibility: visible;
+
 }
 
 .schedulenamesidebar {
@@ -1905,13 +1976,13 @@ p.error {
   margin-left: auto;
   margin-right: auto;
   border: 1px solid black;
-  padding: 15px;
-  border-collapse: none !important;
-  max-width: 350px;
+ 
+  
+  max-width: 350px !important;
 }
 
 .requiredgrid tbody {
-  border-collapse: none;
+  max-width: 350px;
 
 }
 

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start
 from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
@@ -55,14 +55,17 @@ def email():
 @login_required
 def schedule():
     
+    form = schedule_start()
+   
     
-    return render_template('schedule.html')
+    return render_template('schedule.html', form=form)
 
 
 @app.route("/searchschedule", methods=['GET', 'POST'])
 @login_required
 def searchschedule():
     form = request.form
+    form2 = schedule_start()
     search_value = form['search_string']
     if search_value == "all":
             gsa = Employee.query\
@@ -70,14 +73,14 @@ def searchschedule():
 
             #for staff in gsa:
             #   print(staff.id)
-            return render_template('schedule.html', gsa=gsa)
+            return render_template('schedule.html', gsa=gsa, form2=form2)
 
     gsa1 = Employee.query.filter_by(store=search_value)
     gsa = gsa1.order_by(Employee.store).all()
 
         #for staff in gsa:
         #print(staff.firstname)
-    return render_template('schedule.html', gsa=gsa)
+    return render_template('schedule.html', gsa=gsa, form2=form2)
 
 def storelist():
     return db.session.query(Store).all.order_by('number')

@@ -231,8 +231,8 @@ class grade_form(FlaskForm):
             raise ValidationError('Must Select a Manager')
 
     
-      
-       
+class schedule_start(FlaskForm):
+    startdate = DateField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])   
 
  
  
