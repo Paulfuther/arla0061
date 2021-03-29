@@ -2,74 +2,65 @@
 
 
 {% block content%}
-     
-        <div class = "schedulemenu">
+     <form method="POST">  
+
+            <div class = "schedulemenu">
+                      
                         <ul>
-                        <form method="POST">
+                 
                             <!--<input type ="text" autofocus="autofocus" name="search_string">-->
-                            <select id="search_string"  name = "search_string">
-                                <option value="all">Seelct Store</options>
-                                <option value="all">All</options>
-                                <option value="396">396</options>
-                                <option value="398">398</options>
-                                <option value="402">402</options>
-                                <option value="414">414</options>
-                                <option value="1616">1616</options>
-                                <option value="8156">8156</options>
-                                <option value="8435">8435</options>
-                                <option value="33410">33410</options>
-                                <option value="33485">33485</options>
-                                <option value="48314">48314</options>
-                                <option value="65231">65231</options>
-                                <option value="65077">65077</options>
-                            <input type ="submit"  formaction="/searchschedule" value = "Search"> 
-                        </form>
+                           
+                       
+                        <li> {{form.store( placeholder="All")}}    </li>   
+                        <li><input type ="submit"  formaction="/searchschedule" name="action" value = "Search" id="search_string"> 
+                        </li>
+                        <i class = "fas fa-angle-left previous" ></i>
+                        <span class = "tooltiptext">Previous Day</span>
+                        </i>
+                        
+                        <i class = "fas fa-angle-right next"></i>
+                        <span class = "tooltiptext">Next Day</span>
+                        </li>
+                        <li><input type = "submit" formaction="/searchschedule" id="writtenhours" class = "hidden-sdate" name= "action" value = "writtenhours"  ></li>
+                        
                         </ul>
-
+            </div>
+                
             
-            
+                   <div class ="schedulecontainer">
+                        
+                        
 
-   
+                            <div class ="schedulename"> name </div>
 
-            <i class = "fas fa-angle-left previous" >
-            <span class = "tooltiptext">Previous Day</span>
-            </i>
-            
-            <i class = "fas fa-angle-right next">
-            <span class = "tooltiptext">Next Day</span>
-            </i>
+                        
+                            <div class = "scheduledaynames" > 
+                            <div class = "day" id ="day"></div>
+                            <div class = "day" id ="day"></div>
+                            <div class = "day" id ="day"></div>
+                            <div class = "day" id ="dayfour"></div>
+                            <div class = "day" id ="dayfive"></div>
+                            <div class = "day" id ="daysix"></div>
+                            <div class = "day" id ="dayseven"></div>
+                            </div>
+
+                            <div class = "scheduledates" >
+                            {% for x in range (7) %}
+                            
+                            <div class = "date" id = "sdate"  name = "sdate"> </div>
+                            <input type ="hidden" id = "hidden-sdate" name = "sdate"> 
+                                
+                                
+                            {% endfor %}
+
+                        </div>
 
         </div>
+               
+                     <div class ="schedulecontainer2">
 
-    <div class ="schedulecontainer">
-           
-            <div class ="schedulename"> name </div>
-
-        
-            <div class = "scheduledaynames" > 
-            <div class = "day" id ="day"></div>
-            <div class = "day" id ="day"></div>
-            <div class = "day" id ="day"></div>
-            <div class = "day" id ="dayfour"></div>
-            <div class = "day" id ="dayfive"></div>
-            <div class = "day" id ="daysix"></div>
-            <div class = "day" id ="dayseven"></div>
-            </div>
-
-            <div class = "scheduledates" >
-            <div class = "date" id = "tue"> </div>     
-            <div class = "date" id = "wed"> </div>  
-            <div class = "date" id = "wed"> </div>
-            <div class = "date" id = "wed"> </div>
-            <div class = "date" id = "wed"> </div>
-            <div class = "date" id = "wed"> </div>
-            <div class = "date" id = "wed"> </div>
-
-            </div>
-
-    </div>
-
-    <div class ="schedulecontainer2">
+                
+                     
 
                 {% for staff in gsa %}
 
@@ -78,58 +69,59 @@
                     <div class = "weeklyhours">
                         {% for x in range(7) %}
                         
-                        <input type="text" class="writtenhours" placeholder = "Shift">
+                        <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Shift">
 
                         {% endfor %}
 
                             {% for x in range(7) %}
-                            <input type="text" class = "hours" placeholder = "Hours">
+                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Hours">
                             {% endfor %}
                 
                     </div>
 
                 {% endfor %}
 
-
-            
-
-
     </div>
  
+
+ </form>
                 <script>
                     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
                     "Sep", "Oct", "Nov", "Dec"];
                     const dayNames = ["Sun" ,"Mon","Tue", "Wed", "Thu", "Fri", "Sat"];
-                    const one  = new Date()
-                   
+                    const one  = new Date();
+                    divs = document.getElementsByClassName('day');
+                    divs2 = document.getElementsByClassName('date');
+                    hiddenfield = document.getElementsByClassName('hidden-sdate');
+                  
+                    start_date = one.getDate();
+
 
                     const UpdateChart = () => {
 
-                        divs = document.getElementsByClassName('day');
-                        divs2 = document.getElementsByClassName('date');
-                        start_date = one.getDate();
-
-                    
                      for (i=0; i< 7; i++){
-                        this_day =  (dayNames[(one.getDate() +i) %7]);
+                        
+                        this_day =  dayNames[one.getDay()];
                         this_month = (monthNames[(one.getMonth() %12) ]);
                         this_year = (one.getFullYear() );
-                        this_date = (one.getDate() +i);
-                        divs[i].innerHTML = this_day;
+                        this_date = (one.getDate()  );
                         
-                        this_date = this_month + "-" + this_date +"-" + this_year;
-                        divs2[i].innerHTML = this_date;
+                        divs[i].innerHTML = this_day;
+                        this_dates = this_month + "-" + this_date +"-" + this_year;
+                        divs2[i].innerHTML = this_dates;
+                        
+
+                        one.setDate(one.getDate()+1);
                      }
                     };
 
                         document.querySelector(".next").addEventListener("click",() => {
-                            
-                            one.setDate(one.getDate() +1 );                
+                            one.setDate(one.getDate() -6);             
                             UpdateChart();
                         });
                     
                          document.querySelector(".previous").addEventListener("click", () => {
-                            one.setDate(one.getDate() -1 );                
+                            one.setDate(one.getDate() -8 );                
                             UpdateChart();
                          });
                         
@@ -137,9 +129,13 @@
 
                 </script>
 
-                   
+                <script>
+                for (i=0; i<7; i++){
+                document.getElementById("writtenhours").onclick = function () {
+                var info = document.getElementById("sdate").innerHTML;
+                document.getElementById("hidden-sdate").value = info;
+                }};
+                </script>
 
-                  
-                   
 
 {% endblock %}

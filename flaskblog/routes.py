@@ -1,6 +1,6 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule
 from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
@@ -55,7 +55,7 @@ def email():
 @login_required
 def schedule():
     
-    form = schedule_start()
+    form = Schedule()
    
     
     return render_template('schedule.html', form=form)
@@ -64,23 +64,81 @@ def schedule():
 @app.route("/searchschedule", methods=['GET', 'POST'])
 @login_required
 def searchschedule():
-    form = request.form
-    form2 = schedule_start()
-    search_value = form['search_string']
-    if search_value == "all":
-            gsa = Employee.query\
-                .order_by(Employee.store).all()
+    
+    form=Schedule()
+    #form = request.form
+    shifts = request.form.getlist('writtenhours')
+    hoursworked = request.form.getlist('hours')
+    
+    search_value = form.store.data
+    
+    if 'Search' in request.form['action']:
+        print(shifts)
+        print(search_value)
+        print(hoursworked)
+       
+        if search_value == "Home Store":
+                gsa = Employee.query\
+                    .order_by(Employee.store).all()
 
+                #for staff in gsa:
+                #   print(staff.id)
+                return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form)
+            
+        search_value=int(search_value)
+        print(search_value)
+        gsa1 = Employee.query.filter_by(store=search_value)
+        gsa = gsa1.order_by(Employee.store).all()
+        print(gsa[0])
+        #print(workdate[0])
             #for staff in gsa:
-            #   print(staff.id)
-            return render_template('schedule.html', gsa=gsa, form2=form2)
+            #print(staff.firstname)
+        return render_template('schedule.html', gsa=gsa, form=form)
+    
+    elif 'writtenhours' in request.form['action']:
+            
+        if search_value == "Home Store":
+                            gsa = Employee.query\
+                                .order_by(Employee.store).all()
 
-    gsa1 = Employee.query.filter_by(store=search_value)
-    gsa = gsa1.order_by(Employee.store).all()
+                            #for staff in gsa:
+                            #   print(staff.id)
+                            #return render_template('schedule.html', gsa=gsa)
 
-        #for staff in gsa:
-        #print(staff.firstname)
-    return render_template('schedule.html', gsa=gsa, form2=form2)
+        gsa1 = Employee.query.filter_by(store=search_value)
+        gsa = gsa1.order_by(Employee.store).all()
+        
+     
+        
+ 
+        y=0
+        for x in range(6):
+            if x != '':     
+                print(shifts[y],hoursworked[y])
+                y +=1
+                        
+            return render_template('schedule.html', form=form, gsa=gsa)
+    
+    return render_template('schedule.html')
+
+
+
+
+
+@app.route("/addtoschedule", methods = ['GET', 'POST'])
+@login_required
+def addtoschedule():
+    form=request.form
+    search_value = form['search_string']
+    shifts = request.form.getlist('writtenhours')
+    print(search_value)
+    for x in shifts:
+        if x != '':
+            print(shifts)
+        
+    return render_template('schedule.html', form=form)
+        
+
 
 def storelist():
     return db.session.query(Store).all.order_by('number')
@@ -219,11 +277,12 @@ def updategsatraining(staff_id):
     course = Course.query.all()
     for x in course:
         print(x.id, x.name)
+        
     gradelist = Grade.query\
         .filter_by(employee_id=staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value, Grade.completeddate)\
+        .add_columns(Course.name, Grade.value)\
         .order_by(Grade.course_id)
     
     for x in gradelist:

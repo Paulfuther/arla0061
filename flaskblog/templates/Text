@@ -4051,3 +4051,134 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
                      console.log(one);
                             console.log(start_date);
                             start_date = start_date + (one.getDay()+1) ; 
+
+
+
+                             <div class = "day" id ="day"></div>
+            <div class = "day" id ="day"></div>
+            <div class = "day" id ="dayfour"></div>
+            <div class = "day" id ="dayfive"></div>
+            <div class = "day" id ="daysix"></div>
+            <div class = "day" id ="dayseven"></div>
+
+
+             <div class = "scheduledates" >
+            <div class = "date" id = "tue"> </div>     
+            <div class = "date" id = "wed"> </div>  
+            <div class = "date" id = "wed"> </div>
+            <div class = "date" id = "wed"> </div>
+            <div class = "date" id = "wed"> </div>
+            <div class = "date" id = "wed"> </div>
+            <div class = "date" id = "wed"> </div>
+
+            </div>
+
+
+
+
+            <option value="all">Seelct Store</options>
+                                <option value="all">All</options>
+                                <option value="396">396</options>
+                                <option value="398">398</options>
+                                <option value="402">402</options>
+                                <option value="414">414</options>
+                                <option value="1616">1616</options>
+                                <option value="8156">8156</options>
+                                <option value="8435">8435</options>
+                                <option value="33410">33410</options>
+                                <option value="33485">33485</options>
+                                <option value="48314">48314</options>
+                                <option value="65231">65231</options>
+                                <option value="65077">65077</options>
+
+
+
+                          <script>
+                        let yourdiv = $("#sdate").html();
+                        $.ajax({
+                            type: 'post',
+                            url: '/searchschedule',
+                            data: JSON.stringify(yourdiv),
+                            contentType: "application/json; charset=utf-8",
+                            success: function (data) {
+                                console.log(data);
+                            }
+                        });
+                        </script>
+       divinfo = form.request.get_json()
+    print(divinfo)
+
+
+
+
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+                    "Sep", "Oct", "Nov", "Dec"];
+                    const dayNames = ["Sun" ,"Mon","Tue", "Wed", "Thu", "Fri", "Sat"];
+                    const one  = new Date()
+                   
+
+                    const UpdateChart = () => {
+
+                        divs = document.getElementsByClassName('day');
+                        divs2 = document.getElementsByClassName('sdate');
+                        start_date = one.getDate();
+
+                    
+                     for (i=0; i< 7; i++){
+                        this_day =  (dayNames[(one.getDate() +i) %7]);
+                        this_month = (monthNames[(one.getMonth() %12) ]);
+                        this_year = (one.getFullYear() );
+                        this_date = (one.getDate() +i);
+                        divs[i].innerHTML = this_day;
+                        
+                        this_date = this_month + "-" + this_date +"-" + this_year;
+                        divs2[i].innerHTML = this_date;
+                        document.getElementById('sdate').value = this_date
+                     }
+                    };
+
+                        document.querySelector(".next").addEventListener("click",() => {
+                            
+                            one.setDate(one.getDate() +1 );                
+                            UpdateChart();
+                        });
+                    
+                         document.querySelector(".previous").addEventListener("click", () => {
+                            one.setDate(one.getDate() -1 );                
+                            UpdateChart();
+                         });
+                        
+                    UpdateChart();
+
+                </script>
+ document.getElementById('sdate').value = this_date;
+
+
+ document.getElementById('sdate').value = this_date;
+                        document.getElementById('sdate').value = this_date;
+                        document.getElementById('sdate').value = this_date;
+                        document.getElementById('sdate').value = this_date;
+                        document.getElementById('sdate4').value = this_date;
+                        document.getElementById('sdate5').value = this_date;
+                        document.getElementById('sdate6').value = this_date;
+
+
+
+     <div class = "date" id = "sdate" name = "sdate" > </div>  
+                            <div class = "date" id = "sdate" name = "sdate" > </div>
+                            <div class = "date" id = "sdate" name = "sdate" > </div>
+                            <div class = "date" id = "sdate" name = "sdate" > </div>
+                            <div class = "date" id = "sdate" name = "sdate" > </div>
+                            <div class = "date" id = "sdate" name = "sdate" > </div>                   
+
+
+
+                            document.querySelector(".hidden-sdate").addEventListener("click",() => {
+                     $(document).ready(function(){
+                        $('#textarea').keyup(function() {
+                            $('#hidden-sdate').html($('#div').html());
+                            console.log(hidden-sdate)
+                        });
+                    });
+            
+                });

@@ -202,7 +202,15 @@ class EmployeeUpdateForm(FlaskForm):
                            DataRequired(), Length(min=2, max=100)])
     submit = SubmitField('Update Employee')
 
-    
+class Schedule(FlaskForm):
+    store = SelectField('Store', choices=[('Home Store', 'Home Store'), ("396", "396"), ('398', '398'),
+                                          ('402', '402'), ('414', '414'), ('1616',
+                                                                           '1616'), ('8156', '8156'),
+                                          ('8435', '8435'), ('33410',
+                                                             '33410'),
+                                          ('33485', '33485'), ('48314',
+                                                               '48314'),
+                                          ('65077', '65077'), ('65231', '65231')])
    
 class grade_form(FlaskForm):
     
@@ -233,6 +241,13 @@ class grade_form(FlaskForm):
     
 class schedule_start(FlaskForm):
     startdate = DateField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])   
-
+    store = SelectField('Store', choices=[('Home Store', 'Home Store'), ("396", "396"), ('398', '398'),
+                                          ('402', '402'), ('414', '414'), ('1616',
+                                                                           '1616'), ('8156', '8156'),
+                                          ('8435', '8435'), ('33410',
+                                                             '33410'),
+                                          ('33485', '33485'), ('48314',
+                                                               '48314'),
+                                          ('65077', '65077'), ('65231', '65231')])
  
  

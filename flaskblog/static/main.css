@@ -78,14 +78,21 @@ td, th {
   
 }
 
+.schedulemenu ul {
+  display:flex;
+  justify-content: space-between;
+}
+
+.tooltiptext {
+  font-size: 14px;
+}
+
 .schedulemenu {
-  display: flex;
-  display: flex;
-  justify-content: space-evenly;
+  
   width: 50%;
   height: 50px;
   margin: auto;
-  align-items: center;
+  
 }
 
 .day,  .date  {
@@ -762,6 +769,7 @@ ul.a {
 .requiredgrid {
   display: grid;
   grid-template-columns: 1fr; 
+  
   padding: 20px 30px 20px 30px;
   font-size: 12px;
   background: lightcyan;
@@ -780,6 +788,7 @@ ul.a {
 .requiredgrid table {
   margin-left: auto;
   margin-right: auto;
+  
   border: 1px solid black;
   padding: 15px;
   border-collapse: none !important; 
