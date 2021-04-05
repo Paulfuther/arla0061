@@ -2,7 +2,7 @@
 
 
 {% block content%}
-     <form method="POST">  
+     <form id = "form"  method="POST">  
 
             <div class = "schedulemenu">
                       
@@ -21,7 +21,7 @@
                         <i class = "fas fa-angle-right next"></i>
                         <span class = "tooltiptext">Next Day</span>
                         </li>
-                        <li><input type = "submit" formaction="/searchschedule" id="writtenhours" class = "hidden-sdate" name= "action" value = "writtenhours"  ></li>
+                        <li> <input type = "submit" formaction="/searchschedule" class = "submithours" id="submithours"  name= "action" value = "submithours"  ></li>
                         
                         </ul>
             </div>
@@ -47,8 +47,8 @@
                             <div class = "scheduledates" >
                             {% for x in range (7) %}
                             
-                            <div class = "date" id = "sdate"  name = "sdate"> </div>
-                            <input type ="hidden" id = "hidden-sdate" name = "sdate"> 
+                            <div class = "date" id = "date"  name = "date"> </div>
+                            <input type ="hidden" class = "hidden-sdate" id = "hidden-sdate" name = "hidden-sdate"> 
                                 
                                 
                             {% endfor %}
@@ -92,7 +92,8 @@
                     const one  = new Date();
                     divs = document.getElementsByClassName('day');
                     divs2 = document.getElementsByClassName('date');
-                    hiddenfield = document.getElementsByClassName('hidden-sdate');
+                    divshidden = document.getElementsByClassName('hidden-sdate')
+                   
                   
                     start_date = one.getDate();
 
@@ -109,7 +110,7 @@
                         divs[i].innerHTML = this_day;
                         this_dates = this_month + "-" + this_date +"-" + this_year;
                         divs2[i].innerHTML = this_dates;
-                        
+                        divshidden[i].value = this_dates;
 
                         one.setDate(one.getDate()+1);
                      }
@@ -129,13 +130,5 @@
 
                 </script>
 
-                <script>
-                for (i=0; i<7; i++){
-                document.getElementById("writtenhours").onclick = function () {
-                var info = document.getElementById("sdate").innerHTML;
-                document.getElementById("hidden-sdate").value = info;
-                }};
-                </script>
-
-
+                
 {% endblock %}

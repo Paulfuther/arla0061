@@ -95,7 +95,7 @@ def searchschedule():
             #print(staff.firstname)
         return render_template('schedule.html', gsa=gsa, form=form)
     
-    elif 'writtenhours' in request.form['action']:
+    elif 'submithours' in request.form['action']:
             
         if search_value == "Home Store":
                             gsa = Employee.query\
@@ -108,20 +108,41 @@ def searchschedule():
         gsa1 = Employee.query.filter_by(store=search_value)
         gsa = gsa1.order_by(Employee.store).all()
         
-     
+        sdescription = request.form.getlist('writtenhours')
+        shours = request.form.getlist('hours')
+        sdate1 = request.form.getlist('sdate')
+        hsdate1 = request.form.getlist('hidden-sdate')
+        gsalength = len(gsa)
+       
+        #print (type(hsdate1))
+        #y=0
         
- 
-        y=0
-        for x in range(6):
-            if x != '':     
-                print(shifts[y],hoursworked[y])
-                y +=1
-                        
-            return render_template('schedule.html', form=form, gsa=gsa)
+        #for obj in hsdate1:
+        #    print(obj)
+        #   for g in gsa:
+        #        print(g.id,sdescription[y], y, g)
+        #       
+        #    
+        #        if g == gsalength:
+        #           y== y + gsalength
+        #       else:
+        #           y=y+1
+        
+        y=0        
+        for g in gsa:
+            for obj in hsdate1:
+                print(g, obj, sdescription[y], shours[y])
+                empsched = Schedule( employee_id = g,
+                                    shift_description = sdescription[y],
+                                    shift_hours = shours[y],
+                                    shift_date = obj)
+                db.session.add(empsched)
+                y=y+1
+        db.session.commit()
+            
+        return render_template('schedule.html', form=form, gsa=gsa)
     
     return render_template('schedule.html')
-
-
 
 
 

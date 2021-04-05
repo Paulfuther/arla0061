@@ -174,6 +174,14 @@ class Grade(db.Model):
     course = db.relationship('Course', backref='grade')
     
     
+    
+class Schedule(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    employee_id = db.Column(Integer(), ForeignKey('employee.id'))
+    employee = db.relationship('Employee', backref = 'schedule')
+    shift_description = db.Column(db.String())
+    shift_hours = db.Column(db.Integer())
+    shift_date = db.Column(db.Date)
  
 class Empfile(db.Model):
     id = db.Column(db.Integer(), primary_key = True)

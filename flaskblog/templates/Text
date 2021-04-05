@@ -4182,3 +4182,32 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
                     });
             
                 });
+
+
+                <script>
+               
+                info = document.getElementsByClassName("sdate")
+                div4 = document.getElementsByClassName('hidden-sdate')
+
+
+                document.querySelector(".submithours").addEventListener("click", ()=> {
+                    div3 = document.getElementsByClassName('date')
+                    div4 = document.getElementsByClassName('day')
+                    employee = document.getElementsByClassName('schedulenamesidebar')
+                    label = document.getElementsByClassName('writtenhours')
+                    console.log("button clicked");
+
+                    for (j=0; j<employee.length; j++){
+                        console.log(employee[j].innerHTML);
+                        for (i=0; i<7; i++){
+                        console.log(i, div4[i].innerHTML, div3[i].innerHTML, label[i].innerHTML);
+                    };
+
+                   
+                   
+                    };
+                  
+                });
+              
+                </script>
+
