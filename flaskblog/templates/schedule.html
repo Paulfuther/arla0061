@@ -69,12 +69,13 @@
                     <div class = "weeklyhours">
                         {% for x in range(7) %}
                         
-                        <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Shift">
+                        <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Shift", value={{x.writtenhours}}>
 
                         {% endfor %}
 
-                            {% for x in range(7) %}
-                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Hours">
+                            {% for x in s_s %}
+                         
+                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Hours", value={{x.shift_hours}}>
                             {% endfor %}
                 
                     </div>

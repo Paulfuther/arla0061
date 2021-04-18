@@ -16,6 +16,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin, login_required, roles_required
 from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
+
 from flask_admin.menu import MenuLink
 from flask_bcrypt import Bcrypt
 from sqlalchemy.orm import relationship, backref
@@ -162,6 +163,7 @@ class Course(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(100), nullable=False)  
     
+    
     def __str__(self):
         return '%r' % (self.name)
    
@@ -172,13 +174,14 @@ class Grade(db.Model):
     employee = db.relationship('Employee', backref = 'grades')
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
     course = db.relationship('Course', backref='grade')
+    completeddate = db.Column(db.String(),  nullable=True)
     
     
-    
-class Schedule(db.Model):
+class staffschedule(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     employee_id = db.Column(Integer(), ForeignKey('employee.id'))
     employee = db.relationship('Employee', backref = 'schedule')
+    storeworked = db.Column(db.String())
     shift_description = db.Column(db.String())
     shift_hours = db.Column(db.Integer())
     shift_date = db.Column(db.Date)
@@ -209,14 +212,32 @@ salt_store = db.Table(
     db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
 )
        
+reclaim_store = db.Table(
+    'reclaim_store',
+    db.Column('reclaim_id', db.Integer(), db.ForeignKey('reclaimtank.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
+
 class Store(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer)
+    carwash =  db.Column(db.Boolean, default = False)
     
     def __repr__(self):
         return '%r' % (self.number)
     
-   
+class reclaimtank(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    reclaimdate = db.Column(db.DateTime(), nullable=True)
+    reclaimstore = db.relationship('Store', secondary = reclaim_store,
+                                   backref = db.backref('recstore', lazy = 'dynamic'))
+    tankonewater = db.Column(db.String(100))
+    tankonesand = db.Column(db.String(100))
+    tanktwowater = db.Column(db.String(100))
+    tanktwosand = db.Column(db.String(100))
+    tanklids = db.Column(db.String(100))
+    changepillows = db.Column(db.String(100))
+
 # To do list 
 class Todo(db.Model):
     id=db.Column(db.Integer, primary_key=True)
@@ -351,9 +372,15 @@ class MyModelView8(ModelView):
     can_export = True
     can_delete = True
     column_hide_backrefs = False
-    
+    form_args = {
+        'incstore': {
+            'query_factory': lambda: Store.query.order_by(Store.number)
+                
+        }
+    }
     column_list = ('incstore', 'incident', 'details')
     #column_select_related_list = (Todo.store, Todo.task)
+    
 
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -366,7 +393,12 @@ class MyModelView9(ModelView):
     can_delete = False
     column_hide_backrefs = False
     column_default_sort = ('saltdate', True)
-
+    form_args = {
+            'saltstore': {
+                'query_factory': lambda: Store.query.order_by(Store.number)
+                    
+            }
+        }
     column_list = ('saltstore','saltdate', 'area', 'gsa')
     #column_select_related_list = (Todo.store, Todo.task)
 
@@ -375,6 +407,31 @@ class MyModelView9(ModelView):
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+
+
+class MyModelViewReclaim(ModelView):
+    can_export = True
+    can_delete = False
+    column_hide_backrefs = False
+    column_default_sort = ('reclaimdate', True)
+    form_args = {
+        'reclaimstore': {
+            'query_factory': lambda: Store.query.filter_by(
+                carwash = True
+                ).order_by(Store.number)
+        }
+    }
+    
+    
+    column_list = ('reclaimdate', 'reclaimstore', 'tankonewater','tankonesand', 'tanktwowater', 'tanktwosand', 'changepillows')
+    #column_select_related_list = (Todo.store, Todo.task)
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
 
 class AdminViewStore(ModelView):
     
@@ -454,6 +511,7 @@ admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 admin.add_view(hreditor(hrfiles, db.session))
 admin.add_view(MyModelView8(Incidentnumbers, db.session))
 admin.add_view(MyModelView9(Saltlog, db.session))
+admin.add_view(MyModelViewReclaim(reclaimtank, db.session))
 
 from flaskblog import routes
 

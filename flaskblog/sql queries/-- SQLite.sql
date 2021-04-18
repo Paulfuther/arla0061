@@ -1,3 +1,3 @@
 -- SQLite
-select * from Empfile
+select * from Grade
 

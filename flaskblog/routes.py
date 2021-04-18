@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule, GradeForm
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
@@ -16,7 +16,7 @@ import openpyxl
 import xlrd
 import xlwt
 import xlsxwriter
-from flaskblog import datetime, mail
+from flaskblog import datetime # mail
 from flask_moment import Moment
 #from flask_login import login_user, current_user, logout_user, login_required
 #from flask_user import roles_required
@@ -67,16 +67,36 @@ def searchschedule():
     
     form=Schedule()
     #form = request.form
+    hsdate1 = request.form.getlist('hidden-sdate')
     shifts = request.form.getlist('writtenhours')
     hoursworked = request.form.getlist('hours')
     
     search_value = form.store.data
     
     if 'Search' in request.form['action']:
-        print(shifts)
-        print(search_value)
-        print(hoursworked)
-       
+        if search_value != "Home Store":
+            gsa1 = Employee.query.filter_by(store=search_value)
+            gsa = gsa1.order_by(Employee.store).all()
+            s_v = int(search_value)
+            for stuff in hsdate1:
+                newdate = datetime.strptime(stuff, '%b-%d-%Y')
+                nd = datetime.date(newdate)
+                s_s = staffschedule.query.filter_by(shift_date = nd)
+                for r in s_s:
+                    print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
+                
+                
+                #print(s_s.storeworked)
+                #(storeworked = search_value)\
+                #shift_date = t
+                #print(s_s.shift_date)
+                #for xs in s_s :
+                 #   print(xs.employee_id, xs.storeworked, xs.shift_description, xs.shift_hours)
+        #print(shifts)
+        #print(search_value)
+        #print(hoursworked)
+            return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form, s_s=s_s)
+   
         if search_value == "Home Store":
                 gsa = Employee.query\
                     .order_by(Employee.store).all()
@@ -86,13 +106,14 @@ def searchschedule():
                 return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form)
             
         search_value=int(search_value)
-        print(search_value)
+        #print(search_value)
         gsa1 = Employee.query.filter_by(store=search_value)
         gsa = gsa1.order_by(Employee.store).all()
-        print(gsa[0])
-        #print(workdate[0])
-            #for staff in gsa:
-            #print(staff.firstname)
+        for x in gsa:
+           
+            existing_hours = staffschedule.query.filter_by(employee_id = x.id)
+            #print(x, x.id, existing_hours)
+        
         return render_template('schedule.html', gsa=gsa, form=form)
     
     elif 'submithours' in request.form['action']:
@@ -107,35 +128,25 @@ def searchschedule():
 
         gsa1 = Employee.query.filter_by(store=search_value)
         gsa = gsa1.order_by(Employee.store).all()
-        
+        storenumber = search_value
         sdescription = request.form.getlist('writtenhours')
         shours = request.form.getlist('hours')
         sdate1 = request.form.getlist('sdate')
         hsdate1 = request.form.getlist('hidden-sdate')
         gsalength = len(gsa)
        
-        #print (type(hsdate1))
-        #y=0
-        
-        #for obj in hsdate1:
-        #    print(obj)
-        #   for g in gsa:
-        #        print(g.id,sdescription[y], y, g)
-        #       
-        #    
-        #        if g == gsalength:
-        #           y== y + gsalength
-        #       else:
-        #           y=y+1
+      
         
         y=0        
         for g in gsa:
             for obj in hsdate1:
-                print(g, obj, sdescription[y], shours[y])
-                empsched = Schedule( employee_id = g,
+                newdate = datetime.strptime(obj, '%b-%d-%Y')
+                print(g,g.id, storenumber, newdate, sdescription[y], shours[y])
+                empsched = staffschedule( employee_id = g.id,
+                                         storeworked = storenumber,
                                     shift_description = sdescription[y],
                                     shift_hours = shours[y],
-                                    shift_date = obj)
+                                    shift_date = newdate)
                 db.session.add(empsched)
                 y=y+1
         db.session.commit()
@@ -303,11 +314,11 @@ def updategsatraining(staff_id):
         .filter_by(employee_id=staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value)\
+        .add_columns(Course.name, Grade.value, Grade.completeddate)\
         .order_by(Grade.course_id)
     
     for x in gradelist:
-        print(x.name,x.value)
+        print(x.name,x.value, x.completeddate)
     
     # here we are updating the training grade information
     # we get an object that we can alter. Use the .first to do this
@@ -318,17 +329,24 @@ def updategsatraining(staff_id):
     # then commit
     
     if request.method == "POST":
-    
+        r = request.form.getlist("completeddate")
+        
         form = request.form 
         f=staff_id
+        yy=0
         y = 1
         z=1
         for x in request.form.getlist("completed"):
+                
                 t=Grade.query.filter_by(employee_id=staff_id).filter_by(course_id=y).first()
                 t.value = x
+                t.completeddate = r[yy]
+                print(y,x, r[yy])
                 #print(t.__dict__)
+                #print(x,r)
                 y+=1 
-        db.session.commit()
+                yy +=1
+                db.session.commit()
 
             #pdfkit.from_url('127.0.0.1:5000/hrfile6' , 'out.pdf')
 
@@ -527,7 +545,8 @@ def updategsa(staff_id):
 @login_required
 def addemployee():
     
-    form = EmployeeForm()    
+    form = EmployeeForm()   
+    form2 = GradeForm()
     course = Course.query.all()
     
     if form.validate_on_submit():
@@ -552,7 +571,6 @@ def addemployee():
                        postal=form.postal.data,
                        email=form.email.data,
                        mobilephone=form.mobilephone.data,
-                       
                        sinexpire=form.sinexpire.data,
                        startdate=form.Startdate.data,
                        enddate=form.Enddate.data,
@@ -574,17 +592,32 @@ def addemployee():
         # flush will get the id of the pending user so that
         # we can add the raining information     
         db.session.flush()
+        
+        
+        r = request.form.getlist("completeddate")
         f = emp.id
         y = 1
+        yy = 0
         for x in request.form.getlist("completed"):
-            print(f, y, x)
+            grade_date = r[yy]
+           
+            #print(f, y, x, r[yy])
+            
+            if grade_date == '':
+                completeddate = ''
+            else:
+                completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
             empgrade = Grade(value=x,
                              employee_id=f,
-                             course_id=y)
+                             course_id=y,
+                             completeddate =  completeddate)                
             db.session.add(empgrade)
             y += 1
-
-        db.session.commit()
+            yy += 1
+            
+            db.session.commit()
+       
+                
         
        
         flash('Employee has been added to the database', 'success')
@@ -592,7 +625,7 @@ def addemployee():
         return redirect(url_for('hrhome'))
     
     #print(form.errors.items())
-    return render_template('employee.html', title='Employee Information', form=form, course=course)
+    return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course)
 
 
 @app.route("/applications")

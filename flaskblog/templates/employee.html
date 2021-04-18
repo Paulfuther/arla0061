@@ -254,12 +254,17 @@
 
 
          {% for course in course %}
-            <div class = "formtitle"> {{  course }}  </div>
-            
-             <select class="form"name = "completed">
+
+            <div class = "formtitle" >{{ course }}</div>
+            <select class="form"name = "completed">
                 <option value = "n">N</option>
                 <option value = "y">Y</option>
             </select>
+
+            </select>
+                <div class = "formtitle" >Date Completed  
+                </div> 
+                <input type = "date" class ="form"  name = "completeddate" value= {{completeddate}} >
 
             
             {% endfor %}

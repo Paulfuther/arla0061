@@ -74,7 +74,7 @@ class EmployeeForm(FlaskForm):
                           'Manager Name', 'Manager Name'), ('Terry', "Terry"),
         ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
         ('Paul', 'Paul')])
-    hrpicture = FileField(validators=[FileAllowed(['jpg', 'png', 'HEIC'])])
+    hrpicture = FileField(validators=[FileAllowed(['jpg', 'jpeg','png', 'HEIC'])])
     
     active = SelectField('Active', choices=[
                          ('Active?', 'Active?'), ('Y', 'Y'), ('N', 'N')])
@@ -181,7 +181,7 @@ class EmployeeUpdateForm(FlaskForm):
     trainingpassword = StringField(
         'Training Password', validators=[DataRequired()])
     hrpicture = FileField(validators=[
-        FileAllowed(['jpg', 'png', 'HEIC'])])
+        FileAllowed(['jpg', 'jpeg','png', 'HEIC'])])
     active = SelectField('Active', choices=[
                          ('Active', 'Active'), ('Y', 'Y'), ('N', 'N')])
     iprismcode = StringField('Iprism Code', validators=[
@@ -250,4 +250,9 @@ class schedule_start(FlaskForm):
                                                                '48314'),
                                           ('65077', '65077'), ('65231', '65231')])
  
- 
+class GradeForm(FlaskForm):
+    completed = SelectField('Completed', choices=[
+                         ('Completed Y or N?', 'Completed Y or N?'), ('Y', 'Y'), ('N', 'N')], default="N")
+    
+    completeddate = DateField('Completed Date', format='%Y-%m-%d',
+                          )

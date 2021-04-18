@@ -4211,3 +4211,63 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
               
                 </script>
 
+<select class="form"name = "completed">
+                <option value = "n">N</option>
+                <option value = "y">Y</option>
+            </select>
+
+            </select>
+                <div class = "formtitle" >Date Completed  
+                </div> 
+                <input type = "date" class ="form"  name = "completeddate" value="{{completeddate}}" {{completeddate}} >
+
+
+ f = emp.id
+        y = 1
+        for x in request.form.getlist("completed"):
+            print(f, y, x)
+            empgrade = Grade(value=x,
+                             employee_id=f,
+                             course_id=y)
+                             
+            db.session.add(empgrade)
+            y += 1
+
+        for z in request.form.getlist("completeddate"):
+            print(z)
+            empgradedate = Grade(employee_id = f,
+                                 completeddate = z)
+            db.session.add(empgradedate)
+
+        #db.session.commit()
+
+
+        zz = []
+        f=emp.id
+        y = 1
+        for z in request.form.getlist("completeddate"):
+            #print(z)
+            if z != '':
+                zz = z
+                #zz = datetime.strptime(z, '%Y-%m-%d')
+                empgradedate = Grade(employee_id=f,
+                                     course_id=y,
+                                     completeddate=zz,
+                                     )
+                y += 1
+                print(type(zz), zz)
+
+
+                  #print (type(hsdate1))
+        #y=0
+        
+        #for obj in hsdate1:
+        #    print(obj)
+        #   for g in gsa:
+        #        print(g.id,sdescription[y], y, g)
+        #       
+        #    
+        #        if g == gsalength:
+        #           y== y + gsalength
+        #       else:
+        #           y=y+1
