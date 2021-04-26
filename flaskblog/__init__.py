@@ -69,8 +69,46 @@ bcrypt = Bcrypt(app)
 #def load_user(user_id):
 #    return User.query.get(int(user_id))
 
+
+roles_users = db.Table(
+    'roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+)
+
+task_store = db.Table(
+    'task_store',
+    db.Column('todo_id', db.Integer(), db.ForeignKey('todo.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
+
+incident_store = db.Table(
+    'incident_store',
+    db.Column('incidentnumbers_id', db.Integer(),
+              db.ForeignKey('incidentnumbers.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
+
+salt_store = db.Table(
+    'salt_store',
+    db.Column('saltlog_id', db.Integer(), db.ForeignKey('saltlog.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
+
+reclaim_store = db.Table(
+    'reclaim_store',
+    db.Column('reclaim_id', db.Integer(), db.ForeignKey('reclaimtank.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
+
+maintain_store = db.Table(
+    'maintain_store',
+    db.Column('maintain_id', db.Integer(), db.ForeignKey('cwmaintenance.id')),
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
+)
+
 class hrfiles(db.Model):
-    id = db.Column(db.Integer(), primary_key= True)
+    id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String(120))
     effective_date = db.Column(db.DateTime(), nullable=True)
     date_of_review = db.Column(db.DateTime(), nullable=True)
@@ -78,13 +116,6 @@ class hrfiles(db.Model):
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
         db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-
-roles_users = db.Table(
-    'roles_users',
-    
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
-)
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,7 +144,6 @@ class Role(db.Model, RoleMixin):
 
     def __hash__(self):
         return hash(self.name)
-
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -175,8 +205,7 @@ class Grade(db.Model):
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
     course = db.relationship('Course', backref='grade')
     completeddate = db.Column(db.String(),  nullable=True)
-    
-    
+      
 class staffschedule(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     employee_id = db.Column(Integer(), ForeignKey('employee.id'))
@@ -194,30 +223,6 @@ class Empfile(db.Model):
     file = db.relationship('hrfiles', backref = 'filess') 
     sig_data = db.Column(db.Integer())
     
-task_store = db.Table(
-    'task_store',
-    db.Column('todo_id', db.Integer(), db.ForeignKey('todo.id')),
-    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
-)
-     
-incident_store = db.Table(
-    'incident_store',
-    db.Column('incidentnumbers_id', db.Integer(), db.ForeignKey('incidentnumbers.id')),
-    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
-)     
-      
-salt_store = db.Table(
-    'salt_store',
-    db.Column('saltlog_id', db.Integer(),db.ForeignKey('saltlog.id')),
-    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
-)
-       
-reclaim_store = db.Table(
-    'reclaim_store',
-    db.Column('reclaim_id', db.Integer(), db.ForeignKey('reclaimtank.id')),
-    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
-)
-
 class Store(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer)
@@ -237,6 +242,14 @@ class reclaimtank(db.Model):
     tanktwosand = db.Column(db.String(100))
     tanklids = db.Column(db.String(100))
     changepillows = db.Column(db.String(100))
+
+class cwmaintenance(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    maintaindate = db.Column(db.DateTime(), nullable = True)
+    maintainstore = db.relationship('Store', secondary = maintain_store,
+                                   backref = db.backref('maintstore', lazy = 'dynamic'))
+    workdone = db.Column(db.String(500))
+    partsused = db.Column(db.String(500))
 
 # To do list 
 class Todo(db.Model):
@@ -497,6 +510,25 @@ class hreditor(ModelView):
         return current_user.has_roles('Admin')
 
 
+class MyModelView10(ModelView):
+    can_export = True
+    can_delete = False
+    column_hide_backrefs = False
+    column_default_sort = ('maintaindate', True)
+    form_args = {
+        'maintainstore': {
+            'query_factory': lambda: Store.query.order_by(Store.number)
+
+        }
+    }
+    column_list = ('maintainstore', 'maintaindate', 'workdone', 'partsused')
+    #column_select_related_list = (Todo.store, Todo.task)
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
 
 # these are the views needed to display tables in the Admin section
 
@@ -512,6 +544,7 @@ admin.add_view(hreditor(hrfiles, db.session))
 admin.add_view(MyModelView8(Incidentnumbers, db.session))
 admin.add_view(MyModelView9(Saltlog, db.session))
 admin.add_view(MyModelViewReclaim(reclaimtank, db.session))
+admin.add_view(MyModelView10(cwmaintenance, db.session))
 
 from flaskblog import routes
 
