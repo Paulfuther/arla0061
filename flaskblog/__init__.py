@@ -421,7 +421,6 @@ class MyModelView9(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
-
 class MyModelViewReclaim(ModelView):
     can_export = True
     can_delete = False
@@ -444,7 +443,6 @@ class MyModelViewReclaim(ModelView):
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
-
 
 class AdminViewStore(ModelView):
     
@@ -509,7 +507,6 @@ class hreditor(ModelView):
     def is_accessible(self):
         return current_user.has_roles('Admin')
 
-
 class MyModelView10(ModelView):
     can_export = True
     can_delete = False
@@ -523,6 +520,34 @@ class MyModelView10(ModelView):
     }
     column_list = ('maintainstore', 'maintaindate', 'workdone', 'partsused')
     #column_select_related_list = (Todo.store, Todo.task)
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
+class MyModelView11(ModelView):
+    can_export = True
+    can_delete = False
+    
+   # emp = query.filter(Employee.id.notin_(Empfile.query.all()))
+   # file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
+
+    #nofile = Employee.query.filter(
+     #   Employee.id.notin_(file)).order_by(Employee.store)
+
+    #def nofile_function(self):
+     #   return Employee.query.filter(Employee.id.notin_(Empfile.query.with_entities(Empfile.employee2_id).distinct()))
+
+    #form_args = {
+     #   'firstname': {
+      #      'query_factory': lambda: nofile_function
+
+       # }
+    #}
+    column_list = ('firstname')
+
 
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -545,6 +570,7 @@ admin.add_view(MyModelView8(Incidentnumbers, db.session))
 admin.add_view(MyModelView9(Saltlog, db.session))
 admin.add_view(MyModelViewReclaim(reclaimtank, db.session))
 admin.add_view(MyModelView10(cwmaintenance, db.session))
+#admin.add_view(MyModelView11(Employee, db.session))
 
 from flaskblog import routes
 

@@ -4271,3 +4271,38 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
         #           y== y + gsalength
         #       else:
         #           y=y+1
+
+
+
+        msg = Message('Testing', sender='me@demo.com', recipients=['paul.futher@gmail.com'])
+    msg.body =   '''    Hello, 
+    The provincial government has implemented new covid 19 screening rules. 
+    Your manager has the details. 
+    Please note that you must now screen yourself online before you start your shift.
+
+    The link is below.
+    https: // covid-19.ontario.ca/screening/worker/
+
+    When completed, you must forward the results to your store email address. 
+    Please ask your manager for this email address, if needed.
+
+    There are more details regarding these new rules at your store.
+
+    Please discuss with your manager asap.
+
+    Thank you,
+
+    Terry Futher ARL
+    Steph Futher Director HR. '''
+                    
+    #mail.send(msg)
+    #print("mail sent")
+
+
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    dffinal2.to_excel(writer)
+    writer.save()
+    output.seek(0)
+
+    return send_file(output, attachment_filename="cwoutput.xlsx", as_attachment=True)

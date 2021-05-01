@@ -180,6 +180,25 @@ td, th {
 }
 
 
+/* No Employee File Table */
+
+#nofile {
+  table-layout: auto;
+  width: 80%;
+  margin:auto;
+}
+
+#nofile th, td {
+  text-align: left;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+
+}
+
+.fa-file-excel {
+  color: green;
+}
+
 /* Signature CSS */
 
 

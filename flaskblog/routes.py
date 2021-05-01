@@ -16,7 +16,7 @@ import openpyxl
 import xlrd
 import xlwt
 import xlsxwriter
-from flaskblog import datetime # mail
+from flaskblog import datetime, mail
 from flask_moment import Moment
 #from flask_login import login_user, current_user, logout_user, login_required
 #from flask_user import roles_required
@@ -42,12 +42,78 @@ def home():
     return render_template('layout.html')
     #return render_template('home.html')
 
+@app.route("/nofile")
+def nofile():
+    emp = Employee.query.filter(Employee.id)
+    file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
+    
+    nofile = Employee.query.filter(Employee.id.notin_(file)).order_by(Employee.store)
+
+    
+
+    for x in nofile:
+        print(x.id, x.firstname, x.lastname, x.store)
+    #return "done"
+
+    return render_template('nofile.html', nofile=nofile)
+
+@app.route("/nofileexcel")
+def nofileexcel():
+    emp = Employee.query.filter(Employee.id)
+    file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
+
+    nofile = Employee.query.filter(
+        Employee.id.notin_(file)).order_by(Employee.store)
+    
+    out = BytesIO()
+    writer = pd.ExcelWriter(out, engine = 'xlsxwriter')
+    df = pd.read_sql(nofile.statement, nofile.session.bind)
+    df = df[['store','firstname','lastname']]
+    df.to_excel(writer, index=False)
+    writer.save()
+    out.seek(0)
+    
+    
+
+    return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
+
+
 @app.route("/email")
 @login_required
 def email():
-    msg = Message('Testing', sender='me@demo.com', recipients=['paul.futher@gmail.com'])
-    msg.body = '''Hello'''
-    mail.send(msg)
+    emp = Employee.query.filter_by(id=62)
+    with mail.connect() as conn:
+        for user in emp:
+                
+            print(user.firstname, user.lastname, user.email)
+    
+            msg = Message('Urgent Updates to Covid 19 Screening Process', sender='paul.futher@gmail.com',
+                          recipients=['himanshugulati29@hotmail.com'])
+            msg.body = '''    Hello, 
+            The provincial government has implemented new covid 19 screening rules. 
+            Your manager has the details. 
+            Please note that you must now screen yourself online before you start your shift.
+
+            The link is below.
+            https: // covid-19.ontario.ca/screening/worker/
+
+            When completed, you must forward the results to your store email address. 
+            Please ask your manager for this email address, if needed.
+
+            There are more details regarding these new rules at your store.
+
+            Please discuss with your manager asap.
+
+            Thank you,
+
+            Terry Futher ARL
+            Steph Futher Director HR. '''
+
+            mail.send(msg)
+            print("mail sent")
+            
+    
+    
     return "sent"
 
 
