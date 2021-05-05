@@ -117,14 +117,19 @@ class hrfiles(db.Model):
     updated_on = db.Column(
         db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
+
+class Customer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    firstname = db.Column(db.String(100), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    firstname = db.Column(db.String(15), unique=False)
-    lastname = db.Column(db.String(15), unique=False)
     email = db.Column(db.String(200), unique=True)
     password = db.Column(db.String(255))
-    active = db.Column(db.Boolean)
+    active = db.Column(db.Boolean, default = True)
     confirmed_at = db.Column(db.DateTime)
+    #employee = db.relationship('Customer', backref= 'user', uselist = False)
     roles = db.relationship('Role',  secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -133,6 +138,8 @@ class User(UserMixin, db.Model):
 
     def __str__(self):
         return '%r' % (self.firstname)
+
+  
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
@@ -286,6 +293,8 @@ class Saltlog(db.Model):
      
      def __repr__(self):
          return '%r' % (self.area)      
+
+
 
 
 # here we initiate the datastore which is used in the Admin model

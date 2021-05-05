@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule, GradeForm
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer
 #from flask_user import roles_required
 from flask_security import roles_required, login_required
 #from flaskblog.models import  User, Role, Employee
@@ -41,6 +41,35 @@ def home():
     #return render_template('testsig.html')
     return render_template('layout.html')
     #return render_template('home.html')
+
+
+@app.route("/addme", methods=['GET', 'POST'])
+def addme():
+    if request.method == "POST":
+        newuser = request.form.get('email')
+        newpassword = request.form.get('password')
+        active = request.form.get('active')
+        adduser = User(email=newuser,
+                    password=newpassword,
+                    active = active)
+        
+        db.session.add(adduser)
+        db.session.flush()
+        
+        
+        newid = adduser.id
+        
+        print(newid)
+        first = request.form.get('firstname')
+        addfirst = Customer(firstname = first,
+                            user_id = newid)
+        db.session.add(addfirst)
+        db.session.commit()
+        
+        return render_template('newuser.html', newuser=newuser)
+    else:
+        newuser = User.query.get(1)
+        return render_template('addme.html', newuser = newuser)
 
 @app.route("/nofile")
 def nofile():
