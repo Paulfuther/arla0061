@@ -281,9 +281,56 @@ ul {
   font-size: 25px;
 }
 
+.changepassword {
+  display: grid;
+  grid-template-columns: 250px;
+  justify-content: center;
+  justify-items: center;
+  margin-top: 50px;
+  font-size: 15px;
+}
+
+.changepassword a {
+  font-size: 12px;
+}
+
+.changepassword li {
+  display:inline-block;
+  margin-right: 10px;
+}
+
+.changepassword a:hover {
+  text-decoration: underline;
+}
+
+.loginheader2 {
+  text-align: justify;
+}
+
+.loginheader2 h1 {
+  font-family: "Comic Sans MS",
+    Sans,
+    Arial;
+  text-align: justify;
+}
+
+
 .securityform {
   font-size: 25px;
+
+}  
+.securityform input[type=text],
+input[type=password] {
+  font-size: 20px;
+  padding: 12px;
+  border-radius: 12px;
 }
+
+.security form input[type=submit] {
+  font-size: 20px;
+
+}
+
 
 .login {
   display: grid;
@@ -308,8 +355,22 @@ ul {
 }
 
 .loginheader {
-  width: 250px;
+  width: 200px;
   text-align: center;
+}
+
+
+.loginheader h1 {
+  font-family: "Comic Sans MS",
+  Sans,
+  Arial;
+  text-align:center;
+}
+
+.flashes {
+  text-align: center;
+  margin-top: 20px;
+  color:red;
 }
 
 /* -- */
