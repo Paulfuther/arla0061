@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField
 from wtforms.fields.html5 import DateField, TelField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
-from flaskblog import  Employee, db, Store, User
+from flaskblog import  Employee, db, Store, User, Role
 from flask_login import current_user
 import wtforms
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -32,15 +32,21 @@ class TelephoneForm(FlaskForm):
     number = IntegerField('Number', validators=[DataRequired(), Length(min=7, max=7)] )
 
 class EmployeeForm(FlaskForm):
+    username = StringField('Username', validators=[
+                            DataRequired(), Length(min=2, max=100)])
+    email = StringField('Email', validators=[
+                        DataRequired(), Length(min=10, max=100), Email()])
+    password = StringField('Password', validators=[
+        DataRequired(), Length(min=2, max=100)])
+    active = BooleanField(default="checked")
     firstname = StringField('Firstname', validators= [DataRequired(), Length(min=2, max=20)])
     nickname = StringField('Nickname', validators=[Optional()])
     lastname = StringField('Lastname', validators=[DataRequired(), Length(min=2, max=20)])
-    store = SelectField('Store', choices=[('Home Store', 'HomeStore'), ("396", "396"), ('398', '398'),
-                                          ('402', '402'), ('414', '414'), ('1616',
-                                                                           '1616'), ('8156', '8156'),
-                                          ('8435', '8435'), ('33410', '33410'),
-                                          ('33485', '33485'), ('48314', '48314'),
-                                          ('65077', '65077'), ('65231', '65231')])
+    store = QuerySelectField(
+        query_factory=lambda: Store.query.order_by(Store.number),
+        allow_blank=False
+    )
+   
     dob = DateField('Date of Birth', format='%Y-%m-%d',
                     validators=[DataRequired()])
     addressone = StringField('Address Line 1', validators=[
@@ -70,14 +76,26 @@ class EmployeeForm(FlaskForm):
     trainingid = StringField('Training ID', validators=[DataRequired()])
     trainingpassword = StringField(
         'Training Password', validators=[DataRequired()])
-    manager = SelectField('manager', choices=[(
-                          'Manager Name', 'Manager Name'), ('Terry', "Terry"),
-        ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
-        ('Paul', 'Paul')])
+    manager = QuerySelectField(
+        query_factory=lambda: User.query.join(User.roles).filter(Role.id==2).order_by(User.user_name),
+        allow_blank=False
+    )
+    
+   # gradelist = Grade.query\
+    #    .filter_by(employee_id=staff_id)\
+     #   .join(Employee, Employee.id == Grade.employee_id)\
+     #   .join(Course, Course.id == Grade.course_id)\
+     #   .add_columns(Course.name, Grade.value, Grade.completeddate)\
+     #   .order_by(Grade.course_id)
+    
+    
+    #manager = SelectField('manager', choices=[(
+    #                      'Manager Name', 'Manager Name'), ('Terry', "Terry"),
+    #    ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
+    #    ('Paul', 'Paul')])
     hrpicture = FileField(validators=[FileAllowed(['jpg', 'jpeg','png', 'HEIC'])])
     
-    active = SelectField('Active', choices=[
-                         ('Active?', 'Active?'), ('Y', 'Y'), ('N', 'N')])
+   
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
     monavail = StringField('Monday Availability', validators=[

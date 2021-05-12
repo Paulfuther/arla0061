@@ -58,12 +58,14 @@
                      
                       {% endif %} 
                      
+                    {%if current_user.has_roles('gsa') %}
+
                       <li> <a href="{{ url_for('Applications')}}">Apps</a></li>
                       <li> <a href="{{ url_for('home')}}">Charts</a></li>
                       <li> <a href="{{ url_for('hrhome')}}">HR</a></li>
                       <li> <a href="{{ url_for('schedule')}}">Schedule</a></li>
                       <li> <a href="{{ url_for('admin.index')}}">Admin</a></li>
-                      
+                    {% endif %}
                       
                   </ul>
 

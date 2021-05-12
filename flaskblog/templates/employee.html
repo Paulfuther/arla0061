@@ -33,6 +33,45 @@
         <div> <img class="gsaupdateimage" src="{{ image_file }}">
         </div>
         <div></div>
+
+         <div class ="formtitle">Login Credentials</div>
+        <div></div>
+        <div  class="formtitle" >{{"Active:"}}</div>
+        <div> {{form.active(class = "form", placeholder="Active")}} 
+                    
+                    {% if form.active.errors %}
+                        {% for error in form.active.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+        <div  class="formtitle" >{{"User Name:"}}</div>
+        <div> {{form.username(class = "form", placeholder="User Name")}}   
+                        {% if form.usernameerrors %}
+                        {% for error in form.usernameerrors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}  
+                        {% endif %}
+        </div>
+        <div  class="formtitle" >{{"Email:"}}</div>
+        <div> {{form.email(class = "form", placeholder="E-Mail")}} 
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+
+        <div  class="formtitle" >{{"Password:"}}</div>
+        <div> {{form.password(class = "form", placeholder="Password")}} 
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>
+        <div class ="formtitle">Employee Information</div>
+        <div></div>
         <div  class="formtitle" >{{"First Name:"}}</div>
         <div> {{form.firstname(class = "form", placeholder="First Name")}}   
                         {% if form.firstnameerrors %}
@@ -112,14 +151,7 @@
         </div>
 
 
-        <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form", placeholder="E-Mail")}} 
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
+        
         
         <div  class="formtitle" >{{"Manager:"}}</div>
         <div> {{form.manager(class = "form", placeholder="Manager")}} 
@@ -165,15 +197,7 @@
         
         </div>
 
-        <div  class="formtitle" >{{"Active:"}}</div>
-        <div> {{form.active(class = "form", placeholder="Active")}} 
-                    
-                    {% if form.active.errors %}
-                        {% for error in form.active.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
+       
          <div  class="formtitle" >{{"Profile Picture:"}}</div>
          <div>  {{ form.hrpicture(class = "form")}}
         </div>

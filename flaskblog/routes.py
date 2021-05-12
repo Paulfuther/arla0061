@@ -3,7 +3,7 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule, GradeForm
 from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer
 #from flask_user import roles_required
-from flask_security import roles_required, login_required
+from flask_security import roles_required, login_required, current_user
 #from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
@@ -36,9 +36,13 @@ moment = Moment(app)
 @app.route("/home")
 @login_required
 def home():
+    
+    #if current_user.has_roles('gsa'):
+    #    print('user is gsa')
     #return url_for('admin.index')
     
     #return render_template('testsig.html')
+    
     return render_template('layout.html')
     #return render_template('home.html')
 
@@ -48,10 +52,18 @@ def addme():
     if request.method == "POST":
         newuser = request.form.get('email')
         newpassword = request.form.get('password')
-        active = request.form.get('active')
+        active = request.form.get('checkbox')
+        if active:
+            active = 1
+        else:
+            active = 0
+            
+        user_name = request.form.get('user_name')
+        
         adduser = User(email=newuser,
                     password=newpassword,
-                    active = active)
+                    active = active,
+                    user_name = user_name)
         
         db.session.add(adduser)
         db.session.flush()
@@ -375,7 +387,11 @@ def employeefile(staff_id):
 @app.route("/hrlist", methods =['GET', 'POST'])
 @login_required
 def hrlist():
-    return render_template('hrlist.html')
+    
+    store_list = Store.query.order_by(Store.number).all()
+
+    print(store_list)
+    return render_template('hrlist.html', store_list = store_list)
 
 
 @app.route("/trainingcompliance", methods=['GET', 'POST'])
@@ -458,22 +474,39 @@ def updategsatraining(staff_id):
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
 def search():
-    form=request.form  
-    search_value=form['search_string']
-    if search_value == "all":
-        gsa = Employee.query\
-            .order_by(Employee.store).all()
-        
-        #for staff in gsa:
-         #   print(staff.id)
-        return render_template('hrlist.html', gsa=gsa) 
-      
-    gsa1 = Employee.query.filter_by(store=search_value)
-    gsa = gsa1.order_by(Employee.store).all()
+    
+    store_list = Store.query.order_by(Store.number).all()
+
+    #if request.method == "POST":
+    form = request.form
+        #ugh = form['search_string']
+        #print(ugh, ugh)
+         
+        #store_staff = Store.query.filter_by(number = ugh)
+        #search_value=form['search_string']
+        #if search_value == "all":
+        #    gsa = Employee.query\
+         #       .order_by(Employee.store).all()
+            
+            #for staff in gsa:
+            #   print(staff.id)
+          #  return render_template('hrlist.html', gsa=gsa) 
+     
+    ugh = form['search_string']
+    ugh2 = int(ugh)
+    print(ugh2)
+    store_id = Store.query.filter_by(number=ugh2).first()
+    print(store_id.id)
+    storeid = store_id.id
+    
+    
+    gsa = Employee.query.filter_by(store=store_id.id)
+    print(gsa)
+    #gsa = gsa1.order_by(Employee.store).all()
         
     #for staff in gsa:
         #print(staff.firstname)
-    return render_template('hrlist.html', gsa=gsa)
+    return render_template('hrlist.html', gsa=gsa, store_list = store_list, ugh2=ugh2)
 
 
 def save_hrpicture(form_hrpicture):
@@ -644,18 +677,51 @@ def addemployee():
     form2 = GradeForm()
     course = Course.query.all()
     
+    
+    
     if form.validate_on_submit():
+        checker = form.active.data
+        print(checker)
+        teststore = form.store.data
+        print(teststore.id)
+        newuser = request.form.get('email')
+        newpassword = request.form.get('password')
+        #active = request.form.get('checkbox')
+        #print(active)
+        active = 1
+        if checker:
+            active = 1
+        else:
+            active = 0
+        print(active)
+        user_name = request.form.get('username')
+
+        #print(active, newuser, newpassword)
+
+        adduser = User(email=newuser,
+                    password=newpassword,
+                    active=active,
+                    user_name=user_name)
+
+        db.session.add(adduser)
+        db.session.flush()
+        #db.session.commit()
+
+        newid = adduser.id
+        
+        #print(newid)
+        
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
         else:
             picture_file = '3d611379cfdf5a89.jpg'
-        #hashed_password = bcrypt.generate_password_hash(form.email.data).decode('utf-8')     
-        #hashed_SIN = bcrypt.generate_password_hash(form.SIN.data).decode('utf-8')
+       
                 
-        emp = Employee(firstname=form.firstname.data,
+        emp = Employee(user_id=newid,
+                       firstname=form.firstname.data,
                        nickname=form.nickname.data,
                        lastname=form.lastname.data,
-                       store=form.store.data,
+                       store=form.store.data.id,
                        dob=form.dob.data,
                        addressone=form.addressone.data,
                        addresstwo=form.addresstwo.data,
@@ -671,9 +737,8 @@ def addemployee():
                        enddate=form.Enddate.data,
                        trainingid=form.trainingid.data,
                        trainingpassword=form.trainingpassword.data,
-                       manager=form.manager.data,
+                       manager=form.manager.data.id,
                        image_file=picture_file,
-                       active=form.active.data,
                        iprismcode=form.iprismcode.data,
                        mon_avail=form.monavail.data,
                        tue_avail=form.tueavail.data,
@@ -686,8 +751,10 @@ def addemployee():
         db.session.add(emp)  
         # flush will get the id of the pending user so that
         # we can add the raining information     
-        db.session.flush()
+        #db.session.flush()
         
+        #print(emp.store, emp.manager)
+        #print(type(form.store.data))
         
         r = request.form.getlist("completeddate")
         f = emp.id
@@ -709,8 +776,10 @@ def addemployee():
             db.session.add(empgrade)
             y += 1
             yy += 1
+           
+        print(emp)
             
-            db.session.commit()
+        db.session.commit()
        
                 
         

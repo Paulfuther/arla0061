@@ -132,6 +132,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean, default = True)
     confirmed_at = db.Column(db.DateTime)
+    user_name = db.Column(db.String(100), nullable=False)
     #employee = db.relationship('Customer', backref= 'user', uselist = False)
     roles = db.relationship('Role',  secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
@@ -139,9 +140,11 @@ class User(UserMixin, db.Model):
     def has_roles(self, *args):
         return set(args).issubset({role.name for role in self.roles})
 
-    def __str__(self):
-        return '%r' % (self.firstname)
+   # def __str__(self):
+    #    return '%r' % (self.firstname)
 
+    def __str__(self):
+        return (self.user_name) 
   
 
 class Role(db.Model, RoleMixin):
@@ -157,10 +160,11 @@ class Role(db.Model, RoleMixin):
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     firstname = db.Column(db.String(20), nullable=False)
     nickname = db.Column(db.String(20), nullable=True)
     lastname = db.Column(db.String(20), nullable=False)
-    store = db.Column(db.String)
+    store = db.Column(db.Integer)
     addressone = db.Column(db.String(20), nullable=False)
     addresstwo = db.Column(db.String(20), nullable=True)
     apt = db.Column(db.String(20), nullable=True)
@@ -179,10 +183,10 @@ class Employee(db.Model):
     postal = db.Column(db.String(6), nullable=False)
     trainingid = db.Column(db.String(),unique=True, nullable=False)
     trainingpassword = db.Column(db.String(), nullable=False)
-    manager = db.Column(db.String)
+    manager = db.Column(db.Integer)
     image_file = db.Column(db.String(20), nullable=False,
                            default='default.jpg')
-    active = db.Column(db.String(), nullable = False)
+    active = db.Column(db.String(), nullable = True)
     iprismcode = db.Column(db.String(9), nullable=False)
     dob = db.Column(db.DateTime(), nullable=True)
     #active2 = db.Column(db.Boolean)
@@ -316,7 +320,7 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ('firstname', 'roles')
+    column_list = ('user_name', 'roles')
 
     def is_accessible(self):
         return current_user.has_roles('Admin' )
