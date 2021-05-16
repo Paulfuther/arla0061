@@ -155,7 +155,14 @@ class EmployeeForm(FlaskForm):
     
   
 class EmployeeUpdateForm(FlaskForm):
-
+   
+    username = StringField('Username', validators=[
+        DataRequired(), Length(min=2, max=100)])
+    email = StringField('Email', validators=[
+                        DataRequired(), Length(min=10, max=100), Email()])
+    password = StringField('Password', validators=[
+        DataRequired(), Length(min=2, max=100)])
+    
     firstname = StringField('Firstname', validators=[
                             DataRequired(), Length(min=2, max=20)])
     nickname = StringField('Nickname', validators=[Optional()])
@@ -163,12 +170,10 @@ class EmployeeUpdateForm(FlaskForm):
                            DataRequired(), Length(min=2, max=20)])
     dob = DateField('DOB', format='%Y-%m-%d',
                     validators=[DataRequired()])
-    store = SelectField('Store', choices=[('Home Store', 'HomeStore'), ("396", "396"), ('398', '398'),
-                                          ('402', '402'), ('414', '414'), ('1616',
-                                                                           '1616'), ('8156', '8156'),
-                                          ('8435', '8435'), ('33410', '33410'),
-                                          ('33485', '33485'), ('48314', '48314'),
-                                          ('65077', '65077'), ('65231', '65231')])
+    store = QuerySelectField(
+        query_factory=lambda: Store.query.order_by(Store.number),
+        allow_blank=False
+    )
     addressone = StringField('Address Line 1', validators=[
                              DataRequired(), Length(min=2, max=100)])
     addresstwo = StringField('Address Line 2', validators=[
@@ -180,8 +185,7 @@ class EmployeeUpdateForm(FlaskForm):
                            DataRequired(), Length(min=2, max=20)])
     country = StringField('Country', validators=[
                           DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email', validators=[
-                        DataRequired(), Length(min=10, max=100), Email()])
+    
     mobilephone = StringField('mobile', validators=[
                               DataRequired(), Length(min=9, max=12) ])
     
@@ -190,18 +194,18 @@ class EmployeeUpdateForm(FlaskForm):
     enddate = DateField('End Date', format='%Y-%m-%d', validators=[Optional()])
     postal = StringField('Postal Code', validators=[
                          DataRequired(), Length(min=6, max=7)])
-    manager = SelectField('manager', choices=[(
-                          'Manager Name', 'Manager Name'), ('Terry', "Terry"),
-        ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
-        ('Paul', 'Paul')])
+    manager = QuerySelectField(
+        query_factory=lambda: User.query.join(User.roles).filter(
+            Role.id == 2).order_by(User.user_name),
+        allow_blank=False
+    )
 
     trainingid = StringField('Training ID', validators=[DataRequired()])
     trainingpassword = StringField(
         'Training Password', validators=[DataRequired()])
     hrpicture = FileField(validators=[
         FileAllowed(['jpg', 'jpeg','png', 'HEIC'])])
-    active = SelectField('Active', choices=[
-                         ('Active', 'Active'), ('Y', 'Y'), ('N', 'N')])
+    
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
     mon_avail = StringField('Monday Availability', validators=[

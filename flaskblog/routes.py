@@ -119,36 +119,39 @@ def nofileexcel():
     return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
 
 
-@app.route("/email")
-@login_required
+#@app.route("/email")
+#@login_required
 def email():
-    emp = Employee.query.filter_by(id=62)
+    emp = Employee.query.all()
     with mail.connect() as conn:
         for user in emp:
                 
             print(user.firstname, user.lastname, user.email)
     
-            msg = Message('Urgent Updates to Covid 19 Screening Process', sender='paul.futher@gmail.com',
-                          recipients=['himanshugulati29@hotmail.com'])
-            msg.body = '''    Hello, 
-            The provincial government has implemented new covid 19 screening rules. 
-            Your manager has the details. 
-            Please note that you must now screen yourself online before you start your shift.
+            msg = Message('Essential Workers (us) can now get vaccinated', sender='paul.futher@gmail.com',
+                          recipients=[user.email])
+            msg.html = ''' <p> Hello <p> 
+            <p> First, thank you to Priyan for the update.</p>
+    
+            <p> The Ontario government has included gas station attendants as an eligible occpupation for the Covid 19 vaccine.</p>
+            <p> Please click the link below to book your appointment </p>
+                
+                
+            <p> https://covidvaccinelm.ca/ </p>
+            <p> Then, scroll down the page and seelct "Eligible Occupations"</p>
+            <p> Then seclect: </p>
+            <p> Oil and petroleum workers (including petroleum refineries, crude oil and petroleum storage, transmission and distribution, retail sale of fuel)
+            </p> 
+            
+            <p> Please book your appointment. </p>   
+            
+            <p> Thank you, </p>
 
-            The link is below.
-            https: // covid-19.ontario.ca/screening/worker/
+            <p>Terry Futher ARL </p>
+            <p>Steph Futher Director HR. </p>
 
-            When completed, you must forward the results to your store email address. 
-            Please ask your manager for this email address, if needed.
-
-            There are more details regarding these new rules at your store.
-
-            Please discuss with your manager asap.
-
-            Thank you,
-
-            Terry Futher ARL
-            Steph Futher Director HR. '''
+       
+            '''
 
             mail.send(msg)
             print("mail sent")
@@ -157,6 +160,40 @@ def email():
     
     return "sent"
 
+
+@app.route("/emailme")
+@login_required
+@roles_required('Admin')
+def emailme():
+    msg = Message('Essential Workers (us) can now get vaccinated', sender='paul.futher@gmail.com',
+                  recipients=['alrayesmohamed2@gmail.com'])
+
+    msg.html = ''' <p> Hello <p> 
+    <p> First, thank you to Priyan for the update.</p>
+    
+    <p> The Ontario government has included gas station attendants as an eligible occpupation for the Covid 19 vaccine.</p>
+    <p> Please click the link below to book your appointment </p>
+           
+           
+    <p> https://covidvaccinelm.ca/ </p>
+    <p> Then, scroll down the page and seelct "Eligible Occupations"</p>
+    <p> Then seclect: </p>
+    <p> Oil and petroleum workers (including petroleum refineries, crude oil and petroleum storage, transmission and distribution, retail sale of fuel)
+    </p> 
+    
+    <p> Please book your appointment. </p>   
+    
+    <p> Thank you, </p>
+
+    <p>Terry Futher ARL </p>
+    <p>Steph Futher Director HR. </p>
+
+       
+    '''
+    mail.send(msg)
+    print("mail sent")
+
+    return "sent"
 
 @app.route("/schedule", methods = ['GET', 'POST'])
 @login_required
@@ -277,7 +314,13 @@ def addtoschedule():
         
     return render_template('schedule.html', form=form)
         
-
+#@app.route("/employeedashboard", methods = ['GET', 'POST'])
+#@login_required
+#@roles_required('GSA')
+#def employeedashboard():
+    
+    
+    
 
 def storelist():
     return db.session.query(Store).all.order_by('number')
@@ -390,7 +433,7 @@ def hrlist():
     
     store_list = Store.query.order_by(Store.number).all()
 
-    print(store_list)
+    #print(store_list)
     return render_template('hrlist.html', store_list = store_list)
 
 
@@ -476,36 +519,16 @@ def updategsatraining(staff_id):
 def search():
     
     store_list = Store.query.order_by(Store.number).all()
-
-    #if request.method == "POST":
-    form = request.form
-        #ugh = form['search_string']
-        #print(ugh, ugh)
-         
-        #store_staff = Store.query.filter_by(number = ugh)
-        #search_value=form['search_string']
-        #if search_value == "all":
-        #    gsa = Employee.query\
-         #       .order_by(Employee.store).all()
-            
-            #for staff in gsa:
-            #   print(staff.id)
-          #  return render_template('hrlist.html', gsa=gsa) 
-     
+    form = request.form   
     ugh = form['search_string']
-    ugh2 = int(ugh)
-    print(ugh2)
+    ugh2 = ugh
+    #print(ugh2)
     store_id = Store.query.filter_by(number=ugh2).first()
-    print(store_id.id)
     storeid = store_id.id
+    print(storeid)
+    gsa = Employee.query.filter_by(store=storeid)
     
-    
-    gsa = Employee.query.filter_by(store=store_id.id)
-    print(gsa)
-    #gsa = gsa1.order_by(Employee.store).all()
-        
-    #for staff in gsa:
-        #print(staff.firstname)
+   
     return render_template('hrlist.html', gsa=gsa, store_list = store_list, ugh2=ugh2)
 
 
@@ -552,6 +575,8 @@ def save_hrpicture(form_hrpicture):
 @login_required
 def updategsa(staff_id):
     
+    
+    
     # Here we are getting the row of data based on the index, which is staff_id and
     #generatating a query under gsa
     #form is then populated with that data and published
@@ -559,114 +584,130 @@ def updategsa(staff_id):
     #when changes are made the form.data attribut is changed also
     #you can then compare the new form data using .data with old data use gsa.data
     #note below that some data is int and some is text. they need to be the same for the compares
-  
+    gsa = Employee.query.get(staff_id)
+        
+    
     gradelist = Grade.query\
         .filter_by(employee_id = staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
         .add_columns(Course.name, Grade.value)
   
-    #gradelist2 = Grade.query.filter_by(employee_id = staff_id)
-  
-    gsa = Employee.query.get(staff_id)
     
-    form = EmployeeUpdateForm(obj=gsa)
-
-    #storelist2 = Store.query.order_by('number')
-    #mgr = User.query.order_by('firstname')
-    #course = Course.query.all()
-    #grade = Grade.query.get(staff_id)
-
-
     image_file = url_for(
         'static', filename='empfiles/mobile/' + gsa.image_file)
-
-    gsaphone = gsa.mobilephone
     
-    gsaemail = gsa.email
-    gsapostal = gsa.postal
-    gsatrainingid = gsa.trainingid
-    gsatrainingpassword = gsa.trainingpassword
-    gsaiprism = gsa.iprismcode
-
-    phone = form.mobilephone.data
     
-    postal = form.postal.data
-    trainingid = form.trainingid.data
-    trainingpassword = form.trainingpassword.data
-    iprismcodecheck = form.iprismcode.data
+    form = EmployeeUpdateForm(obj=gsa)
+    
+    if request.method == "GET":
+        return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa)
+ 
 
-    #add a pciture
-    #print(form.hrpicture.data)
+    else:
+        image_file = url_for(
+        'static', filename='empfiles/mobile/' + gsa.image_file)
 
-    emp = Employee.query.filter_by(mobilephone=text(phone)).first()
-    emailcheck = Employee.query.filter_by(email=form.email.data).first()
+        gsaphone = gsa.mobilephone
+        
+        gsaemail = gsa.email
+        gsapostal = gsa.postal
+        gsatrainingid = gsa.trainingid
+        gsatrainingpassword = gsa.trainingpassword
+        gsaiprism = gsa.iprismcode
+
+        phone = form.mobilephone.data
+        
+        postal = form.postal.data
+        trainingid = form.trainingid.data
+        trainingpassword = form.trainingpassword.data
+        iprismcodecheck = form.iprismcode.data
+
+        emp = Employee.query.filter_by(mobilephone=text(phone)).first()
+        emailcheck = Employee.query.filter_by(email=form.email.data).first()
+    
+        postalcheck = Employee.query.filter_by(postal=postal).first()
+        trainingidcheck = Employee.query.filter_by(trainingid=trainingid).first()
+        trainingpasswordcheck = Employee.query.filter_by(
+            trainingpassword=trainingpassword).first()
+        iprismcheck = Employee.query.filter_by(iprismcode=iprismcodecheck).first()
+
+        if gsaphone == phone:
+            print("same mobile")
+        else:
+            if emp:
+                flash("mobile already used")
+                return render_template('employeeupdate.html', form=form, gsa=gsa)
+
+        if gsa.email == form.email.data:
+            print("same email")
+        else:
+            if emailcheck:
+                flash("email already used")
+                return render_template('employeeupdate.html', form=form, gsa=gsa)
+
+        if gsa.postal == form.postal.data:
+            print("same postal code")
+        else:
+            if postalcheck:
+                flash("postal already exists")
+                return render_template('employeeupdate.html', form=form, gsa=gsa)
+
+        if gsa.trainingid == form.trainingid.data:
+            print("same user id ")
+        else:
+            if trainingidcheck:
+                flash("user id already exists")
+                return render_template('employeeupdate.html', form=form, gsa=gsa)
+
+        if gsa.trainingpassword == form.trainingpassword.data:
+            print("same training password")
+        else:
+            if trainingpasswordcheck:
+                flash("training password already exists")
+                return render_template('employeeupdate.html', form=form, gsa=gsa)
+        
    
-    postalcheck = Employee.query.filter_by(postal=postal).first()
-    trainingidcheck = Employee.query.filter_by(trainingid=trainingid).first()
-    trainingpasswordcheck = Employee.query.filter_by(
-        trainingpassword=trainingpassword).first()
-    iprismcheck = Employee.query.filter_by(iprismcode=iprismcodecheck).first()
-
-    if gsaphone == phone:
-        print("same mobile")
-    else:
-        if emp:
-            flash("mobile already used")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-    #if gsaiprism == iprismcodecheck:
-    #    print("same iprism")
-    #else:
-    #    if iprismcheck:
-    #        flash("iprism code already used")
-    #        return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-  
-
-    if gsa.email == form.email.data:
-       print("same email")
-    else:
-        if emailcheck:
-            flash("email already used")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-    if gsa.postal == form.postal.data:
-        print("same postal code")
-    else:
-        if postalcheck:
-            flash("postal already exists")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-    if gsa.trainingid == form.trainingid.data:
-        print("same user id ")
-    else:
-        if trainingidcheck:
-            flash("user id already exists")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-    if gsa.trainingpassword == form.trainingpassword.data:
-        print("same training password")
-    else:
-        if trainingpasswordcheck:
-            flash("training password already exists")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-    print(form)
-    if form.validate_on_submit():
+    
         print('validate')
         if form.submit.data:
+            #print(form.manager.data.id, form.store.data.id)
+            
+            #form.populate_obj(gsa)
+            #print(form)
+            if form.hrpicture.data:
+                        picture_file = save_hrpicture(form.hrpicture.data)
+                        gsa.image_file = picture_file
+            else:
+                picture_file = url_for(
+                    'static', filename='empfiles/mobile/' + gsa.image_file)
+        
+        
+        # here we take the data of the employee from the database
+        # that is called an object. Here we call it gsa.
+        # that object was created above.
+        # we then pass the form data to the obj and populate_obj
+        # however, we have two drop down lists.
+        # we need to pass the id of the value from that last
+        # in both store and manager
+        
             form.populate_obj(gsa)
-        if form.hrpicture.data:
-                picture_file = save_hrpicture(form.hrpicture.data)
-                gsa.image_file = picture_file
-
-        db.session.commit()
-
-        flash("info updated")
-        return render_template('hrhome.html')
+            #print(form.store.data)
+            
+            #gsa.manager = form.manager.data.id
+            #print(gsa.manager)
+            #gsa.store = form.store.data.id
+            #print(gsa.store)
+            
+                
+            db.session.commit()
+                #print("committed")
+                #print(Employee.manager)
+            flash("info updated")
+            return render_template('hrhome.html')
 
         
-    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa)
+    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa, )
 
     
 @app.route("/addemployee", methods=['GET', 'POST'])

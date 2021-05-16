@@ -161,6 +161,7 @@ class Role(db.Model, RoleMixin):
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    
     firstname = db.Column(db.String(20), nullable=False)
     nickname = db.Column(db.String(20), nullable=True)
     lastname = db.Column(db.String(20), nullable=False)
@@ -184,12 +185,12 @@ class Employee(db.Model):
     trainingid = db.Column(db.String(),unique=True, nullable=False)
     trainingpassword = db.Column(db.String(), nullable=False)
     manager = db.Column(db.Integer)
-    image_file = db.Column(db.String(20), nullable=False,
+    image_file = db.Column(db.String(50), nullable=False,
                            default='default.jpg')
-    active = db.Column(db.String(), nullable = True)
+    
     iprismcode = db.Column(db.String(9), nullable=False)
     dob = db.Column(db.DateTime(), nullable=True)
-    #active2 = db.Column(db.Boolean)
+   
     mon_avail = db.Column(db.String(100), nullable=False)
     tue_avail = db.Column(db.String(100), nullable=False)
     wed_avail = db.Column(db.String(100), nullable=False)
@@ -243,7 +244,7 @@ class Store(db.Model):
     carwash =  db.Column(db.Boolean, default = False)
     
     def __repr__(self):
-        return '%r' % (self.number)
+        return str(self.number)
     
 class reclaimtank(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -345,12 +346,16 @@ class MyModelView2(ModelView):
     #column_hide_backrefs = False
     #column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
-
+    column_searchable_list = ['firstname']
     def is_accessible(self):
         return current_user.has_roles('Admin')
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
+    
+    def on_model_change(self, form, model, is_created):
+         
+        super().on_model_change(form, model, is_created)
     
 class MyModelView6(ModelView):
     can_export = True
@@ -562,7 +567,7 @@ class MyModelView11(ModelView):
 
        # }
     #}
-    column_list = ('firstname')
+    #column_list = ('firstname')
 
 
     def is_accessible(self):

@@ -4306,3 +4306,84 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
     output.seek(0)
 
     return send_file(output, attachment_filename="cwoutput.xlsx", as_attachment=True)
+
+
+    Employee(
+                       firstname=form.firstname.data,
+                       nickname=form.nickname.data,
+                       lastname=form.lastname.data,
+                       store=form.store.data.id,
+                       dob=form.dob.data,
+                       addressone=form.addressone.data,
+                       addresstwo=form.addresstwo.data,
+                       apt=form.apt.data,
+                       city=form.city.data,
+                       province=form.province.data,
+                       country=form.country.data,
+                       postal=form.postal.data,
+                       email=form.email.data,
+                       mobilephone=form.mobilephone.data,
+                       
+                       startdate=form.startdate.data,
+                       enddate=form.enddate.data,
+                       trainingid=form.trainingid.data,
+                       trainingpassword=form.trainingpassword.data,
+                       manager=form.manager.data.id,
+                       image_file=picture_file,
+                       iprismcode=form.iprismcode.data,
+                       mon_avail=form.mon_avail.data,
+                       tue_avail=form.tue_avail.data,
+                       wed_avail=form.wed_avail.data,
+                       thu_avail=form.thu_avail.data,
+                       fri_avail=form.fri_avail.data,
+                       sat_avail=form.sat_avail.data,
+                       sun_avail=form.sun_avail.data)
+
+        db.session.add(emp)
+
+        msg = Message('Urgent Updates to Covid 19 Screening Process', sender='paul.futher@gmail.com',
+                          recipients=['himanshugulati29@hotmail.com'])
+            msg.body = '''    Hello, 
+            The provincial government has implemented new covid 19 screening rules. 
+            Your manager has the details. 
+            Please note that you must now screen yourself online before you start your shift.
+
+            The link is below.
+            https: // covid-19.ontario.ca/screening/worker/
+
+            When completed, you must forward the results to your store email address. 
+            Please ask your manager for this email address, if needed.
+
+            There are more details regarding these new rules at your store.
+
+            Please discuss with your manager asap.
+
+            Thank you,
+
+            Terry Futher ARL
+            Steph Futher Director HR. '''
+
+
+            lambda: Store.query.order_by(Store.number)
+
+
+
+
+               <div  class="formtitle" >{{"Home Store:"}}</div>
+            <div> {{form.store(class = "form" , placeholder='Store')}} 
+                    {% if form.store.errors %}
+                        {% for error in form.store.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}       
+                    {% endif %}
+             </div>
+
+
+             <div  class="formtitle" >{{"Manager:"}}</div>
+        <div> {{form.manager(class = "form", placeholder="Manager")}} 
+                    {% if form.manager.errors %}
+                        {% for error in form.manager.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+        </div>

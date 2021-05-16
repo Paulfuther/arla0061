@@ -35,14 +35,14 @@
 
         
            {{form.hidden_tag()}}
-      
+           
 
         <div> <img class="gsaupdateimage" src="{{ image_file }}">
         </div>
         <div></div>
 
         
-
+       
 
 
         <div  class="formtitle" >{{"First Name:"}}</div>
@@ -73,15 +73,8 @@
                         {% endif %}
         </div> 
 
-
-            <div  class="formtitle" >{{"Home Store:"}}</div>
-            <div> {{form.store(class = "form", value=gsa.store)}} 
-                    {% if form.store.errors %}
-                        {% for error in form.store.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}       
-                    {% endif %}
-             </div>
+        
+         
 
        
         <div  class="formtitle" >{{"Phone Number:"}}</div>
@@ -157,14 +150,7 @@
                     {% endif %}
         </div>
         
-        <div  class="formtitle" >{{"Manager:"}}</div>
-        <div> {{form.manager(class = "form", value=gsa.manager)}} 
-                    {% if form.manager.errors %}
-                        {% for error in form.manager.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
+        
         
 
         <div  class="formtitle" >{{"Online Training User ID:"}}</div>
@@ -201,15 +187,7 @@
         
         </div>
 
-        <div  class="formtitle" >{{"Active:"}}</div>
-        <div> {{form.active(class = "form", placeholder="Active")}} 
-                    
-                    {% if form.active.errors %}
-                        {% for error in form.active.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
+        
          <div  class="formtitle" >{{"Profile Picture:"}}</div>
          <div>  {{ form.hrpicture(class = "form")}}
         </div>
