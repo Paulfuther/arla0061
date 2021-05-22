@@ -201,7 +201,14 @@ td, th {
 
 /* Signature CSS */
 
+/* admin email panel */
 
+.emaileditor {
+  display: flex;
+  width: 75%;
+  margin: auto;
+
+}
 
 
 

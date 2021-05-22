@@ -1,0 +1,73 @@
+{% extends 'admin/master.html' %}
+
+
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+{% block body %}
+ 
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Send Email</title>
+    <script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
+</head>
+<body>
+
+    <style>
+        /*Textbox*/
+        .ck-editor__editable {
+            min-height: 400px;
+            max-height: 400px;
+            min-width: 400px;
+            max-width: 400px;
+        }
+        /*Toolbar*/
+        .ck-editor__top {
+            min-width: 400px;
+            max-witdh: 400px;
+        }
+
+        .emaileditor {
+          
+          width: 400px;
+          margin: auto;
+
+        }
+
+    </style>
+
+
+   
+
+    <div class = "emaileditor">
+    <form action = "/emailme", method = "POST">
+      <textarea name = "content" id="editor">
+          
+      </textarea>
+      <p> <input type = "submit" value = "Submiot"></p>
+    </form>
+              <script>
+                  ClassicEditor
+                      .create( document.querySelector( '#editor' ) )
+                      .catch( error => {
+                          console.error( error );
+                      } );
+              </script>
+    </div>
+      
+</body>
+</html>
+
+
+
+
+{% endblock %}

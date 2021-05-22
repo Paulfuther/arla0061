@@ -4387,3 +4387,70 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
                         {% endfor %}            
                     {% endif %}
         </div>
+
+
+
+        851330118RT0001
+        851330118RT0001
+
+        jkpbjcpbatqqpsgs
+
+
+        app.config['MAIL_SERVER']= 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'arltest61@gmail.com'
+app.config['MAIL_PASSWORD'] = 'dujqgbtemfpleotn'
+
+
+
+SECRET_KEY = 'mysecret'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
+SECURITY_PASSWORD_SALT = 'none'
+
+
+app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
+app.config['MAIL_SERVER'] ='smtp.gmail.com'
+app.config['MAIL_USERNAME'] = 'paul.futher@gmail.com'
+app.config['MAIL_PASSWORD'] = 'lptzullejoqdvyms'
+
+##one ModuleNotFoundErro
+
+SECRET_KEY = 'mysecret'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///site.db'
+SECURITY_PASSWORD_SALT = 'none'
+
+
+app.config['SECRET_KEY'] = 'c164d8ed65cf46b1df5e336bd6adc4619a31830185f62b64'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99f66a4527'
+
+
+##one ModuleNotFoundError
+
+
+''' <p> Hello <p> 
+    <p> First, thank you to Priyan for the update.</p>
+    
+    <p> The Ontario government has included gas station attendants as an eligible occpupation for the Covid 19 vaccine.</p>
+    <p> Please click the link below to book your appointment </p>
+           
+           
+    <p> https://covidvaccinelm.ca/ </p>
+    <p> Then, scroll down the page and seelct "Eligible Occupations"</p>
+    <p> Then seclect: </p>
+    <p> Oil and petroleum workers (including petroleum refineries, crude oil and petroleum storage, transmission and distribution, retail sale of fuel)
+    </p> 
+    
+    <p> Please book your appointment. </p>   
+    
+    <p> Thank you, </p>
+
+    <p>Terry Futher ARL </p>
+    <p>Steph Futher Director HR. </p>
+
+       
+    '''

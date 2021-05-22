@@ -9,7 +9,7 @@ import json
 import pdfkit
 from datetime import datetime
 from flask import render_template_string, url_for, redirect, send_from_directory, request
-from flask_admin import Admin
+from flask_admin import Admin, expose, BaseView
 from flask_admin.actions import action
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -29,6 +29,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 # Flask and Flask-SQLAlchemy initialization here
 #get variables
 
+#!!!!!!!!!!!!!!!!!! you need the next three lines of code on the server#
+# environment variables are hidden.....#
 
 #with open('/etc/config.json') as config_file:
 #	config = json.load(config_file)
@@ -576,6 +578,18 @@ class MyModelView11(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
+class EmailView(BaseView):
+    @expose('/')
+    def index(self):
+        return self.render('send_email.html')
+    
+    can_delete = False
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+    
+
+    
 # these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
@@ -592,7 +606,7 @@ admin.add_view(MyModelView9(Saltlog, db.session))
 admin.add_view(MyModelViewReclaim(reclaimtank, db.session))
 admin.add_view(MyModelView10(cwmaintenance, db.session))
 #admin.add_view(MyModelView11(Employee, db.session))
-
+admin.add_view(EmailView(name = 'Email', endpoint='email'))
 from flaskblog import routes
 
 

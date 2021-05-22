@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+  
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Send Email</title>
+    <script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
+</head>
+<body>
+
+<style>
+    /*Textbox*/
+    .ck-editor__editable {
+        min-height: 400px;
+        max-height: 400px;
+        min-width: 400px;
+        max-width: 400px;
+    }
+    /*Toolbar*/
+    .ck-editor__top {
+        min-width: 400px;
+        max-witdh: 400px;
+    }
+</style>
+
+
+    <h1>Send Email</h1>
+    <div id="editor">
+        <p>This is some sample content.</p>
+    </div>
+    <script>
+        ClassicEditor
+            .create( document.querySelector( '#editor' ) )
+            .catch( error => {
+                console.error( error );
+            } );
+    </script>
+</body>
+</html>
+
+
+
+{% endblock content %}

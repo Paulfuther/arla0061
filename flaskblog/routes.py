@@ -32,6 +32,12 @@ from flask_mail import Message
 moment = Moment(app)
 
 
+def send_email(subject, sender, recipients, text_body, html_body):
+    msg = Message(subject, sender=sender, recipients=recipients)
+    msg.body = text_body
+    msg.html = html_body
+    mail.send(msg)
+
 @app.route("/")
 @app.route("/home")
 @login_required
@@ -160,40 +166,30 @@ def email():
     
     return "sent"
 
+@app.route("/send_email2" , methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def send_email2():
+    
+    return render_template('send_email2.html')
 
-@app.route("/emailme")
+
+
+
+@app.route("/emailme", methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
 def emailme():
+    data = request.form['content']
     msg = Message('Essential Workers (us) can now get vaccinated', sender='paul.futher@gmail.com',
-                  recipients=['alrayesmohamed2@gmail.com'])
+                  recipients=['paul.futher@gmail.com'])
 
-    msg.html = ''' <p> Hello <p> 
-    <p> First, thank you to Priyan for the update.</p>
-    
-    <p> The Ontario government has included gas station attendants as an eligible occpupation for the Covid 19 vaccine.</p>
-    <p> Please click the link below to book your appointment </p>
-           
-           
-    <p> https://covidvaccinelm.ca/ </p>
-    <p> Then, scroll down the page and seelct "Eligible Occupations"</p>
-    <p> Then seclect: </p>
-    <p> Oil and petroleum workers (including petroleum refineries, crude oil and petroleum storage, transmission and distribution, retail sale of fuel)
-    </p> 
-    
-    <p> Please book your appointment. </p>   
-    
-    <p> Thank you, </p>
-
-    <p>Terry Futher ARL </p>
-    <p>Steph Futher Director HR. </p>
-
-       
-    '''
+    msg.html = data
     mail.send(msg)
     print("mail sent")
-
-    return "sent"
+    print(data)
+    flash('Email Sent')
+    return redirect(request.referrer)
 
 @app.route("/schedule", methods = ['GET', 'POST'])
 @login_required
