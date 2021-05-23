@@ -94,13 +94,11 @@ def nofile():
     emp = Employee.query.filter(Employee.id)
     file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
     
-    nofile = Employee.query.filter(Employee.id.notin_(file)).order_by(Employee.store)
-
-    
-
-    for x in nofile:
-        print(x.id, x.firstname, x.lastname, x.store)
-    #return "done"
+    nofile = Employee.query.filter(Employee.id.notin_(file))\
+        .join(Store, Store.id == Employee.store_id)\
+        .add_columns(Store.number, Employee.firstname, Employee.lastname)\
+        .order_by(Store.number)
+        
 
     return render_template('nofile.html', nofile=nofile)
 
@@ -108,14 +106,19 @@ def nofile():
 def nofileexcel():
     emp = Employee.query.filter(Employee.id)
     file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
-
-    nofile = Employee.query.filter(
-        Employee.id.notin_(file)).order_by(Employee.store)
+    
+    nofile = Employee.query.filter(Employee.id.notin_(file))\
+        .join(Store, Store.id==Employee.store_id)\
+        .add_columns(Store.number, Employee.firstname)\
+        .order_by(Store.number)
+    
+    #for x in nofile:
+     #   print(x.Store)
     
     out = BytesIO()
     writer = pd.ExcelWriter(out, engine = 'xlsxwriter')
     df = pd.read_sql(nofile.statement, nofile.session.bind)
-    df = df[['store','firstname','lastname']]
+    df = df[['number','firstname','lastname']]
     df.to_excel(writer, index=False)
     writer.save()
     out.seek(0)
@@ -166,28 +169,18 @@ def email():
     
     return "sent"
 
-@app.route("/send_email2" , methods = ['GET', 'POST'])
-@login_required
-@roles_required('Admin')
-def send_email2():
-    
-    return render_template('send_email2.html')
-
-
-
 
 @app.route("/emailme", methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
 def emailme():
     data = request.form['content']
-    msg = Message('Essential Workers (us) can now get vaccinated', sender='paul.futher@gmail.com',
+    dataheader = request.form['emheader']
+    msg = Message(dataheader, sender='paul.futher@gmail.com',
                   recipients=['paul.futher@gmail.com'])
 
     msg.html = data
     mail.send(msg)
-    print("mail sent")
-    print(data)
     flash('Email Sent')
     return redirect(request.referrer)
 

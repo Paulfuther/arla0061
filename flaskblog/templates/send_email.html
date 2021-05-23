@@ -25,15 +25,15 @@
     <style>
         /*Textbox*/
         .ck-editor__editable {
-            min-height: 400px;
-            max-height: 400px;
-            min-width: 400px;
-            max-width: 400px;
+            min-height: 381px;
+            max-height: 381px;
+            min-width: 381px;
+            max-width: 381px;
         }
         /*Toolbar*/
         .ck-editor__top {
-            min-width: 400px;
-            max-witdh: 400px;
+            min-width: 381px;
+            max-witdh: 381px;
         }
 
         .emaileditor {
@@ -43,17 +43,26 @@
 
         }
 
+        .emailheader {
+          width: 386px;
+        }
     </style>
 
 
    
 
     <div class = "emaileditor">
-    <form action = "/emailme", method = "POST">
+    <div class = "emaileditor">This email will go to all staff</div>
+    <br></br>  
+     <form action = "/emailme", method = "POST">
+     <div>Subject:</div>
+      <input class = "emailheader" name = "emheader" type = "text" id = "email_subject" >
+    
+    
       <textarea name = "content" id="editor">
           
       </textarea>
-      <p> <input type = "submit" value = "Submiot"></p>
+      <p> <input type = "submit" value = "Submit"></p>
     </form>
               <script>
                   ClassicEditor

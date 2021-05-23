@@ -167,7 +167,8 @@ class Employee(db.Model):
     firstname = db.Column(db.String(20), nullable=False)
     nickname = db.Column(db.String(20), nullable=True)
     lastname = db.Column(db.String(20), nullable=False)
-    store = db.Column(db.Integer)
+    store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
+    store = relationship('Store')
     addressone = db.Column(db.String(20), nullable=False)
     addresstwo = db.Column(db.String(20), nullable=True)
     apt = db.Column(db.String(20), nullable=True)
@@ -323,7 +324,7 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ('user_name', 'roles')
+    column_list = ('user_name', 'active','roles')
 
     def is_accessible(self):
         return current_user.has_roles('Admin' )
@@ -349,6 +350,7 @@ class MyModelView2(ModelView):
     #column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
     column_searchable_list = ['firstname']
+    #list_columns = ['firstname','store']
     def is_accessible(self):
         return current_user.has_roles('Admin')
 

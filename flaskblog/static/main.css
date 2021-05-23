@@ -210,6 +210,9 @@ td, th {
 
 }
 
+.emailheader {
+  width: 380px;
+}
 
 
 /* .messagescontainer {
