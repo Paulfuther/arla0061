@@ -4454,3 +4454,39 @@ app.config['SECURITY_PASSWORD_SALT'] = '6598120c4f17a416e33707393c85f809e782eb99
 
        
     '''
+
+    @app.route("/addme", methods=['GET', 'POST'])
+def addme():
+    if request.method == "POST":
+        newuser = request.form.get('email')
+        newpassword = request.form.get('password')
+        active = request.form.get('checkbox')
+        if active:
+            active = 1
+        else:
+            active = 0
+            
+        user_name = request.form.get('user_name')
+        
+        adduser = User(email=newuser,
+                    password=newpassword,
+                    active = active,
+                    user_name = user_name)
+        
+        db.session.add(adduser)
+        db.session.flush()
+        
+        
+        newid = adduser.id
+        
+        print(newid)
+        first = request.form.get('firstname')
+        addfirst = Customer(firstname = first,
+                            user_id = newid)
+        db.session.add(addfirst)
+        db.session.commit()
+        
+        return render_template('newuser.html', newuser=newuser)
+    else:
+        newuser = User.query.get(1)
+        return render_template('addme.html', newuser = newuser)

@@ -3,7 +3,7 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule, GradeForm
 from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer
 #from flask_user import roles_required
-from flask_security import roles_required, login_required, current_user
+from flask_security import roles_required, login_required, current_user, roles_accepted
 #from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
@@ -53,43 +53,11 @@ def home():
     #return render_template('home.html')
 
 
-@app.route("/addme", methods=['GET', 'POST'])
-def addme():
-    if request.method == "POST":
-        newuser = request.form.get('email')
-        newpassword = request.form.get('password')
-        active = request.form.get('checkbox')
-        if active:
-            active = 1
-        else:
-            active = 0
-            
-        user_name = request.form.get('user_name')
-        
-        adduser = User(email=newuser,
-                    password=newpassword,
-                    active = active,
-                    user_name = user_name)
-        
-        db.session.add(adduser)
-        db.session.flush()
-        
-        
-        newid = adduser.id
-        
-        print(newid)
-        first = request.form.get('firstname')
-        addfirst = Customer(firstname = first,
-                            user_id = newid)
-        db.session.add(addfirst)
-        db.session.commit()
-        
-        return render_template('newuser.html', newuser=newuser)
-    else:
-        newuser = User.query.get(1)
-        return render_template('addme.html', newuser = newuser)
+
 
 @app.route("/nofile")
+@login_required
+@roles_accepted('Admin', 'Manager')
 def nofile():
     emp = Employee.query.filter(Employee.id)
     file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
@@ -103,6 +71,8 @@ def nofile():
     return render_template('nofile.html', nofile=nofile)
 
 @app.route("/nofileexcel")
+@login_required
+@roles_accepted('Admin', 'Manager')
 def nofileexcel():
     emp = Employee.query.filter(Employee.id)
     file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
@@ -186,6 +156,8 @@ def emailme():
 
 @app.route("/schedule", methods = ['GET', 'POST'])
 @login_required
+
+@roles_accepted('Admin', 'Manager')
 def schedule():
     
     form = Schedule()
@@ -196,6 +168,7 @@ def schedule():
 
 @app.route("/searchschedule", methods=['GET', 'POST'])
 @login_required
+@roles_accepted('Admin', 'Manager')
 def searchschedule():
     
     form=Schedule()
@@ -208,15 +181,20 @@ def searchschedule():
     
     if 'Search' in request.form['action']:
         if search_value != "Home Store":
-            gsa1 = Employee.query.filter_by(store=search_value)
-            gsa = gsa1.order_by(Employee.store).all()
+            
+            store_id = Store.query.filter_by(number=search_value).first()
+            storeid = store_id.id
+            
+            gsa1 = Employee.query.filter_by(store_id=storeid)
+            
+            gsa = gsa1.order_by(Employee.store_id).all()
             s_v = int(search_value)
             for stuff in hsdate1:
                 newdate = datetime.strptime(stuff, '%b-%d-%Y')
                 nd = datetime.date(newdate)
                 s_s = staffschedule.query.filter_by(shift_date = nd)
-                for r in s_s:
-                    print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
+                #for r in s_s:
+                #    print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
                 
                 
                 #print(s_s.storeworked)
@@ -232,7 +210,7 @@ def searchschedule():
    
         if search_value == "Home Store":
                 gsa = Employee.query\
-                    .order_by(Employee.store).all()
+                    .order_by(Employee.store_id).all()
 
                 #for staff in gsa:
                 #   print(staff.id)
@@ -250,17 +228,20 @@ def searchschedule():
         return render_template('schedule.html', gsa=gsa, form=form)
     
     elif 'submithours' in request.form['action']:
+          
+        store_id = Store.query.filter_by(number=search_value).first()
+        storeid = store_id.id
             
         if search_value == "Home Store":
                             gsa = Employee.query\
-                                .order_by(Employee.store).all()
+                                .order_by(Employee.store_id).all()
 
                             #for staff in gsa:
                             #   print(staff.id)
                             #return render_template('schedule.html', gsa=gsa)
 
-        gsa1 = Employee.query.filter_by(store=search_value)
-        gsa = gsa1.order_by(Employee.store).all()
+        gsa1 = Employee.query.filter_by(store_id=storeid)
+        gsa = gsa1.order_by(Employee.store_id).all()
         storenumber = search_value
         sdescription = request.form.getlist('writtenhours')
         shours = request.form.getlist('hours')
@@ -276,7 +257,7 @@ def searchschedule():
                 newdate = datetime.strptime(obj, '%b-%d-%Y')
                 print(g,g.id, storenumber, newdate, sdescription[y], shours[y])
                 empsched = staffschedule( employee_id = g.id,
-                                         storeworked = storenumber,
+                                         storeworked = storeid,
                                     shift_description = sdescription[y],
                                     shift_hours = shours[y],
                                     shift_date = newdate)
@@ -292,6 +273,7 @@ def searchschedule():
 
 @app.route("/addtoschedule", methods = ['GET', 'POST'])
 @login_required
+@roles_accepted('Admin', 'Manager')
 def addtoschedule():
     form=request.form
     search_value = form['search_string']
@@ -427,6 +409,7 @@ def hrlist():
 
 
 @app.route("/trainingcompliance", methods=['GET', 'POST'])
+@roles_accepted('Admin', 'Manager')
 @login_required
 def trainingcompliance():
     
@@ -515,7 +498,7 @@ def search():
     store_id = Store.query.filter_by(number=ugh2).first()
     storeid = store_id.id
     print(storeid)
-    gsa = Employee.query.filter_by(store=storeid)
+    gsa = Employee.query.filter_by(store_id=storeid)
     
    
     return render_template('hrlist.html', gsa=gsa, store_list = store_list, ugh2=ugh2)
@@ -701,6 +684,7 @@ def updategsa(staff_id):
     
 @app.route("/addemployee", methods=['GET', 'POST'])
 @login_required
+@roles_accepted('Admin', 'Manager')
 def addemployee():
     
     form = EmployeeForm()   
@@ -739,19 +723,21 @@ def addemployee():
 
         newid = adduser.id
         
-        #print(newid)
+        print(newid)
         
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
         else:
             picture_file = '3d611379cfdf5a89.jpg'
        
-                
+        print (form.manager.data.id)
+        print (form.store.data.id)
+            
         emp = Employee(user_id=newid,
                        firstname=form.firstname.data,
                        nickname=form.nickname.data,
                        lastname=form.lastname.data,
-                       store=form.store.data.id,
+                       store=form.store.data,
                        dob=form.dob.data,
                        addressone=form.addressone.data,
                        addresstwo=form.addresstwo.data,
@@ -788,6 +774,9 @@ def addemployee():
         
         r = request.form.getlist("completeddate")
         f = emp.id
+        
+        print(emp.id)
+        
         y = 1
         yy = 0
         for x in request.form.getlist("completed"):

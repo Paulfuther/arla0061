@@ -324,8 +324,8 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ('user_name', 'active','roles')
-
+    column_list = ( 'user_name', 'active','roles')
+    column_searchable_list = ['user_name']
     def is_accessible(self):
         return current_user.has_roles('Admin' )
     
