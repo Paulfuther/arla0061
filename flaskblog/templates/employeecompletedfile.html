@@ -25,7 +25,11 @@
 
                   <ul class = "app-menu">
                         <ul>
-                              <li> <a href="hrhome">HR Main Page</a></li>
+
+                                {% if current_user.has_roles('GSA') %}
+                                {% else %}
+                                <li> <a href="hrhome">HR Main Page</a></li>
+                                {% endif %}
                         </ul>
                         
                   </ul>

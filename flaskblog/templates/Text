@@ -4490,3 +4490,129 @@ def addme():
     else:
         newuser = User.query.get(1)
         return render_template('addme.html', newuser = newuser)
+
+
+          <ul>
+                        <form method="POST">
+                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
+                            <select id="search_string"  name = "searchname" >
+                                {% for x in store_list %}
+                                <option value=" {{ x }}">{{x}}</option>
+                                {% endfor %}
+                             <input type ="submit"  formaction="/search" value = "Search"> 
+                            
+                        </form>
+                        </ul>
+
+
+
+           <script>
+                    $(document).ready(function(){
+                        load_data();
+                        function load_data(query)
+                        {
+                            $.ajax({
+                                url: "/livesearch",
+                                method:"POST",
+                                data:{query:query},
+                                success:function(data)
+                                {
+                                    $('#result').html(data);
+                                    console.log(data)
+                                }
+                            });
+                        }
+                        $('#live_search').keyup(function(){
+                            var search = $(this).val();
+                            if (search != ''){
+                                load_data(search);
+                            }else{
+                                load_data();
+                            }
+                                
+                            
+                        });
+                    });               
+
+
+                      {% for gsa in result %}
+                               <div>
+                                {{gsa['firstname']}} {{gsa['lastname']}} {{gsa['email'] }} 
+                               </div>
+                               {% endfor %}
+
+
+             <img class="hrlistimage" src= {{url_for('static', filename='empfiles/thumb/') + staff.image_file}}>    
+
+
+              $("#rtrythis").html(res.email);
+                                    for i in response
+
+
+                           <!--
+                                    <a   href="/updategsa{{}}"><i class="fas fa-id-card"></i></a>
+                                    <a   href="/updategsatraining{{}}"><i class="fas fa-user-graduate"></i></a>
+                                    <a   href="/hrfile{{}}"><i class="far fa-file-image"></i></a>
+                                    <a   href="/existingemployeefile{{}}"><i class="far fa-file-archive"></i></a>
+                                     -->                        
+
+
+                                     document.getElementById("#tablecard").appendChild(document.createElement("div"));
+
+
+
+                 for (var i = 0; i < res.length ; i++){
+                                        
+                                        var newElement = document.createElement('div');
+                                        var list = document.getElementById("tablecard");
+                                        newElement.className = "tablecard";
+                                        
+
+                                        $('#hritem2').append("<div>" + res[i].firstname+ " " +res[i].lastname +"</div>");
+                                       
+                                        list.appendChild(newElement);
+                                        list.parentNode.insertBefore(newElement, list.nextSibling);
+                                        console.log(newElement);
+                                   
+                               
+                                    }     
+
+
+        <a   href="/updategsatraining{{staff['id']}}"><i class="fas fa-user-graduate"></i></a>
+                                        <a   href="/hrfile{{staff['id']}}"><i class="far fa-file-image"></i></a>
+                                        <a   href="/existingemployeefile{{staff['id']}}"><i class="far fa-file-archive"></i></a>         
+
+
+                                      $(MY_URL/static/empfiles/thumb/1ae084f1246d73fe.JPG}'                                    
+
+
+old hr list:
+
+ form = request.form
+    #if request.method == 'GET':
+        #store_list = Store.query.order_by(Store.number).all()
+
+        #print(store_list)
+        #return render_template('hrlist.html', store_list = store_list, jsonfile = "")
+        #searchbox = request.form.get("text")
+     #   gsa = Employee.query.all()
+      #  result = employee_schema.dump(gsa)
+        #result = json.dumps(results)
+        #jsonfile = json.dumps(result)
+        #result = jsonify(result)
+        #return jsonify(result)
+        #return render_template('hrlist.html', result=result)
+        
+    if request.method == 'POST':
+        
+        searchbox = form["text"]
+        print(searchbox)
+        #gsa = Employee.query.filter_by(id=1)
+        gsa = Employee.query.filter(Employee.lastname.like('%' + searchbox + '%')).all()
+        result = employee_schema.dump(gsa)
+        #result = jsonify(results)
+        #print(gsa)
+        #return "result"
+        return render_template('hrlist.html', result=result)
+    
+    if request.method == 'GET':

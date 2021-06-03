@@ -3,6 +3,10 @@
 
 {% block content%}
 
+
+           
+
+
     <div class="container">  
 
                 <nav class="app-nav">
@@ -18,72 +22,108 @@
                   
                         <ul>
                         <form method="POST">
-                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
-                            <select id="search_string"  name = "search_string" >
-                                {% for x in store_list %}
-                                <option value=" {{ x }}">{{x}}</option>
-                                {% endfor %}
-                             <input type ="submit"  formaction="/search" value = "Search"> 
+                           
+                          
+                             <input type ="text"  id = "live_search" name = "text" placeholder = "name"> 
                         </form>
                         </ul>
                     </ul>
                 </nav>
     </div>    
-                <div class = "tableheader">
+               
 
-                        <!-- <div class = "tableheader"> -->
-                        <div> Image </div>
-                        <div> Store</div>
-                        <div> Name</div>
-                        <!--<div> Nickname</div>-->
-                       
-                       
-                      
-                        <div> Update Staff Information</div>
-                        <div> Update Staff Training</div>
-                        <div> Create File </div>
-                        <div> View File</div>
-                       
-                        <!-- </div> -->
-                </div>
+
+                    
                            <!--url_for('static', filename='profile_pics/mobile/' +-->
 
-                        {% for staff in gsa %}
+                  
 
                         <div class = "border-top" ></div>
                       
-                    
+                        <div class = "tablecontainer" id ="tablecontainer">
 
-                        <div class = "tablecard">
+                        <div class = "tablecard" id = "tablecard">
 
                                 <div class = "tablecard-image">
 
-                                    <img class="hrlistimage" src= {{url_for('static', filename='empfiles/thumb/') + staff.image_file}}>
+                                    
                                
                                 </div>
 
-                            <div class = "tablecard-inner">
+                            <div class = "tablecard-inner" id = "tablecard-inner">
 
                                 <div class = "hritem1"> {{ugh2}}</div>   
-                                <div class = "hritem2"> {{staff.firstname}} {{ staff.lastname}}</div>
-                                <div class = "hritem3"> {{staff.email}} </div>
+                                <div class = "hritem2" id = "hritem2"> </div>
+                                <div class = "hritem3" id = "hritem3">  </div>
                        
-                                    <div class = "tablecard-links">
-
-                                    <a   href="/updategsa{{staff.id}}"><i class="fas fa-id-card"></i></a>
-                                    <a   href="/updategsatraining{{staff.id}}"><i class="fas fa-user-graduate"></i></a>
-                                    <a   href="/hrfile{{staff.id}}"><i class="far fa-file-image"></i></a>
-                                    <a   href="/existingemployeefile{{staff.id}}"><i class="far fa-file-archive"></i></a>
-                                    </div> 
-                            
+                                    <div class = "tablecard-links"></div> 
+                                  
                             </div> 
                      
                         </div>
-                        {% endfor %}
+                   
+                        </div>
 
-                    
+                        
+                      <script>
 
+                    $(document).ready(function(){
+                        $("#live_search").on("input",function(e){
+                            textinlivebox= $("#live_search").val();
+                            
+                            $.ajax({
+                                method:"POST",
+                                url:"/livesearch",
+                                data:{text:textinlivebox},
+                                success:function(res){
+                                    $('#tablecontainer').empty();
+                                
+                                    let html = res.reduce(( acc, {firstname, lastname, email, store, store_id, image_file, id}) =>
+                                        acc += `
+                                        <div class = 'tablecard'>
+                                        <div class = 'tablecard-image'>
 
+                                   
+                                        <img src =' /static/empfiles/thumb/${image_file}' class = 'hrlistimage' > 
+                                        </div>
+                                        <div class = 'tablecard-inner'>
+                                        
+                                        <div class = 'hritem1'>
+                                        ${store_id}
+                                        </div>
+                                        <div class = 'hritem2'>
+                                        ${firstname +" "+ lastname}
+                                        </div>
+                                        <div class = 'hritem3'>
+                                        ${email}
+                                        </div> 
+                                        <div class = "tablecard-links">
+
+                                        <a   href="/updategsa${id}"><i class="fas fa-id-card"></i></a>
+                                        <a   href="/updategsatraining${id}"><i class="fas fa-user-graduate"></i></a>
+                                        <a   href="/hrfile${id}"><i class="far fa-file-image"></i></a>
+                                        <a   href="/existingemployeefile${id}"><i class="far fa-file-archive"></i></a>
+                                        </div> 
+                                        </div>
+                                     
+                                        </div>`
+                                     
+
+                                    , '');
+                                    console.log(res.id)
+                                    $('.tablecontainer').append(html);
+                                    console.log(res);
+                                 
+                                }
+                            })
+
+                        });
+                    })
+
+                </script>
+                      
+            
+                
 
 {% endblock content %}
 

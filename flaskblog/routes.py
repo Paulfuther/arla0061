@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule, GradeForm
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer
+from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer, employee_schema
 #from flask_user import roles_required
 from flask_security import roles_required, login_required, current_user, roles_accepted
 #from flaskblog.models import  User, Role, Employee
@@ -29,6 +29,7 @@ from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_mail import Message
 
+
 moment = Moment(app)
 
 
@@ -39,13 +40,15 @@ def send_email(subject, sender, recipients, text_body, html_body):
     mail.send(msg)
 
 @app.route("/")
-@app.route("/home")
+@app.route("/home<int:user_id>")
 @login_required
 def home():
-    
-    #if current_user.has_roles('gsa'):
-    #    print('user is gsa')
-    #return url_for('admin.index')
+    print(current_user.id)
+    gsaid = int(current_user.id)
+    staff = Employee.query.filter_by(user_id=gsaid).first()
+    if current_user.has_roles('GSA'):
+        #print('user is gsa')
+        return render_template('gsadashboard.html', staff=staff)
     
     #return render_template('testsig.html')
     
@@ -401,12 +404,7 @@ def employeefile(staff_id):
 @app.route("/hrlist", methods =['GET', 'POST'])
 @login_required
 def hrlist():
-    
-    store_list = Store.query.order_by(Store.number).all()
-
-    #print(store_list)
-    return render_template('hrlist.html', store_list = store_list)
-
+   return render_template('hrlist.html')
 
 @app.route("/trainingcompliance", methods=['GET', 'POST'])
 @roles_accepted('Admin', 'Manager')
@@ -485,6 +483,23 @@ def updategsatraining(staff_id):
     
     return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
 
+
+@app.route("/livesearch", methods = ["POST", "GET"])
+@login_required
+def livesearch():
+    
+    #result=""
+    searchbox = request.form.get("text")
+    gsa = Employee.query.filter(
+        Employee.lastname.like('%' + searchbox + '%')).all()
+    #gsa = Employee.query.filter_by(id=1)
+    results = employee_schema.dump(gsa)
+    result = jsonify(results)
+    for x in gsa:
+        print(x.firstname)
+    return result
+    #return render_template('hrlistsearch.html', result=result)
+    #return redirect (url_for('hrlist', result=result))
 
 @app.route("/search", methods=['GET', 'POST'])
 @login_required

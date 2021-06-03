@@ -16,7 +16,8 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin, login_required, roles_required
 from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
-
+from flask_marshmallow import Marshmallow
+from marshmallow import Schema
 from flask_admin.menu import MenuLink
 from flask_bcrypt import Bcrypt
 from sqlalchemy.orm import relationship, backref
@@ -60,6 +61,7 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 #delte above three on server
 
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 #USER_APP_NAME ="app"
 ckeditor = CKEditor(app)
 mail = Mail(app)
@@ -147,7 +149,7 @@ class User(UserMixin, db.Model):
 
     def __str__(self):
         return (self.user_name) 
-  
+ 
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
@@ -168,7 +170,7 @@ class Employee(db.Model):
     nickname = db.Column(db.String(20), nullable=True)
     lastname = db.Column(db.String(20), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
-    store = relationship('Store')
+    store = db.relationship('Store', backref = 'store')
     addressone = db.Column(db.String(20), nullable=False)
     addresstwo = db.Column(db.String(20), nullable=True)
     apt = db.Column(db.String(20), nullable=True)
@@ -206,6 +208,15 @@ class Employee(db.Model):
     
     def __str__(self):
         return (self.firstname) 
+
+class EmployeeSchema(ma.Schema):
+    class Meta:
+        model = Employee
+        store = ma.Nested("StoreSchema", exclude=("store",))
+        fields = ('id', 'firstname', 'lastname', 'email', 'store_id', 'image_file')
+        
+        
+employee_schema = EmployeeSchema(many=True)
 
 class Course(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -248,6 +259,11 @@ class Store(db.Model):
     
     def __repr__(self):
         return str(self.number)
+   
+class StoreSchema(ma.Schema):
+    class Meta:
+        model = Store
+        
     
 class reclaimtank(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -513,6 +529,7 @@ class AdminViewClass(ModelView):
 class AdminViewClass4(ModelView):
     can_export = True
     can_delete = False
+    
     #column_sortable_list = ['Grade.employee']
 
     def is_accessible(self):

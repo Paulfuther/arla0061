@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+
+
+<div class = "tableheader">
+
+                        <!-- <div class = "tableheader"> -->
+                        <div> Image </div>
+                        <div> Store</div>
+                        <div> Name</div>
+                        <!--<div> Nickname</div>-->
+                       
+                       
+                      
+                        <div> Update Staff Information</div>
+                        <div> Update Staff Training</div>
+                        <div> Create File </div>
+                        <div> View File</div>
+                       
+                        <!-- </div> -->
+                </div>
+                           <!--url_for('static', filename='profile_pics/mobile/' +-->
+
+                   
+
+                        <div class = "border-top" ></div>
+                      
+                    
+
+                        <div class = "tablecard">
+
+                                <div class = "tablecard-image">
+
+                                    
+                               
+                                </div>
+
+                            <div class = "tablecard-inner">
+
+                              
+                                <div class = "hritem2"> {{staff.firstname}} {{ staff.lastname}}</div>
+                                <div class = "hritem3"> {{staff.email}} </div>
+                       
+                                    <div class = "tablecard-links">
+
+                                    <a   href="/updategsa{{staff.id}}"><i class="fas fa-id-card"></i></a>
+                                    <a   href="/updategsatraining{{staff.id}}"><i class="fas fa-user-graduate"></i></a>
+                                    <a   href="/hrfile{{staff.id}}"><i class="far fa-file-image"></i></a>
+                                    <a   href="/existingemployeefile{{staff.id}}"><i class="far fa-file-archive"></i></a>
+                                    </div> 
+                            
+                            </div> 
+                     
+                        </div>
+                 
+
+
+
+{% endblock content %}
