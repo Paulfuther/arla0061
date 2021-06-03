@@ -47,8 +47,21 @@ def home():
     gsaid = int(current_user.id)
     staff = Employee.query.filter_by(user_id=gsaid).first()
     if current_user.has_roles('GSA'):
-        #print('user is gsa')
-        return render_template('gsadashboard.html', staff=staff)
+        
+        print(staff.id)
+        
+        exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+        
+        if exists:
+            flash("you have a file")
+            return render_template('gsadashboard.html', staff=staff, exists=exists)
+        else:
+            print("no")
+            flash("no file exists")
+      
+        
+            #print('user is gsa')
+            return render_template('gsadashboard.html', staff=staff, exists=exists)
     
     #return render_template('testsig.html')
     
@@ -351,7 +364,8 @@ def hrfile(staff_id):
                 z += 1
                 
         db.session.commit()
-  
+        flash("file completed. Thank you")
+        return render_template('layout.html')
   
     #print("success")
   
@@ -381,7 +395,7 @@ def employeefile(staff_id):
     if exists:
         print("yes")
     else:
-        print("no")
+        print("no", staff_id)
         flash("no file exists")
         return redirect(url_for("hrlist"))
     
@@ -484,22 +498,43 @@ def updategsatraining(staff_id):
     return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
 
 
-@app.route("/livesearch", methods = ["POST", "GET"])
+@app.route("/livesearch_first", methods = ["POST", "GET"])
 @login_required
 def livesearch():
     
-    #result=""
     searchbox = request.form.get("text")
-    gsa = Employee.query.filter(
-        Employee.lastname.like('%' + searchbox + '%')).all()
-    #gsa = Employee.query.filter_by(id=1)
+
+    gsa = db.session.query(Employee, User)\
+        .filter(Employee.firstname.like('%' + searchbox + '%'))\
+            .join(User, Employee.user_id == User.id)\
+        .filter(User.active == 1)\
+        .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id)\
+        .all()
+
     results = employee_schema.dump(gsa)
     result = jsonify(results)
-    for x in gsa:
-        print(x.firstname)
+
     return result
-    #return render_template('hrlistsearch.html', result=result)
-    #return redirect (url_for('hrlist', result=result))
+
+@app.route("/livesearch_last", methods = ["POST", "GET"])
+@login_required
+def livesearchlast():
+    
+    
+    searchbox = request.form.get("text")
+    
+    gsa = db.session.query(Employee, User)\
+        .filter(Employee.lastname.like('%' + searchbox + '%'))\
+            .join(User, Employee.user_id == User.id)\
+                .filter(User.active == 1)\
+                    .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id)\
+                    .all()
+    
+    results = employee_schema.dump(gsa)
+    result = jsonify(results)
+   
+    return result
+ 
 
 @app.route("/search", methods=['GET', 'POST'])
 @login_required

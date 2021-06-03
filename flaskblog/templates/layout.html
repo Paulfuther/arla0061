@@ -98,6 +98,10 @@
                       
                      
                        {% if current_user.has_roles('GSA') %}
+               
+                      {% else %}
+                    
+                 
 
                       <li class = "dropdown-btn">HR Main</li>
                       <div class= "dropdown-container">
@@ -132,7 +136,7 @@
                          <a href="addemployee">Add Employee</a>
                          <a href="nofile">Employees Without a File</a>
                       </div>
-                        {% else %}
+                       
 
                         <li> <a href="{{ url_for('schedule')}}">Schedule</a></li>
                        <li><a href="{{ url_for('admin.index')}}">Admin</a></li>
@@ -186,8 +190,8 @@
                         <a href="securityfilenegconvert">Security Log Negative Sales Converter</a>
                       </div>
 
-                      
-                       {% endif %}
+                        {% endif %}
+                       
               </ul>
               </nav>
 

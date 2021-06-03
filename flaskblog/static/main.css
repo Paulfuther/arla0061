@@ -537,9 +537,9 @@ input[type=password] {
 
  .tablecard-links {
    display: flex;
-   justify-content: space-between;
-   grid-column-start: 2;
-   grid-column-end: 4;
+   justify-content: space-around;
+   grid-column-start: 1;
+   grid-column-end: 5;
    grid-row-start: 3;
    padding: 20px 0px 20px 0px;
  }
@@ -584,7 +584,7 @@ input[type=password] {
    justify-self: start;
  }
 
- .tablecard-links>a {
+ /*.tablecard-links>a {
    opacity: 0.5;
    font-size: 20px;
  }
@@ -592,6 +592,29 @@ input[type=password] {
  .tablecard-links>a:hover {
    color: black;
    opacity:1.5;
+ }
+*/
+
+ #loadfile {
+   display:none;
+ }
+
+ .fa-file-image {
+   color: blue;
+ }
+
+ 
+
+ .fa-file-archive {
+   color:brown
+ }
+ 
+ .fa-user-graduate {
+   color:blue
+ }
+
+ .fa-id-card {
+   color:blue
  }
 
 /*
@@ -1713,9 +1736,9 @@ p.error {
 
   .tablecard-links {
     display:flex;
-    justify-content: space-between;
-    grid-column-start: 2;
-    grid-column-end: 4;
+    justify-content: space-around;
+    grid-column-start: 1;
+    grid-column-end: 5;
     grid-row-start: 3;
     padding: 20px 0px 20px 0px;
   }
@@ -1757,8 +1780,9 @@ p.error {
   }
 
   .tablecard-links >a {
-    opacity: 0.5;
+    opacity: 1;
     font-size: 15px;
+    text-align: center;
   }
 
   

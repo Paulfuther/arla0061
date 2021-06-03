@@ -4616,3 +4616,17 @@ old hr list:
         return render_template('hrlist.html', result=result)
     
     if request.method == 'GET':
+
+
+        <div class = "tablecard-links">
+
+                                    <a   href="/updategsa{{staff.id}}"><i class="fas fa-id-card fa-lg"></i></a>
+                                    <a   href="/updategsatraining{{staff.id}}"><i class="fas fa-user-graduate fa-lg"></i></a>
+
+                                    {% if exists %}
+                                    <a   href="/existingemployeefile{{staff.id}}"><i class="far fa-file-archive fa-lg"></i></a>
+                                    {% else %}
+                                    <a   href="/hrfile{{staff.id}}"><i class="far fa-file-image fa-lg" ></i></a>
+                                  
+                                    {% endif %}
+                                    </div> 

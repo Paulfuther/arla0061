@@ -12,6 +12,10 @@
                 <nav class="app-nav">
 
                   <ul class = "app-menu">
+
+                        {% if current_user.has_roles('GSA') %}
+                        {% else %}
+
                         <ul>
                               <li> <a href="hrlist">List of Employess</a></li>
                         </ul>
@@ -23,10 +27,11 @@
                         <ul>
                         <form method="POST">
                            
-                          
-                             <input type ="text"  id = "live_search" name = "text" placeholder = "name"> 
+                                <input type ="text"  id = "live_search_first" name = "text" placeholder = " first name"> 
+                                <input type ="text"  id = "live_search_last" name = "text" placeholder = "last name"> 
                         </form>
                         </ul>
+                        {% endif %}
                     </ul>
                 </nav>
     </div>    
@@ -42,38 +47,17 @@
                       
                         <div class = "tablecontainer" id ="tablecontainer">
 
-                        <div class = "tablecard" id = "tablecard">
-
-                                <div class = "tablecard-image">
-
-                                    
-                               
-                                </div>
-
-                            <div class = "tablecard-inner" id = "tablecard-inner">
-
-                                <div class = "hritem1"> {{ugh2}}</div>   
-                                <div class = "hritem2" id = "hritem2"> </div>
-                                <div class = "hritem3" id = "hritem3">  </div>
-                       
-                                    <div class = "tablecard-links"></div> 
-                                  
-                            </div> 
-                     
-                        </div>
-                   
-                        </div>
 
                         
                       <script>
 
                     $(document).ready(function(){
-                        $("#live_search").on("input",function(e){
-                            textinlivebox= $("#live_search").val();
+                        $("#live_search_first").on("input",function(e){
+                            textinlivebox= $("#live_search_first").val();
                             
                             $.ajax({
                                 method:"POST",
-                                url:"/livesearch",
+                                url:"/livesearch_first",
                                 data:{text:textinlivebox},
                                 success:function(res){
                                     $('#tablecontainer').empty();
@@ -122,8 +106,62 @@
 
                 </script>
                       
-            
-                
+                <script>
+
+                 $(document).ready(function(){
+                        $("#live_search_last").on("input",function(e){
+                            textinlivebox= $("#live_search_last").val();
+                            
+                            $.ajax({
+                                method:"POST",
+                                url:"/livesearch_last",
+                                data:{text:textinlivebox},
+                                success:function(res){
+                                    $('#tablecontainer').empty();
+                                
+                                    let html = res.reduce(( acc, {firstname, lastname, email, store, store_id, image_file, id}) =>
+                                        acc += `
+                                        <div class = 'tablecard'>
+                                        <div class = 'tablecard-image'>
+
+                                   
+                                        <img src =' /static/empfiles/thumb/${image_file}' class = 'hrlistimage' > 
+                                        </div>
+                                        <div class = 'tablecard-inner'>
+                                        
+                                        <div class = 'hritem1'>
+                                        ${store_id}
+                                        </div>
+                                        <div class = 'hritem2'>
+                                        ${firstname +" "+ lastname}
+                                        </div>
+                                        <div class = 'hritem3'>
+                                        ${email}
+                                        </div> 
+                                        <div class = "tablecard-links">
+
+                                        <a   href="/updategsa${id}"><i class="fas fa-id-card"></i></a>
+                                        <a   href="/updategsatraining${id}"><i class="fas fa-user-graduate"></i></a>
+                                        <a   href="/hrfile${id}"><i class="far fa-file-image"></i></a>
+                                        <a   href="/existingemployeefile${id}"><i class="far fa-file-archive"></i></a>
+                                        </div> 
+                                        </div>
+                                     
+                                        </div>`
+                                     
+
+                                    , '');
+                                    console.log(res.id)
+                                    $('.tablecontainer').append(html);
+                                    console.log(res);
+                                 
+                                }
+                            })
+
+                        });
+                    })
+
+                        </script>
 
 {% endblock content %}
 
