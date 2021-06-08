@@ -85,110 +85,41 @@
               <nav class = "mobile-nav">
 
               <ul class = "mobile-menu">
-              <li> <a href="{{ url_for('home')}}">ARL A0061</a></li>
-                      <li> <a href="{{ url_for('home')}}">Home</a></li>
-                      {% if current_user.is_authenticated %}
-                       <li> <a href="{{ url_for('security.logout')}}">Logout</a></li>
+
+                      {% if current_user.has_roles('GSA') %}
+
+                        <li> <a href="{{ url_for('home')}}">ARL A0061</a></li>
+                        <li> <a href="{{ url_for('home')}}">Home</a></li>
+
+                        <li> <a href="{{ url_for('security.logout')}}">Logout</a></li>
+                    
                       {% else %}
-                      <li> <a href="{{ url_for('login')}}">Login</a></li>
-                     
-                      {% endif %} 
-                     
                     
                       
-                     
-                       {% if current_user.has_roles('GSA') %}
-               
-                      {% else %}
-                    
-                 
 
-                      <li class = "dropdown-btn">HR Main</li>
-                      <div class= "dropdown-container">
-                         
-                         <li class = "dropdown-btn">List of Employess</li>
-                          <div class = "dropdown-container">
-                              <form method="POST">
-                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
-                            <select id="search_string"  name = "search_string">
-                               
-                               
-                                <option value="396">396</options>
-                                <option value="398">398</options>
-                                <option value="402">402</options>
-                                <option value="414">414</options>
-                                <option value="1616">1616</options>
-                                <option value="8156">8156</options>
-                                <option value="8435">8435</options>
-                                <option value="33410">33410</options>
-                                <option value="33485">33485</options>
-                                <option value="48314">48314</options>
-                                <option value="65231">65231</options>
-                                <option value="65077">65077</options>
-                            <input type ="submit"  formaction="/search" value = "Search"> 
-                        </form>
-                       
-
-
-
-
-                          </div>
-                         <a href="addemployee">Add Employee</a>
-                         <a href="nofile">Employees Without a File</a>
-                      </div>
-                       
-
+                        <li> <a href="{{ url_for('home')}}">Home</a></li>
+                        <li> <a href="{{ url_for('security.logout')}}">Logout</a></li>
                         <li> <a href="{{ url_for('schedule')}}">Schedule</a></li>
-                       <li><a href="{{ url_for('admin.index')}}">Admin</a></li>
+                        <li><a href="{{ url_for('admin.index')}}">Admin</a></li>
+                        <li> <a href="{{ url_for('home')}}">Charts</a></li>
 
+                        <li class = "dropdown-btn">HR Main</li>
+                        <div class= "dropdown-container">
                          
-
-
-
-                      <li> <a href="{{ url_for('home')}}">Charts</a></li>
-
-                      <li class = "dropdown-btn">HR Main</li>
-                      <div class= "dropdown-container">
-                         
-                         <li class = "dropdown-btn">List of Employess</li>
-                          <div class = "dropdown-container">
-                              <form method="POST">
-                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
-                            <select id="search_string"  name = "search_string">
-                               
-                               
-                                <option value="396">396</options>
-                                <option value="398">398</options>
-                                <option value="402">402</options>
-                                <option value="414">414</options>
-                                <option value="1616">1616</options>
-                                <option value="8156">8156</options>
-                                <option value="8435">8435</options>
-                                <option value="33410">33410</options>
-                                <option value="33485">33485</options>
-                                <option value="48314">48314</options>
-                                <option value="65231">65231</options>
-                                <option value="65077">65077</options>
-                            <input type ="submit"  formaction="/search" value = "Search"> 
-                        </form>
-                       
-
-
-
-
-                          </div>
+                         <a href = "{{ url_for('hrlist')}}" >Search Employess</a>
+                        
                          <a href="addemployee">Add Employee</a>
                          <a href="nofile">Employees Without a File</a>
                       </div>
 
                       <li class="dropdown-btn">Apps</li>
-                      <div class = "dropdown-container">
-                        <a href="kpiconvert">Growth KPI Converter</a>
-                        <a href="carwashkpiconvert">Carwash KPI Converter </a>
-                        <a  href="tpfileconvert">Team Performance Converter </a>
-                        <a href="securityfileconvert">Security Log Converter</a>
-                        <a href="securityfilenegconvert">Security Log Negative Sales Converter</a>
-                      </div>
+                        <div class = "dropdown-container">
+                          <a href="kpiconvert">Growth KPI Converter</a>
+                          <a href="carwashkpiconvert">Carwash KPI Converter </a>
+                          <a  href="tpfileconvert">Team Performance Converter </a>
+                          <a href="securityfileconvert">Security Log Converter</a>
+                          <a href="securityfilenegconvert">Security Log Negative Sales Converter</a>
+                       </div>
 
                         {% endif %}
                        
@@ -269,5 +200,7 @@
 
 
 </html>
+
+
 
 

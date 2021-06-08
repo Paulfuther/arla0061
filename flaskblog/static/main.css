@@ -22,17 +22,6 @@ body {
   
 }
 
-/* hr file table */
-
-/* .table {
-  width: 80%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-} */
 
 /*------------------------------*/
 /* Schedule */
@@ -258,6 +247,7 @@ td, th {
   text-align: center;
   font-size: 12px;
   color : red;
+  margin-bottom: 5px;
 }
 
 
@@ -474,6 +464,14 @@ input[type=password] {
    margin: auto;
    justify-content: center;
  }
+
+
+.hrsearch {
+  display: flex;
+  grid-template-rows: 25px 25px;
+  margin-right: 25px;
+  grid-gap: 15px;
+}
 
  .hr-container {
    display: grid;
@@ -969,6 +967,18 @@ ul.a {
   padding-top: 5px 5px 5px 5px;
 }*/
 
+
+.inputform {
+  
+  background: #f5f5f5;
+  width: 150px;
+  padding: 0px 15px 0px 5px;
+  border-radius: 3px;
+  font-size: 14px;
+
+  
+}
+
 .form {
   background: #f5f5f5;
   
@@ -1289,7 +1299,7 @@ a.hrbutton {
   justify-content: space-between;
   height: 60px;
   padding: 20px 0;
-  font-size: 12px;
+  font-size: 14px;
 }
 .app-nav ul {
   display: flex;
@@ -1620,12 +1630,25 @@ p.error {
     outline: none;
   }
 
-  .app-nav {
-    display: none;
+  .container {
+    padding-bottom: 10px;
   }
 
-  .app-menu {
-    display: none;
+  .mhrlist {
+    display:none;
+  }
+
+  .hrmenumobile {
+    display:none;
+  }
+
+  
+
+  .hrsearch {
+    display: grid;
+    grid-template-rows: 25px 25px;
+    margin-right: 25px;
+    grid-gap: 15px;
   }
 
   .card {
@@ -1652,16 +1675,18 @@ p.error {
 
   }
 
-  .form {
-    background: #f5f5f5;
-    margin-bottom: 10px;
+  .inputform {
 
-    width: 95%;
-    padding: 15px 15px 15px 15px;
+    background: #f5f5f5;
+    width: 150px;
+    padding: 0px 15px 0px 5px;
     border-radius: 3px;
-    font-size: 24px;
+    font-size: 20px;
+    font
+
 
   }
+
 
 
  /* HR List on mobile */
@@ -1781,7 +1806,7 @@ p.error {
 
   .tablecard-links >a {
     opacity: 1;
-    font-size: 15px;
+    font-size: 12px;
     text-align: center;
   }
 

@@ -4630,3 +4630,84 @@ old hr list:
                                   
                                     {% endif %}
                                     </div> 
+
+
+
+
+         <form method="POST">
+                            <!--<input type ="text" autofocus="autofocus" name="search_string">-->
+                            <select id="search_string"  name = "search_string">
+                               
+                               
+                                <option value="396">396</options>
+                                <option value="398">398</options>
+                                <option value="402">402</options>
+                                <option value="414">414</options>
+                                <option value="1616">1616</options>
+                                <option value="8156">8156</options>
+                                <option value="8435">8435</options>
+                                <option value="33410">33410</options>
+                                <option value="33485">33485</options>
+                                <option value="48314">48314</options>
+                                <option value="65231">65231</options>
+                                <option value="65077">65077</options>
+                            <input type ="submit"  formaction="/search" value = "Search"> 
+                        </form>
+                       
+
+                              
+
+    #emp = Employee.query.all()
+    #with mail.connect() as conn:
+        #for user in emp:
+                
+            #print(user.firstname, user.lastname, user.email)
+    
+            #msg = Message('Essential Workers (us) can now get vaccinated', sender='paul.futher@gmail.com',
+                          recipients=[user.email])
+            msg.html = ''' <p> Hello <p> 
+            <p> First, thank you to Priyan for the update.</p>
+    
+            <p> The Ontario government has included gas station attendants as an eligible occpupation for the Covid 19 vaccine.</p>
+            <p> Please click the link below to book your appointment </p>
+                
+                
+            <p> https://covidvaccinelm.ca/ </p>
+            <p> Then, scroll down the page and seelct "Eligible Occupations"</p>
+            <p> Then seclect: </p>
+            <p> Oil and petroleum workers (including petroleum refineries, crude oil and petroleum storage, transmission and distribution, retail sale of fuel)
+            </p> 
+            
+            <p> Please book your appointment. </p>   
+            
+            <p> Thank you, </p>
+
+            <p>Terry Futher ARL </p>
+            <p>Steph Futher Director HR. </p>
+
+       
+            '''
+
+            mail.send(msg)
+            print("mail sent")
+
+
+
+            #@app.route("/email")
+#@login_required
+#def email():
+ #   gsa = db.session.query(Employee, User)\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+                .filter(User.active == 1)\
+                    .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
+                    .all()
+    
+    for x in gsa:
+            print(x.firstname, x.lastname, x.email)
+    
+    
+    
+            
+    
+    
+    return "sent"

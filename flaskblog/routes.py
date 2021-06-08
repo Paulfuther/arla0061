@@ -114,59 +114,29 @@ def nofileexcel():
     return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
 
 
-#@app.route("/email")
-#@login_required
-def email():
-    emp = Employee.query.all()
-    with mail.connect() as conn:
-        for user in emp:
-                
-            print(user.firstname, user.lastname, user.email)
-    
-            msg = Message('Essential Workers (us) can now get vaccinated', sender='paul.futher@gmail.com',
-                          recipients=[user.email])
-            msg.html = ''' <p> Hello <p> 
-            <p> First, thank you to Priyan for the update.</p>
-    
-            <p> The Ontario government has included gas station attendants as an eligible occpupation for the Covid 19 vaccine.</p>
-            <p> Please click the link below to book your appointment </p>
-                
-                
-            <p> https://covidvaccinelm.ca/ </p>
-            <p> Then, scroll down the page and seelct "Eligible Occupations"</p>
-            <p> Then seclect: </p>
-            <p> Oil and petroleum workers (including petroleum refineries, crude oil and petroleum storage, transmission and distribution, retail sale of fuel)
-            </p> 
-            
-            <p> Please book your appointment. </p>   
-            
-            <p> Thank you, </p>
 
-            <p>Terry Futher ARL </p>
-            <p>Steph Futher Director HR. </p>
-
-       
-            '''
-
-            mail.send(msg)
-            print("mail sent")
-            
-    
-    
-    return "sent"
 
 
 @app.route("/emailme", methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
 def emailme():
-    data = request.form['content']
-    dataheader = request.form['emheader']
-    msg = Message(dataheader, sender='paul.futher@gmail.com',
-                  recipients=['paul.futher@gmail.com'])
+    
+    gsa = db.session.query(Employee, User)\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+        .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
+        .all()
+    
+    with mail.connect() as conn:
+        for user in gsa:
+            data = request.form['content']
+            dataheader = request.form['emheader']
+            msg = Message(dataheader, sender='paul.futher@gmail.com',
+                  recipients=[user.email])
 
-    msg.html = data
-    mail.send(msg)
+            msg.html = data
+            mail.send(msg)
     flash('Email Sent')
     return redirect(request.referrer)
 
@@ -491,6 +461,13 @@ def updategsatraining(staff_id):
             #db.session.commit()
 
         flash('Employee Training Compliance Has Been Updated', 'success')
+        
+        if current_user.has_roles('GSA'):
+            gsaid = int(current_user.id)
+            staff = Employee.query.filter_by(user_id=gsaid).first()
+            exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+
+            return render_template('gsadashboard.html', staff=staff, exists=exists)
 
         return redirect(url_for('hrhome'))
     
@@ -508,7 +485,7 @@ def livesearch():
         .filter(Employee.firstname.like('%' + searchbox + '%'))\
             .join(User, Employee.user_id == User.id)\
         .filter(User.active == 1)\
-        .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id)\
+        .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
         .all()
 
     results = employee_schema.dump(gsa)
@@ -527,7 +504,7 @@ def livesearchlast():
         .filter(Employee.lastname.like('%' + searchbox + '%'))\
             .join(User, Employee.user_id == User.id)\
                 .filter(User.active == 1)\
-                    .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id)\
+                    .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
                     .all()
     
     results = employee_schema.dump(gsa)
@@ -726,10 +703,18 @@ def updategsa(staff_id):
                 #print("committed")
                 #print(Employee.manager)
             flash("info updated")
+            
+            if current_user.has_roles('GSA'):
+                gsaid = int(current_user.id)
+                staff = Employee.query.filter_by(user_id=gsaid).first()
+                exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+            
+                return render_template('gsadashboard.html', staff=staff, exists=exists)
+            
             return render_template('hrhome.html')
 
         
-    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa, )
+    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa )
 
     
 @app.route("/addemployee", methods=['GET', 'POST'])

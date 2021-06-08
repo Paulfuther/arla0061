@@ -62,19 +62,14 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-#USER_APP_NAME ="app"
+
 ckeditor = CKEditor(app)
 mail = Mail(app)
 
 admin = Admin(app, name='Dashboard')
     
 bcrypt = Bcrypt(app)
-#login_manager = flask_login.LoginManager()
-#login_manager.init_app(app)
 
-#@login_manager.user_loader
-#def load_user(user_id):
-#    return User.query.get(int(user_id))
 
 
 roles_users = db.Table(

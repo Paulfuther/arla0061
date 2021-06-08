@@ -17,18 +17,18 @@
                         {% else %}
 
                         <ul>
-                              <li> <a href="hrlist">List of Employess</a></li>
+                              <li> <a href="hrlist" class = "mhrlist">Search Employees</a></li>
                         </ul>
-                        <ul>
-                              <li> <a href="hrhome">HR Main Page</a></li>
-                        </ul>
+                       
                        
                   
                         <ul>
-                        <form method="POST">
+                        <form method="POST" class = "hrsearch">
                            
-                                <input type ="text"  id = "live_search_first" name = "text" placeholder = " first name"> 
-                                <input type ="text"  id = "live_search_last" name = "text" placeholder = "last name"> 
+                                <div><input type ="text"  id = "live_search_first" name = "text" placeholder = " first name" class = "inputform"> 
+                                </div>
+                                <div><input type ="text"  id = "live_search_last" name = "text" placeholder = " last name" class = "inputform"> 
+                                </div>
                         </form>
                         </ul>
                         {% endif %}
@@ -73,7 +73,7 @@
                                         <div class = 'tablecard-inner'>
                                         
                                         <div class = 'hritem1'>
-                                        ${store_id}
+                                        ${id}
                                         </div>
                                         <div class = 'hritem2'>
                                         ${firstname +" "+ lastname}
@@ -83,10 +83,10 @@
                                         </div> 
                                         <div class = "tablecard-links">
 
-                                        <a   href="/updategsa${id}"><i class="fas fa-id-card"></i></a>
-                                        <a   href="/updategsatraining${id}"><i class="fas fa-user-graduate"></i></a>
-                                        <a   href="/hrfile${id}"><i class="far fa-file-image"></i></a>
-                                        <a   href="/existingemployeefile${id}"><i class="far fa-file-archive"></i></a>
+                                        <a   href="/updategsa${id}">Contact Info</a>
+                                        <a   href="/updategsatraining${id}">Training Info</a>
+                                        <a   href="/hrfile${id}">Create File</a>
+                                        <a   href="/existingemployeefile${id}">View File</a>
                                         </div> 
                                         </div>
                                      
@@ -139,11 +139,11 @@
                                         ${email}
                                         </div> 
                                         <div class = "tablecard-links">
-
-                                        <a   href="/updategsa${id}"><i class="fas fa-id-card"></i></a>
-                                        <a   href="/updategsatraining${id}"><i class="fas fa-user-graduate"></i></a>
-                                        <a   href="/hrfile${id}"><i class="far fa-file-image"></i></a>
-                                        <a   href="/existingemployeefile${id}"><i class="far fa-file-archive"></i></a>
+                                        <a   href="/updategsa${id}">Contact Info</a>
+                                        <a   href="/updategsatraining${id}">Training Info</a>
+                                        <a   href="/hrfile${id}">Create File</a>
+                                        <a   href="/existingemployeefile${id}">View File</a>
+                                       
                                         </div> 
                                         </div>
                                      
