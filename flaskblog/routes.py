@@ -1,9 +1,10 @@
-from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory
+from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory, make_response
 #from flaskblog import app, db, Bcrypt
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule, GradeForm
-from flaskblog import app, Employee, User, Role, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer, employee_schema
-#from flask_user import roles_required
-from flask_security import roles_required, login_required, current_user, roles_accepted
+from flaskblog import app, Employee, User, Role, roles_users, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer, employee_schema
+from flask_email_verifier import EmailVerifier
+from flask_security import roles_required, login_required, current_user, roles_accepted, Security
+from flask_security.datastore import UserDatastore
 #from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
@@ -16,7 +17,7 @@ import openpyxl
 import xlrd
 import xlwt
 import xlsxwriter
-from flaskblog import datetime, mail
+from flaskblog import datetime, mail, verifier
 from flask_moment import Moment
 #from flask_login import login_user, current_user, logout_user, login_required
 #from flask_user import roles_required
@@ -28,6 +29,7 @@ from sqlalchemy import *
 from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_mail import Message
+from json import dumps, loads
 
 
 moment = Moment(app)
@@ -68,18 +70,32 @@ def home():
     return render_template('layout.html')
     #return render_template('home.html')
 
-
+@app.route('/email/<email>')
+def email(email):
+    # Retrieve an info for the given email address
+    email_address_info = verifier.verify(email)
+    if email_address_info is not None:
+        data = dumps(loads(email_address_info.json_string), indent=4)
+        resp = make_response(data, 200)
+        resp.headers['Content-Type'] = 'application/json'
+    else:
+        
+        resp = make_response('None', 404)
+        return resp
 
 
 @app.route("/nofile")
 @login_required
 @roles_accepted('Admin', 'Manager')
 def nofile():
-    emp = Employee.query.filter(Employee.id)
+    
+    
     file = Empfile.query.with_entities(Empfile.employee2_id).distinct()
     
     nofile = Employee.query.filter(Employee.id.notin_(file))\
         .join(Store, Store.id == Employee.store_id)\
+            .join(User, Employee.user_id == User.id)\
+        .filter(User.active == 1)\
         .add_columns(Store.number, Employee.firstname, Employee.lastname)\
         .order_by(Store.number)
         
@@ -112,10 +128,6 @@ def nofileexcel():
     
 
     return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
-
-
-
-
 
 @app.route("/emailme", methods = ['GET', 'POST'])
 @login_required
@@ -480,13 +492,22 @@ def updategsatraining(staff_id):
 def livesearch():
     
     searchbox = request.form.get("text")
-
-    gsa = db.session.query(Employee, User)\
-        .filter(Employee.firstname.like('%' + searchbox + '%'))\
+    
+    gsa = Employee.query.filter(Employee.firstname.like('%' + searchbox + '%'))\
+        .join(Store, Store.id == Employee.store_id)\
             .join(User, Employee.user_id == User.id)\
-        .filter(User.active == 1)\
-        .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
+        .filter(User.active == 1).order_by(Store.number)\
+        .add_columns(Store.number, Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
         .all()
+    
+    #print(gsa[0].number)
+
+    #gsa = db.session.query(Employee, User)\
+    #    .filter(Employee.firstname.like('%' + searchbox + '%'))\
+    #        .join(User, Employee.user_id == User.id)\
+    #    .filter(User.active == 1)\
+    #    .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
+    #    .all()
 
     results = employee_schema.dump(gsa)
     result = jsonify(results)
@@ -500,12 +521,13 @@ def livesearchlast():
     
     searchbox = request.form.get("text")
     
-    gsa = db.session.query(Employee, User)\
-        .filter(Employee.lastname.like('%' + searchbox + '%'))\
+    gsa = Employee.query.filter(Employee.lastname.like('%' + searchbox + '%'))\
+        .join(Store, Store.id == Employee.store_id)\
             .join(User, Employee.user_id == User.id)\
-                .filter(User.active == 1)\
-                    .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
-                    .all()
+        .filter(User.active == 1).order_by(Store.number)\
+        .add_columns(Store.number, Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
+        .all()
+    
     
     results = employee_schema.dump(gsa)
     result = jsonify(results)
@@ -757,6 +779,8 @@ def addemployee():
         #db.session.commit()
 
         newid = adduser.id
+        
+        #user_datastore.add_role_to_user(newid,5)
         
         print(newid)
         

@@ -62,7 +62,7 @@
                                 success:function(res){
                                     $('#tablecontainer').empty();
                                 
-                                    let html = res.reduce(( acc, {firstname, lastname, email, store, store_id, image_file, id}) =>
+                                    let html = res.reduce(( acc, {number, firstname, lastname, email, store, store_id, image_file, id}) =>
                                         acc += `
                                         <div class = 'tablecard'>
                                         <div class = 'tablecard-image'>
@@ -73,7 +73,7 @@
                                         <div class = 'tablecard-inner'>
                                         
                                         <div class = 'hritem1'>
-                                        ${id}
+                                        ${number}
                                         </div>
                                         <div class = 'hritem2'>
                                         ${firstname +" "+ lastname}
@@ -119,7 +119,7 @@
                                 success:function(res){
                                     $('#tablecontainer').empty();
                                 
-                                    let html = res.reduce(( acc, {firstname, lastname, email, store, store_id, image_file, id}) =>
+                                    let html = res.reduce(( acc, {number,firstname, lastname, email, store, store_id, image_file, id}) =>
                                         acc += `
                                         <div class = 'tablecard'>
                                         <div class = 'tablecard-image'>
@@ -130,7 +130,7 @@
                                         <div class = 'tablecard-inner'>
                                         
                                         <div class = 'hritem1'>
-                                        ${store_id}
+                                        ${number}
                                         </div>
                                         <div class = 'hritem2'>
                                         ${firstname +" "+ lastname}

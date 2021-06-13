@@ -3,6 +3,7 @@ from flask import Flask
 #import flask_login
 app = Flask(__name__)
 
+
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os
 import json
@@ -24,6 +25,7 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
 from flask_mail import Mail
+from flask_email_verifier import EmailVerifier
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -38,7 +40,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 #app=app.config.from_object(config) --not needed
 
-
+verifier = EmailVerifier(app)
 
 # use evnironment variables while building
 app.config['SECRET_KEY'] =os.environ.get('SECRET_KEY') 
@@ -52,7 +54,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-
+app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
 
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 # app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
@@ -65,6 +67,7 @@ ma = Marshmallow(app)
 
 ckeditor = CKEditor(app)
 mail = Mail(app)
+
 
 admin = Admin(app, name='Dashboard')
     
@@ -208,7 +211,7 @@ class EmployeeSchema(ma.Schema):
     class Meta:
         model = Employee
         store = ma.Nested("StoreSchema", exclude=("store",))
-        fields = ('id', 'firstname', 'lastname', 'email', 'store_id', 'image_file')
+        fields = ('id', 'firstname', 'lastname', 'email', 'store_id', 'image_file', 'number')
         
         
 employee_schema = EmployeeSchema(many=True)
@@ -615,12 +618,14 @@ admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass4(Grade, db.session))
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 admin.add_view(hreditor(hrfiles, db.session))
-admin.add_view(MyModelView8(Incidentnumbers, db.session))
+admin.add_view(MyModelView8(Incidentnumbers, db.session, category = "Paul"))
 admin.add_view(MyModelView9(Saltlog, db.session))
-admin.add_view(MyModelViewReclaim(reclaimtank, db.session))
-admin.add_view(MyModelView10(cwmaintenance, db.session))
+admin.add_view(MyModelViewReclaim(reclaimtank, db.session, category = "Paul"))
+admin.add_view(MyModelView10(cwmaintenance, db.session, category = "Paul"))
 #admin.add_view(MyModelView11(Employee, db.session))
 admin.add_view(EmailView(name = 'Email', endpoint='email'))
+#admin.add_sub_category(name = "Links", parent_name="Team")
+
 from flaskblog import routes
 
 
