@@ -1,8 +1,10 @@
 
 from flask import Flask
+from flask_redis import FlaskRedis
 #import flask_login
 app = Flask(__name__)
-
+redis_client = FlaskRedis(app)
+REDIS_URL = "redis://:password@localhost:6379/0"
 
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os
@@ -26,6 +28,10 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
 from flask_mail import Mail
 from flask_email_verifier import EmailVerifier
+from flask_login import  user_logged_out, user_logged_in
+#from flask_user import user_registered
+#from blinker import signal
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -45,6 +51,7 @@ verifier = EmailVerifier(app)
 # use evnironment variables while building
 app.config['SECRET_KEY'] =os.environ.get('SECRET_KEY') 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT')
 app.config['SECURITY_RECOVERABLE'] = True
 app.config['SECURITY_CHANGEABLE'] = True
@@ -61,6 +68,20 @@ app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 #delte above three on server
+
+#@user_logged_in.connect_via(app)
+#def on_user_logged_in(app, user, **extra):
+#    print('USER LOG in: ', user)
+
+    
+#@user_registered.connect_via(app)
+#def _after_user_registered_hook(app ,user, **extra):
+#    print('user is registered', user)
+
+#@user_logged_out.connect_via(app)
+#def on_user_logged_out(app, user, **extra):
+#    print('USER LOG OUT: ', user)
+
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -139,14 +160,19 @@ class User(UserMixin, db.Model):
     roles = db.relationship('Role',  secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.roles is  None:
+            self.roles = Role.query.filter_by(name="GSA").first()
+    
     def has_roles(self, *args):
         return set(args).issubset({role.name for role in self.roles})
 
-   # def __str__(self):
-    #    return '%r' % (self.firstname)
-
     def __str__(self):
         return (self.user_name) 
+    
+    
+        
  
 
 class Role(db.Model, RoleMixin):
@@ -330,6 +356,14 @@ security = Security(app, user_datastore)
 #create a user to test with
 
 
+
+
+
+#@user_registered.connect_via(app)
+#def user_registered_sighandler(app, user, confirm_token):
+#    default_role = user_datastore.find_role('GSA')
+#    user_datastore.add_role_to_user(user, default_role)
+#    db.session.commit()
 
 
 

@@ -1,11 +1,13 @@
-from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect, flash, abort, send_from_directory, make_response
-#from flaskblog import app, db, Bcrypt
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, grade_form, schedule_start, Schedule, GradeForm
-from flaskblog import app, Employee, User, Role, roles_users, bcrypt, db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, staffschedule, User, Customer, employee_schema
+from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect,\
+    flash, abort, send_from_directory, make_response
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
+    grade_form, schedule_start, Schedule, GradeForm
+from flaskblog import app, redis_client, Employee, User, Role, roles_users, bcrypt, \
+    db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
+        staffschedule, User, Customer, employee_schema
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.datastore import UserDatastore
-#from flaskblog.models import  User, Role, Employee
 from io import BytesIO
 import os
 import json
@@ -19,8 +21,6 @@ import xlwt
 import xlsxwriter
 from flaskblog import datetime, mail, verifier
 from flask_moment import Moment
-#from flask_login import login_user, current_user, logout_user, login_required
-#from flask_user import roles_required
 import secrets
 from PIL import Image
 import re, base64
@@ -70,6 +70,15 @@ def home():
     return render_template('layout.html')
     #return render_template('home.html')
 
+
+
+
+
+@app.route('/redis')
+def redis():
+    return redis_client
+
+
 @app.route('/email/<email>')
 def email(email):
     # Retrieve an info for the given email address
@@ -78,10 +87,13 @@ def email(email):
         data = dumps(loads(email_address_info.json_string), indent=4)
         resp = make_response(data, 200)
         resp.headers['Content-Type'] = 'application/json'
+ 
+        value1 = json.loads(data)
+        print (value1['formatCheck'],value1['smtpCheck'])
     else:
         
         resp = make_response('None', 404)
-        return resp
+    return resp
 
 
 @app.route("/nofile")
@@ -293,6 +305,7 @@ def addtoschedule():
 
 def storelist():
     return db.session.query(Store).all.order_by('number')
+
 #@app.route("/login", methods=['GET', 'POST'])
 #def login():
  #   if current_user.is_authenticated:
@@ -748,13 +761,27 @@ def addemployee():
     form2 = GradeForm()
     course = Course.query.all()
     
-    
+    email = request.form.get('email')
+    email_address_info = verifier.verify(email)
+    if email_address_info is not None:
+        data = dumps(loads(email_address_info.json_string), indent=4)
+        resp = make_response(data, 200)
+        resp.headers['Content-Type'] = 'application/json'
+ 
+        value1 = json.loads(data)
+        #print (value1['formatCheck'],value1['smtpCheck'])
+        if value1['smtpCheck'] == 'false':
+            flash("please chekck your email. It does not work")
+            #print("bad email")
+            return render_template('employee.html', form=form)
+    else:
+        pass
     
     if form.validate_on_submit():
         checker = form.active.data
-        print(checker)
+        #print(checker)
         teststore = form.store.data
-        print(teststore.id)
+        #print(teststore.id)
         newuser = request.form.get('email')
         newpassword = request.form.get('password')
         #active = request.form.get('checkbox')
@@ -764,7 +791,7 @@ def addemployee():
             active = 1
         else:
             active = 0
-        print(active)
+        #print(active)
         user_name = request.form.get('username')
 
         #print(active, newuser, newpassword)
@@ -782,15 +809,15 @@ def addemployee():
         
         #user_datastore.add_role_to_user(newid,5)
         
-        print(newid)
+        #print(newid)
         
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
         else:
             picture_file = '3d611379cfdf5a89.jpg'
        
-        print (form.manager.data.id)
-        print (form.store.data.id)
+        #print (form.manager.data.id)
+        #print (form.store.data.id)
             
         emp = Employee(user_id=newid,
                        firstname=form.firstname.data,
@@ -834,7 +861,7 @@ def addemployee():
         r = request.form.getlist("completeddate")
         f = emp.id
         
-        print(emp.id)
+        #print(emp.id)
         
         y = 1
         yy = 0
@@ -855,12 +882,15 @@ def addemployee():
             y += 1
             yy += 1
            
-        print(emp)
+        #print(emp)
             
-        db.session.commit()
-       
-                
+        # here we add the defuault role of GSA to new hire
+        # you cannot add to the association table 
+        # instead you insert
         
+        addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
+        db.session.execute(addrole)
+        db.session.commit()
        
         flash('Employee has been added to the database', 'success')
                 
