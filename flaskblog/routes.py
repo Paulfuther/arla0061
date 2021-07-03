@@ -4,7 +4,7 @@ from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
     grade_form, schedule_start, Schedule, GradeForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, User, Customer, employee_schema, send_async_email, celery, print_names
+        staffschedule, User, Customer, employee_schema, send_async_email, celery, print_names, trythis
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -46,14 +46,14 @@ moment = Moment(app)
 
 #app = Celery('tasks', broker='pyamqp://guest@localhost//')
 
-#@celery.task
-#def add_this(x, y):
-#    return x + y
 
-#@app.route('/add')
-#def whattodo():
-#    add_this.delay(5,5)
-#    return ('hello')
+
+
+
+@app.route('/add')
+def whattodo():
+    trythis.delay
+    return "5"
 #@celery.task()
 #def print_names(person):
 #    print('hello', person)
@@ -108,7 +108,7 @@ def home():
 @app.route('/printname/<person>')
 def success(person):
     print_names(person)
-    print_names.delay(person)
+    print_names.apply_async(args=[person] , countdown=10)
     
     return "heldddlo %s" % person
 
@@ -131,7 +131,7 @@ def add_task():
         print(email)
     else:
         # send in one minute
-        send_async_email.apply_async(args=[email_data], countdown=3)
+        send_async_email.apply_async(args=[email_data], countdown=30)
         flash('An email will be sent to {0} in one minute'.format(email))
 
     return redirect(url_for('add_task'))

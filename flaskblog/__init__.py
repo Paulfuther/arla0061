@@ -4,6 +4,7 @@ from flask import Flask
 #import flask_login
 app = Flask(__name__)
 
+from dotenv import load_dotenv
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os
 import json
@@ -45,7 +46,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 #app=app.config.from_object(config) --not needed
 
-verifier = EmailVerifier(app)
+load_dotenv()
 
 # use evnironment variables while building
 app.config['SECRET_KEY'] =os.environ.get('SECRET_KEY') 
@@ -60,7 +61,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
+app.config['EMAIL_VERIFIER_KEY']= os.environ.get('MAIL_VERIFIER_KEY')
 
 app.config['MAIL_DEFAULT_SENDER'] = 'paul.futher@gmail.com'
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
@@ -71,6 +72,7 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 #app.config['CELERY_BROKER_URL'] = 'amqp://guest:guest@localhost'
 #app.config['CELERY_BACKEND_URL'] = 'db+sqlite:///test.db'
 
+verifier = EmailVerifier(app)
 
 # initialize celery
 
@@ -79,7 +81,13 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 @celery.task
 def print_names(person):
-    print('hello sexy', person)
+    print(person)
+
+
+    
+@celery.task
+def trythis():
+    return "5"
 
 
 
