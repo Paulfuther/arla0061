@@ -1,12 +1,13 @@
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect,\
-    flash, abort, send_from_directory, make_response
+    flash, abort, send_from_directory, make_response, session
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
     grade_form, schedule_start, Schedule, GradeForm
-from flaskblog import app, redis_client, Employee, User, Role, roles_users, bcrypt, \
+from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, User, Customer, employee_schema
+        staffschedule, User, Customer, employee_schema, send_async_email, celery, print_names
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
+from flask_security.utils import encrypt_password
 from flask_security.datastore import UserDatastore
 from io import BytesIO
 import os
@@ -30,9 +31,42 @@ from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_mail import Message
 from json import dumps, loads
-
+import time
+#from flaskblog.tasks import celery
 
 moment = Moment(app)
+
+
+
+
+#celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+#celery.conf.update(app.config)
+
+#from celery import Celery
+
+#app = Celery('tasks', broker='pyamqp://guest@localhost//')
+
+#@celery.task
+#def add_this(x, y):
+#    return x + y
+
+#@app.route('/add')
+#def whattodo():
+#    add_this.delay(5,5)
+#    return ('hello')
+#@celery.task()
+#def print_names(person):
+#    print('hello', person)
+    
+
+#@celery.task
+#def send_async_email(email_data):
+#    """Background task to send an email with Flask-Mail."""
+#    msg = Message( sender='paul.futher@gmail.com',
+#                  recipients=['paul.futher@gmail.com'])
+#    msg.body = email_data['body']
+#    #with app.app_context():
+#    mail.send(msg)
 
 
 def send_email(subject, sender, recipients, text_body, html_body):
@@ -71,13 +105,46 @@ def home():
     #return render_template('home.html')
 
 
+@app.route('/printname/<person>')
+def success(person):
+    print_names(person)
+    print_names.delay(person)
+    
+    return "heldddlo %s" % person
 
+@app.route('/task', methods = ['GET', 'POST'])
+def add_task():
+    if request.method == 'GET':
+        return render_template('getemail.html', email=session.get('email', ''))
+    email = request.form['email']
+    session['email'] = email
+    #send the email
+    email_data = {
+        'subject': 'Hello from Flask',
+        'to': email,
+        'body': 'nothing here'
+    }
+    if request.form['submit'] == 'Send':
+        # send right away
+        send_async_email(email_data)
+        flash('Sending email to {0}'.format(email))
+        print(email)
+    else:
+        # send in one minute
+        send_async_email.apply_async(args=[email_data], countdown=3)
+        flash('An email will be sent to {0} in one minute'.format(email))
 
+    return redirect(url_for('add_task'))
 
-@app.route('/redis')
-def redis():
-    return redis_client
-
+ 
+@app.route('/emailpaul')
+def email_paul():
+    msg = Message("hello",
+                  sender='paul.futher@gmail.com',
+                  recipients = ['paul.futher@gmail.com'],
+                  body = 'just testing',)
+    mail.send(msg)
+    return "sent"
 
 @app.route('/email/<email>')
 def email(email):
@@ -783,7 +850,9 @@ def addemployee():
         teststore = form.store.data
         #print(teststore.id)
         newuser = request.form.get('email')
-        newpassword = request.form.get('password')
+        newpass = request.form.get('password')
+        newpassword = encrypt_password(newpass)
+        
         #active = request.form.get('checkbox')
         #print(active)
         active = 1

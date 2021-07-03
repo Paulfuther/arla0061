@@ -1,15 +1,13 @@
 
 from flask import Flask
-from flask_redis import FlaskRedis
+
 #import flask_login
 app = Flask(__name__)
-redis_client = FlaskRedis(app)
-REDIS_URL = "redis://:password@localhost:6379/0"
 
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os
 import json
-import pdfkit
+#import pdfkit
 from datetime import datetime
 from flask import render_template_string, url_for, redirect, send_from_directory, request
 from flask_admin import Admin, expose, BaseView
@@ -22,15 +20,16 @@ from flask_admin.contrib.sqla import ModelView
 from flask_marshmallow import Marshmallow
 from marshmallow import Schema
 from flask_admin.menu import MenuLink
-from flask_bcrypt import Bcrypt
+from flask_bcrypt import Bcrypt, generate_password_hash
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from flask_email_verifier import EmailVerifier
 from flask_login import  user_logged_out, user_logged_in
-#from flask_user import user_registered
-#from blinker import signal
+from celery import Celery
+from flaskblog.tasks import celery
+
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -53,8 +52,8 @@ app.config['SECRET_KEY'] =os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT')
-app.config['SECURITY_RECOVERABLE'] = True
-app.config['SECURITY_CHANGEABLE'] = True
+app.config['SECURITY_RECOVERABLE'] = False
+app.config['SECURITY_CHANGEABLE'] = False
 app.config['SECURITY_EMAIL_SENDER'] = ('NO-REPLY@LOCALHOST.COM')
 app.config['MAIL_SERVER']= os.environ.get('MAIL_SERVER')
 app.config['MAIL_PORT'] = 587
@@ -63,32 +62,53 @@ app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
 
+app.config['MAIL_DEFAULT_SENDER'] = 'paul.futher@gmail.com'
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 # app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
-#delte above three on server
 
-#@user_logged_in.connect_via(app)
-#def on_user_logged_in(app, user, **extra):
-#    print('USER LOG in: ', user)
+#app.config['CELERY_BROKER_URL'] = 'amqp://guest:guest@localhost'
+#app.config['CELERY_BACKEND_URL'] = 'db+sqlite:///test.db'
 
-    
-#@user_registered.connect_via(app)
-#def _after_user_registered_hook(app ,user, **extra):
-#    print('user is registered', user)
 
-#@user_logged_out.connect_via(app)
-#def on_user_logged_out(app, user, **extra):
-#    print('USER LOG OUT: ', user)
+# initialize celery
+
+#celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+#celery.conf.update(app.config)
+
+@celery.task
+def print_names(person):
+    print('hello sexy', person)
+
 
 
 db = SQLAlchemy(app)
+
+# configure celery
+
+#celery = Celery('tasks', broker='amqp://guest:guest@localhost')
+#celery = celery
+
 ma = Marshmallow(app)
 
 ckeditor = CKEditor(app)
 mail = Mail(app)
 
+@celery.task
+def send_async_email(email_data):
+    """Background task to send an email with Flask-Mail."""
+    msg = Message(email_data['subject'],
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=[email_data['to']])
+    msg.body = email_data['body']
+    with app.app_context():
+        mail.send(msg)
+
+
+@celery.task
+def add_this(x,y):
+    return (x+y)
 
 admin = Admin(app, name='Dashboard')
     
@@ -156,10 +176,16 @@ class User(UserMixin, db.Model):
     active = db.Column(db.Boolean, default = True)
     confirmed_at = db.Column(db.DateTime)
     user_name = db.Column(db.String(100), nullable=False)
+    
+    # new additions 
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow) 
+       
     #employee = db.relationship('Customer', backref= 'user', uselist = False)
     roles = db.relationship('Role',  secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
+    
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.roles is  None:
@@ -372,7 +398,7 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ( 'user_name', 'active','roles')
+    column_list = ( 'user_name', 'active','created_on', 'updated_on', 'roles')
     column_searchable_list = ['user_name']
     def is_accessible(self):
         return current_user.has_roles('Admin' )
