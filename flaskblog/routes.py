@@ -38,36 +38,12 @@ import time
 moment = Moment(app)
 
 
-
-
-#celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-#celery.conf.update(app.config)
-
-#from celery import Celery
-
-#app = Celery('tasks', broker='pyamqp://guest@localhost//')
-
-
-
-
-
 @app.route('/add')
+@login_required
+@roles_accepted('Admin', 'Manager')
 def whattodo():
     trythis.delay
     return "5"
-#@celery.task()
-#def print_names(person):
-#    print('hello', person)
-    
-
-#@celery.task
-#def send_async_email(email_data):
-#    """Background task to send an email with Flask-Mail."""
-#    msg = Message( sender='paul.futher@gmail.com',
-#                  recipients=['paul.futher@gmail.com'])
-#    msg.body = email_data['body']
-#    #with app.app_context():
-#    mail.send(msg)
 
 
 def send_email(subject, sender, recipients, text_body, html_body):
@@ -107,6 +83,8 @@ def home():
 
 
 @app.route('/printname/<person>')
+@login_required
+@roles_accepted('Admin', 'Manager')
 def success(person):
     print_names(person)
     print_names.apply_async(args=[person] , countdown=10)
@@ -114,6 +92,8 @@ def success(person):
     return "heldddlo %s" % person
 
 @app.route('/task', methods = ['GET', 'POST'])
+@login_required
+@roles_accepted('Admin', 'Manager')
 def add_task():
     if request.method == 'GET':
         return render_template('getemail.html', email=session.get('email', ''))
@@ -139,6 +119,8 @@ def add_task():
 
  
 @app.route('/emailpaul')
+@login_required
+@roles_accepted('Admin', 'Manager')
 def email_paul():
     msg = Message("hello",
                   sender='paul.futher@gmail.com',
@@ -148,6 +130,8 @@ def email_paul():
     return "sent"
 
 @app.route('/email/<email>')
+@login_required
+@roles_accepted('Admin', 'Manager')
 def email(email):
     # Retrieve an info for the given email address
     email_address_info = verifier.verify(email)
@@ -235,6 +219,7 @@ def emailme():
 
 @app.route("/verifyemailtoday", methods = ['GET','POST'])
 @login_required
+@roles_accepted('Admin', 'Manager')
 def verify():
     form = EmployeeForm()
     email = request.form['email']
@@ -866,6 +851,8 @@ def updategsa(staff_id):
 @roles_accepted('Admin', 'Manager')
 def addemployee():
     
+    # here we set the appropriate forms
+
     form = EmployeeForm()   
     form2 = GradeForm()
     course = Course.query.all()
@@ -876,7 +863,12 @@ def addemployee():
     emailcheck1 = request.form.get('emailv')
     emailcheck2 = request.form.get('emailvu')
     emailpass = request.form.get('emailpass')
-    print("hah", emailcheck1, emailcheck2, emailpass)
+    #print("hah", emailcheck1, emailcheck2, emailpass)
+
+    # if email has failed valid or unique then the emailpass is null or 0
+    # if so then return back. However, we need to hold the status flagas
+    # and the email input to readOnly
+    # we do not want to change an email once it has been properly validated
 
     if emailpass == 0 or emailpass == "":
         flash ('Email needs to be verified','success')
@@ -885,12 +877,20 @@ def addemployee():
     else:
         pass
     
+    # if we made it this far then the email is good. It is both uniqe and valid
+    # email pass is set to 1. This is reflected in an if loop in the jinja template.
+    # we do not want anyone to change the email address once it has been validated.
+
+
     if form.validate_on_submit():
         checker = form.active.data
         #print(checker)
         teststore = form.store.data
         #print(teststore.id)
         newuser = request.form.get('hiddenemail')
+
+        # here we encrypt the password.
+
         newpass = request.form.get('password')
         newpassword = encrypt_password(newpass)
         
@@ -968,6 +968,11 @@ def addemployee():
         #print(emp.store, emp.manager)
         #print(type(form.store.data))
         
+        # here we are adding the training courses and the compelted dates.
+        # adding the dates requires some work.
+        # the data has to be in the format that the database can read.
+
+
         r = request.form.getlist("completeddate")
         f = emp.id
         
