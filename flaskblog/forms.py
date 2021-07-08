@@ -35,7 +35,7 @@ class EmployeeForm(FlaskForm):
     username = StringField('Username', validators=[
                             DataRequired(), Length(min=2, max=100)])
     email = StringField('Email', validators=[
-                        DataRequired(), Length(min=10, max=100), Email()])
+                         Length(min=10, max=100), Email()])
     password = StringField('Password', validators=[
         DataRequired(), Length(min=2, max=100)])
     active = BooleanField(default="checked")

@@ -16,6 +16,9 @@
                   </ul>
             </nav>
 
+
+
+            
     <div   class="form-container">
 
     <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
@@ -47,13 +50,15 @@
                         {% endif %}
         </div>
         <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form", placeholder="E-Mail")}} 
+        <div> {{form.email(class = "form", id="emailinput", placeholder="E-Mail")}} 
                     {% if form.email.errors %}
                         {% for error in form.email.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
         </div>
+
+        <input type="hidden" id="hiddenemail" name="hiddenemail">
 
         <div  class="formtitle" >{{"Password:"}}</div>
         <div> {{form.password(class = "form", placeholder="Password")}} 
@@ -63,6 +68,58 @@
                         {% endfor %}            
                     {% endif %}
         </div>
+
+        <div></div>
+
+        <div class="formcheckcontainer">
+
+        
+            <div class="emailverifydiv">Verify Email</div>
+            <div class="formbutton"> 
+                <button id = formtest class="formcheckbtn"> Verify </button>
+
+            </div>
+        
+        
+        
+            <div class="emailverifydiv">Is Email Valid</div>
+
+            <input type="hidden" id="emailv" name="emailv" value= "0">
+            <div class="circlebox">
+
+                {% if emailcheck1 == "1" %} 
+                <div class="circleem11", id="circleem11"> </div>
+                {% else %}
+
+            <div class="circleem1", id="circleem1"> </div>
+           
+                {% endif %}
+
+            </div>
+       
+       
+        
+            <div class="emailverifydiv">Is Email Unique</div>
+            <input type="hidden" id="emailvu" name="emailvu" value="0">
+            <div class="circlebox">
+
+                {% if emailcheck2 == "1" %}
+                <div class="circleem21", id="circleem21"></div>
+                {% else %}
+            <div class="circleem2", id="circleem2"></div>
+            {% endif %}
+            </div>
+            
+        </div>
+        <div></div>
+        <div> </div>
+        <div></div>
+        <div class = "emailverifydiv2">
+            Both dots must be green
+        </div>
+
+        
+
         <div class ="formtitle">Employee Information</div>
         <div></div>
         <div  class="formtitle" >{{"First Name:"}}</div>
@@ -300,7 +357,75 @@
             </div>
     
     </form>
+
+    
+    <script>
+        $(function(){
+            $('button').click(function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: '/verifyemailtoday',
+                    data : {
+                        email : $('#emailinput').val()
+                    },
+                    
+                    type: 'POST',
+                
+                    success: function(response){
+                        if (response[0] == 1){ 
+                            alert("valid"),
+                            $('#circleem1').css('background', 'green'),
+                            $("#emailv").val(1);
+                    }
+                       else {
+                           alert("not valie"),
+                            $('#circleem1').css('background', 'red')
+                            $("#emailv").val(0);
+                       };
+                      
+                       console.log(response);
+
+                       if (response[1] == 1){ 
+                           alert("unique"),
+                            $('#circleem2').css('background', 'green'),
+                            $("#emailvu").val(1);
+                    }
+                       else {
+                           alert("not unique"),
+                            $('#circleem2').css('background', 'red');
+                            $("#emailvu").val(0);
+                       };
+
+                        if ( response[0]&&response[1] == 1){
+                            alert("winners");
+                            l = document.getElementById("emailinput").value;
+                            document.getElementById("emailinput").disabled=true;
+                            $('#hiddenemail').val(l);
+                            
+                        }   
+                        else {
+                            alert("loser");
+                        };
+                    },
+                         
+
+
+                    error: function(error){
+                        console.log(error)
+                    },
+                 
+                });
+            });
+
+        });
+
+
+    </script>
+
 </div>
       
+    
+
+
 {% endblock content %}
 

@@ -4711,3 +4711,41 @@ old hr list:
     
     
     return "sent"
+
+
+
+  updater = (text(data['response'])),
+                        console.log('hello')
+                       var IDD = JSON.stringify(response);
+
+
+                       if (IDD == 7) {
+                        alert (IDD);
+                       }
+
+
+
+          if (response2 == 0){
+                            $('#circleem2').css('background', 'red');
+                        }
+                        else {
+                            $('#circleem2').css('background', 'green');
+                            alert(response, response2)
+                        }              
+
+
+                         #email = request.form.get('email')
+    #email_address_info = verifier.verify(email)
+    #if email_address_info is not None:
+    #    data = dumps(loads(email_address_info.json_string), indent=4)
+    #    resp = make_response(data, 200)
+    #    resp.headers['Content-Type'] = 'application/json'
+ 
+    #    value1 = json.loads(data)
+        #print (value1['formatCheck'],value1['smtpCheck'])
+     #   if value1['smtpCheck'] == 'false':
+     #       flash("please chekck your email. It does not work")
+            #print("bad email")
+      #      return render_template('employee.html', form=form)
+    #else:
+      #  pass

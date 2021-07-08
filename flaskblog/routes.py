@@ -1,3 +1,4 @@
+from emailverifier.models import response
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect,\
     flash, abort, send_from_directory, make_response, session
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
@@ -230,6 +231,47 @@ def emailme():
             mail.send(msg)
     flash('Email Sent')
     return redirect(request.referrer)
+
+
+@app.route("/verifyemailtoday", methods = ['GET','POST'])
+@login_required
+def verify():
+    form = EmployeeForm()
+    email = request.form['email']
+    print(email)
+    if email == "":
+        response = (0)
+        response2 = (0)
+        return jsonify(response, response2)
+
+    emailcheck = User.query.filter_by(email=form.email.data).first()
+    if emailcheck:
+        response2 = (0)
+    else:
+        response2 = (1)
+
+    
+    
+    email_address_info = verifier.verify(email)
+    if email_address_info is not None:
+        data = dumps(loads(email_address_info.json_string), indent=4)
+        resp = make_response(data, 200)
+        resp.headers['Content-Type'] = 'application/json'
+ 
+        value1 = json.loads(data)
+        print (value1['formatCheck'],value1['smtpCheck'])
+        if value1['smtpCheck'] == 'false':
+            #flash("please chekck your email. It does not work")
+            print("bad email")
+            #return render_template('employee.html', form=form)
+            response =(0)
+            return jsonify(response, response2)
+    else:
+        pass
+    print("test")
+    response = (1)
+    print(response, response2)
+    return jsonify(response, response2)
 
 @app.route("/schedule", methods = ['GET', 'POST'])
 @login_required
@@ -828,28 +870,18 @@ def addemployee():
     form2 = GradeForm()
     course = Course.query.all()
     
-    email = request.form.get('email')
-    email_address_info = verifier.verify(email)
-    if email_address_info is not None:
-        data = dumps(loads(email_address_info.json_string), indent=4)
-        resp = make_response(data, 200)
-        resp.headers['Content-Type'] = 'application/json'
- 
-        value1 = json.loads(data)
-        #print (value1['formatCheck'],value1['smtpCheck'])
-        if value1['smtpCheck'] == 'false':
-            flash("please chekck your email. It does not work")
-            #print("bad email")
-            return render_template('employee.html', form=form)
-    else:
-        pass
+    emailcheck1 = request.form.get('emailv')
+    emailcheck2 = request.form.get('emailvu')
+    print("hah", emailcheck1, emailcheck2)
+
+   
     
     if form.validate_on_submit():
         checker = form.active.data
         #print(checker)
         teststore = form.store.data
         #print(teststore.id)
-        newuser = request.form.get('email')
+        newuser = request.form.get('hiddenemail')
         newpass = request.form.get('password')
         newpassword = encrypt_password(newpass)
         
@@ -966,7 +998,7 @@ def addemployee():
         return redirect(url_for('hrhome'))
     
     #print(form.errors.items())
-    return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course)
+    return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2)
 
 
 @app.route("/applications")
