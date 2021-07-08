@@ -34,8 +34,8 @@ class TelephoneForm(FlaskForm):
 class EmployeeForm(FlaskForm):
     username = StringField('Username', validators=[
                             DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email', validators=[
-                         Length(min=10, max=100), Email()])
+    email = StringField('Email',validators=[
+                        Optional()])
     password = StringField('Password', validators=[
         DataRequired(), Length(min=2, max=100)])
     active = BooleanField(default="checked")
@@ -122,10 +122,7 @@ class EmployeeForm(FlaskForm):
         if user:
             raise ValidationError( 'That mobile is Taken')
 
-    def validate_email(self, email):
-        emp = Employee.query.filter_by(email=email.data).first()
-        if emp:
-            raise ValidationError('That email is Taken')
+    
 
     
 

@@ -49,16 +49,35 @@
                         {% endfor %}  
                         {% endif %}
         </div>
+
+        {% if emailpass == "1" %}
+
         <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form", id="emailinput", placeholder="E-Mail")}} 
+        <div> {{form.email(class = "form",  readonly=true, id="emailinput", placeholder="E-Mail")}} 
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}            
+                    {% endif %}
+                    <input type="hidden" id="hiddenemail" name="hiddenemail">
+                    <input type="hidden" id="emailpass" name="emailpass", val="1">           
+        </div>
+
+        {% else %}
+
+        <div  class="formtitle" >{{"Email:"}}</div>
+        <div> {{form.email(class = "form",id="emailinput", placeholder="E-Mail")}} 
                     {% if form.email.errors %}
                         {% for error in form.email.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}            
                     {% endif %}
         </div>
-
         <input type="hidden" id="hiddenemail" name="hiddenemail">
+        <input type="hidden" id="emailpass" name="emailpass", val="0">
+        {% endif %}
+
+      
 
         <div  class="formtitle" >{{"Password:"}}</div>
         <div> {{form.password(class = "form", placeholder="Password")}} 
@@ -378,7 +397,7 @@
                             $("#emailv").val(1);
                     }
                        else {
-                           alert("not valie"),
+                           alert("not valid"),
                             $('#circleem1').css('background', 'red')
                             $("#emailv").val(0);
                        };
@@ -397,13 +416,14 @@
                        };
 
                         if ( response[0]&&response[1] == 1){
-                            alert("winners");
+                        
                             l = document.getElementById("emailinput").value;
-                            document.getElementById("emailinput").disabled=true;
+                            document.getElementById("emailinput").readOnly=true;
                             $('#hiddenemail').val(l);
-                            
+                            $('#emailpass').val(1);                            
                         }   
                         else {
+                            
                             alert("loser");
                         };
                     },

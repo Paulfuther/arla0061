@@ -4749,3 +4749,8 @@ old hr list:
       #      return render_template('employee.html', form=form)
     #else:
       #  pass
+
+      def validate_email(self, email):
+        emp = Employee.query.filter_by(email=email.data).first()
+        if emp:
+            raise ValidationError('That email is Taken')

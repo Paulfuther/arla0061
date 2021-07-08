@@ -870,11 +870,20 @@ def addemployee():
     form2 = GradeForm()
     course = Course.query.all()
     
+    # email check 1 and 2 is for validation. May need to return back to the form
+    # if so, then we want to hold the validation flags.
+
     emailcheck1 = request.form.get('emailv')
     emailcheck2 = request.form.get('emailvu')
-    print("hah", emailcheck1, emailcheck2)
+    emailpass = request.form.get('emailpass')
+    print("hah", emailcheck1, emailcheck2, emailpass)
 
-   
+    if emailpass == 0 or emailpass == "":
+        flash ('Email needs to be verified','success')
+        return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
+
+    else:
+        pass
     
     if form.validate_on_submit():
         checker = form.active.data
@@ -998,7 +1007,7 @@ def addemployee():
         return redirect(url_for('hrhome'))
     
     #print(form.errors.items())
-    return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2)
+    return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
 
 
 @app.route("/applications")

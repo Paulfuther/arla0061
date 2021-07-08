@@ -1070,6 +1070,10 @@ ul.a {
   padding: 20px 0px 20px 0px;
 }
 
+.emailhide {
+  hidden
+}
+
 .circlebox {
   grid-column-start: 3;
   grid-column-end: 4;
