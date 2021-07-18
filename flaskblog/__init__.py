@@ -55,22 +55,22 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT')
 app.config['SECURITY_RECOVERABLE'] = False
 app.config['SECURITY_CHANGEABLE'] = False
-app.config['SECURITY_EMAIL_SENDER'] = ('NO-REPLY@LOCALHOST.COM')
+app.config['SECURITY_EMAIL_SENDER'] = ('valid_email@my_domain.com')
 app.config['MAIL_SERVER']= os.environ.get('MAIL_SERVER')
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
-
 app.config['MAIL_DEFAULT_SENDER'] = 'paul.futher@gmail.com'
-#app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
+app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 
 #app.config['CELERY_BROKER_URL'] = 'amqp://guest:guest@localhost'
-#app.config['CELERY_BACKEND_URL'] = 'db+sqlite:///test.db'
+app.config['CELERY_BACKEND_URL'] = 'sqlite:///test.db'
 
 verifier = EmailVerifier(app)
 
@@ -113,6 +113,16 @@ def send_async_email(email_data):
     with app.app_context():
         mail.send(msg)
 
+
+@celery.task
+def send_async_email2(email_data):
+    """Background task to send an email with Flask-Mail."""
+    msg = Message(email_data['subject'],
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=[email_data['to']])
+    msg.body = email_data['body']
+    with app.app_context():
+        mail.send(msg)
 
 @celery.task
 def add_this(x,y):

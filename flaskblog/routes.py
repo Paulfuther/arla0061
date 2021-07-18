@@ -8,7 +8,7 @@ from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
     grade_form, schedule_start, Schedule, GradeForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, User, Customer, employee_schema, send_async_email, celery, print_names, trythis
+        staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, celery, print_names, trythis
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -120,16 +120,34 @@ def add_task():
 
     return redirect(url_for('add_task'))
 
- 
+@app.route('/task2', methods = ['GET', 'POST'])
+@login_required
+@roles_accepted('Admin', 'Manager')
+def new_mail():
+    email = 'paul.futher@gmail.com'
+    for x in range(0,10):
+        email_data = {
+         'subject': 'testing 10',
+         'to': email,
+         'body': 'testing a loop on delay'
+        }
+        send_async_email2.apply_async(args=[email_data], countdown=30)
+        print("we did it")
+    return 'tasksent'
+
 @app.route('/emailpaul')
 @login_required
 @roles_accepted('Admin', 'Manager')
 def email_paul():
-    msg = Message("hello",
-                  sender='paul.futher@gmail.com',
-                  recipients = ['paul.futher@gmail.com'],
-                  body = 'just testing',)
-    mail.send(msg)
+
+    with mail.connect() as conn:
+
+        msg = Message("hello",
+                    sender='paul.futher@gmail.com',
+                    recipients = ['paul.futher@gmail.com'],
+                    body = 'just testing',)
+        mail.send(msg)
+   
     return "sent"
 
 @app.route('/email/<email>')
