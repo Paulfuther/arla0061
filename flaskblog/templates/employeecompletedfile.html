@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+
 
   
 
@@ -9,11 +9,10 @@
   <style>
     body { font: normal 100.01%/1.375 "Helvetica Neue",Helvetica,Arial,sans-serif; }
   </style>
-  <link href="../static/jquery.signaturepad.css" rel="stylesheet">
+  <link href="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.css" rel="stylesheet">
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
-
-
+  
 </head>
  {% block content %}  
 
@@ -77,7 +76,7 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               
                               <script>
                                   $(document).ready(function() {
@@ -85,7 +84,7 @@
                                   $('.sigPad').signaturePad({displayOnly:true}).regenerate(sigdata);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -127,14 +126,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata1 = {{signatures[1].sig_data | tojson}}
                                   $('.sigPad1').signaturePad({displayOnly:true}).regenerate(sigdata1);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -175,14 +174,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata2 = {{signatures[2].sig_data | tojson}}                             
                                   $('.sigPad2').signaturePad({displayOnly:true}).regenerate(sigdata2);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -222,14 +221,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata3 = {{signatures[3].sig_data | tojson}}                             
                                   $('.sigPad3').signaturePad({displayOnly:true}).regenerate(sigdata3);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -269,14 +268,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata4 = {{signatures[4].sig_data | tojson}}                             
                                   $('.sigPad4').signaturePad({displayOnly:true}).regenerate(sigdata4);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -317,14 +316,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata5 = {{signatures[5].sig_data | tojson}}                             
                                   $('.sigPad5').signaturePad({displayOnly:true}).regenerate(sigdata5);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -364,14 +363,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata6 = {{signatures[6].sig_data | tojson}}                             
                                   $('.sigPad6').signaturePad({displayOnly:true}).regenerate(sigdata6);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -412,14 +411,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata7 = {{signatures[7].sig_data | tojson}}                             
                                   $('.sigPad7').signaturePad({displayOnly:true}).regenerate(sigdata7);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -459,14 +458,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata8 = {{signatures[8].sig_data | tojson}}                             
                                   $('.sigPad8').signaturePad({displayOnly:true}).regenerate(sigdata8);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -506,14 +505,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata9 = {{signatures[9].sig_data | tojson}}                             
                                   $('.sigPad9').signaturePad({displayOnly:true}).regenerate(sigdata9);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -553,14 +552,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata10 = {{signatures[10].sig_data | tojson}}                             
                                   $('.sigPad10').signaturePad({displayOnly:true}).regenerate(sigdata10);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -601,14 +600,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata11 = {{signatures[11].sig_data | tojson}}                             
                                   $('.sigPad11').signaturePad({displayOnly:true}).regenerate(sigdata11);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -649,14 +648,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata12 = {{signatures[12].sig_data | tojson}}                             
                                   $('.sigPad12').signaturePad({displayOnly:true}).regenerate(sigdata12);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -697,14 +696,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata13 = {{signatures[13].sig_data | tojson}}                             
                                   $('.sigPad13').signaturePad({displayOnly:true}).regenerate(sigdata13);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -745,14 +744,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata14 = {{signatures[14].sig_data | tojson}}                             
                                   $('.sigPad14').signaturePad({displayOnly:true}).regenerate(sigdata14);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -793,14 +792,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata15 = {{signatures[15].sig_data | tojson}}                             
                                   $('.sigPad15').signaturePad({displayOnly:true}).regenerate(sigdata15);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -841,14 +840,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata16 = {{signatures[16].sig_data | tojson}}                             
                                   $('.sigPad16').signaturePad({displayOnly:true}).regenerate(sigdata16);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -889,14 +888,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata17 = {{signatures[17].sig_data | tojson}}                             
                                   $('.sigPad17').signaturePad({displayOnly:true}).regenerate(sigdata17);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -936,14 +935,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata18 = {{signatures[18].sig_data | tojson}}                             
                                   $('.sigPad18').signaturePad({displayOnly:true}).regenerate(sigdata18);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -984,14 +983,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata19 = {{signatures[19].sig_data | tojson}}                             
                                   $('.sigPad19').signaturePad({displayOnly:true}).regenerate(sigdata19);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -1032,14 +1031,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata20 = {{signatures[20].sig_data | tojson}}                             
                                   $('.sigPad20').signaturePad({displayOnly:true}).regenerate(sigdata20);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -1079,14 +1078,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata21 = {{signatures[21].sig_data | tojson}}                             
                                   $('.sigPad21').signaturePad({displayOnly:true}).regenerate(sigdata21);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -1127,14 +1126,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata22 = {{signatures[22].sig_data | tojson}}                             
                                   $('.sigPad22').signaturePad({displayOnly:true}).regenerate(sigdata22);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -1174,14 +1173,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata23 = {{signatures[23].sig_data | tojson}}                             
                                   $('.sigPad23').signaturePad({displayOnly:true}).regenerate(sigdata23);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    
@@ -1334,14 +1333,14 @@
                           </div> 
                   </div>
                                 
-                             <script src="../static/jquery.signaturepad.js"></script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
                                   var sigdata24 = {{signatures[24].sig_data | tojson}}                             
                                   $('.sigPad24').signaturePad({displayOnly:true}).regenerate(sigdata24);
                                   });
                               </script>
-                              <script src="../static/json2.min.js" ></script>
+                              <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
                   
                   </div>
                    

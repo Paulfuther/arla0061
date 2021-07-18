@@ -4754,3 +4754,16 @@ old hr list:
         emp = Employee.query.filter_by(email=email.data).first()
         if emp:
             raise ValidationError('That email is Taken')
+
+
+
+
+
+            employee file relative paths
+
+            ../static/jquery.signaturepad.css
+
+            https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js
+
+
+            {% extends "layout.html" %}
