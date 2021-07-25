@@ -70,7 +70,7 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 
 #app.config['CELERY_BROKER_URL'] = 'amqp://guest:guest@localhost'
-app.config['CELERY_BACKEND_URL'] = 'sqlite:///test.db'
+#app.config['CELERY_BACKEND_URL'] = 'sqlite:///test.db'
 
 verifier = EmailVerifier(app)
 
