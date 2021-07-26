@@ -63,14 +63,13 @@ app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
-app.config['MAIL_DEFAULT_SENDER'] = 'paul.futher@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = ('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 
-#app.config['CELERY_BROKER_URL'] = 'amqp://guest:guest@localhost'
-#app.config['CELERY_BACKEND_URL'] = 'sqlite:///test.db'
+
 
 verifier = EmailVerifier(app)
 
