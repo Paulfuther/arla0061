@@ -1,4 +1,5 @@
 from mmap import PAGESIZE
+from dropbox.files import WriteMode
 from emailverifier.models import response
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect,\
     flash, abort, send_from_directory, make_response, session
@@ -7,7 +8,7 @@ from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
     grade_form, schedule_start, Schedule, GradeForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
-    db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
+    db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, celery, print_names, trythis
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
@@ -547,13 +548,21 @@ def pdf_file(staff_id):
     img = '/files/image-20201205212708-1.png'
 
     image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
+    image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
+    image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
+    image4 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213057-2.png'
+    image5 = '/Users/paulfuther/arla0061/flaskblog/images/uniformfour.png'
+    image6 = '/Users/paulfuther/arla0061/flaskblog/images/uniformthree.png' 
 
 
     x=signatures
     hrpage = hrfiles.query.all()
     gsa = Employee.query.get(staff_id)
-    
-    rendered = render_template('employeefilepdf.html',image1=image1, hrpage = hrpage, signatures=signatures, gsa=gsa)
+    fname = gsa.firstname
+    lname = gsa.lastname
+    id = gsa.id
+    print(fname)
+    rendered = render_template('employeefilepdf.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, signatures=signatures, gsa=gsa)
     
     #return rendered
 
@@ -568,8 +577,13 @@ def pdf_file(staff_id):
 
     file = BytesIO(pdf)
     created_on = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    filename = f"Filename ({created_on}).pdf"
+    filename = f" {lname} {fname}  ID: {id} {created_on}.pdf"
 
+    
+    with file as f:    
+        dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
+   
+    file = BytesIO(pdf)
     return send_file(file,
             attachment_filename=filename,
             mimetype='application/pdf',

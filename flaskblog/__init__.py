@@ -30,7 +30,8 @@ from flask_email_verifier import EmailVerifier
 from flask_login import  user_logged_out, user_logged_in
 from celery import Celery
 from flaskblog.tasks import celery
-
+import dropbox
+from dropbox.files import WriteMode
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -65,8 +66,10 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
 app.config['MAIL_DEFAULT_SENDER'] = ('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
+DROP_BOX_KEY='UiU1WeRa49cAAAAAAAAAAQDCJbs1D2wAT745M4SR05UMJ9Gu8HySMLcGbhTTkhUu'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
+
 
 
 
@@ -91,7 +94,7 @@ def trythis():
 
 
 db = SQLAlchemy(app)
-
+dbx = dropbox.Dropbox('UiU1WeRa49cAAAAAAAAAAQDCJbs1D2wAT745M4SR05UMJ9Gu8HySMLcGbhTTkhUu')
 # configure celery
 
 #celery = Celery('tasks', broker='amqp://guest:guest@localhost')

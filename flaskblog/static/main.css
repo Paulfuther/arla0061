@@ -22,6 +22,9 @@ body {
   
 }
 
+/* pdf of employee file */
+
+
 
 /*------------------------------*/
 /* Schedule */
@@ -2379,6 +2382,8 @@ p.error {
     display: none;
   }
 
+
+  
   /* .file-container {
     column-width: 17em;
     column-gap: 3em;

@@ -795,7 +795,7 @@
                              <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
                               <script>
                                   $(document).ready(function() {
-                                  var sigdata15 = {{signatures[15].sig_data | tojson}}                             
+                                  var sigdata15 = ({signatures[15].sig_data | tojson})                             
                                   $('.sigPad15').signaturePad({displayOnly:true}).regenerate(sigdata15);
                                   });
                               </script>
@@ -1009,7 +1009,7 @@
                     <p>Last Reviewed by Owner:    {{hrpage[20].date_of_review|safe}}
                     </div>
                     <br/>
-
+                    
                     {{hrpage[20].text | safe}}
 
                     </br>
