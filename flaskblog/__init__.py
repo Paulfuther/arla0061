@@ -72,7 +72,7 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
 verifier = EmailVerifier(app)
 db = SQLAlchemy(app)
-dbx = dropbox.Dropbox('UiU1WeRa49cAAAAAAAAAAQDCJbs1D2wAT745M4SR05UMJ9Gu8HySMLcGbhTTkhUu')
+dbx = dropbox.Dropbox('DROP_BOX_KEY')
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
 mail = Mail(app)
