@@ -36,16 +36,7 @@ from dropbox.files import WriteMode
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Flask and Flask-SQLAlchemy initialization here
-#get variables
 
-#!!!!!!!!!!!!!!!!!! you need the next three lines of code on the server#
-# environment variables are hidden.....#
-
-#with open('/etc/config.json') as config_file:
-#	config = json.load(config_file)
-
-#app=app.config.from_object(config) --not needed
 
 load_dotenv()
 
