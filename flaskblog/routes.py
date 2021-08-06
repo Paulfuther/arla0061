@@ -126,7 +126,7 @@ def add_task():
 @roles_accepted('Admin', 'Manager')
 def new_mail():
     email = 'paul.futher@gmail.com'
-    for x in range(0,10):
+    for x in range(0,3):
         email_data = {
          'subject': 'testing 10',
          'to': email,
