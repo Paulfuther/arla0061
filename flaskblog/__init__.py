@@ -66,11 +66,9 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
 app.config['MAIL_DEFAULT_SENDER'] = ('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
-
+app.config['DROP_BOX_KEY'] = os.environ.get('DROP_BOX_KEY')
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
-
-
 
 
 
@@ -80,16 +78,6 @@ verifier = EmailVerifier(app)
 
 #celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 #celery.conf.update(app.config)
-
-@celery.task
-def print_names(person):
-    print(person)
-
-
-
-@celery.task
-def trythis():
-    return "5"
 
 
 
@@ -126,9 +114,7 @@ def send_async_email2(email_data):
     with app.app_context():
         mail.send(msg)
 
-@celery.task
-def add_this(x,y):
-    return (x+y)
+
 
 admin = Admin(app, name='Dashboard')
     
