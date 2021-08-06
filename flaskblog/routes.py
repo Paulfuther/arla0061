@@ -125,7 +125,7 @@ def add_task():
 @login_required
 @roles_accepted('Admin', 'Manager')
 def new_mail():
-    email = 'paul.futher@gmail.com'
+    email = app.config['MAIL_DEFAULT_SENDER']
     for x in range(0,3):
         email_data = {
          'subject': 'testing 10',
