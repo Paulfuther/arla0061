@@ -136,20 +136,7 @@ def new_mail():
         print("we did it")
     return 'tasksent'
 
-@app.route('/emailpaul')
-@login_required
-@roles_accepted('Admin', 'Manager')
-def email_paul():
 
-    with mail.connect() as conn:
-
-        msg = Message("hello",
-                    sender='paul.futher@gmail.com',
-                    recipients = ['paul.futher@gmail.com'],
-                    body = 'just testing',)
-        mail.send(msg)
-   
-    return "sent"
 
 @app.route('/email/<email>')
 @login_required
