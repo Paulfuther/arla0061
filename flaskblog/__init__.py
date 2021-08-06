@@ -70,26 +70,10 @@ app.config['DROP_BOX_KEY'] = os.environ.get('DROP_BOX_KEY')
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
-
-
 verifier = EmailVerifier(app)
-
-# initialize celery
-
-#celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-#celery.conf.update(app.config)
-
-
-
 db = SQLAlchemy(app)
 dbx = dropbox.Dropbox('UiU1WeRa49cAAAAAAAAAAQDCJbs1D2wAT745M4SR05UMJ9Gu8HySMLcGbhTTkhUu')
-# configure celery
-
-#celery = Celery('tasks', broker='amqp://guest:guest@localhost')
-#celery = celery
-
 ma = Marshmallow(app)
-
 ckeditor = CKEditor(app)
 mail = Mail(app)
 
