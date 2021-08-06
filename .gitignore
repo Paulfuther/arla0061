@@ -7,3 +7,4 @@ site6.db
 .env
 sitemay31.db
 flaskblog/templates/text
+db.rabbit
