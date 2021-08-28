@@ -39,7 +39,7 @@
 
 
 <body>           
-    <form class = "hrform" method = "POST" action  = "" enctype="multipart/form-data" >     
+    <form id = "newhirefile" class = "hrform" method = "POST" action  = "" enctype="multipart/form-data" >     
 
             {% for page in hrpage %}
 
@@ -224,32 +224,41 @@
                       
 
                         </div>
+                        
                           <div style="break-after:page"></div>
-                   
+
+                        
+                            
+
+                          <div style="text-align:center; padding-bottom:50px">
+                            <p>
+                              Click submit. 
+                              </p>
+                              <p></p>
+                              If you are still here then you have not provided all of the required signatures. 
+                            </p>
+                            <p>
+                              Please scroll up and provide the missing signatures. Thank you.
+                            </p>
+                  
+                            </div>
+                                <div class="sig sigWrapper">
+                                <!-- <div class="typed"></div> -->
+                                  
+                                </div>
+                                  <div>
+                                    <div style="text-align:center; padding-bottom:50px">
+                                  <button type="submit" class="formcheckbtn">Submit.</button>
+                                  </div>
+                                  </div>
+                            
+                             
+                          </div>
+                              
         </form>                   
-      <div  style="text-align:center; padding-bottom:50px">
-                  <button class= "hrbutton" onclick="printFunction()"> Print   File</button>
-                  </div>
-
-                  <div style="text-align:center; padding-bottom:50px">
-                 <button onclick="topFunction()" id="myBtn" class ="hrbutton" >Top Of Page</button>
-                 <script>
-                  mybutton = document.getElementById("myBtn")
-                  function topFunction() {
-                  document.body.scrollTop = 0; // For Safari
-                  document.documentElement.scrollTop = 0;
-                  } // For Chrome, Firefox, IE and Opera
-
-                  </script>
-                  </div>
-                 
-                  </br>
-                  </br>
-                   <script>
-                    function printFunction(){
-                    window.print();
-                  }
-                  </script>
+      
+                  
+        
 
 </body> 
 {% endblock content %}

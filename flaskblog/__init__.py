@@ -1,21 +1,21 @@
 
 from flask import Flask
 
-#import flask_login
 app = Flask(__name__)
 
 from dotenv import load_dotenv
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os
 import json
-#import pdfkit
 from datetime import datetime
-from flask import render_template_string, url_for, redirect, send_from_directory, request
+from flask import render_template_string, make_response, url_for, redirect, send_from_directory, \
+     request, render_template, send_file
 from flask_admin import Admin, expose, BaseView
 from flask_admin.actions import action
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, UserMixin, RoleMixin, login_required, roles_required
+from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, \
+     UserMixin, RoleMixin, login_required, roles_required
 from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
 from flask_marshmallow import Marshmallow
@@ -32,11 +32,10 @@ from celery import Celery
 from flaskblog.tasks import celery
 import dropbox
 from dropbox.files import WriteMode
-
+import pdfkit
+from io import BytesIO
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-
-
 
 load_dotenv()
 
@@ -57,15 +56,14 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['EMAIL_VERIFIER_KEY']= os.environ.get('EMAIL_VERIFIER_KEY')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
-app.config['DROP_BOX_KEY'] = os.environ.get('DROP_BOX_KEY')
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 
-
+DROP_BOX_KEY = os.environ.get('DROP_BOX_KEY')
 
 verifier = EmailVerifier(app)
 db = SQLAlchemy(app)
-dbx = dropbox.Dropbox('DROP_BOX_KEY')
+dbx = dropbox.Dropbox(DROP_BOX_KEY)
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
 mail = Mail(app)
@@ -91,7 +89,89 @@ def send_async_email2(email_data):
     with app.app_context():
         mail.send(msg)
 
+@celery.task
+def make_pdf(staff_id):
+    with app.test_request_context():
+        signatures = Empfile.query.filter_by(employee2_id = staff_id)
+        rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
+    
+         
 
+
+        img = '/files/image-20201205212708-1.png'
+
+        image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
+        image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
+        image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
+        image4 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213057-2.png'
+        image5 = '/Users/paulfuther/arla0061/flaskblog/images/uniformfour.png'
+        image6 = '/Users/paulfuther/arla0061/flaskblog/images/uniformthree.png' 
+
+
+        x=signatures
+        hrpage = hrfiles.query.all()
+        gsa = Employee.query.get(staff_id)
+        fname = gsa.firstname
+        lname = gsa.lastname
+        id = gsa.id
+        print(fname)
+    
+        rendered = render_template('employeefilepdf.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, signatures=signatures, gsa=gsa)
+    
+        
+
+        options = {'enable-local-file-access': None,
+            '--keep-relative-links': '',
+            '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
+            'encoding' : "UTF-8"
+        }
+        css = "flaskblog/static/jquery.signaturepad.css"
+        css2 = ".."
+        pdf = pdfkit.from_string(rendered, False, options=options, css=css)
+
+        file = BytesIO(pdf)
+        created_on = datetime.now().strftime('%Y-%m-%d')
+        filename = f" {lname} {fname}  ID  {id} {created_on}.pdf"
+
+        #response = make_response(pdf)
+        #response.headers['Content-Type']='application/pdf'
+        #response.headers['Content-Disposition']='inline'
+
+        for x in rol:
+            email = x.email
+            email_data = {
+                'subject': 'A new hire file has been created',
+                'to': email,
+                'body': 'A new hire file has been created and uploaded to dropbox. {}'.format(filename),
+               
+            }
+
+            msg = Message(email_data['subject'],
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=[email_data['to']])
+            msg.body = email_data['body']
+            msg.attach("pdf","application/pdf", pdf)
+            mail.send(msg)
+        
+        with file as f:    
+            dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
+    
+        
+        #file = BytesIO(pdf)
+        #return (file),{
+        #    'Content-Type': 'application/pdf',
+        #    'Content-Disposition': 'inline'
+        #   }
+        
+        
+        #return send_file(file,
+        #         attachment_filename=filename,
+        #         mimetype='application/pdf',
+        #         as_attachment=True,
+        #         cache_timeout=1
+        #          )      
+
+       
 
 admin = Admin(app, name='Dashboard')
     

@@ -17,7 +17,7 @@
                         {% else %}
 
                         <ul>
-                              <li> <a href="hrlist" class = "mhrlist">Search Employees</a></li>
+                              <li> <a href="hrlist" class = "mhrlist">Search Employees By First Name, Last Name or Store</a></li>
                         </ul>
                        
                        
@@ -25,10 +25,9 @@
                         <ul>
                         <form method="POST" class = "hrsearch">
                            
-                                <div><input type ="text"  id = "live_search_first" name = "text" placeholder = " first name" class = "inputform"> 
+                                <div><input type ="text"  id = "live_search_first" name = "text" placeholder = " Search " class = "inputform"> 
                                 </div>
-                                <div><input type ="text"  id = "live_search_last" name = "text" placeholder = " last name" class = "inputform"> 
-                                </div>
+                                
                         </form>
                         </ul>
                         {% endif %}
@@ -57,7 +56,7 @@
                             
                             $.ajax({
                                 method:"POST",
-                                url:"/livesearch_first",
+                                url:"/livesearch",
                                 data:{text:textinlivebox},
                                 success:function(res){
                                     $('#tablecontainer').empty();
@@ -86,7 +85,7 @@
                                         <a   href="/updategsa${id}">Contact Info</a>
                                         <a   href="/updategsatraining${id}">Training Info</a>
                                         <a   href="/hrfile${id}">Create File</a>
-                                        <a   href="/createpdfnewhire${id}">View File</a>
+                                        <a   href="/existingemployeefile${id}">View File</a>
                                         </div> 
                                         </div>
                                      
@@ -106,62 +105,7 @@
 
                 </script>
                       
-                <script>
-
-                 $(document).ready(function(){
-                        $("#live_search_last").on("input",function(e){
-                            textinlivebox= $("#live_search_last").val();
-                            
-                            $.ajax({
-                                method:"POST",
-                                url:"/livesearch_last",
-                                data:{text:textinlivebox},
-                                success:function(res){
-                                    $('#tablecontainer').empty();
-                                
-                                    let html = res.reduce(( acc, {number,firstname, lastname, email, store, store_id, image_file, id}) =>
-                                        acc += `
-                                        <div class = 'tablecard'>
-                                        <div class = 'tablecard-image'>
-
-                                   
-                                        <img src =' /static/empfiles/thumb/${image_file}' class = 'hrlistimage' > 
-                                        </div>
-                                        <div class = 'tablecard-inner'>
-                                        
-                                        <div class = 'hritem1'>
-                                        ${number}
-                                        </div>
-                                        <div class = 'hritem2'>
-                                        ${firstname +" "+ lastname}
-                                        </div>
-                                        <div class = 'hritem3'>
-                                        ${email}
-                                        </div> 
-                                        <div class = "tablecard-links">
-                                        <a   href="/updategsa${id}">Contact Info</a>
-                                        <a   href="/updategsatraining${id}">Training Info</a>
-                                        <a   href="/hrfile${id}">Create File</a>
-                                        <a   href="/existingemployeefile${id}">View File</a>
-                                       
-                                        </div> 
-                                        </div>
-                                     
-                                        </div>`
-                                     
-
-                                    , '');
-                                    console.log(res.id)
-                                    $('.tablecontainer').append(html);
-                                    console.log(res);
-                                 
-                                }
-                            })
-
-                        });
-                    })
-
-                        </script>
+                
 
 {% endblock content %}
 

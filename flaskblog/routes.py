@@ -2,14 +2,15 @@ from mmap import PAGESIZE
 from dropbox.files import WriteMode
 from emailverifier.models import response
 from flask import Flask, render_template, jsonify, request, send_file, url_for, redirect,\
-    flash, abort, send_from_directory, make_response, session
+    flash, abort, send_from_directory, make_response, session, current_app, app
 from requests.api import options
 from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
     grade_form, schedule_start, Schedule, GradeForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, celery
+        staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, \
+            make_pdf, celery
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -42,19 +43,6 @@ import time
 moment = Moment(app)
 
 
-@app.route('/add')
-@login_required
-@roles_accepted('Admin', 'Manager')
-def whattodo():
-    trythis.delay
-    return "5"
-
-
-def send_email(subject, sender, recipients, text_body, html_body):
-    msg = Message(subject, sender=sender, recipients=recipients)
-    msg.body = text_body
-    msg.html = html_body
-    mail.send(msg)
 
 @app.route("/")
 @app.route("/home<int:user_id>")
@@ -86,15 +74,6 @@ def home():
     #return render_template('home.html')
 
 
-@app.route('/printname/<person>')
-@login_required
-@roles_accepted('Admin', 'Manager')
-def success(person):
-    print_names(person)
-    print_names.apply_async(args=[person] , countdown=10)
-    
-    return "heldddlo %s" % person
-
 @app.route('/task', methods = ['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -125,16 +104,27 @@ def add_task():
 @login_required
 @roles_accepted('Admin', 'Manager')
 def new_mail():
-    email = os.environ.get('MAIL_DEFAULT_SENDER')
-    for x in range(0,3):
+
+    #this is for testing purposed. 
+    # testing for HR users.
+
+     email = os.environ.get('MAIL_DEFAULT_SENDER')
+
+     rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
+
+     for x in rol:
+        print(x.email)
+
+        email = x.email
+        print(email)
         email_data = {
-         'subject': 'testing 10',
-         'to': email,
-         'body': 'testing a loop on delay'
-        }
+             'subject': 'testing 10',
+             'to': email,
+             'body': 'testing a loop on delay {} '.format(email)
+            }
         send_async_email2.apply_async(args=[email_data], countdown=30)
         print("we did it")
-    return 'tasksent'
+     return 'tasksent'
 
 
 
@@ -434,6 +424,17 @@ def storelist():
 
    # return render_template('login.html', form=form)
 
+@app.route("/sendfile<int:staff_id>", methods =['GET', 'POST'])
+@login_required
+def sendfile(staff_id):
+    gsa = Employee.query.get(staff_id)
+    #hrpage = hrfiles.query.limit(3).all()
+    hrpage = hrfiles.query.all()
+    #print(gsa.firstname)
+
+    make_pdf.apply_async(args=[staff_id], countdown=10)
+    return render_template('layout.html')
+
 @app.route("/hrfile<int:staff_id>", methods=['GET', 'POST'])
 @login_required
 def hrfile(staff_id):
@@ -442,6 +443,12 @@ def hrfile(staff_id):
     hrpage = hrfiles.query.all()
     #print(gsa.firstname)
     
+    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
+    if exists:
+        print("yes")
+        flash("This employee has a file. Thank you.")
+        return redirect(url_for("hrlist"))
+
     if request.method == "POST":
         sigs = request.form.getlist('output')
        
@@ -463,6 +470,7 @@ def hrfile(staff_id):
                 
         db.session.commit()
         flash("file completed. Thank you")
+        make_pdf.apply_async(args=[staff_id], countdown=10)
         return render_template('layout.html')
   
     #print("success")
@@ -479,9 +487,9 @@ def hrfile(staff_id):
 def hrhome(): 
     return render_template('hrhome.html')
 
-#@app.route("/existingemployeefile<int:staff_id>", methods = ['GET', 'POST'])
-#@login_required
-#def employeefile(staff_id):
+@app.route("/existingemployeefile<int:staff_id>", methods = ['GET', 'POST'])
+@login_required
+def employeefile(staff_id):
     
     # here we need to get the signatures for each file and pass to html 
     # we alos need the employee name which is stored in gsa variable
@@ -489,27 +497,28 @@ def hrhome():
     # and we need to test if a file even exists 
     # if not we need to return with and error message
     
-#    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
-#    if exists:
-#        print("yes")
-#   else:
-#        print("no", staff_id)
-#        flash("no file exists")
-#        return redirect(url_for("hrlist"))
-#    
-#    signatures = Empfile.query.filter_by(employee2_id = staff_id)
+    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
+    if exists:
+        print("yes")
+        
+    else:
+        #print("no", staff_id)
+        flash("No file exists. Please create a file. Thank you.")
+        return redirect(url_for("hrlist"))
+    
+    signatures = Empfile.query.filter_by(employee2_id = staff_id)
     
     
-#    x=signatures
-#    hrpage = hrfiles.query.all()
-#    gsa = Employee.query.get(staff_id)
+    x=signatures
+    hrpage = hrfiles.query.all()
+    gsa = Employee.query.get(staff_id)
     #for x in signatures:
-        #print (type(x.sig_data))
-        #print(x.file_id, x)
-        #print(x.sig_data)
+    #    print (type(x.sig_data))
+    #    print(x.file_id, x)
+    #    print(x.sig_data)
    
     
-  #  return render_template('employeecompletedfile.html', hrpage = hrpage, signatures=signatures, gsa=gsa)
+    return render_template('employeecompletedfile.html', hrpage = hrpage, signatures=signatures, gsa=gsa)
 
 
 @app.route("/createpdfnewhire<int:staff_id>", methods = ['GET', 'POST'])
@@ -530,59 +539,11 @@ def pdf_file(staff_id):
         flash("no file exists")
         return redirect(url_for("hrlist"))
     
-    signatures = Empfile.query.filter_by(employee2_id = staff_id)
+    make_pdf.apply_async(args=[staff_id], countdown=10)
+       
+    return "working"
     
-    img = '/files/image-20201205212708-1.png'
 
-    image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
-    image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
-    image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
-    image4 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213057-2.png'
-    image5 = '/Users/paulfuther/arla0061/flaskblog/images/uniformfour.png'
-    image6 = '/Users/paulfuther/arla0061/flaskblog/images/uniformthree.png' 
-
-
-    x=signatures
-    hrpage = hrfiles.query.all()
-    gsa = Employee.query.get(staff_id)
-    fname = gsa.firstname
-    lname = gsa.lastname
-    id = gsa.id
-    print(fname)
-    rendered = render_template('employeefilepdf.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, signatures=signatures, gsa=gsa)
-    
-    #return rendered
-
-    options = {'enable-local-file-access': None,
-        '--keep-relative-links': '',
-        '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
-        'encoding' : "UTF-8"
-    }
-    css = "flaskblog/static/jquery.signaturepad.css"
-    css2 = ".."
-    pdf = pdfkit.from_string(rendered, False, options=options, css=css)
-
-    file = BytesIO(pdf)
-    created_on = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    filename = f" {lname} {fname}  ID: {id} {created_on}.pdf"
-
-    
-    with file as f:    
-        dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
-   
-    file = BytesIO(pdf)
-    return send_file(file,
-            attachment_filename=filename,
-            mimetype='application/pdf',
-            as_attachment=True,
-            cache_timeout=1
-    )
-
-
-    #response = make_response(pdf)
-    #response.headers['Content-Type'] = 'application/pdf'
-    #response.headers['Content-Disposition'] = 'inline; filename=output.pdf'
-    #return response
 
 @app.route("/hrlist", methods =['GET', 'POST'])
 @login_required
@@ -674,52 +635,34 @@ def updategsatraining(staff_id):
     return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
 
 
-@app.route("/livesearch_first", methods = ["POST", "GET"])
+
+
+
+
+@app.route("/livesearch", methods = ["POST", "GET"])
 @login_required
 def livesearch():
     
+    # search by first name, last name or store number
+    # you need to serialise the result to pass it on as json.
+
     searchbox = request.form.get("text")
-    
-    gsa = Employee.query.filter(Employee.firstname.like('%' + searchbox + '%'))\
+    gsa = Employee.query.filter(or_(Employee.firstname.like('%' + searchbox + '%')\
+        ,Employee.lastname.like('%' + searchbox + '%')\
+        ,Store.number.like('%' + searchbox + '%')))\
         .join(Store, Store.id == Employee.store_id)\
-            .join(User, Employee.user_id == User.id)\
+        .join(User, Employee.user_id == User.id)\
         .filter(User.active == 1).order_by(Store.number)\
-        .add_columns(Store.number, Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
+        .add_columns(Store.number, Employee.firstname, Employee.lastname, \
+        Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
         .all()
     
-    #print(gsa[0].number)
-
-    #gsa = db.session.query(Employee, User)\
-    #    .filter(Employee.firstname.like('%' + searchbox + '%'))\
-    #        .join(User, Employee.user_id == User.id)\
-    #    .filter(User.active == 1)\
-    #    .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
-    #    .all()
 
     results = employee_schema.dump(gsa)
     result = jsonify(results)
-
     return result
 
-@app.route("/livesearch_last", methods = ["POST", "GET"])
-@login_required
-def livesearchlast():
-    
-    
-    searchbox = request.form.get("text")
-    
-    gsa = Employee.query.filter(Employee.lastname.like('%' + searchbox + '%'))\
-        .join(Store, Store.id == Employee.store_id)\
-            .join(User, Employee.user_id == User.id)\
-        .filter(User.active == 1).order_by(Store.number)\
-        .add_columns(Store.number, Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
-        .all()
-    
-    
-    results = employee_schema.dump(gsa)
-    result = jsonify(results)
-   
-    return result
+
  
 
 @app.route("/search", methods=['GET', 'POST'])
