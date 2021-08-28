@@ -7,8 +7,7 @@ load_dotenv()
 
 #CELERY_BROKER_URL= os.environ.get('CELERY_BROKER_URL')
 #USR='codfish.rmq.cloudamqp.com'
-AMPUSER='ftrhyovk'
-AMPPASSWORD='L-8g5-R5eGgBOzBPYAgKG1axKplnz4yy'
+
 
 CLOUDAMQP_URL = os.environ.get('CLOUDAMQP_URL')
 
