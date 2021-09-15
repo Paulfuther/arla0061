@@ -24,8 +24,156 @@ body {
 
 /* pdf of employee file */
 
+/* report container*/
+
+.report-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: auto;
+    position: center;
+    padding-top: 30px;
+    padding-bottom: 50px;
+    margin-right: 20px;
+    margin-left: 20px;
+    height: 100%;
+    border-radius: 15px;
+}
+
+.inc1 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.inc2 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+.inc3 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 3;
+  grid-row-end: 4;
+}
+.inc4 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 4;
+  grid-row-end: 5;
+}
+.inc5 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 5;
+  grid-row-end: 6;
+}
+.inc6 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 6;
+  grid-row-end: 7;
+}
+.inc7 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 7;
+  grid-row-end: 8;
+}
+
+.inc8 {
+  grid-column-start: 1;
+  grid-column-end: 6;
+  grid-row-start: 8;
+  grid-row-end: 9;
+}
+.inc9 {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 9;
+  grid-row-end: 12;
+}
+
+.inc10 {
+  grid-column-start: 2;
+  grid-column-end: 6;
+  grid-row-start: 9;
+  grid-row-end: 12;
+}
+
+.inc11 {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 12;
+  grid-row-end: 13;
+}
+.inc12 {
+  grid-column-start: 2;
+  grid-column-end: 6;
+  grid-row-start: 12;
+  grid-row-end: 13;
+}
+.inc13 {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 13;
+  grid-row-end: 14;
+}
+.inc14 {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 13;
+  grid-row-end: 14;
+}
+
+.inc15 {
+  grid-column-start: 3;
+  grid-column-end: 4;
+  grid-row-start: 13;
+  grid-row-end: 14;
+}
+.inc16 {
+  grid-column-start: 4;
+  grid-column-end: 5;
+  grid-row-start: 13;
+  grid-row-end: 14;
+}
+.inc17 {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 14;
+  grid-row-end: 15;
+}
+.inc18 {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 14;
+  grid-row-end: 15;
+}
+.inc19 {
+  grid-column-start: 3;
+  grid-column-end: 4;
+  grid-row-start: 14;
+  grid-row-end: 15;
+}
+.inc20 {
+  grid-column-start: 4;
+  grid-column-end: 5;
+  grid-row-start: 14;
+  grid-row-end: 15;
+}
+
+.inc21 {
+  grid-column-start: 5;
+  grid-column-end: 6;
+  grid-row-start: 13;
+  grid-row-end: 16;
+}
 
 
+/* ---- */
 /*------------------------------*/
 /* Schedule */
 

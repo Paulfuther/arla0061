@@ -1,7 +1,10 @@
+from flask_security.utils import get_post_login_redirect
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
+from sqlalchemy.sql.elements import BooleanClauseList
+from sqlalchemy.sql.sqltypes import Date, String
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField
-from wtforms.fields.html5 import DateField, TelField
+from wtforms.fields.html5 import DateField, TelField, TimeField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
 from flaskblog import  Employee, db, Store, User, Role
 from flask_login import current_user
@@ -275,3 +278,108 @@ class GradeForm(FlaskForm):
     
     completeddate = DateField('Completed Date', format='%Y-%m-%d',
                           )
+
+
+class SiteIncident(FlaskForm):
+    injuryorillness = BooleanField()
+    environmental = BooleanField()
+    regulatory = BooleanField()
+    EconomicDamage = BooleanField()
+    Reputation = BooleanField()
+    Security = BooleanField()
+    Fire = BooleanField()
+
+    location = StringField('Location', validators=[DataRequired(), Length(min=1, max= 100)])
+
+    eventdetails = StringField('Details', validators=[DataRequired(), Length(min=2, max = 100)])
+    eventdate = DateField('EvenDate', validators=[DataRequired()])
+    eventtime = TimeField('EvenTime', validators=[DataRequired()])
+    reportedby = StringField('Reported by', validators=[DataRequired()])
+    reportedbynumber = StringField('Phone NUmber', validators=[DataRequired()])
+
+    suncoremployee = BooleanField()
+    contractor = BooleanField()
+    associate = BooleanField()
+    generalpublic = BooleanField()
+    other = BooleanField()
+    othertext = StringField('Other')
+
+    actionstaken = StringField('Actions Taken')
+    correctiveactions = StringField('Corrective Actions')
+
+    sno = BooleanField()
+    syes = BooleanField()
+    scomment = StringField()
+
+    rna = BooleanField()
+    rno = BooleanField()
+    ryes = BooleanField()
+    rcomment = StringField()
+
+    gas = BooleanField()
+    diesel = BooleanField()
+    sewage = BooleanField()
+    chemical = BooleanField()
+    chemcomment = StringField()
+    deiselexhaustfluid = BooleanField()
+    sother = BooleanField()
+    scomment = StringField()
+
+    air = BooleanField()
+    water = BooleanField()
+    wildlife = BooleanField()
+    land = BooleanField()
+    volumerelease = StringField()
+
+    pyes = BooleanField()
+    pno = BooleanField()
+    pna = BooleanField()
+    pcase = StringField()
+
+    stolentransactions = BooleanField()
+    stoltransactions = StringField()
+    stolencards = BooleanField()
+    stolcards = StringField()
+    stolentobacco = BooleanField()
+    stoltobacco = StringField()
+    stolenlottery = BooleanField()
+    stollottery = StringField()
+    stolenfuel = BooleanField()
+    stolfuel = StringField()
+    stolenother = BooleanField()
+    stolother = StringField()
+    stolenothervalue = StringField()
+    stolenna = BooleanField()
+
+    gender = StringField()
+    age = StringField()
+    weight = StringField()
+    haircolor = StringField()
+    haircut= StringField()
+    complexion = StringField()
+    beardmoustache = StringField()
+    eyeeyeglasses = StringField()
+    licencenumber = StringField()
+    makemodel = StringField()
+    color = StringField()
+    scars = StringField()
+    tatoos = StringField()
+    hat = StringField()
+    shirt = StringField()
+    trousers = StringField()
+    shoes = StringField()
+    voice = StringField()
+    bumpersticker = StringField()
+    direction = StringField()
+    damage = StringField()
+
+    wgsa = BooleanField()
+    wcontractor = BooleanField()
+    wassociate = BooleanField()
+    wpublic = BooleanField()
+    wother = BooleanField()
+    wothertext = StringField()
+    wname = StringField()
+    wnumber = StringField()
+    waddress = StringField()
+    wdate = DateField()

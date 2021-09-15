@@ -5,8 +5,8 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
     flash, abort, send_from_directory, make_response, session, current_app, app
 from requests.api import options
 from sqlalchemy.sql.functions import current_time
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
-    grade_form, schedule_start, Schedule, GradeForm
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
+    grade_form, schedule_start, Schedule, GradeForm, SiteIncident
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, \
@@ -146,6 +146,12 @@ def email(email):
         resp = make_response('None', 404)
     return resp
 
+
+@app.route("/event")
+@login_required
+def eventreport():
+    form = SiteIncident()
+    return render_template('eventreport.html', form=form)
 
 @app.route("/nofile")
 @login_required
