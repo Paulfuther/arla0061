@@ -9,138 +9,124 @@
         
         {{form.hidden_tag()}}
 
-        <div class="inc1">  Primary Incident Type </div>
-         <div class="formtitle inc2" >Injury {{form.injuryorillness}} </div>
-        <div  class="formtitle inc3" >{{"Environmental"}} {{form.environmental}} </div>
-        <div  class="formtitle inc4" >{{"Regulatory"}} {{form.regulatory}} </div>
-        <div  class="formtitle inc5">{{"Economic/Damage"}} {{form.EconomicDamage}} </div>
-        <div  class="formtitle inc6">{{"Reputation"}} {{form.Reputation}} </div>    
-        <div  class="formtitle inc7">{{"Security"}} {{form.Security}} </div>
-        <div  class="formtitle inc8">{{"Fire"}} {{form.Fire}} </div>
+        <div class="inctitle inc1">  Primary Incident Type </div>
+        <div class="inctitle inc2" >Injury {{form.injuryorillness}} </div>
+        <div  class="inctitle inc3" >{{"Environmental"}} {{form.environmental}} </div>
+        <div  class="inctitle inc4" >{{"Regulatory"}} {{form.regulatory}} </div>
+        <div  class="inctitle inc5">{{"Economic/Damage"}} {{form.EconomicDamage}} </div>
+        <div  class="inctitle inc6">{{"Reputation"}} {{form.Reputation}} </div>    
+        <div  class="inctitle inc7">{{"Security"}} {{form.Security}} </div>
+        <div  class="inctitle inc8">{{"Fire"}} {{form.Fire}} </div>
 
        
+        <div class="row-border1"></div>
 
-
-        <div  class="formtitle inc9">Location</div>
-        <div  class="inc10" >{{form.location}} </div>
-        <div  class="formtitle inc11">{{"Event Details"}} </div>
-        <div  class = "inc12">{{form.eventdetails}} </div>
-
-
-
-        <div  class="formtitle inc13" >Event Date </div> 
-        <div  class="inc14" >{{form.eventdate}} </div>
-        <div  class="formtitle inc15" > Event Time </div>
-        <div  class="inc16"> {{form.eventtime}} </div>
-        <div  class="formtitle inc17" >Reported By: </div>
-        <div  class ="inc18" >{{form.reportedby}} </div>
-        <div  class="formtitle inc19" >Phone Number</div>
-        <div  class="inc20">{{form.reportedbynumber}} </div>
-
-        <div  class="inc21" >break </div>
-
-        <div  class="formtitle" >{{"Suncor Employee"}} {{form.suncoremployee}} </div>
-        <div  class="formtitle" >{{"Contractor"}} {{form.contractor}} </div>
-        <div  class="formtitle" >{{"Associate"}} {{form.associate}} </div>
-        <div  class="formtitle" >{{"General Public"}} {{form.generalpublic}} </div>
-        <div  class="formtitle" >{{"Other"}} {{form.other}} </div>
-        <div  class="formtitle" >{{"Text"}} {{form.othertext}} </div>
-
-        <div  class="formtitle" >{{"Immediate Actions Taken"}} {{form.actionstaken}} </div>
-        <div  class="formtitle" >{{"Corrective Actions"}} {{form.correctiveactions}} </div>
-
-        <div> Off Property Impact</div>
-        <div  class="formtitle" >{{"no"}} {{form.sno}} </div>
-        <div  class="formtitle" >{{"yes"}} {{form.syes}} </div>
-        <div  class="formtitle" >{{"comment"}} {{form.scomment}} </div>
-
-        <div> Regulatory Authorities Notified?</div>
-
-        <div  class="formtitle" >{{"N/A"}} {{form.rna}} </div>
-        <div  class="formtitle" >{{"no"}} {{form.rno}} </div>
-        <div  class="formtitle" >{{"yes"}} {{form.ryes}} </div>
-        <div  class="formtitle" >{{"comment"}} {{form.rcomment}} </div>
-
-        <div> Product Spilled?</div>
-
-        <div  class="formtitle" >{{"Gas"}} {{form.gas}} </div>
-        <div  class="formtitle" >{{"Diesel"}} {{form.diesel}} </div>
-        <div  class="formtitle" >{{"Sewage"}} {{form.sewage}} </div>
-        <div  class="formtitle" >{{"Chemical"}} {{form.chemical}} </div>
-        <div  class="formtitle" >{{"Please Specify Chemical"}} {{form.chemcomment}} </div>
-        <div  class="formtitle" >{{"Diesel Exhaust Fluid"}} {{form.dieselexhaustfluid}} </div>
-        <div  class="formtitle" >{{"Other"}} {{form.sother}} </div>
-        <div  class="formtitle" >{{"Other"}} {{form.scomment}} </div>
-
-        <div> Source Impacted</div>
-
-        <div  class="formtitle" >{{"Air"}} {{form.air}} </div>
-        <div  class="formtitle" >{{"water"}} {{form.water}} </div>
-        <div  class="formtitle" >{{"wildlife"}} {{form.wildlife}} </div>
-        <div  class="formtitle" >{{"land"}} {{form.land}} </div>
-        <div  class="formtitle" >{{"Volume Release Estimate"}} {{form.volumerelease}} </div>
-
-        <div> Police Notified?</div>
-
-        <div  class="formtitle" >{{"Yes"}} {{form.pyes}} </div>
-        <div  class="formtitle" >{{"No"}} {{form.pno}} </div>
-        <div  class="formtitle" >{{"N/A"}} {{form.pna}} </div>
-        <div  class="formtitle" >{{"Case #"}} {{form.pcase}} </div>
-
-        <div> What Was Stolen</div>
-
-        <div  class="formtitle" >{{"# of Transactions"}} {{form.stolentransactions}} </div>
-        <div  class="formtitle" >{{""}} {{form.stoltransactions}} </div>
-        <div  class="formtitle" >{{"# of Cards"}} {{form.stolencards}} </div>
-        <div  class="formtitle" >{{""}} {{form.stolcards}} </div>
-        <div  class="formtitle" >{{"Tobacco Value"}} {{form.stolentobacco}} </div>
-        <div  class="formtitle" >{{""}} {{form.stoltobacco}} </div>
-        <div  class="formtitle" >{{"Lottery Value"}} {{form.stolenlottery}} </div>
-        <div  class="formtitle" >{{""}} {{form.stollottery}} </div>
-        <div  class="formtitle" >{{"Fuel Value"}} {{form.stolenfuel}} </div>
-        <div  class="formtitle" >{{""}} {{form.stolfuel}} </div>
-        <div  class="formtitle" >{{"Other"}} {{form.stolenother}} </div>
-        <div  class="formtitle" >{{""}} {{form.stolother}} </div>
-        <div  class="formtitle" >{{"value:"}} {{form.stolenothervalue}} </div>
-        <div  class="formtitle" >{{"N/A: nothihng taken"}} {{form.stolenna}} </div>
+        <div  class="inctitle inc9">Location</div>
+        <div  class="inctitle  inc10 formstyle2" >{{form.location(style ='width:100%')}} </div>
+        <div  class="inctitle inc11 formstyle">{{"Event Details"}} </div>
+        <div  class = "inctitle  inc12">{{form.eventdetails( style='width:100%; height:100%; autofocus=autofocus')}} </div>
 
 
 
-        <div  class="formtitle" >{{"Gener/Estimated Age"}} {{form.gender}} </div>
-        <div  class="formtitle" >{{"Height"}} {{form.height}} </div>
-        <div  class="formtitle" >{{"Weight"}} {{form.weight}} </div>
-        <div  class="formtitle" >{{"Hair Color/Cut"}} {{form.haircolor}} </div>
-        <div  class="formtitle" >{{"Complexion"}} {{form.complexion}} </div>
-        <div  class="formtitle" >{{"Bear/Moustache"}} {{form.beardmoustache}} </div>
-        <div  class="formtitle" >{{"Eye/Eyeglasses"}} {{form.eyeeyeglasses}} </div>
-        <div  class="formtitle" >{{"Licence #"}} {{form.licence}} </div>
-        <div  class="formtitle" >{{"Make/Model"}} {{form.makemodel}} </div>
-        <div  class="formtitle" >{{"Color"}} {{form.color}} </div>
-        <div  class="formtitle" >{{"Visible Scars"}} {{form.visiblescars}} </div>
-        <div  class="formtitle" >{{"Tatoos"}} {{form.tatoos}} </div>
-        <div  class="formtitle" >{{"Type of Hat"}} {{form.hat}} </div>
-        <div  class="formtitle" >{{"Shirt/Coat"}} {{form.shirt}} </div>
-        <div  class="formtitle" >{{"Trousers"}} {{form.trousers}} </div>
-        <div  class="formtitle" >{{"Shoes"}} {{form.shoes}} </div>
-        <div  class="formtitle" >{{"Voice"}} {{form.voice}} </div>
-        <div  class="formtitle" >{{"Bumper Sticker"}} {{form.bumpersticker}} </div>
-        <div  class="formtitle" >{{"Direction of Travel"}} {{form.direction}} </div>
-        <div  class="formtitle" >{{"Damage/Rust"}} {{form.damage}} </div>
+        <div  class="inctitle inc13" >Event Date </div> 
+        <div  class="inctitle  inc14" >{{form.eventdate}} </div>
+        <div  class="inctitle inc15" > Event Time </div>
+        <div  class=" inctitle inc16"> {{form.eventtime}} </div>
+        <div  class="inctitle inc17" >Reported By: </div>
+        <div  class ="inctitle  inc18" >{{form.reportedby}} </div>
+        <div  class="inctitle inc19" >Phone Number</div>
+        <div  class="inctitle  inc20">{{form.reportedbynumber}} </div>
 
+      
 
+        <div  class = "inctitle inc23" >Is The Person A:</div>
 
-        <div  class="formtitle" > {{form.wgsa}} {{"GSA"}}</div>
-        <div  class="formtitle" >{{"Contractor"}} {{form.wcontractor}} </div>
-        <div  class="formtitle" >{{"Associate"}} {{form.wassociate}} </div>
-        <div  class="formtitle" >{{"General Public"}} {{form.wpublic}} </div>
-        <div  class="formtitle" >{{"Other"}} {{form.wother}} </div>
-        <div  class="formtitle" >{{""}} {{form.wothertext}} </div>
-        <div  class="formtitle" >{{"Name of Witness"}} {{form.wname}} </div>
-        <div  class="formtitle" >{{"Phone Number of Witness"}} {{form.wnumber}} </div>
-        <div  class="formtitle" >{{"Address of Witness"}} {{form.waddress}} </div>
-        <div  class="formtitle" >{{"Date Statement Provided"}} {{form.wdate}} </div>
+        <div  class="incheader inc100" >SECTION 1 - INCIDENT INFORMATION -(always complete this section)</div>
 
-    
+        <div  class="inctitle inc24" > {{form.suncoremployee}} Suncor Emp </div>
+        <div  class="inctitle inc25" > {{form.contractor}} Contractor</div>
+        <div  class="inctitle inc26" >{{form.associate}} Associate </div>
+        <div  class="inctitle inc27" > {{form.generalpublic}} General Public</div>
+        <div  class="inctitle inc28" >{{form.other}} Other: {{form.othertext}}</div>
+        
+
+        <div  class="inctitle inc30" >Immediate Actions Taken</div>
+        <div  class = "inctitle  inc31 formstyle" >{{form.actionstaken( style='width:100%; ')}} </div>
+        <div  class="inctitle inc32" >Corrective Actions</div>
+        <div  class="inctitle  inc33 formstyle" >{{form.correctiveactions( style = 'width:100%;height:100%')}} </div>
+
+        <div class="row-border2"></div>
+
+        <div  class="incheader inc59" >SECTION 2 - SPILLS - (complete only if spill occured)</div>
+        <div  class="inctitle  inc34"> Off Property Impact</div>
+        <div  class="inctitle inc35" >no {{form.sno}} </div>
+        <div  class="inctitle inc36" >yes {{form.syes}} </div>
+        <div  class="inctitle inc37" >comment {{form.scomment}} </div>
+
+        <div  class="inctitle inc38"> Regulatory Authorities Notified?</div>
+
+        <div  class="inctitle inc39" >N/A {{form.rna}} </div>
+        <div  class="inctitle inc40" >no {{form.rno}} </div>
+        <div  class="inctitle inc41" >yes {{form.ryes}} </div>
+        <div  class="inctitle inc42" >comment {{form.rcomment}} </div>
+
+        <div  class="inctitle inc43"> Product Spilled?</div>
+
+        <div  class="inctitle inc44" >Gas {{form.gas}} </div>
+        <div  class="inctitle inc45" >Diesel {{form.diesel}} </div>
+        <div  class="inctitle inc46" >Sewage {{form.sewage}} </div>
+        <div  class="inctitle inc47" >Chemical {{form.chemical}} </div>
+        <div  class="inctitle inc48" >(Please Specify Chemical) {{form.chemcomment}} </div>
+        <div  class="inctitle inc49" >Diesel Exhaust Fluid {{form.deiselexhaustfluid}} </div>
+        <div  class="inctitle inc50" >Other {{form.sother}} </div>
+        <div  class="inctitle inc51" >(Please Specify) {{form.scomment}} </div>
+
+        <div  class="inctitle inc52"> Source Impacted</div>
+
+        <div  class="inctitle inc53" >Air {{form.air}} </div>
+        <div  class="inctitle inc54" >water {{form.water}} </div>
+        <div  class="inctitle inc55" >wildlife {{form.wildlife}} </div>
+        <div  class="inctitle inc56" >land {{form.land}} </div>
+        <div  class="inctitle inc57" >Volume Release Estimate {{form.volumerelease}} </div>
+        <div class="row-border3"></div>
+        <div  class="incheader inc58">SECTION 3 SECURITY -(complete only for security such as a theft, robbery, break & enter or drive off)</div>
+
+        <div  class="inctitle inc60"> Police Notified?</div>
+
+        <div  class="inctitle inc61" >Yes {{form.pyes}} No {{form.pno}} N/A {{form.pna}} </div>
+        <div  class="inctitle inc62" >{{"Case #"}} {{form.pcase}} </div>
+
+        <div  class="inctitle inc63"> What Was Stolen</div>
+
+        <div  class="inctitle inc64" > {{form.stolentransactions}} # of Transactions {{form.stoltransactions}} </div>
+        <div  class="inctitle inc65" >{{form.stolencards}} # of Cards {{form.stolcards}} </div>
+        <div  class="inctitle inc66" >{{form.stolentobacco}} Tobacco Value {{form.stoltobacco}} </div>
+        <div  class="inctitle inc67" >{{form.stolenlottery}} Lottery Value {{form.stollottery}} </div>
+        <div  class="inctitle inc68" >{{form.stolenfuel}} Fuel Value {{form.stolfuel}} </div>
+        <div  class="inctitle inc69" >{{form.stolenother}} Other {{form.stolother}} </div>
+        <div  class="inctitle inc70"> value of other: {{form.stolenothervalue}}  </div>
+        <div  class="inctitle inc71" >{{form.stolenna}} N/A: nothihng taken  </div>
+
+        <div  class="inctitle inc72" >{{"Gener/Estimated Age"}} {{form.gender}} </div>
+        <div  class="inctitle inc73" >{{"Height"}} {{form.height}} </div>
+        <div  class="inctitle inc74" >{{"Weight"}} {{form.weight}} </div>
+        <div  class="inctitle inc75" >{{"Hair Color/Cut"}} {{form.haircolor}} </div>
+        <div  class="inctitle inc76" >{{"Complexion"}} {{form.complexion}} </div>
+        <div  class="inctitle inc77" >{{"Bear/Moustache"}} {{form.beardmoustache}} </div>
+        <div  class="inctitle inc78" >{{"Eye/Eyeglasses"}} {{form.eyeeyeglasses}} </div>
+        <div  class="inctitle inc79" >{{"Licence #"}} {{form.licencenumber}} </div>
+        <div  class="inctitle inc80" >{{"Make/Model"}} {{form.makemodel}} </div>
+        <div  class="inctitle inc81" >{{"Color"}} {{form.color}} </div>
+        <div  class="inctitle inc82 placement" >{{form.scars}} {{"Visible Scars"}}  </div>
+        <div  class="inctitle inc83" >{{form.tatoos}} {{"Tatoos"}}  </div>
+        <div  class="inctitle inc84" >{{form.hat}} {{"Type of Hat"}}  </div>
+        <div  class="inctitle inc85" >{{form.shirt}} {{"Shirt/Coat"}}  </div>
+        <div  class="inctitle inc86" >{{form.trousers}} {{"Trousers"}}  </div>
+        <div  class="inctitle inc87" >{{form.shoes}} {{"Shoes"}}  </div>
+        <div  class="inctitle inc88" >{{form.voice}} {{"Voice"}}  </div>
+        <div  class="inctitle inc89" >{{form.bumpersticker}} {{"Bumper Sticker"}}  </div>
+        <div  class="inctitle inc90" >{{form.direction}} {{"Direction of Travel"}}  </div>
+        <div  class="inctitle inc91" >{{form.damage}} {{"Damage/Rust"}}  </div>
 
         </form>
 

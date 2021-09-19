@@ -291,7 +291,7 @@ class SiteIncident(FlaskForm):
 
     location = StringField('Location', validators=[DataRequired(), Length(min=1, max= 100)])
 
-    eventdetails = StringField('Details', validators=[DataRequired(), Length(min=2, max = 100)])
+    eventdetails = TextAreaField('Details', validators=[DataRequired()])
     eventdate = DateField('EvenDate', validators=[DataRequired()])
     eventtime = TimeField('EvenTime', validators=[DataRequired()])
     reportedby = StringField('Reported by', validators=[DataRequired()])
@@ -305,7 +305,7 @@ class SiteIncident(FlaskForm):
     othertext = StringField('Other')
 
     actionstaken = StringField('Actions Taken')
-    correctiveactions = StringField('Corrective Actions')
+    correctiveactions = TextAreaField('Corrective Actions', validators=[DataRequired()])
 
     sno = BooleanField()
     syes = BooleanField()
@@ -352,7 +352,7 @@ class SiteIncident(FlaskForm):
     stolenna = BooleanField()
 
     gender = StringField()
-    age = StringField()
+    height = StringField()
     weight = StringField()
     haircolor = StringField()
     haircut= StringField()
