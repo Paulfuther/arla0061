@@ -10,7 +10,7 @@ from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteInc
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, \
-            make_pdf, celery
+            make_pdf, celery, siteincident
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -147,11 +147,99 @@ def email(email):
     return resp
 
 
-@app.route("/event")
+@app.route("/event", methods = ['GET', 'POST'])
 @login_required
 def eventreport():
     form = SiteIncident()
-    return render_template('eventreport.html', form=form)
+
+    if request.method == "POST":
+        if form.validate_on_submit():
+            inc=SiteIncident(injuryorillness=form.injuryorillness.data,
+                            environmental =form.environmental.data,
+                            regulatory =form.regulatory.data,
+                            economicdamage = form.economicdamage.data,
+                            reputation = form.reputation.data,
+                            security = form.security.data,
+                            fire = form.fire.data,
+                            location = form.location.data,
+                            eventdetails = form.eventdetails.data,
+                            eventdate = form.eventdate.data,
+                            eventtime = form.eventtime.data,
+                            reportedby = form.reportedby.data,
+                            reportedbynumber = form.reportedby.data,
+                            suncoremployee = form.suncoremployee.data,
+                            contractor = form.contractor.data,
+                            associate = form.associate.data,
+                            generalpublic = form.generalpublic.data,
+                            other = form.other.data,
+                            othertext = form.othertext.data,
+                            actionstaken = form.actionstaken.data,
+                            correctiveactions = form.correctiveactions.data,
+                            sno = form.sno.data,
+                            syes = form.syes.data,
+                            scomment = form.scomment.data,
+                            rna = form.rna.data,
+                            rno = form.rno.data,
+                            ryes = form.ryes.data,
+                            rcomment = form.rcomment.data,
+                            gas = form.gas.data,
+                            diesel = form.diesel.data,
+                            sewage = form.sewage.data,
+                            chemical = form.chemical.data,
+                            chemcomment = form.chemcomment.data,
+                            deiselexhaustfluid = form.deiselexhaustfluid.data,
+                            sother = form.sother.data,
+                            s2comment = form.scomment.data,
+                            air = form.air.data,
+                            water = form.water.data,
+                            wildlife = form.wildlife.data,
+                            land = form.land.data,
+                            volumerelease = form.volumerelease.data,
+                            pyes = form.pyes.data,
+                            pno = form.pno.data,
+                            pna = form.pna.data,
+                            pcase = form.pcase.data,
+                            stolentransactions = form.stolentransactions.data,
+                            stoltransactions = form.stoltransactions.data,
+                            stolencards = form.stolencards.data,
+                            stolcards = form.stolcards.data,
+                            stolentobacco = form.stolentobacco.data,
+                            stoltobacco = form.stoltobacco.data,
+                            stolenlottery = form.stolenlottery.data,
+                            stollottery = form.stollottery.data,
+                            stolenfuel = form.stolenfuel.data,
+                            stolfuel = form.stolfuel.data,
+                            stolenother = form.stolenother.data,
+                            stolother = form.stolother.data,
+                            stolenothervalue = form.stolenothervalue.data,
+                            stolenna = form.stolenna.data,
+                            gender = form.gender.data,
+                            height = form.height.data,
+                            weight = form.weight.data,
+                            haircolor = form.haircolor.data,
+                            haircut= form.haircut.data,
+                            complexion = form.complexion.data,
+                            beardmoustache = form.beardmoustache.data,
+                            eyeeyeglasses = form.eyeeyeglasses.data,
+                            licencenumber = form.licencenumber.data,
+                            makemodel = form.makemodel.data,
+                            color = form.color.data,
+                            scars = form.scars.data,
+                            tatoos = form.tatoos.data,
+                            hat = form.hat.data,
+                            shirt = form.shirt.data,
+                            trousers = form.trousers.data,
+                            shoes = form.shoes.data,
+                            voice = form.voice.data,
+                            bumpersticker = form.bumpersticker.data,
+                            direction = form.direction.data,
+                            damage = form.damage.data)
+
+            db.session.add(inc)
+            db.session.commit()
+    else:
+
+        return render_template('eventreport.html', form=form)
 
 @app.route("/nofile")
 @login_required
@@ -639,9 +727,6 @@ def updategsatraining(staff_id):
     
     
     return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
-
-
-
 
 
 

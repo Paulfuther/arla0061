@@ -435,6 +435,101 @@ class Saltlog(db.Model):
          return '%r' % (self.area)      
 
 
+class siteincident(db.Model):
+     id = db.Column(db.Integer, primary_key=True)
+     injuryorillness = db.Column(db.Boolean, default = False)
+     environmental = db.Column(db.Boolean, default = False)
+     regulatory = db.Column(db.Boolean, default = False)
+     economicDamage = db.Column(db.Boolean, default = False)
+     reputation = db.Column(db.Boolean, default = False)
+     security = db.Column(db.Boolean, default = False)
+     fire = db.Column(db.Boolean, default = False)
+
+     location = db.Column(db.String())
+
+     eventdetails = db.Column(db.String())
+     eventdate = db.Column(db.DateTime(), nullable = True)
+     eventtime = db.Column(db.String())
+     reportedby = db.Column(db.String())
+     reportedbynumber = db.Column(db.String())
+
+     suncoremployee = db.Column(db.Boolean, default = False)
+     contractor = db.Column(db.Boolean, default = False)
+     associate = db.Column(db.Boolean, default = False)
+     generalpublic = db.Column(db.Boolean, default = False)
+     other = db.Column(db.Boolean, default = False)
+     othertext = db.Column(db.String())
+
+     actionstaken = db.Column(db.String())
+     correctiveactions = db.Column(db.String())
+
+     sno = db.Column(db.Boolean, default = False)
+     syes = db.Column(db.Boolean, default = False)
+     scomment = db.Column(db.String())
+
+     rna = db.Column(db.Boolean, default = False)
+     rno = db.Column(db.Boolean, default = False)
+     ryes = db.Column(db.Boolean, default = False)
+     rcomment = db.Column(db.String())
+
+     gas = db.Column(db.Boolean, default = False)
+     diesel = db.Column(db.Boolean, default = False)
+     sewage = db.Column(db.Boolean, default = False)
+     chemical = db.Column(db.Boolean, default = False)
+     chemcomment = db.Column(db.String())
+     deiselexhaustfluid = db.Column(db.Boolean, default = False)
+     sother = db.Column(db.Boolean, default = False)
+     s2comment = db.Column(db.String())
+
+     air = db.Column(db.Boolean, default = False)
+     water = db.Column(db.Boolean, default = False)
+     wildlife = db.Column(db.Boolean, default = False)
+     land = db.Column(db.Boolean, default = False)
+     volumerelease = db.Column(db.String())
+
+     pyes = db.Column(db.Boolean, default = False)
+     pno = db.Column(db.Boolean, default = False)
+     pna = db.Column(db.Boolean, default = False)
+     pcase = db.Column(db.String())
+
+     stolentransactions = db.Column(db.Boolean, default = False)
+     stoltransactions = db.Column(db.String())
+     stolencards = db.Column(db.Boolean, default = False)
+     stolcards = db.Column(db.String())
+     stolentobacco = db.Column(db.Boolean, default = False)
+     stoltobacco = db.Column(db.String())
+     stolenlottery = db.Column(db.Boolean, default = False)
+     stollottery = db.Column(db.String())
+     stolenfuel = db.Column(db.Boolean, default = False)
+     stolfuel = db.Column(db.String())
+     stolenother = db.Column(db.Boolean, default = False)
+     stolother = db.Column(db.String())
+     stolenothervalue = db.Column(db.String())
+     stolenna = db.Column(db.Boolean, default = False)
+
+     gender = db.Column(db.String())
+     height = db.Column(db.String())
+     weight = db.Column(db.String())
+     haircolor = db.Column(db.String())
+     haircut= db.Column(db.String())
+     complexion = db.Column(db.String())
+     beardmoustache = db.Column(db.String())
+     eyeeyeglasses = db.Column(db.String())
+     licencenumber = db.Column(db.String())
+     makemodel = db.Column(db.String())
+     color = db.Column(db.String())
+     scars = db.Column(db.String())
+     tatoos = db.Column(db.String())
+     hat = db.Column(db.String())
+     shirt = db.Column(db.String())
+     trousers = db.Column(db.String())
+     shoes = db.Column(db.String())
+     voice = db.Column(db.String())
+     bumpersticker = db.Column(db.String())
+     direction = db.Column(db.String())
+     damage = db.Column(db.String())
+
+
 
 
 # here we initiate the datastore which is used in the Admin model

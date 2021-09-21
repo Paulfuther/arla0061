@@ -1,3 +1,4 @@
+from typing import Text
 from flask_security.utils import get_post_login_redirect
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
@@ -284,10 +285,10 @@ class SiteIncident(FlaskForm):
     injuryorillness = BooleanField()
     environmental = BooleanField()
     regulatory = BooleanField()
-    EconomicDamage = BooleanField()
-    Reputation = BooleanField()
-    Security = BooleanField()
-    Fire = BooleanField()
+    economicdamage = BooleanField()
+    reputation = BooleanField()
+    security = BooleanField()
+    fire = BooleanField()
 
     location = StringField('Location', validators=[DataRequired(), Length(min=1, max= 100)])
 
@@ -304,7 +305,7 @@ class SiteIncident(FlaskForm):
     other = BooleanField()
     othertext = StringField('Other')
 
-    actionstaken = StringField('Actions Taken')
+    actionstaken = TextAreaField('Actions Taken')
     correctiveactions = TextAreaField('Corrective Actions', validators=[DataRequired()])
 
     sno = BooleanField()
@@ -323,7 +324,7 @@ class SiteIncident(FlaskForm):
     chemcomment = StringField()
     deiselexhaustfluid = BooleanField()
     sother = BooleanField()
-    scomment = StringField()
+    s2comment = StringField()
 
     air = BooleanField()
     water = BooleanField()
@@ -383,3 +384,4 @@ class SiteIncident(FlaskForm):
     wnumber = StringField()
     waddress = StringField()
     wdate = DateField()
+    submit = SubmitField('Submit Event Form')

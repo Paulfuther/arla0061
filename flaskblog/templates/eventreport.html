@@ -5,7 +5,7 @@
 
     
 
-        <form class = "report-container">
+        <form method = "POST" action  = "" enctype="multipart/form-data" class = "report-container">
         
         {{form.hidden_tag()}}
 
@@ -50,9 +50,9 @@
         <div  class="inctitle inc28" >{{form.other}} Other: {{form.othertext}}</div>
         
 
-        <div  class="inctitle inc30" >Immediate Actions Taken</div>
-        <div  class = "inctitle  inc31 formstyle" >{{form.actionstaken( style='width:100%; ')}} </div>
-        <div  class="inctitle inc32" >Corrective Actions</div>
+        <div  class="inctitle inc30" >Immediate   Actions Taken</div>
+        <div  class = "inctitle  inc31 formstyle" >{{form.actionstaken( style='width:100%; height:100%')}} </div>
+        <div  class="inctitle inc32" >Corrective   Actions Taken</div>
         <div  class="inctitle  inc33 formstyle" >{{form.correctiveactions( style = 'width:100%;height:100%')}} </div>
 
         <div class="row-border2"></div>
@@ -79,7 +79,7 @@
         <div  class="inctitle inc48" >(Please Specify Chemical) {{form.chemcomment}} </div>
         <div  class="inctitle inc49" >Diesel Exhaust Fluid {{form.deiselexhaustfluid}} </div>
         <div  class="inctitle inc50" >Other {{form.sother}} </div>
-        <div  class="inctitle inc51" >(Please Specify) {{form.scomment}} </div>
+        <div  class="inctitle inc51" >(Please Specify) {{form.s2comment}} </div>
 
         <div  class="inctitle inc52"> Source Impacted</div>
 
@@ -107,6 +107,10 @@
         <div  class="inctitle inc70"> value of other: {{form.stolenothervalue}}  </div>
         <div  class="inctitle inc71" >{{form.stolenna}} N/A: nothihng taken  </div>
 
+        <div  class="inc110"><img src="/static/images/SECURITYPERSON.jpg" ></div>
+        
+
+
         <div  class="inctitle inc72" >{{"Gener/Estimated Age"}} {{form.gender}} </div>
         <div  class="inctitle inc73" >{{"Height"}} {{form.height}} </div>
         <div  class="inctitle inc74" >{{"Weight"}} {{form.weight}} </div>
@@ -127,6 +131,10 @@
         <div  class="inctitle inc89" >{{form.bumpersticker}} {{"Bumper Sticker"}}  </div>
         <div  class="inctitle inc90" >{{form.direction}} {{"Direction of Travel"}}  </div>
         <div  class="inctitle inc91" >{{form.damage}} {{"Damage/Rust"}}  </div>
+
+        <div class="inctitle inc120">
+                {{form.submit(class_="hrbutton")}}
+                </div>
 
         </form>
 
