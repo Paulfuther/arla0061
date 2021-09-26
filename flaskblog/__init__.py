@@ -157,6 +157,64 @@ def make_pdf(staff_id):
             dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
     
         
+    
+       
+
+@celery.task
+def make_incident_pdf(file_id):
+    with app.test_request_context():
+        rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
+        print(file_id)
+        img = '/Users/paulfuther/arla0061/flaskblog/static/images/SECURITYPERSON.jpg'
+
+        css = "flaskblog/static/main.css"
+        file = Incident.query.get(file_id)
+        fdate = file.eventdate
+        fstore = file.location
+        id = file_id
+        print(fdate)
+        gsa = Incident.query.get(file_id)
+        rendered = render_template('eventreportpdf.html',gsa=gsa, css=css)
+    
+        
+
+        options = {'enable-local-file-access': None,
+            '--keep-relative-links': '',
+            '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
+            'encoding' : "UTF-8"
+        }
+        css = "flaskblog/static/main.css"
+        
+        pdf = pdfkit.from_string(rendered, False, options=options, css=css)
+
+        file = BytesIO(pdf)
+        created_on = datetime.now().strftime('%Y-%m-%d')
+        filename = f" {fstore} {fdate}  ID  {id} {created_on}.pdf"
+
+        #response = make_response(pdf)
+        #response.headers['Content-Type']='application/pdf'
+        #response.headers['Content-Disposition']='inline'
+
+        for x in rol:
+            email = x.email
+            email_data = {
+                'subject': 'A new incident report has been filed',
+                'to': email,
+                'body': 'An incident report has been filed. {}'.format(filename),
+               
+            }
+
+            msg = Message(email_data['subject'],
+                  sender=app.config['MAIL_DEFAULT_SENDER'],
+                  recipients=[email_data['to']])
+            msg.body = email_data['body']
+            msg.attach("pdf","application/pdf", pdf)
+            mail.send(msg)
+        
+        with file as f:    
+            dbx.files_upload(f.read(), path=f"/SITEINCDIENTS/{filename}", mode=WriteMode('overwrite'))
+    
+        
         #file = BytesIO(pdf)
         #return (file),{
         #    'Content-Type': 'application/pdf',
@@ -172,6 +230,7 @@ def make_pdf(staff_id):
         #          )      
 
        
+
 
 admin = Admin(app, name='Dashboard')
     
@@ -435,12 +494,12 @@ class Saltlog(db.Model):
          return '%r' % (self.area)      
 
 
-class siteincident(db.Model):
+class Incident(db.Model):
      id = db.Column(db.Integer, primary_key=True)
      injuryorillness = db.Column(db.Boolean, default = False)
      environmental = db.Column(db.Boolean, default = False)
      regulatory = db.Column(db.Boolean, default = False)
-     economicDamage = db.Column(db.Boolean, default = False)
+     economicdamage = db.Column(db.Boolean, default = False)
      reputation = db.Column(db.Boolean, default = False)
      security = db.Column(db.Boolean, default = False)
      fire = db.Column(db.Boolean, default = False)
@@ -449,7 +508,7 @@ class siteincident(db.Model):
 
      eventdetails = db.Column(db.String())
      eventdate = db.Column(db.DateTime(), nullable = True)
-     eventtime = db.Column(db.String())
+     eventtime = db.Column(db.Time())
      reportedby = db.Column(db.String())
      reportedbynumber = db.Column(db.String())
 

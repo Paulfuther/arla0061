@@ -30,7 +30,6 @@ body {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-auto-rows: auto;
-    
     position: center;
     padding-top: 30px;
     padding-bottom: 50px;
@@ -42,6 +41,50 @@ body {
     grid-row-gap:10px;
     
     
+}
+
+table {
+  border: 1px solid black;
+  table-layout: fixed;
+  width: 100%
+}
+
+.blankrow {
+  height: 50px !important;
+}
+.increporthr {
+  width: 100%;
+  padding: 10 0 10 0;
+  border-bottom: none;
+}
+
+.increporthr td{
+  width: 100%;
+  padding: 10 0 10 0;
+  border-bottom: none;
+}
+
+.incident-info  td:nth-child(1) {
+  width: 25%;
+  vertical-align: top;
+  text-align: left;
+  border-bottom: none;
+}
+
+.incident-info  td:nth-child(2){
+  width: 75%;
+  height: 300px;
+  vertical-align: top;
+  text-align: left;
+  border-bottom: none;
+}
+
+
+
+
+.blank-row {
+  height: 30px;
+  background-color: white;
 }
 
 .row-border1

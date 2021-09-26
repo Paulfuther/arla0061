@@ -6,11 +6,11 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 from requests.api import options
 from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
-    grade_form, schedule_start, Schedule, GradeForm, SiteIncident
+    grade_form, schedule_start, Schedule, GradeForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, \
-            make_pdf, celery, siteincident
+        staffschedule, Incident, User, Customer, employee_schema, send_async_email, send_async_email2, \
+            make_pdf, make_incident_pdf, celery
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -126,7 +126,14 @@ def new_mail():
         print("we did it")
      return 'tasksent'
 
-
+@app.route('/testincident', methods = ['GET', 'POST'])
+def print_incident():
+    form=SiteIncident()
+    x=int(1)
+    gsa = Incident.query.get(x)
+    print(gsa)
+    
+    return render_template('eventreportpdf.html' , form=form, gsa=gsa)
 
 @app.route('/email/<email>')
 @login_required
@@ -149,12 +156,18 @@ def email(email):
 
 @app.route("/event", methods = ['GET', 'POST'])
 @login_required
+@roles_accepted('Admin', 'Manager')
 def eventreport():
     form = SiteIncident()
 
     if request.method == "POST":
+        
+        
+        newtime=str(form.eventtime.data)
+        time2 =datetime.strptime(newtime, '%H:%M:%S').time()
+    
         if form.validate_on_submit():
-            inc=SiteIncident(injuryorillness=form.injuryorillness.data,
+            inc=Incident(injuryorillness=form.injuryorillness.data,
                             environmental =form.environmental.data,
                             regulatory =form.regulatory.data,
                             economicdamage = form.economicdamage.data,
@@ -164,7 +177,7 @@ def eventreport():
                             location = form.location.data,
                             eventdetails = form.eventdetails.data,
                             eventdate = form.eventdate.data,
-                            eventtime = form.eventtime.data,
+                            eventtime = time2,
                             reportedby = form.reportedby.data,
                             reportedbynumber = form.reportedby.data,
                             suncoremployee = form.suncoremployee.data,
@@ -234,12 +247,21 @@ def eventreport():
                             bumpersticker = form.bumpersticker.data,
                             direction = form.direction.data,
                             damage = form.damage.data)
-
+                            
             db.session.add(inc)
+            db.session.flush()
             db.session.commit()
-    else:
 
-        return render_template('eventreport.html', form=form)
+            print(inc.id)
+            file_id = int(inc.id)
+            flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
+            make_incident_pdf.apply_async(args=[file_id], countdown=10)
+            return render_template('layout.html')
+            
+            
+    
+
+    return render_template('eventreport.html', form=form)
 
 @app.route("/nofile")
 @login_required
