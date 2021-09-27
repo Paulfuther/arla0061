@@ -2,8 +2,8 @@
 
         <meta charset="utf-8">
 
+        
         <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet">
-
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
                 integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
                 crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -13,6 +13,8 @@
                 table {
                         border-collapse: collapse;
                         border: 1px solid black;
+                        table-layout: fixed;
+                        width: 100%
 
                 }
 
@@ -20,6 +22,55 @@
                         border: 1px solid black;
                         padding: 20 0 10 10;
                 }
+                .incheader {
+                        font-size: 18px;
+                        padding: 20px 0px 10px 0px; 
+                }
+
+                .blankrow {
+                        height: 50px !important;
+                        }
+                .increporthr {
+                        width: 100%;
+                        padding: 10 0 10 0;
+                        border-bottom: none;
+                        }
+
+                .increporthr td{
+                        width: 100%;
+                        padding: 10 0 10 0;
+                        border-bottom: none;
+                        }
+                .increporthr {
+                                width: 100%;
+                                padding: 10 0 10 0;
+                                border-bottom: none;
+                                }
+                .container {
+  
+                                width: 100%;
+                                max-width: 1100px;
+                                margin: auto;
+                                
+                
+                        }
+                .incident-info  td:nth-child(1) {
+                                width: 25%;
+                                vertical-align: top;
+                                text-align: left;
+                                border-bottom: none;
+                                }
+
+                .incident-info  td:nth-child(2){
+                                width: 75%;
+                                height: 300px;
+                                vertical-align: top;
+                                text-align: left;
+                                border-bottom: none;
+                }
+                .blankrow {
+                                height: 50px !important;
+                                }
         </style>
 </head>
 
@@ -36,52 +87,61 @@
 
                         <tr>
                                 {% if gsa.injuryorillness %}
-                                <td> <i class="far fa-check-square"></i> Injury/Illness </td>
+                                <td> <i class="far fa-check-square"></i> Injury or</td>
                                 {% else %}
-                                <td><i class="far fa-square"></i> Injury/Illness </td>
+                                <td><i class="far fa-square"></i> Injury or </td>
                                 {% endif %}
 
 
 
                                 {% if gsa.environmental %}
-                                <td><i class="far fa-check-square"></i> Environmental </td>
+                                <td><i class="far fa-check-square"></i>  </td>
                                 {% else %}
-                                <td><i class="far fa-square"></i> Environmental </td>
+                                <td><i class="far fa-square"></i>  </td>
                                 {% endif %}
 
 
                                 {% if gsa.regulatory %}
-                                <td><i class="far fa-check-square"></i> Regulatory</td>
+                                <td><i class="far fa-check-square"></i> </td>
                                 {% else %}
-                                <td><i class="far fa-square"></i> Regulatory </td>
+                                <td><i class="far fa-square"></i>  </td>
                                 {% endif %}
 
                                 {% if gsa.economicdamage %}
 
-                                <td><i class="far fa-check-square"></i> Economic/Damage</td>
+                                <td><i class="far fa-check-square"></i> Economic/</td>
                                 {% else %}
-                                <td><i class="far fa-square"></i> Economic/Damage </td>
+                                <td><i class="far fa-square"></i> Economic/ </td>
                                 {% endif %}
 
                                 {% if gsa.reputation %}
 
-                                <td><i class="far fa-check-square"></i> Reputation</td>
+                                <td><i class="far fa-check-square"></i> </td>
                                 {% else %}
-                                <td><i class="far fa-square"></i> Reputation </td>
+                                <td><i class="far fa-square"></i> </td>
                                 {% endif %}
 
                                 {% if gsa.security %}
 
-                                <td><i class="far fa-check-square"></i> Security</td>
+                                <td><i class="far fa-check-square"></i> </td>
                                 {% else %}
-                                <td><i class="far fa-square"></i> Security </td>
+                                <td><i class="far fa-square"></i> </td>
                                 {% endif %}
 
                                 {% if gsa.fire %}
-                                <td><i class="far fa-check-square"></i> Fire</td>
+                                <td><i class="far fa-check-square"></i> </td>
                                 {% else %}
-                                <td><i class="far fa-square"></i> Fire </td>
+                                <td><i class="far fa-square"></i> </td>
                                 {% endif %}
+                        </tr>
+                        <tr>
+                                <td>Illnes</td>
+                                <td>Environmental</td>
+                                <td>Regulatory</td>
+                                <td>Damage</td>
+                                <td>Reputation</td>
+                                <td>Security</td>
+                                <td>Fire</td>
                         </tr>
 
                 </table>
@@ -95,7 +155,7 @@
                         </tr>
                 </table>
 
-                <table class="incident-info">
+                <table >
 
                         <tr>
                                 <td
@@ -201,48 +261,56 @@
                                 <td rowspan="3"
                                         style="background-color: lightgray; width:25%; text-align:left; vertical-align:top; border-bottom: none">
                                         Off Property Impact</td>
-
+                                <td style="width:25%">
                                 {% if gsa.sno %}
-                                <td><i class="far fa-check-square"></i> no </td>
+                                <i class="far fa-check-square"></i> no 
                                 {% else %}
-                                <td><i class="far fa-square"></i> no </td>
+                                <i class="far fa-square"></i> no 
                                 {% endif %}
+                                {% if gsa.rna %}
+                                <i class="far fa-check-square"></i> n/a 
+                               {% else %}
+                               <i class="far fa-square"></i> n/a 
+                               {% endif %}
+                               {% if gsa.syes %}
+                               <i class="far fa-check-square"></i> yes 
+                               {% else %}
+                               <i class="far fa-square"></i> yes 
+                               {% endif %}
+                                </td>
+                                
                                 <td
                                         style="background-color: lightgray; width:25%; text-align:left; vertical-align:top; border-bottom: none">
-                                        Regulatory Authorities Notified?</td>
+                                        Regulatory Authorities Notified?
 
-                                {% if gsa.rna %}
-                                <td> <i class="far fa-check-square"></i> N/A </td>
-                                {% else %}
-                                <td><i class="far fa-square"></i> N/A </td>
-                                {% endif %}
-
-
-                        </tr>
-                        <tr>
-                                {% if gsa.syes %}
-                                <td><i class="far fa-check-square"></i> yes </td>
-                                {% else %}
-                                <td><i class="far fa-square"></i> yes </td>
-                                {% endif %}
-                                <td style="background-color: lightgray;"> </td>
+                               </td>
+                               <td style="width:25%">
                                 {% if gsa.rno %}
-                                <td><i class="far fa-check-square"></i>no </td>
+                                <i class="far fa-check-square"></i>no
                                 {% else %}
-                                <td><i class="far fa-square"></i> no </td>
+                                <i class="far fa-square"></i> no 
                                 {% endif %}
                                 {% if gsa.ryes %}
-                                <td><i class="far fa-check-square"></i> yes </td>
+                                <i class="far fa-check-square"></i> yes 
                                 {% else %}
-                                <td><i class="far fa-square"></i> yes </td>
+                                <i class="far fa-square"></i> yes 
                                 {% endif %}
+                                </td>
+
                         </tr>
+                        
 
                         <tr>
                                 <td> comment </td>
-                                <td>{{gsa.scomment}}</td>
+                                <td style="width:25%"></td>
                                 <td> comment </td>
-                                <td>{{gsa.rcomment }}</td>
+                                
+                        </tr>
+
+                        <tr>
+                                <td style="width:25%"></tdstyle>{{gsa.scomment}}</td>
+                                <td style="width:25%"></td>
+                                <td style="width:25%"></tdstyle>{{gsa.rcomment }}</td>
                         </tr>
 
                 </table>
@@ -288,6 +356,7 @@
                                 {% else %}
                                 <td><i class="far fa-square"></i> Other</td>
                                 {% endif %}
+                                <td></td>
                         </tr>
                         <tr>
                                 <td>(Please Specify Chemical) </td>
@@ -330,9 +399,10 @@
                         {% else %}
                         <td><i class="far fa-square"></i> Land</td>
                         {% endif %}
+                        
+                        <td></td>
+                        <td></td>
                         </tr>
-                        
-                        
                 </table>
 
                 
@@ -368,33 +438,69 @@
                                  </td>
 
                                 <td style="background-color: lightgray;"> What Was Stolen</td>
-                                <td> {{gsa.stolentransactions}} # of Transactions {{gsa.stoltransactions}}</td>
+                                <td> 
+                                        {% if gsa.stolentransactions %}
+                                        <i class="far fa-check-square"></i>
+                                        {% else %}
+                                        <i class="far fa-square"></i> 
+                                        {% endif %}
+                                         # of Transactions {{gsa.stoltransactions}}</td>
                         </tr>
                         
                         <tr>
                                 <td>{{"Case #"}} {{gsa.pcase}} </td>
                                 <td style="background-color: lightgray; border: hidden"></td>
-                                <td>{{gsa.stolencards}} # of Cards {{gsa.stolcards}} </td>
+                                <td>
+                                        {% if gsa.stolencards %}
+                                        <i class="far fa-check-square"></i>
+                                        {% else %}
+                                        <i class="far fa-square"></i> 
+                                        {% endif %}
+                                         # of Cards {{gsa.stolcards}} </td>
                         </tr>
                         <tr>
                                 <td ></td>
                                 <td style="background-color: lightgray;border: hidden "></td>
-                                <td>{{gsa.stolentobacco}} Tobacco Value {{gsa.stoltobacco}} </td>
+                                <td>
+                                        {% if gsa.stolentobacco %}
+                                        <i class="far fa-check-square"></i>
+                                        {% else %}
+                                        <i class="far fa-square"></i> 
+                                        {% endif %}
+                                        Tobacco Value {{gsa.stoltobacco}} </td>
                         </tr>
                         <tr>
                                 <td style=" border: hidden" ></td>
                                 <td style="background-color: lightgray;border: hidden "></td>
-                                <td>{{gsa.stolenlottery}} Lottery Value {{gsa.stollottery}} </td>
+                                <td>
+                                        {% if gsa.stolenlottery %}
+                                        <i class="far fa-check-square"></i>
+                                        {% else %}
+                                        <i class="far fa-square"></i> 
+                                        {% endif %}
+                                        Lottery Value {{gsa.stollottery}} </td>
                         </tr>
                         <tr>
                                 <td style=" border: hidden" ></td>
                                 <td style="background-color: lightgray; border: hidden"></td>
-                                <td>{{gsa.stolenfuel}} Fuel Value {{gsa.stolfuel}} </td>
+                                <td>
+                                        {% if gsa.stolenfuel %}
+                                        <i class="far fa-check-square"></i>
+                                        {% else %}
+                                        <i class="far fa-square"></i> 
+                                        {% endif %}
+                                        Fuel Value {{gsa.stolfuel}} </td>
                         </tr>
                         <tr>
                                 <td style=" border: hidden" ></td>
                                 <td style="background-color: lightgray; border: hidden"></td>
-                                <td>{{gsa.stolenother}} Other {{gsa.stolother}} </td>
+                                <td>
+                                        {% if gsa.stolenother %}
+                                        <i class="far fa-check-square"></i>
+                                        {% else %}
+                                        <i class="far fa-square"></i> 
+                                        {% endif %}
+                                        Other {{gsa.stolother}} </td>
                         </tr>
                         <tr>
                                 <td style=" border: hidden" ></td>
@@ -404,45 +510,48 @@
                         <tr>
                                 <td></td>
                                 <td style="background-color: lightgray; "></td>
-                                <td>{{gsa.stolenna}} N/A: nothihng taken  </td>
+                                <td>
+                                       {% if gsa.stolenna %}
+                                       <i class="far fa-check-square"></i>
+                                       {% else %}
+                                       <i class="far fa-square"></i> 
+                                       {% endif %}
+                                        N/A: nothihng taken  </td>
                         </tr>
                 </table>
              
                 <table>
                         <tr>     
-                                <td style= "width:25%;">{{"Gener/Estimated Age"}} {{gsa.gender}} </td>
+                                <td style= "width:25%;">Gener/Estimated Age: {{gsa.gender}} </td>
                                 <td style = "width:50%; text-align: center" rowspan="10"> <img src='/Users/paulfuther/arla0061/flaskblog/static/images/SECURITYPERSON.jpg'></td>
-                                <td style="width:25%">{{gsa.scars}} {{"Visible Scars"}} </td>
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.scars}}  :Visible Scars </td>
                         </tr>
-                        <tr><td>{{"Height"}} {{gsa.height}} </td>
-                                <td>{{gsa.tatoos}} {{"Tatoos"}} </td>
+                        <tr><td>Height: {{gsa.height}} </td>
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.tatoos}} :Tatoos </td>
                         </tr>
-                        <tr><td>{{"Weight"}} {{gsa.weight}} </td>
-                                <td>{{gsa.hat}} {{"Type of Hat"}} </td>
+                        <tr><td>Weight: {{gsa.weight}} </td>
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.hat}} :Type of Hat </td>
                         </tr>
-                        <tr><td>{{"Hair Color/Cut"}} {{gsa.haircolor}} </td>
-                                <td>{{gsa.shirt}} {{"Shirt/Coat"}} </td>
+                        <tr><td>Hair Color/Cut: {{gsa.haircolor}} </td>
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.shirt}} :Shirt/Coat </td>
                         </tr>        
-                        <tr><td>{{"Complexion"}} {{gsa.complexion}} </td>
-                                <td>{{gsa.trousers}} {{"Trousers"}} </td>
+                        <tr><td>Complexion: {{gsa.complexion}} </td>
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.shoes}} :Shoes </td>
                         </tr>
-                        <tr><td>{{"Bear/Moustache"}} {{gsa.beardmoustache}} </td>
-                                <td>{{gsa.shoes}} {{"Shoes"}} </td>
-                        </tr>
-                        <tr><td>{{"Eye/Eyeglasses"}} {{gsa.eyeeyeglasses}} </td>
-                                <td>{{gsa.voice}} {{"Voice"}} </td>
+                        <tr><td>Eye/Eyeglasses: {{gsa.eyeeyeglasses}} </td>
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.voice}} :Voice </td>
                         </tr>   
-                        <tr> <td>{{"Licence #"}} {{gsa.licencenumber}} </td>
-                                <td>{{gsa.bumpersticker}} {{"Bumper Sticker"}} </td>
+                        <tr> <td>Licence # : {{gsa.licencenumber}} </td>
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.bumpersticker}} :Bumper Sticker </td>
                         </tr>      
-                        <tr><td>{{"Make/Model"}} {{gsa.makemodel}} </td> 
-                                <td>{{gsa.direction}} {{"Direction of Travel"}} </td>
+                        <tr><td>Make/Model: {{gsa.makemodel}} </td> 
+                                <td style="width:25%; text-align:right; padding-right:10px">{{gsa.direction}} :Direction of Travel </td>
                         </tr>
-                        <tr><td>{{"Color"}} {{gsa.color}} </td> 
-                                <td>{{gsa.damage}} {{"Damage/Rust"}} </td>
+                        <tr><td>Color: {{gsa.color}} </td> 
+                                <td style="width:25%; text-align:right; padding-right:10px"> {{gsa.damage}} :Damage/Rust </td>
                         </tr> 
-                                
-                        <tr class="blankrow"></tr>
+                       
+                        
                         
                 </table>
                 

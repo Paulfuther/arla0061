@@ -34,6 +34,7 @@ import dropbox
 from dropbox.files import WriteMode
 import pdfkit
 from io import BytesIO
+from twilio.rest import Client
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -58,6 +59,17 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
+account_sid = os.environ['TWILIO_ACCOUNT_SID']
+auth_token = os.environ['TWILIO_AUTH_TOKEN']
+client = Client(account_sid, auth_token)
+
+message = client.messages.create(
+                              body='Hello there!',
+                              from_='whatsapp:+14155238886',
+                              to='whatsapp:+15005550006'
+                          )
+
+print(message.sid)
 
 DROP_BOX_KEY = os.environ.get('DROP_BOX_KEY')
 
@@ -169,7 +181,8 @@ def make_incident_pdf(file_id):
 
         css = "flaskblog/static/main.css"
         file = Incident.query.get(file_id)
-        fdate = file.eventdate
+        fdate1 = file.eventdate
+        fdate= datetime.fdate1().strftime('%Y-%m-%d')
         fstore = file.location
         id = file_id
         print(fdate)

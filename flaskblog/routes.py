@@ -10,7 +10,7 @@ from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteInc
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, send_async_email, send_async_email2, \
-            make_pdf, make_incident_pdf, celery
+            make_pdf, make_incident_pdf, celery, client
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -126,6 +126,20 @@ def new_mail():
         print("we did it")
      return 'tasksent'
 
+@app.route('/comms', methods = ['GET', 'POST'])
+@login_required
+@roles_accepted('Admin', 'Manager')
+def send_whatsapp():
+    message = client.messages.create(
+                              body='Hello there! We are testing Whats App Integration',
+                              from_='whatsapp:+14155238886',
+                              to='whatsapp:+12269211300'
+                          )
+
+    print(message.sid)
+    return render_template("layout.html")
+
+
 @app.route('/testincident', methods = ['GET', 'POST'])
 def print_incident():
     form=SiteIncident()
@@ -160,13 +174,9 @@ def email(email):
 def eventreport():
     form = SiteIncident()
 
-    if request.method == "POST":
-        
-        
-        newtime=str(form.eventtime.data)
-        time2 =datetime.strptime(newtime, '%H:%M:%S').time()
-    
-        if form.validate_on_submit():
+    if form.validate_on_submit():
+            newtime=str(form.eventtime.data)
+            time2 =datetime.strptime(newtime, '%H:%M:%S').time()
             inc=Incident(injuryorillness=form.injuryorillness.data,
                             environmental =form.environmental.data,
                             regulatory =form.regulatory.data,
