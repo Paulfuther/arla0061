@@ -182,7 +182,10 @@ def make_incident_pdf(file_id):
         css = "flaskblog/static/main.css"
         file = Incident.query.get(file_id)
         fdate1 = file.eventdate
-        fdate= datetime.fdate1().strftime('%Y-%m-%d')
+        print(fdate1)
+        
+        fdate= datetime.strftime(fdate1,'%Y-%m-%d')
+        print(fdate)
         fstore = file.location
         id = file_id
         print(fdate)
@@ -209,20 +212,21 @@ def make_incident_pdf(file_id):
         #response.headers['Content-Disposition']='inline'
 
         for x in rol:
-            email = x.email
-            email_data = {
-                'subject': 'A new incident report has been filed',
-                'to': email,
-                'body': 'An incident report has been filed. {}'.format(filename),
-               
-            }
+                email = x.email
+                print(email)
+                email_data = {
+                    'subject': 'A new incident report has been filed',
+                    'to': email,
+                    'body': 'An incident report has been filed. {}'.format(filename),
+                
+                }
 
-            msg = Message(email_data['subject'],
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
-                  recipients=[email_data['to']])
-            msg.body = email_data['body']
-            msg.attach("pdf","application/pdf", pdf)
-            mail.send(msg)
+                msg = Message(email_data['subject'],
+                    sender=app.config['MAIL_DEFAULT_SENDER'],
+                    recipients=[email_data['to']])
+                msg.body = email_data['body']
+                msg.attach("pdf","application/pdf", pdf)
+                mail.send(msg)
         
         with file as f:    
             dbx.files_upload(f.read(), path=f"/SITEINCDIENTS/{filename}", mode=WriteMode('overwrite'))
