@@ -21,7 +21,7 @@
             
     <div   class="form-container">
 
-    <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+    <form id="userform" method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
     
         
         {{form.hidden_tag()}}
@@ -50,34 +50,20 @@
                         {% endif %}
         </div>
 
-        {% if emailpass == "1" %}
+
+
 
         <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form",  readonly=true, id="emailinput", placeholder="E-Mail")}} 
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
+        <div> {{form.email(class = "form",   id="emailinput", placeholder="E-Mail")}} 
+                    
                     <input type="hidden" id="hiddenemail" name="hiddenemail">
                     <input type="hidden" id="emailpass" name="emailpass", val="1">           
+        
+
+                    <div class="alert alert2-info" style="display: none;"></div>
+                    <div class="alert alert2-error" style="display: none"></div>
         </div>
-
-        {% else %}
-
-        <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form",id="emailinput", placeholder="E-Mail")}} 
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        <input type="hidden" id="hiddenemail" name="hiddenemail">
-        <input type="hidden" id="emailpass" name="emailpass", val="0">
-        {% endif %}
-
-      
+        
 
         <div  class="formtitle" >{{"Password:"}}</div>
         <div> {{form.password(class = "form", placeholder="Password")}} 
@@ -88,7 +74,10 @@
                     {% endif %}
         </div>
 
+
         <div></div>
+
+
 
         <div class="formcheckcontainer">
 
@@ -101,41 +90,17 @@
         
         
         
-            <div class="emailverifydiv">Is Email Valid</div>
-
-            <input type="hidden" id="emailv" name="emailv" value= "0">
-            <div class="circlebox">
-
-                {% if emailcheck1 == "1" %} 
-                <div class="circleem11", id="circleem11"> </div>
-                {% else %}
-
-            <div class="circleem1", id="circleem1"> </div>
-           
-                {% endif %}
-
-            </div>
+            
        
        
         
-            <div class="emailverifydiv">Is Email Unique</div>
-            <input type="hidden" id="emailvu" name="emailvu" value="0">
-            <div class="circlebox">
-
-                {% if emailcheck2 == "1" %}
-                <div class="circleem21", id="circleem21"></div>
-                {% else %}
-            <div class="circleem2", id="circleem2"></div>
-            {% endif %}
-            </div>
+          
             
         </div>
         <div></div>
         <div> </div>
-        <div></div>
-        <div class = "emailverifydiv2">
-            Both dots must be green
-        </div>
+        
+        
 
         
 
@@ -172,13 +137,18 @@
         
 
 
-        <div  class="formtitle" >{{"Phone Number:"}}</div>
-        <div> {{form.mobilephone(class = "form" ,placeholder="Phone Number")}} 
+        <div  class="formtitle"  >{{"Phone Number:"}}</div>
+        <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
+            <input type="hidden" id="hiddenphone" name="hiddenphone"   >
                     {% if form.mobilephone.errors %}
                         {% for error in form.mobilephone.errors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}        
                     {% endif %}
+        <input id="verify2" onclick="process(event)"  type="submit" class="formcheckbtn" value="Verify2" />
+        <div class="alert alert-info" style="display: none;"></div>
+        <div class="alert alert-error" style="display: none"></div>
+            
         </div>
         <div  class="formtitle" >{{"Start Date:"}}</div>
         <div> {{form.Startdate(class = "form" ,placeholder="Start Date")}} </div>
@@ -323,7 +293,7 @@
                     {% endif %}
         </div>
 
-        <div  class="formtitle" >{{"Saturday Availability"}}</div>
+    <div  class="formtitle" >{{"Saturday Availability"}}</div>
         <div> {{form.satavail(class = "form", placeholder="Saturday Availability")}} 
                     
                     {% if form.satavail.errors %}
@@ -346,19 +316,15 @@
         <!-- test delte after use-->
 
 
-         {% for course in course %}
+            {% for course in course %}
 
-            <div class = "formtitle" >{{ course }}</div>
-            <select class="form"name = "completed">
-                <option value = "n">N</option>
-                <option value = "y">Y</option>
-            </select>
-
-            </select>
-                <div class = "formtitle" >Date Completed  
-                </div> 
-                <input type = "date" class ="form"  name = "completeddate" value= {{completeddate}} >
-
+            <div class = "formtitle"  >{{ course }}</div>
+            <input class = "check-box" type="checkbox" name="myCheck" onclick="testfunction()" id="myCheck">
+            <div class = "check-completed formtitle" style="display:none">Date Completed  </div> 
+            <div class = "check-placeholder" id="placeholder" style="display:show"></div>
+            <div class = "check-placeholder2" id="placeholder" style="display:show"></div>
+            <input class = "form check-date" id="testingdiv" style="display:none" type = "date" class ="form"  name = "completeddate" value= {{completeddate}} >
+              
             
             {% endfor %}
 
@@ -380,6 +346,11 @@
     
     <script>
         $(function(){
+
+                const info2 = document.querySelector(".alert2-info");
+                const error2 = document.querySelector(".alert2-error");
+
+
             $('button').click(function(e){
                 e.preventDefault();
                 $.ajax({
@@ -390,60 +361,163 @@
                     
                     type: 'POST',
                 
+                    
+
                     success: function(response){
+
+                        info2.style.display = "none";
+                    error2.style.display = "none";
+
                         if (response[0] == 1){ 
-                            alert("valid"),
+                           
                             $('#circleem1').css('background', 'green'),
                             $("#emailv").val(1);
+                            
                     }
                        else {
-                           alert("not valid"),
+                           
                             $('#circleem1').css('background', 'red')
                             $("#emailv").val(0);
+                            error2.style.display = "";
+                            error2.innerHTML = `Invalid Email`;
+                            return
+                           
                        };
                       
-                       console.log(response);
+                 
 
                        if (response[1] == 1){ 
-                           alert("unique"),
+                          
                             $('#circleem2').css('background', 'green'),
                             $("#emailvu").val(1);
                     }
                        else {
-                           alert("not unique"),
+                         
                             $('#circleem2').css('background', 'red');
                             $("#emailvu").val(0);
+                            error2.style.display = "";
+                            error2.innerHTML = `Email already in use`;
+                            return
                        };
 
                         if ( response[0]&&response[1] == 1){
                         
                             l = document.getElementById("emailinput").value;
-                            document.getElementById("emailinput").readOnly=true;
+                           
                             $('#hiddenemail').val(l);
-                            $('#emailpass').val(1);                            
+                            $('#emailpass').val(1);   
+                            info2.style.display = "";
+                            info2.innerHTML = `Email is valid and unique`; 
+                            return                     
                         }   
                         else {
                             
-                            alert("please fix email");
+                            return
                         };
+                        
                     },
                          
-
-
+                    
+                    
                     error: function(error){
                         console.log(error)
                     },
                  
+                    
+                    always: function() {
+                    $("#userform").submit();
+                    }
+                
+                    
                 });
+               
             });
-
+            
         });
-
-
+             
     </script>
+                <script>
 
-</div>
-      
+                function testfunction(){
+              
+                    let checkBox = document.querySelectorAll(".check-box");
+                    let T = document.querySelectorAll('.check-date');
+                    let S = document.querySelectorAll('.check-placeholder');
+                    let U = document.querySelectorAll('.check-completed')
+                    let V = document.querySelectorAll('.check-placeholder2');
+
+                    
+                for( let i = 0; i < checkBox.length; i++ ){
+                    
+                   console.log(checkBox[i].value)
+                 if (checkBox[i].checked == true){
+                        
+                    T[i].style.display = "block";
+                    S[i].style.display= "none"; 
+                    U[i].style.display="block";
+                    V[i].style.display="none";
+                 } else
+                 {
+                    T[i].style.display = "none";
+                    S[i].style.display= "block";
+                    U[i].style.display = "none";
+                    V[i].style.display = "block";
+                 }
+                }
+                }
+                </script>
+
+
+             
+
+                <script>
+                    
+                const phoneInputField = document.querySelector("#phone");
+                const phoneInput = window.intlTelInput(phoneInputField, {
+                    preferredCountries: ["ca"],
+                utilsScript:
+                    "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                });
+
+                const info = document.querySelector(".alert-info");
+                const error = document.querySelector(".alert-error");
+
+                    function process(event) {
+                    event.preventDefault();
+
+                    const phoneNumber = phoneInput.getNumber();
+
+                    info.style.display = "none";
+                    error.style.display = "none";
+
+                    const data = new URLSearchParams();
+                    data.append("phone", phoneNumber);
+
+                    fetch("https://phone-look-up-4269.twil.io/lookup", {
+                    method: "POST",
+                    body: data,
+                    })
+                    .then((response) => response.json())
+                    .then((json) => {
+                        if (json.success) {
+                        info.style.display = "";
+                        info.innerHTML = `Valid E.164 format: <strong>${phoneNumber}</strong>`;
+                        } else {
+                        console.log(json.error);
+                        error.style.display = "";
+                        error.innerHTML = `Invalid phone number.`;
+                        }
+                    })
+                        .catch((err) => {
+                            error.style.display = "";
+                            error.innerHTML = `Something went wrong: ${err}`;
+                        });
+                        
+        
+                document.getElementById("hiddenphone").value = phoneNumber;
+                }
+                
+            </script>
     
 
 

@@ -422,7 +422,7 @@ class Grade(db.Model):
     employee = db.relationship('Employee', backref = 'grades')
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
     course = db.relationship('Course', backref='grade')
-    completeddate = db.Column(db.String(),  nullable=True)
+    completeddate = db.Column(db.Boolean, default = False)
       
 class staffschedule(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

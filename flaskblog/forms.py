@@ -70,7 +70,7 @@ class EmployeeForm(FlaskForm):
     email = StringField('Email', validators=[
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
-                              DataRequired(), Length(min=9, max=12)])
+                              DataRequired()])
     
     sinexpire = DateField('Sin Expire', format='%Y-%m-%d', validators=[Optional()])
     Startdate = DateField('Start Date', format='%Y-%m-%d',
@@ -118,13 +118,19 @@ class EmployeeForm(FlaskForm):
                            DataRequired(), Length(min=2, max=100)])
     submit = SubmitField('Add Employee')
 
-   
+    def validate_phone(self, mobilephone):
+        try:
+            p = phonenumbers.parse(mobilephone.data)
+            if not phonenumbers.is_valid_number(p):
+                raise ValueError()
+        except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
+            raise ValidationError('Invalid phone number')
 
         
-    def validate_mobilephone(self, mobilephone):
-        user = Employee.query.filter_by(mobilephone=mobilephone.data).first()
-        if user:
-            raise ValidationError( 'That mobile is Taken')
+    #def validate_mobilephone(self, mobilephone):
+    #    user = Employee.query.filter_by(mobilephone=mobilephone.data).first()
+    #    if user:
+    #        raise ValidationError( 'That mobile is Taken')
 
     
 
@@ -274,8 +280,7 @@ class schedule_start(FlaskForm):
                                           ('65077', '65077'), ('65231', '65231')])
  
 class GradeForm(FlaskForm):
-    completed = SelectField('Completed', choices=[
-                         ('Completed Y or N?', 'Completed Y or N?'), ('Y', 'Y'), ('N', 'N')], default="N")
+    completed = BooleanField()
     
     completeddate = DateField('Completed Date', format='%Y-%m-%d',
                           )

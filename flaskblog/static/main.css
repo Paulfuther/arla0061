@@ -22,6 +22,51 @@ body {
   
 }
 
+.hiddendiv {
+  display: none;
+}
+
+/* employee add css */
+
+.alert {
+  padding: 15px;
+  margin-top: 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.alert-info {
+  border-color: #bce8f1;
+  color: #31708f;
+  background-color: #d9edf7;
+  width: 95%;
+  margin-bottom: 14px;
+}
+
+.alert-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  width: 95%;
+  margin-bottom: 14px;
+}
+
+.alert2-info {
+  border-color: #bce8f1;
+  color: #31708f;
+  background-color: #d9edf7;
+  width: 95%;
+  margin-bottom: 14px;
+}
+
+.alert2-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  width: 95%;
+  margin-bottom: 14px;
+}
+
 /* pdf of employee file */
 
 /* report container*/

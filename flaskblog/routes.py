@@ -1006,9 +1006,9 @@ def addemployee():
     # email check 1 and 2 is for validation. May need to return back to the form
     # if so, then we want to hold the validation flags.
 
-    emailcheck1 = request.form.get('emailv')
-    emailcheck2 = request.form.get('emailvu')
-    emailpass = request.form.get('emailpass')
+    # beed this  emailcheck1 = request.form.get('emailv')
+    # need this  emailcheck2 = request.form.get('emailvu')
+    # need this  emailpass = request.form.get('emailpass')
     #print("hah", emailcheck1, emailcheck2, emailpass)
 
     # if email has failed valid or unique then the emailpass is null or 0
@@ -1016,12 +1016,12 @@ def addemployee():
     # and the email input to readOnly
     # we do not want to change an email once it has been properly validated
 
-    if emailpass == 0 or emailpass == "":
-        flash ('Email needs to be verified','success')
-        return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
+    # need this if emailpass == 0 or emailpass == "":
+        # beed this  flash ('Email needs to be verified','success')
+        # need this  return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
 
-    else:
-        pass
+    # need thnis else:
+        #  beed tgus  pass
     
     # if we made it this far then the email is good. It is both uniqe and valid
     # email pass is set to 1. This is reflected in an if loop in the jinja template.
@@ -1029,6 +1029,14 @@ def addemployee():
 
 
     if form.validate_on_submit():
+        user = Employee.query.filter_by(mobilephone=form.mobilephone.data).first()
+        if user:
+            flash ( 'That mobile is Taken')
+            target=request.form.get('hiddenphone')
+            form.mobilephone.data = target
+            return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course)
+       
+
         checker = form.active.data
         #print(checker)
         teststore = form.store.data
@@ -1075,61 +1083,62 @@ def addemployee():
         #print (form.manager.data.id)
         #print (form.store.data.id)
             
-        emp = Employee(user_id=newid,
-                       firstname=form.firstname.data,
-                       nickname=form.nickname.data,
-                       lastname=form.lastname.data,
-                       store=form.store.data,
-                       dob=form.dob.data,
-                       addressone=form.addressone.data,
-                       addresstwo=form.addresstwo.data,
-                       apt=form.apt.data,
-                       city=form.city.data,
-                       province=form.province.data,
-                       country=form.country.data,
-                       postal=form.postal.data,
-                       email=form.email.data,
-                       mobilephone=form.mobilephone.data,
-                       sinexpire=form.sinexpire.data,
-                       startdate=form.Startdate.data,
-                       enddate=form.Enddate.data,
-                       trainingid=form.trainingid.data,
-                       trainingpassword=form.trainingpassword.data,
-                       manager=form.manager.data.id,
-                       image_file=picture_file,
-                       iprismcode=form.iprismcode.data,
-                       mon_avail=form.monavail.data,
-                       tue_avail=form.tueavail.data,
-                       wed_avail=form.wedavail.data,
-                       thu_avail=form.thuavail.data,
-                       fri_avail=form.friavail.data,
-                       sat_avail=form.satavail.data,
-                       sun_avail=form.sunavail.data)
+        #emp = Employee(user_id=newid,
+        #               firstname=form.firstname.data,
+        #              nickname=form.nickname.data,
+        #               lastname=form.lastname.data,
+        #               store=form.store.data,
+        #               dob=form.dob.data,
+        #               addressone=form.addressone.data,
+        #               addresstwo=form.addresstwo.data,
+        #               apt=form.apt.data,
+        #               city=form.city.data,
+        #               province=form.province.data,
+        #               country=form.country.data,
+        #               postal=form.postal.data,
+        #               email=form.email.data,
+        #               mobilephone=form.mobilephone.data,
+        #               sinexpire=form.sinexpire.data,
+        #               startdate=form.Startdate.data,
+        #               enddate=form.Enddate.data,
+        #               trainingid=form.trainingid.data,
+        #               trainingpassword=form.trainingpassword.data,
+        #               manager=form.manager.data.id,
+        #               image_file=picture_file,
+        #               iprismcode=form.iprismcode.data,
+        #               mon_avail=form.monavail.data,
+        #               tue_avail=form.tueavail.data,
+        #               wed_avail=form.wedavail.data,
+        #               thu_avail=form.thuavail.data,
+        #               fri_avail=form.friavail.data,
+        #               sat_avail=form.satavail.data,
+        #               sun_avail=form.sunavail.data)
                                      
-        db.session.add(emp)  
+        #   need  db.session.add(emp)  
         # flush will get the id of the pending user so that
         # we can add the raining information     
-        #db.session.flush()
+        #   need  db.session.flush()
         
-        #print(emp.store, emp.manager)
+        # beed  print(emp.store, emp.manager)
         #print(type(form.store.data))
         
         # here we are adding the training courses and the compelted dates.
         # adding the dates requires some work.
         # the data has to be in the format that the database can read.
 
-
-        r = request.form.getlist("completeddate")
-        f = emp.id
+        # need all of this  
+    '''
+       # r = request.form.getlist("completeddate")
+       # f = emp.id
         
-        #print(emp.id)
+       # print(emp.id)
         
         y = 1
         yy = 0
         for x in request.form.getlist("completed"):
             grade_date = r[yy]
            
-            #print(f, y, x, r[yy])
+            print(f, y, x, r[yy])
             
             if grade_date == '':
                 completeddate = ''
@@ -1143,7 +1152,7 @@ def addemployee():
             y += 1
             yy += 1
            
-        #print(emp)
+        print(emp)
             
         # here we add the defuault role of GSA to new hire
         # you cannot add to the association table 
@@ -1151,14 +1160,20 @@ def addemployee():
         
         addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
         db.session.execute(addrole)
-        db.session.commit()
-       
-        flash('Employee has been added to the database', 'success')
+
+        # need this  db.session.commit()
+       '''
+    flash('Employee has been added to the database', 'success')
                 
-        return redirect(url_for('hrhome'))
-    
+       # return redirect(url_for('hrhome'))
+   #
+    target=request.form.get('hiddenphone')
+    form.mobilephone.data = target
     #print(form.errors.items())
-    return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
+    print(form.mobilephone.data)
+    print(target)
+    return render_template('employee.html', title='Employee Information', oldphone=target, form=form, form2=form2, course=course) #
+    #emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
 
 
 @app.route("/applications")
