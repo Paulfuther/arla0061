@@ -66,7 +66,21 @@ body {
   width: 95%;
   margin-bottom: 14px;
 }
+.alert3-info {
+  border-color: #bce8f1;
+  color: #31708f;
+  background-color: #d9edf7;
+  width: 95%;
+  margin-bottom: 14px;
+}
 
+.alert3-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  width: 95%;
+  margin-bottom: 14px;
+}
 /* pdf of employee file */
 
 /* report container*/
@@ -1782,7 +1796,7 @@ ul.a {
   width: 95%;
   border:black;
   display:grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(2,1fr);
 }
 
 
@@ -1790,9 +1804,9 @@ ul.a {
 .formcheckbtn {
   
   background-color: lightskyblue;
-  
+  width: 100%;
   color: black;
-  padding: 15px 32px;
+  padding: 15px 32px 10px 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -1803,13 +1817,21 @@ ul.a {
 
 
 .formbutton {
-  grid-column-start: 3;
-  grid-column-end: 4;
+  grid-column-start: 2;
+  grid-column-end: 3;
   text-align: right;
+  padding: 10px 0px 10px 10px;
 }
 
 .formcheckbtn:hover {
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.formbutton2 {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  text-align: left;
+  padding: 10px 10px 10px 0px;
 }
 
 .emailverifydiv {

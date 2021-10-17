@@ -116,21 +116,9 @@ class EmployeeForm(FlaskForm):
                            DataRequired(), Length(min=2, max=100)])
     sunavail = StringField('Sunday Availability', validators=[
                            DataRequired(), Length(min=2, max=100)])
-    submit = SubmitField('Add Employee')
+    submit2 = SubmitField('Add Employee')
 
-    def validate_phone(self, mobilephone):
-        try:
-            p = phonenumbers.parse(mobilephone.data)
-            if not phonenumbers.is_valid_number(p):
-                raise ValueError()
-        except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
-            raise ValidationError('Invalid phone number')
-
-        
-    #def validate_mobilephone(self, mobilephone):
-    #    user = Employee.query.filter_by(mobilephone=mobilephone.data).first()
-    #    if user:
-    #        raise ValidationError( 'That mobile is Taken')
+    
 
     
 
@@ -138,26 +126,7 @@ class EmployeeForm(FlaskForm):
 
     
         
-    def validate_trainingid(self, trainingid):
-        user = Employee.query.filter_by(trainingid=trainingid.data).first()
-        if user:
-            raise ValidationError('That id is Taken')
-
-    def validate_store(self, store):
-        if store.data == "Home Store":
-            raise ValidationError('Please Enter a Store')
-
-    def validate_active(self, active):
-
-        if active.data == "Active":
-            print("homestore")
-            raise ValidationError('Must indicate active or not')
-
-    def validate_manager(self, manager):
-
-        if manager.data == "Manager Name":
-            print("Manager Name")
-            raise ValidationError('Must Select a Manager')
+   
    
     
   

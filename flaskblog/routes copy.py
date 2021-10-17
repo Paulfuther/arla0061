@@ -348,16 +348,20 @@ def emailme():
 def verify():
     form = EmployeeForm()
     email = request.form['email']
-    mobilephone = request.form['mobilephone']
-    print(email,mobilephone)
-    
-        
-    #check to see if email is blank
-
+    print(email)
     if email == "":
         response = (0)
-       #return jsonify(response)
+        response2 = (0)
+        return jsonify(response, response2)
 
+    emailcheck = User.query.filter_by(email=form.email.data).first()
+    if emailcheck:
+        response2 = (0)
+    else:
+        response2 = (1)
+
+    
+    
     email_address_info = verifier.verify(email)
     if email_address_info is not None:
         data = dumps(loads(email_address_info.json_string), indent=4)
@@ -370,38 +374,12 @@ def verify():
             #flash("please chekck your email. It does not work")
             print("bad email")
             #return render_template('employee.html', form=form)
-            response =(2)
-        else:
-            response = (3)
-
-    # check to see if email is already in use in the database.
-
-    emailcheck = User.query.filter_by(email=form.email.data).first()
-    if emailcheck:
-        response = (1)
-        #return jsonify(response)
-   
-    # check to see if email is valid using service
-
-   
-       
-            #return jsonify(response)
-    #else:
-     #   pass
-    if mobilephone == "":
-        response2 = (7)
-    else:    
-        user = Employee.query.filter_by(mobilephone=mobilephone).first()
-        if user:
-            response2 = (5)
-        else:
-            response2 = (6)
-        #return jsonify(response)
-    #print("test")
-
-    #if email is unique and valide pass repsonse of 3
-
-    
+            response =(0)
+            return jsonify(response, response2)
+    else:
+        pass
+    print("test")
+    response = (1)
     print(response, response2)
     return jsonify(response, response2)
 
@@ -1018,26 +996,51 @@ def updategsa(staff_id):
 @login_required
 @roles_accepted('Admin', 'Manager')
 def addemployee():
+    
+    # here we set the appropriate forms
+
     form = EmployeeForm()   
     form2 = GradeForm()
     course = Course.query.all()
+    
+    # email check 1 and 2 is for validation. May need to return back to the form
+    # if so, then we want to hold the validation flags.
 
-    # the get is for the first load of the page
+    # beed this  emailcheck1 = request.form.get('emailv')
+    # need this  emailcheck2 = request.form.get('emailvu')
+    # need this  emailpass = request.form.get('emailpass')
+    #print("hah", emailcheck1, emailcheck2, emailpass)
 
-    if request.method=="GET":
-        return render_template('employee.html', title='Employee Information',form=form, form2=form2, course=course)
+    # if email has failed valid or unique then the emailpass is null or 0
+    # if so then return back. However, we need to hold the status flagas
+    # and the email input to readOnly
+    # we do not want to change an email once it has been properly validated
 
-    # here we submit a form...which should be valid
+    # need this if emailpass == 0 or emailpass == "":
+        # beed this  flash ('Email needs to be verified','success')
+        # need this  return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
+
+    # need thnis else:
+        #  beed tgus  pass
+    
+    # if we made it this far then the email is good. It is both uniqe and valid
+    # email pass is set to 1. This is reflected in an if loop in the jinja template.
+    # we do not want anyone to change the email address once it has been validated.
+
 
     if form.validate_on_submit():
-   
-        target=request.form.get('hiddenphone')
-        form.mobilephone.data = target
-        print(target)
+        user = Employee.query.filter_by(mobilephone=form.mobilephone.data).first()
+        if user:
+            flash ( 'That mobile is Taken')
+            target=request.form.get('hiddenphone')
+            form.mobilephone.data = target
+            return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course)
+       
+
         checker = form.active.data
-        print("checker",checker)
+        #print(checker)
         teststore = form.store.data
-        print(teststore.id)
+        #print(teststore.id)
         newuser = request.form.get('hiddenemail')
 
         # here we encrypt the password.
@@ -1045,38 +1048,40 @@ def addemployee():
         newpass = request.form.get('password')
         newpassword = encrypt_password(newpass)
         
-        active = request.form.get('checkbox')
-        print(active)
+        #active = request.form.get('checkbox')
+        #print(active)
         active = 1
         if checker:
             active = 1
         else:
             active = 0
-        print(active)
+        #print(active)
         user_name = request.form.get('username')
 
-        print(active, newuser, newpassword)
+        #print(active, newuser, newpassword)
 
         adduser = User(email=newuser,
                     password=newpassword,
                     active=active,
                     user_name=user_name)
 
-        #db.session.add(adduser)
-        #db.session.flush()
+        db.session.add(adduser)
+        db.session.flush()
         #db.session.commit()
 
         newid = adduser.id
         
-        print(newid)
+        #user_datastore.add_role_to_user(newid,5)
+        
+        #print(newid)
         
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
         else:
             picture_file = '3d611379cfdf5a89.jpg'
        
-        print (form.manager.data.id)
-        print (form.store.data.id)
+        #print (form.manager.data.id)
+        #print (form.store.data.id)
             
         #emp = Employee(user_id=newid,
         #               firstname=form.firstname.data,
@@ -1123,8 +1128,8 @@ def addemployee():
 
         # need all of this  
     '''
-        r = request.form.getlist("completeddate")
-        f = emp.id
+       # r = request.form.getlist("completeddate")
+       # f = emp.id
         
        # print(emp.id)
         
@@ -1160,9 +1165,15 @@ def addemployee():
        '''
     flash('Employee has been added to the database', 'success')
                 
-    return redirect(url_for('hrhome'))
-   
-    
+       # return redirect(url_for('hrhome'))
+   #
+    target=request.form.get('hiddenphone')
+    form.mobilephone.data = target
+    #print(form.errors.items())
+    print(form.mobilephone.data)
+    print(target)
+    return render_template('employee.html', title='Employee Information', oldphone=target, form=form, form2=form2, course=course) #
+    #emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
 
 
 @app.route("/applications")
