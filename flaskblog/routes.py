@@ -10,7 +10,8 @@ from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteInc
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, send_async_email, send_async_email2, \
-            make_pdf, make_incident_pdf, celery, client
+            make_pdf, make_incident_pdf, celery, client, twilio_from, validate_twilio_request, sg, Mail, \
+                SendGridAPIClient
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -37,6 +38,7 @@ from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_mail import Message
 from json import dumps, loads
+from twilio.twiml.messaging_response import MessagingResponse
 import time
 #from flaskblog.tasks import celery
 
@@ -133,14 +135,57 @@ def send_whatsapp():
     message = client.messages.create(
                               body='Hello there! We are testing Whats App Integration',
                               from_='whatsapp:+14155238886',
-                              to='whatsapp:+12269211300'
+                              to='whatsapp:+15196707469'
                           )
 
     print(message.sid)
     return render_template("layout.html")
 
+@app.route("/sms2", methods= ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def send_sms():
+    message = client.messages\
+        .create(
+            body="Paul is testing sms",
+            from_=twilio_from,
+            to='+15196707469'
+        )
+
+    print(message.sid)
+    return render_template("layout.html")
+
+@app.route("/sms", methods=['GET', 'POST'])
+@validate_twilio_request
+def sms_reply():
+    """Respond to incoming calls with a simple text message."""
+    # Start our TwiML response
+    resp = MessagingResponse()
+
+    # Add a message
+    resp.message("The Robots are coming! Head for the hills!")
+
+    return str(resp)
+
+@app.route('/sendgridtest', methods = ['GET','POST'])
+def send_sendgrid():
+
+    message = Mail(
+    from_email='paul.futher@outlook.com',
+    to_emails='paul.futher@gmail.com',
+    subject='Sending with Twilio SendGrid is Fun',
+    html_content='<strong>and easy to do anywhere, even with Python</strong>')
+    
+    print(sg)
+    response = sg.send(message)
+    #print(response.status_code)
+    #print(response.body)
+    #print(response.headers)
+   
+    return render_template("layout.html")
 
 @app.route('/testincident', methods = ['GET', 'POST'])
+@login_required
 def print_incident():
     form=SiteIncident()
     x=int(1)
@@ -173,6 +218,8 @@ def email(email):
 @roles_accepted('Admin', 'Manager')
 def eventreport():
     form = SiteIncident()
+
+    # get all of the information from the form
 
     if form.validate_on_submit():
             newtime=str(form.eventtime.data)
@@ -265,12 +312,13 @@ def eventreport():
             print(inc.id)
             file_id = int(inc.id)
             flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
+            
+            # once the data has been written to the database, we create a pdf.
+            # we call a task mamanger to do this. That is the apply_async
+
             make_incident_pdf.apply_async(args=[file_id], countdown=10)
             return render_template('layout.html')
-            
-            
-    
-
+           
     return render_template('eventreport.html', form=form)
 
 @app.route("/nofile")
@@ -349,7 +397,8 @@ def verify():
     form = EmployeeForm()
     email = request.form['email']
     mobilephone = request.form['mobilephone']
-    print(email,mobilephone)
+    hiddenmobile = request.form['mobilephone2']
+    print(email,mobilephone, hiddenmobile)
     
         
     #check to see if email is blank
@@ -720,21 +769,25 @@ def trainingcompliance():
 @login_required
 def updategsatraining(staff_id):
     
+    # get employee information form the database
+
     gsa = Employee.query.get(staff_id)
     store = Store.query.all()
     course = Course.query.all()
-    for x in course:
-        print(x.id, x.name)
+    #for x in course:
+    #    print(x.id, x.name)
         
+    # get course infomraiton and grade by empployee
+
     gradelist = Grade.query\
         .filter_by(employee_id=staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value, Grade.completeddate)\
+        .add_columns(Course.name, Grade.completed, Grade.completeddate)\
         .order_by(Grade.course_id)
     
-    for x in gradelist:
-        print(x.name,x.value, x.completeddate)
+    #for x in gradelist:
+    #    print(x.name,x.completed, x.completeddate)
     
     # here we are updating the training grade information
     # we get an object that we can alter. Use the .first to do this
@@ -744,29 +797,47 @@ def updategsatraining(staff_id):
     # then increment course by 1
     # then commit
     
+    # There are two things to receive, the compelted date and the check box information
+    # one has the id of completeddate and the other has the id of myCheck2
+    # we then loop over the number of courses to enter new competed dates.
+    # note. check boxes will not exist if they are not checked.
+    # We need to check the completed date first, then create a value for the checkbox.
+    # then enter this information into the database
+
+
     if request.method == "POST":
         r = request.form.getlist("completeddate")
-        
+        g = request.form.getlist("myCheck2")
+        #print(r)
         form = request.form 
         f=staff_id
         yy=0
         y = 1
         z=1
-        for x in request.form.getlist("completed"):
+        for x in course:
                 
+                # here we get the course infomration for the employee.
+                # any changes made will over write the exisiting data.
+                # we are not creating a duplicate entry.
+
                 t=Grade.query.filter_by(employee_id=staff_id).filter_by(course_id=y).first()
-                t.value = x
+                grade_date = r[yy]
+                if grade_date=="":
+                    completeddate = ''
+                    grade_check = 0
+                
+                else:
+                    grade_check = 1
+                    completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
+                    #print(grade_check, completeddate)
+                t.completed= grade_check
                 t.completeddate = r[yy]
-                print(y,x, r[yy])
+                #print(y,x, r[yy])
                 #print(t.__dict__)
                 #print(x,r)
                 y+=1 
                 yy +=1
                 db.session.commit()
-
-            #pdfkit.from_url('127.0.0.1:5000/hrfile6' , 'out.pdf')
-
-            #db.session.commit()
 
         flash('Employee Training Compliance Has Been Updated', 'success')
         
@@ -779,7 +850,9 @@ def updategsatraining(staff_id):
 
         return redirect(url_for('hrhome'))
     
-    
+    # this is the GET line. Create the dashboard for the employee with the data from 
+    # gsa, store, course and gradelist, done up top.
+
     return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
 
 
@@ -1021,7 +1094,8 @@ def addemployee():
     form = EmployeeForm()   
     form2 = GradeForm()
     course = Course.query.all()
-
+    coursecount = int(Course.query.count())
+    print(coursecount)
     # the get is for the first load of the page
 
     if request.method=="GET":
@@ -1033,11 +1107,11 @@ def addemployee():
    
         target=request.form.get('hiddenphone')
         form.mobilephone.data = target
-        print(target)
+        #print(target)
         checker = form.active.data
-        print("checker",checker)
+        #print("checker",checker)
         teststore = form.store.data
-        print(teststore.id)
+        #print(teststore.id)
         newuser = request.form.get('hiddenemail')
 
         # here we encrypt the password.
@@ -1045,76 +1119,85 @@ def addemployee():
         newpass = request.form.get('password')
         newpassword = encrypt_password(newpass)
         
+        # here we enable the user
+
         active = request.form.get('checkbox')
-        print(active)
+        #print(active)
         active = 1
         if checker:
             active = 1
         else:
             active = 0
-        print(active)
+        #print(active)
         user_name = request.form.get('username')
 
-        print(active, newuser, newpassword)
+        #print(active, newuser, newpassword)
+        # now add the user to the database
 
         adduser = User(email=newuser,
                     password=newpassword,
                     active=active,
                     user_name=user_name)
 
-        #db.session.add(adduser)
-        #db.session.flush()
-        #db.session.commit()
+        db.session.add(adduser)
+        # flush will create an entry in the database that cannot be over written.
+        # flush then gives us the user id. 
+        # we need the user id to go along with the employee id.
+
+        db.session.flush()
+        db.session.commit()
 
         newid = adduser.id
         
-        print(newid)
+        #print(newid)
         
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
         else:
             picture_file = '3d611379cfdf5a89.jpg'
        
-        print (form.manager.data.id)
-        print (form.store.data.id)
-            
-        #emp = Employee(user_id=newid,
-        #               firstname=form.firstname.data,
-        #              nickname=form.nickname.data,
-        #               lastname=form.lastname.data,
-        #               store=form.store.data,
-        #               dob=form.dob.data,
-        #               addressone=form.addressone.data,
-        #               addresstwo=form.addresstwo.data,
-        #               apt=form.apt.data,
-        #               city=form.city.data,
-        #               province=form.province.data,
-        #               country=form.country.data,
-        #               postal=form.postal.data,
-        #               email=form.email.data,
-        #               mobilephone=form.mobilephone.data,
-        #               sinexpire=form.sinexpire.data,
-        #               startdate=form.Startdate.data,
-        #               enddate=form.Enddate.data,
-        #               trainingid=form.trainingid.data,
-        #               trainingpassword=form.trainingpassword.data,
-        #               manager=form.manager.data.id,
-        #               image_file=picture_file,
-        #               iprismcode=form.iprismcode.data,
-        #               mon_avail=form.monavail.data,
-        #               tue_avail=form.tueavail.data,
-        #               wed_avail=form.wedavail.data,
-        #               thu_avail=form.thuavail.data,
-        #               fri_avail=form.friavail.data,
-        #               sat_avail=form.satavail.data,
-        #               sun_avail=form.sunavail.data)
+        #print (form.manager.data.id)
+        #print (form.store.data.id)
+
+        # Here we create the new employee in the database.
+
+        emp = Employee(user_id=newid,
+                       firstname=form.firstname.data,
+                       nickname=form.nickname.data,
+                       lastname=form.lastname.data,
+                       store=form.store.data,
+                       dob=form.dob.data,
+                       addressone=form.addressone.data,
+                       addresstwo=form.addresstwo.data,
+                       apt=form.apt.data,
+                       city=form.city.data,
+                       province=form.province.data,
+                       country=form.country.data,
+                       postal=form.postal.data,
+                       email=form.email.data,
+                       mobilephone=form.mobilephone.data,
+                       sinexpire=form.sinexpire.data,
+                       startdate=form.Startdate.data,
+                       enddate=form.Enddate.data,
+                       trainingid=form.trainingid.data,
+                       trainingpassword=form.trainingpassword.data,
+                       manager=form.manager.data.id,
+                       image_file=picture_file,
+                       iprismcode=form.iprismcode.data,
+                       mon_avail=form.monavail.data,
+                       tue_avail=form.tueavail.data,
+                       wed_avail=form.wedavail.data,
+                       thu_avail=form.thuavail.data,
+                       fri_avail=form.friavail.data,
+                       sat_avail=form.satavail.data,
+                       sun_avail=form.sunavail.data)
                                      
-        #   need  db.session.add(emp)  
+        db.session.add(emp)  
         # flush will get the id of the pending user so that
         # we can add the raining information     
-        #   need  db.session.flush()
+        db.session.flush()
         
-        # beed  print(emp.store, emp.manager)
+        #print(emp.store, emp.manager)
         #print(type(form.store.data))
         
         # here we are adding the training courses and the compelted dates.
@@ -1122,49 +1205,55 @@ def addemployee():
         # the data has to be in the format that the database can read.
 
         # need all of this  
-    '''
+    
         r = request.form.getlist("completeddate")
+        g = request.form.getlist("myCheck2")
         f = emp.id
         
-       # print(emp.id)
+        print(emp.id)
         
-        y = 1
         yy = 0
-        for x in request.form.getlist("completed"):
-            grade_date = r[yy]
-           
-            print(f, y, x, r[yy])
+        y=1
+        
+        for x in r:
             
-            if grade_date == '':
+            grade_date = r[yy]
+            if grade_date == "":
+                grade_check = 0
                 completeddate = ''
+                print(g,"X")
+
             else:
+                grade_check = 1
                 completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
-            empgrade = Grade(value=x,
+                print(g,completeddate)
+          
+            empgrade = Grade(
                              employee_id=f,
                              course_id=y,
-                             completeddate =  completeddate)                
+                             completed = grade_check,
+                             completeddate =  completeddate)  
+            print(f, y, x, completeddate, grade_check)
             db.session.add(empgrade)
             y += 1
             yy += 1
            
-        print(emp)
+        #print(emp)
             
         # here we add the defuault role of GSA to new hire
         # you cannot add to the association table 
         # instead you insert
         
-        addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
-        db.session.execute(addrole)
+        #addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
+        #db.session.execute(addrole)
 
-        # need this  db.session.commit()
-       '''
+        db.session.commit()
+       
     flash('Employee has been added to the database', 'success')
                 
     return redirect(url_for('hrhome'))
    
     
-
-
 @app.route("/applications")
 #@login_required
 @roles_required('Admin')

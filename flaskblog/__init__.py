@@ -9,7 +9,7 @@ import os
 import json
 from datetime import datetime
 from flask import render_template_string, make_response, url_for, redirect, send_from_directory, \
-     request, render_template, send_file
+     request, render_template, send_file, abort
 from flask_admin import Admin, expose, BaseView
 from flask_admin.actions import action
 from flask_sqlalchemy import SQLAlchemy
@@ -35,7 +35,10 @@ from dropbox.files import WriteMode
 import pdfkit
 from io import BytesIO
 from twilio.rest import Client
-
+from functools import wraps
+from twilio.request_validator import RequestValidator
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 load_dotenv()
@@ -61,15 +64,33 @@ app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 account_sid = os.environ['TWILIO_ACCOUNT_SID']
 auth_token = os.environ['TWILIO_AUTH_TOKEN']
+twilio_from = os.environ['TWILIO_FROM']
+sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+
 client = Client(account_sid, auth_token)
 
-message = client.messages.create(
-                              body='Hello there!',
-                              from_='whatsapp:+14155238886',
-                              to='whatsapp:+15005550006'
-                          )
+def validate_twilio_request(f):
+    """Validates that incoming requests genuinely originated from Twilio"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Create an instance of the RequestValidator class
+        validator = RequestValidator(os.environ.get('TWILIO_AUTH_TOKEN'))
 
-print(message.sid)
+        # Validate the request using its URL, POST data,
+        # and X-TWILIO-SIGNATURE header
+        request_valid = validator.validate(
+            request.url,
+            request.form,
+            request.headers.get('X-TWILIO-SIGNATURE', ''))
+
+        # Continue processing the request if it's valid, return a 403 error if
+        # it's not
+        if request_valid:
+            return f(*args, **kwargs)
+        else:
+            return abort(403)
+    return decorated_function
+
 
 DROP_BOX_KEY = os.environ.get('DROP_BOX_KEY')
 
@@ -417,12 +438,13 @@ class Course(db.Model):
    
 class Grade(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    value = db.Column(db.String(), default="n")
+    
     employee_id = db.Column(Integer(), ForeignKey('employee.id'))
     employee = db.relationship('Employee', backref = 'grades')
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
     course = db.relationship('Course', backref='grade')
-    completeddate = db.Column(db.Boolean, default = False)
+    completed = db.Column(db.Boolean, default = False)
+    completeddate = db.Column(db.String(), nullable=True)
       
 class staffschedule(db.Model):
     id = db.Column(db.Integer(), primary_key=True)

@@ -249,7 +249,7 @@ class schedule_start(FlaskForm):
                                           ('65077', '65077'), ('65231', '65231')])
  
 class GradeForm(FlaskForm):
-    completed = BooleanField()
+    completed = BooleanField('Check If Completed', default=False)
     
     completeddate = DateField('Completed Date', format='%Y-%m-%d',
                           )

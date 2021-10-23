@@ -314,8 +314,8 @@
             {% for course in course %}
 
             <div class = "formtitle"  >{{ course }}</div>
-            <input class = "check-box" style="margin: 0px 0px 10px 20px" type="checkbox" name="myCheck" onclick="testfunction()" id="myCheck">  
-           
+            <input class = "check-box"  style="margin: 0px 0px 10px 20px" type="checkbox" name="myCheck2" onclick="testfunction()" id="myCheck2" >  
+         
             
             <div class = "check-completed formtitle" style="display:none">Date Completed  </div> 
             <div class = "check-placeholder" id="placeholder" style="display:show"></div>
@@ -349,6 +349,9 @@
                 
 
                 $(function makevalidate(){
+                
+
+
                         const info = document.querySelector(".alert-info");
                         const error = document.querySelector(".alert-error");
                         const info2 = document.querySelector(".alert2-info");
@@ -366,25 +369,26 @@
                             info3.style.display = "none";
                             error3.style.display = "none";
                             var checkphone = 0;
-
+                            
                             {
                            
                            const phoneNumber = phoneInput.getNumber();
-
+                           document.getElementById("hiddenphone").value = phoneNumber;
                            info.style.display = "none";
                            error.style.display = "none";
                        
                            const data = new URLSearchParams();
                            data.append("phone", phoneNumber);
-
+                            
                            fetch("https://phone-look-up-4269.twil.io/lookup", {
                            method: "POST",
                            body: data,
+                           
                            })
                            .then((response) => response.json())
                            .then((json) => {
                            if (json.success) {
-                            document.getElementById("hiddenphone").value = phoneNumber;
+                            
                            } else {
                            console.log(json.error);
                            error.style.display = "";
