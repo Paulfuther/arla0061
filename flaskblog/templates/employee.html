@@ -394,6 +394,7 @@
                            error.style.display = "";
                            error.innerHTML = `Invalid phone number.`;
                            info3.style.display = "none";
+                           document.getElementById("emailinput").style.borderColor = "#a9442";
                            checkphone = 1;
                            console.log(checkphone);
                             return;
@@ -425,31 +426,38 @@
                                 if (response[0] == 0){ 
                                     error2.style.display = "";
                                     error2.innerHTML = `Pleaes Enter an Email`; 
-                                    return
+                                    document.getElementById("emailinput").className = "form-bad";
+                                 
                                     }
                                 else if (response[0] == 1) {
                                         console.log("oops");
                                     error2.style.display = "";
                                     error2.innerHTML = `Email Already In Use`;
-                                      return
+                                    document.getElementById("emailinput").className = "form-bad";
+                                     
                                     }
                                 else if (response[0] == 2){ 
                                     error2.style.display = "";
                                     error2.innerHTML = `Email Is Not valid`;
-                                    return      
+                                    document.getElementById("emailinput").className = "form-bad";
+                                      
                                     }
                                 else if ( response[0] == 3){ 
+                                    info2.style.display="";
+                                    info2.innerHTML = 'Email is good';
+                                    document.getElementById("emailinput").className = "form-good";
                                     }
                                     
                                 if ( response[1] == 5){
                                     error3.style.display = "";
                                     error3.innerHTML = `Phone number in already used`; 
                                     info.style.display = "none"
-                                    return
+                                   
                                     }
                                 else if ( response[1] == 6 && checkphone==0){
                                     info2.style.display="";
                                     info2.innerHTML = 'Email is good';
+                                    document.getElementById("emailinput").className = "form-good";
                                     info3.style.display="";
                                     info3.innerHTML = 'Phone # is good';
                                     document.getElementById("emailinput").readOnly = true;
@@ -463,7 +471,7 @@
                            
                                     error3.style.display = "";
                                     error3.innerHTML = `Please Enter a phonenumber`; 
-                                    return
+                                   
                                     }                              
                                 },                                   
                         })                       

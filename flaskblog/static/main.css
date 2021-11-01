@@ -1746,17 +1746,34 @@ ul.a {
 }
 
 .form {
-  background: #f5f5f5;
   
-  
-  margin-bottom: 10px;
-  
+  margin: 10px 0px 10px 0px;
+  border-color: none;
   width: 95%;
   padding: 15px 15px 15px 15px;
-  border-radius: 3px;
+  
   font-size: 20px;
 
 }
+
+.form-bad {
+  margin: 10px 0px 10px 0px;
+  width: 95%;
+  padding: 15px 15px 15px 15px;
+  font-size: 20px;
+  background-color: #f2dede;
+  border-color: none;
+}
+
+.form-good {
+  margin: 10px 0px 10px 0px;
+  width: 95%;
+  padding: 15px 15px 15px 15px;
+  font-size: 20px;
+  background-color: #d9edf7;
+  border-color: none;
+}
+
 .form2 {
   background: #eee;
   border: none;
@@ -1803,7 +1820,7 @@ ul.a {
 
 .formcheckbtn {
   
-  background-color: lightskyblue;
+  background-color: #d9edf7;
   width: 100%;
   color: black;
   padding: 15px 32px 10px 10px;

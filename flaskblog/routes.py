@@ -147,9 +147,9 @@ def send_whatsapp():
 def send_sms():
     message = client.messages\
         .create(
-            body="Paul is testing sms",
+            body="Paul Futher is testing sms from our website. No need to reply.",
             from_=twilio_from,
-            to='+15196707469'
+            to='+12269211300'
         )
 
     print(message.sid)
@@ -396,23 +396,26 @@ def emailme():
 def verify():
     form = EmployeeForm()
     email = request.form['email']
-    mobilephone = request.form['mobilephone']
+    mobile = request.form['mobilephone']
     hiddenmobile = request.form['mobilephone2']
-    print(email,mobilephone, hiddenmobile)
-    
+    emailcheck = User.query.filter_by(email=form.email.data).first()
+    email_address_info = verifier.verify(email)
+    print(email,mobile, hiddenmobile)
+    print(emailcheck)
         
     #check to see if email is blank
 
     if email == "":
         response = (0)
-       #return jsonify(response)
-
-    email_address_info = verifier.verify(email)
-    if email_address_info is not None:
+        print("no email")
+    # check to see if email is already in use in the database.    
+    elif emailcheck:
+        response = (1)
+    # check to see if email is valid using service 
+    elif email_address_info is not None:
         data = dumps(loads(email_address_info.json_string), indent=4)
         resp = make_response(data, 200)
         resp.headers['Content-Type'] = 'application/json'
- 
         value1 = json.loads(data)
         print (value1['formatCheck'],value1['smtpCheck'])
         if value1['smtpCheck'] == 'false':
@@ -422,34 +425,15 @@ def verify():
             response =(2)
         else:
             response = (3)
-
-    # check to see if email is already in use in the database.
-
-    emailcheck = User.query.filter_by(email=form.email.data).first()
-    if emailcheck:
-        response = (1)
-        #return jsonify(response)
-   
-    # check to see if email is valid using service
-
-   
-       
-            #return jsonify(response)
-    #else:
-     #   pass
-    if mobilephone == "":
+    
+    if mobile == "":
         response2 = (7)
     else:    
-        user = Employee.query.filter_by(mobilephone=mobilephone).first()
+        user = Employee.query.filter(or_(Employee.mobilephone==mobile, Employee.mobilephone==hiddenmobile)).first()
         if user:
             response2 = (5)
         else:
             response2 = (6)
-        #return jsonify(response)
-    #print("test")
-
-    #if email is unique and valide pass repsonse of 3
-
     
     print(response, response2)
     return jsonify(response, response2)
@@ -960,7 +944,7 @@ def updategsa(staff_id):
         .filter_by(employee_id = staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value)
+        .add_columns(Course.name, Grade.completed)
   
     
     image_file = url_for(
@@ -1244,8 +1228,8 @@ def addemployee():
         # you cannot add to the association table 
         # instead you insert
         
-        #addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
-        #db.session.execute(addrole)
+        addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
+        db.session.execute(addrole)
 
         db.session.commit()
        
