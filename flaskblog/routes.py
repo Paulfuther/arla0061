@@ -6,12 +6,14 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 from requests.api import options
 from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
-    grade_form, schedule_start, Schedule, GradeForm
+    grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, Incident, User, Customer, employee_schema, send_async_email, send_async_email2, \
-            make_pdf, make_incident_pdf, celery, client, twilio_from, validate_twilio_request, sg, Mail, \
-                SendGridAPIClient
+        staffschedule, Incident, User, Customer, employee_schema, make_pdf,\
+            make_incident_pdf,celery, client, twilio_from, validate_twilio_request, sg, Mail, \
+                SendGridAPIClient, employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
+                    Attachment, FileContent, FileName, FileType, Disposition, DEFAULT_SENDER
+
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
@@ -27,7 +29,7 @@ import openpyxl
 import xlrd
 import xlwt
 import xlsxwriter
-from flaskblog import datetime, mail, verifier
+from flaskblog import datetime, verifier
 from flask_moment import Moment
 import secrets
 from PIL import Image
@@ -40,10 +42,14 @@ from flask_mail import Message
 from json import dumps, loads
 from twilio.twiml.messaging_response import MessagingResponse
 import time
-#from flaskblog.tasks import celery
+from flask_cors import CORS
+from flaskblog.utils.request import validate_body
+from flaskblog.utils.response import response, error_response
+from flaskblog.utils.sms import send_bulk_sms
+from flaskblog.utils.twofa import twofa
 
 moment = Moment(app)
-
+CORS(app)
 
 
 @app.route("/")
@@ -75,32 +81,12 @@ def home():
     return render_template('layout.html')
     #return render_template('home.html')
 
-
-@app.route('/task', methods = ['GET', 'POST'])
+@app.route('/commsmenu', methods = ['GET', 'PSOT'])
 @login_required
-@roles_accepted('Admin', 'Manager')
-def add_task():
-    if request.method == 'GET':
-        return render_template('getemail.html', email=session.get('email', ''))
-    email = request.form['email']
-    session['email'] = email
-    #send the email
-    email_data = {
-        'subject': 'Hello from Flask',
-        'to': email,
-        'body': 'nothing here'
-    }
-    if request.form['submit'] == 'Send':
-        # send right away
-        send_async_email(email_data)
-        flash('Sending email to {0}'.format(email))
-        print(email)
-    else:
-        # send in one minute
-        send_async_email.apply_async(args=[email_data], countdown=30)
-        flash('An email will be sent to {0} in one minute'.format(email))
+@roles_required('Admin')
+def comms_menu():
+    return render_template('commsmenu.html')
 
-    return redirect(url_for('add_task'))
 
 @app.route('/task2', methods = ['GET', 'POST'])
 @login_required
@@ -128,34 +114,127 @@ def new_mail():
         print("we did it")
      return 'tasksent'
 
-@app.route('/comms', methods = ['GET', 'POST'])
-@login_required
-@roles_accepted('Admin', 'Manager')
-def send_whatsapp():
-    message = client.messages.create(
-                              body='Hello there! We are testing Whats App Integration',
-                              from_='whatsapp:+14155238886',
-                              to='whatsapp:+15196707469'
-                          )
-
-    print(message.sid)
-    return render_template("layout.html")
-
-@app.route("/sms2", methods= ['GET', 'POST'])
+@app.route('/bulkemail', methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
-def send_sms():
-    message = client.messages\
-        .create(
-            body="Paul Futher is testing sms from our website. No need to reply.",
-            from_=twilio_from,
-            to='+12269211300'
-        )
+def bulk_email():
+    form=BulkEmailSendgridForm()
+    
+    if request.method == "GET":
+        return render_template("commsemail.html", form=form)
+    else:
+        
+        role_id = request.form['role']
+        templatename = request.form['templatename']
+        
+    # this is bulk sms using the notify api from twilio.
+    # first we grab all employees who are active users.
+    # we need to search specifically for mobile phone
 
-    print(message.sid)
-    return render_template("layout.html")
+        bulkmessage = BulkEmailSendgrid.query.get(templatename)
+        bm = bulkmessage.templateid
+        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+        .all()
+    # gsa returns an object. Although we can serialise the object, we still
+    # have issues generating the proper format for twilio rest api.
+    # so we do it old school.
+    ''' 
+        email_data = {
+            'from_email':'',
+            'to_email':'',
+            'message.tempalte.data': {
+                'subject':'Winter Readiness',
+                'name' : user.firstname
+            }
+        },
 
-@app.route("/sms", methods=['GET', 'POST'])
+        for user in gsa:
+       
+            message = Mail(
+            from_email='paul.futher@outlook.com',
+            to_emails= user.email)
+            message.dynamic_template_data = {
+                'subject':'Winter Readiness',
+                'name': user.firstname,
+
+            }
+            
+            message.template_id = bm
+            response = sg.send(message)
+         
+    # once completed. Do something.
+
+        return render_template("layout.html")
+
+'''
+
+@app.route('/bulkms', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def bulk_sms():
+    form=CommsForm()
+    
+    if request.method == "GET":
+        return render_template("comms.html", form=form)
+    else:
+        
+        role_id = request.form['role']
+        message_to_send = request.form['message_body']
+        print(message_to_send)
+        print(role_id)
+        
+    # this is bulk sms using the notify api from twilio.
+    # first we grab all employees who are active users.
+    # we need to search specifically for mobile phone
+
+        gsa = db.session.query(Employee.mobilephone, Employee.firstname,User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+        .all()
+    # gsa returns an object. Although we can serialise the object, we still
+    # have issues generating the proper format for twilio rest api.
+    # so we do it old school.
+
+        gsat = []
+        for id in gsa:
+            gsatt = id.mobilephone
+            print(gsatt, id.firstname)
+            gsat.append(gsatt)
+
+    # we need a message to send. This will be a variable.
+
+        message = message_to_send
+        print(message)
+                    
+    
+    # call the function send_bulk_sms.
+    # it is a file in the utils section.
+    # this will create the list needed by twilio.
+    # we are sending a payload called a binding.
+        #for x in gsa:
+            #print (x.mobilephone, x.firstname)
+
+        #send_bulk_sms(gsat, message)
+
+    # once completed. Do something.
+
+        return render_template("layout.html")
+
+@app.route('/twofa', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def two_fa():
+    twofa('+15196707469')
+
+    return "hello"
+
+#@app.route("/sms", methods=['GET', 'POST'])
 @validate_twilio_request
 def sms_reply():
     """Respond to incoming calls with a simple text message."""
@@ -167,22 +246,7 @@ def sms_reply():
 
     return str(resp)
 
-@app.route('/sendgridtest', methods = ['GET','POST'])
-def send_sendgrid():
 
-    message = Mail(
-    from_email='paul.futher@outlook.com',
-    to_emails='paul.futher@gmail.com',
-    subject='Sending with Twilio SendGrid is Fun',
-    html_content='<strong>and easy to do anywhere, even with Python</strong>')
-    
-    print(sg)
-    response = sg.send(message)
-    #print(response.status_code)
-    #print(response.body)
-    #print(response.headers)
-   
-    return render_template("layout.html")
 
 @app.route('/testincident', methods = ['GET', 'POST'])
 @login_required
@@ -211,6 +275,7 @@ def email(email):
         
         resp = make_response('None', 404)
     return resp
+
 
 
 @app.route("/event", methods = ['GET', 'POST'])
@@ -314,9 +379,10 @@ def eventreport():
             flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
             
             # once the data has been written to the database, we create a pdf.
-            # we call a task mamanger to do this. That is the apply_async
-
+            # we call a task mamanger to do this. That is the apply_async 
             make_incident_pdf.apply_async(args=[file_id], countdown=10)
+
+
             return render_template('layout.html')
            
     return render_template('eventreport.html', form=form)
@@ -366,28 +432,32 @@ def nofileexcel():
 
     return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
 
-@app.route("/emailme", methods = ['GET', 'POST'])
+@app.route("/sendgridsend", methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
 def emailme():
     
-    gsa = db.session.query(Employee, User)\
-            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
-        .filter(User.active == 1)\
-        .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
-        .all()
-    
-    with mail.connect() as conn:
-        for user in gsa:
-            data = request.form['content']
-            dataheader = request.form['emheader']
-            msg = Message(dataheader, sender='paul.futher@gmail.com',
-                  recipients=[user.email])
+    gsa = User.query.join(roles_users).join(Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .filter(Role.id == 5)\
+                .filter(User.active == 1)\
+                .order_by(User.user_name).all()
 
-            msg.html = data
-            mail.send(msg)
-    flash('Email Sent')
-    return redirect(request.referrer)
+    for user in gsa:
+
+        #message = Mail(
+        #from_email='paul.futher@outlook.com',
+        #to_emails= user.email,
+        #subject='Winter Readiness')
+       
+        #message.template_id = 'd-d97855409101488ea4432a1baccc7f45'
+  
+        print(user, user.email, user.roles)
+        #print(user.firstname, user.email)
+        #response = sg.send(message)
+   
+   
+    return render_template("layout.html")
 
 
 @app.route("/verifyemailtoday", methods = ['GET','POST'])
@@ -412,19 +482,22 @@ def verify():
     elif emailcheck:
         response = (1)
     # check to see if email is valid using service 
-    elif email_address_info is not None:
-        data = dumps(loads(email_address_info.json_string), indent=4)
-        resp = make_response(data, 200)
-        resp.headers['Content-Type'] = 'application/json'
-        value1 = json.loads(data)
-        print (value1['formatCheck'],value1['smtpCheck'])
-        if value1['smtpCheck'] == 'false':
-            #flash("please chekck your email. It does not work")
-            print("bad email")
-            #return render_template('employee.html', form=form)
-            response =(2)
-        else:
-            response = (3)
+
+    else:
+         response = (3)
+    #elif email_address_info is not None:
+    #    data = dumps(loads(email_address_info.json_string), indent=4)
+    #    resp = make_response(data, 200)
+    #    resp.headers['Content-Type'] = 'application/json'
+ 
+    #    value1 = json.loads(data)
+    #    print (value1['formatCheck'],value1['smtpCheck'])
+    #    if value1['smtpCheck']=='false':
+    #        print("bad email")
+    #        response = (2)
+    #    else:
+    #        response = (3)
+
     
     if mobile == "":
         response2 = (7)
@@ -440,7 +513,6 @@ def verify():
 
 @app.route("/schedule", methods = ['GET', 'POST'])
 @login_required
-
 @roles_accepted('Admin', 'Manager')
 def schedule():
     
@@ -839,7 +911,27 @@ def updategsatraining(staff_id):
 
     return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
 
+@app.route("/rolesearch", methods = ['POST', "GET"])
+@login_required
+def rolesearch():
 
+    searchbox = request.form.get("text")
+    
+
+    gsa = db.session.query(Employee.mobilephone, Employee.firstname,Employee.lastname,User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==searchbox)\
+        .all()
+
+    #for x in gsa:
+    #    print(x.firstname, x.mobilephone)
+    results = employee_schema.dump(gsa)
+    result = jsonify(results)
+
+   
+    return result
 
 @app.route("/livesearch", methods = ["POST", "GET"])
 @login_required
@@ -862,6 +954,7 @@ def livesearch():
 
     results = employee_schema.dump(gsa)
     result = jsonify(results)
+    
     return result
 
 

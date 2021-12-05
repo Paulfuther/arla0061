@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 from dotenv import load_dotenv
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
-import os
+import os, base64
 import json
 from datetime import datetime
 from flask import render_template_string, make_response, url_for, redirect, send_from_directory, \
@@ -25,7 +25,7 @@ from flask_bcrypt import Bcrypt, generate_password_hash
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey
-from flask_mail import Mail, Message
+
 from flask_email_verifier import EmailVerifier
 from flask_login import  user_logged_out, user_logged_in
 from celery import Celery
@@ -38,7 +38,8 @@ from twilio.rest import Client
 from functools import wraps
 from twilio.request_validator import RequestValidator
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+from flask_mail import Message
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 load_dotenv()
@@ -62,9 +63,11 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
-account_sid = os.environ['TWILIO_ACCOUNT_SID']
-auth_token = os.environ['TWILIO_AUTH_TOKEN']
+account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+NOTIFY_SERVICE_SID = os.environ.get('TWILIO_NOTIFY_SERVICE_SID')
 twilio_from = os.environ['TWILIO_FROM']
+DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
 
 client = Client(account_sid, auth_token)
@@ -99,38 +102,46 @@ db = SQLAlchemy(app)
 dbx = dropbox.Dropbox(DROP_BOX_KEY)
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
-mail = Mail(app)
 
+'''
 @celery.task
-def send_async_email(email_data):
-    """Background task to send an email with Flask-Mail."""
-    msg = Message(email_data['subject'],
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
-                  recipients=[email_data['to']])
-    msg.body = email_data['body']
-    with app.app_context():
-        mail.send(msg)
+def send_bulk_email(email_data):
+    with app.test_request_context():    
 
+        
+        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
+            .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+            .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+            .all()
+    # gsa returns an object. Although we can serialise the object, we still
+    # have issues generating the proper format for twilio rest api.
+    # so we do it old school.
 
-@celery.task
-def send_async_email2(email_data):
-    """Background task to send an email with Flask-Mail."""
-    msg = Message(email_data['subject'],
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
-                  recipients=[email_data['to']])
-    msg.body = email_data['body']
-    with app.app_context():
-        mail.send(msg)
+    for user in gsa:
+       
+            message = Mail(
+            from_email='paul.futher@outlook.com',
+            to_emails= user.email)
+            message.dynamic_template_data = {
+                'subject':'Winter Readiness',
+                'name': user.firstname,
+
+            }
+            
+            message.template_id = bm
+            response = sg.send(message)
+
+       
+'''
+
 
 @celery.task
 def make_pdf(staff_id):
     with app.test_request_context():
         signatures = Empfile.query.filter_by(employee2_id = staff_id)
         rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
-    
-         
-
-
         img = '/files/image-20201205212708-1.png'
 
         image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
@@ -151,8 +162,6 @@ def make_pdf(staff_id):
     
         rendered = render_template('employeefilepdf.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, signatures=signatures, gsa=gsa)
     
-        
-
         options = {'enable-local-file-access': None,
             '--keep-relative-links': '',
             '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
@@ -166,32 +175,28 @@ def make_pdf(staff_id):
         created_on = datetime.now().strftime('%Y-%m-%d')
         filename = f" {lname} {fname}  ID  {id} {created_on}.pdf"
 
-        #response = make_response(pdf)
-        #response.headers['Content-Type']='application/pdf'
-        #response.headers['Content-Disposition']='inline'
+        encoded_file = base64.b64encode(pdf).decode()
+        attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName(filename),
+                FileType('application/pdf'),
+                Disposition('attachment')) 
 
         for x in rol:
             email = x.email
-            email_data = {
-                'subject': 'A new hire file has been created',
-                'to': email,
-                'body': 'A new hire file has been created and uploaded to dropbox. {}'.format(filename),
-               
-            }
-
-            msg = Message(email_data['subject'],
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
-                  recipients=[email_data['to']])
-            msg.body = email_data['body']
-            msg.attach("pdf","application/pdf", pdf)
-            mail.send(msg)
+            message =  Mail(
+                from_email = DEFAULT_SENDER,
+                to_emails=email,
+                subject = 'A New Hire File has been created',
+                html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
+            )
+            message.attachment=attachedFile
+            response = sg.send(message)
         
         with file as f:    
             dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
     
-        
-    
-       
+
 
 @celery.task
 def make_incident_pdf(file_id):
@@ -199,22 +204,17 @@ def make_incident_pdf(file_id):
         rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
         print(file_id)
         img = '/Users/paulfuther/arla0061/flaskblog/static/images/SECURITYPERSON.jpg'
-
         css = "flaskblog/static/main.css"
         file = Incident.query.get(file_id)
         fdate1 = file.eventdate
-        print(fdate1)
-        
+        #print(fdate1)
         fdate= datetime.strftime(fdate1,'%Y-%m-%d')
-        print(fdate)
+        #print(fdate)
         fstore = file.location
         id = file_id
-        print(fdate)
+        #print(fdate)
         gsa = Incident.query.get(file_id)
         rendered = render_template('eventreportpdf.html',gsa=gsa, css=css)
-    
-        
-
         options = {'enable-local-file-access': None,
             '--keep-relative-links': '',
             '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
@@ -225,50 +225,37 @@ def make_incident_pdf(file_id):
         pdf = pdfkit.from_string(rendered, False, options=options, css=css)
 
         file = BytesIO(pdf)
+            #print(type(file))
         created_on = datetime.now().strftime('%Y-%m-%d')
         filename = f" {fstore} {fdate}  ID  {id} {created_on}.pdf"
 
-        #response = make_response(pdf)
-        #response.headers['Content-Type']='application/pdf'
-        #response.headers['Content-Disposition']='inline'
+        # need to create a bytes file to use as an attachment for sendgrid
+
+        encoded_file = base64.b64encode(pdf).decode()
+        attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName(filename),
+                FileType('application/pdf'),
+                Disposition('attachment')) 
 
         for x in rol:
-                email = x.email
-                print(email)
-                email_data = {
-                    'subject': 'A new incident report has been filed',
-                    'to': email,
-                    'body': 'An incident report has been filed. {}'.format(filename),
                 
-                }
+            email = x.email
+            message = Mail(
+            from_email = DEFAULT_SENDER,
+            to_emails=email,
+            subject ='A new incident report has been filed',
+            html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
+            message.attachment = attachedFile
+            response = sg.send(message)
+            print(response.status_code, response.body, response.headers)
 
-                msg = Message(email_data['subject'],
-                    sender=app.config['MAIL_DEFAULT_SENDER'],
-                    recipients=[email_data['to']])
-                msg.body = email_data['body']
-                msg.attach("pdf","application/pdf", pdf)
-                mail.send(msg)
-        
+            # upload to drop box
+
         with file as f:    
             dbx.files_upload(f.read(), path=f"/SITEINCDIENTS/{filename}", mode=WriteMode('overwrite'))
     
-        
-        #file = BytesIO(pdf)
-        #return (file),{
-        #    'Content-Type': 'application/pdf',
-        #    'Content-Disposition': 'inline'
-        #   }
-        
-        
-        #return send_file(file,
-        #         attachment_filename=filename,
-        #         mimetype='application/pdf',
-        #         as_attachment=True,
-        #         cache_timeout=1
-        #          )      
-
-       
-
+    
 
 admin = Admin(app, name='Dashboard')
     
@@ -357,7 +344,13 @@ class User(UserMixin, db.Model):
     def __str__(self):
         return (self.user_name) 
     
+class BulkEmailSendgrid(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    templatename = db.Column(db.String, unique=True)
+    templateid = db.Column(db.String(200), unique=True)
     
+    def __repr__(self):
+        return '%r' % (self.templatename)
         
  
 
@@ -387,7 +380,7 @@ class Employee(db.Model):
     city = db.Column(db.String(20), nullable=False)
     province = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(20), nullable=False)
-    mobilephone = db.Column(db.String(10), nullable=False)
+    mobilephone = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(120), nullable=False)
    
     sinexpire = db.Column(db.DateTime(), nullable=True)
@@ -423,10 +416,18 @@ class EmployeeSchema(ma.Schema):
     class Meta:
         model = Employee
         store = ma.Nested("StoreSchema", exclude=("store",))
-        fields = ('id', 'firstname', 'lastname', 'email', 'store_id', 'image_file', 'number')
+        fields = ('id', 'firstname', 'lastname', 'mobilephone','email', 'store_id', 'image_file', 'number')
         
         
 employee_schema = EmployeeSchema(many=True)
+
+class EmployeeSMSSchema(ma.Schema):
+    class Meta:
+        model = Employee
+        fields = ('id','mobilephone')
+employeeSMS_schema = EmployeeSMSSchema(many=True)
+
+
 
 class Course(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -921,8 +922,16 @@ class EmailView(BaseView):
     def is_accessible(self):
         return current_user.has_roles('Admin')
     
+class MyModelView12(ModelView):
+    can_export = True
+    can_delete = False
 
-    
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
 # these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
@@ -937,6 +946,7 @@ admin.add_view(hreditor(hrfiles, db.session))
 admin.add_view(MyModelView8(Incidentnumbers, db.session, category = "Paul"))
 admin.add_view(MyModelView9(Saltlog, db.session))
 admin.add_view(MyModelViewReclaim(reclaimtank, db.session, category = "Paul"))
+admin.add_view(MyModelView12(BulkEmailSendgrid, db.session, category="Paul"))
 admin.add_view(MyModelView10(cwmaintenance, db.session, category = "Paul"))
 #admin.add_view(MyModelView11(Employee, db.session))
 admin.add_view(EmailView(name = 'Email', endpoint='email'))

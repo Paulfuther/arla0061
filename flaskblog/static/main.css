@@ -83,6 +83,42 @@ body {
 }
 /* pdf of employee file */
 
+
+/* comms container */
+
+.comms-container {
+  display: grid;
+  grid-template-columns:repeat(2, 1fr);
+
+  padding: 20px 20px 20px 20px;
+}
+
+.comms-list {
+  padding: 10px 10px 10px 10px;
+  
+}
+
+.searchbyrole {
+  grid-column: 1;
+}
+.tablecontainer {
+  grid-column: 2;
+  overflow:auto;
+  height:300px;
+
+}
+.comms-button {
+  background-color: #d9edf7;
+  margin:auto;
+  color: black;
+  padding: 10px 10px 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
 /* report container*/
 
 .report-container {
@@ -1745,13 +1781,24 @@ ul.a {
   
 }
 
-.form {
-  
+.form3 {
+  -webkit-appearance:menulist-button;
   margin: 10px 0px 10px 0px;
   border-color: none;
   width: 95%;
+  height:75px;
   padding: 15px 15px 15px 15px;
-  
+  font-size: 20px;
+  background:white;
+
+}
+
+.form {
+  margin: 10px 0px 10px 0px;
+  border-color: none;
+  width: 95%;
+  height:75px;
+  padding: 15px 15px 15px 15px;
   font-size: 20px;
 
 }
@@ -3577,6 +3624,49 @@ grid-row-end: 95;
 text-align: right;
 }
 
+
+/* comms container */
+
+.comms-container {
+  display: grid;
+  grid-template-columns:1fr;
+
+  padding: 20px 20px 20px 20px;
+}
+
+.comms-list {
+  padding: 10px 10px 10px 10px;
+  
+}
+
+.newone {
+  height:50px;
+  -webkit-appearance: none;
+}
+
+.searchbyrole {
+  grid-column: 1;
+}
+.tablecontainer {
+  grid-column: 1;
+  overflow:auto;
+  height:300px;
+  margin-top: 20px;
+  border-top-style: hidden;
+
+}
+.comms-button {
+  background-color: #d9edf7;
+  margin:auto;
+  color: black;
+  padding: 10px 10px 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
 /* ---- */
 
 
@@ -3819,7 +3909,41 @@ text-align: right;
 
 
   }
-
+  .comms-container {
+    display: grid;
+    grid-template-columns:1fr;
+  
+    padding: 20px 20px 20px 20px;
+  }
+  
+  .comms-list {
+    padding: 10px 10px 10px 10px;
+    
+  }
+  
+  .searchbyrole {
+    grid-column: 1;
+  }
+  .tablecontainer {
+    grid-column: 1;
+    overflow:auto;
+    height:300px;
+    margin-top: 20px;
+    border-top-style: hidden;
+  
+  }
+  .comms-button {
+    background-color: #d9edf7;
+    margin:auto;
+    color: black;
+    padding: 10px 10px 10px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+  }
+  
 
   
 }

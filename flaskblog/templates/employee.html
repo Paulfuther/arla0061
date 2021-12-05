@@ -430,7 +430,7 @@
                                  
                                     }
                                 else if (response[0] == 1) {
-                                        console.log("oops");
+                                        
                                     error2.style.display = "";
                                     error2.innerHTML = `Email Already In Use`;
                                     document.getElementById("emailinput").className = "form-bad";
@@ -454,7 +454,7 @@
                                     info.style.display = "none"
                                    
                                     }
-                                else if ( response[1] == 6 && checkphone==0){
+                                else if ( response[1] == 6 && checkphone==0 && response[0]==3){
                                     info2.style.display="";
                                     info2.innerHTML = 'Email is good';
                                     document.getElementById("emailinput").className = "form-good";

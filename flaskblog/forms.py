@@ -4,13 +4,13 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy.sql.sqltypes import Date, String
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
 from wtforms.fields.html5 import DateField, TelField, TimeField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
-from flaskblog import  Employee, db, Store, User, Role
+from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid
 from flask_login import current_user
 import wtforms
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 import phonenumbers
 import re
 
@@ -30,7 +30,20 @@ class LoginForm(FlaskForm):
     remember = BooleanField('remember me')
     submit = SubmitField('Login')
 
+
+
+class CommsForm(FlaskForm):
+    role = (QuerySelectField(query_factory=lambda: Role.query.order_by(Role.name),
+        allow_blank=False))
+    message_body = TextAreaField('Message', validators=[DataRequired()])
     
+class BulkEmailSendgridForm(FlaskForm):
+    role = (QuerySelectField(query_factory=lambda: Role.query.order_by(Role.name),
+        allow_blank=False))
+    templatename = (QuerySelectField(query_factory=lambda: BulkEmailSendgrid.query.order_by(BulkEmailSendgrid.templatename),
+        allow_blank=False))
+   
+
 class TelephoneForm(FlaskForm):
     area_code = IntegerField('Area Code', validators=[DataRequired()])
     number = IntegerField('Number', validators=[DataRequired(), Length(min=7, max=7)] )
@@ -118,17 +131,7 @@ class EmployeeForm(FlaskForm):
                            DataRequired(), Length(min=2, max=100)])
     submit2 = SubmitField('Add Employee')
 
-    
-
-    
-
-    
-
-    
-        
    
-   
-    
   
 class EmployeeUpdateForm(FlaskForm):
    
