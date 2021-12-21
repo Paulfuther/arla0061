@@ -59,28 +59,36 @@
                
                      <div class ="schedulecontainer2">
 
-                
-                     
-
-                {% for staff in gsa %}
-
-                  <div class = "schedulenamesidebar">  {{staff.firstname}} </div>
-
-                    <div class = "weeklyhours">
-                        {% for x in range(7) %}
+               
                         
-                        <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Shift", value={{x.writtenhours}}>
 
-                        {% endfor %}
+              
 
-                            {% for x in ss %}
-                         
-                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Hours", value={{x.shift_hours}}>
+                    
+                  <div class = "schedulenamesidebar">  </div>
+                  
+
+                        <div class = "weeklyhours">
+                            
+                            {% for x in gsas %}
+                            {{ x }}
                             {% endfor %}
+                            {% for y in s_s %}
+                            
+                            {{ y.shift_description}}
+                            
+                           
+                   
+                            {% endfor %}
+                           {% for x in s_s %}
+                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Hours", value={{x.shift_hours}}>
+                      
+                            {% endfor %}
+                            
                 
                     </div>
-
-                {% endfor %}
+                    
+                
 
     </div>
  
@@ -104,12 +112,12 @@
                      for (i=0; i< 7; i++){
                         
                         this_day =  dayNames[one.getDay()];
-                        this_month = (monthNames[(one.getMonth() %12) ]);
+                        this_month = (one.getMonth() %12)+1;
                         this_year = (one.getFullYear() );
                         this_date = (one.getDate()  );
                         
                         divs[i].innerHTML = this_day;
-                        this_dates = this_month + "-" + this_date +"-" + this_year;
+                        this_dates = this_year + "-" + this_month +"-" + this_date;
                         divs2[i].innerHTML = this_dates;
                         divshidden[i].value = this_dates;
 

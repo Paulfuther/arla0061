@@ -142,17 +142,17 @@ def bulk_email():
     # gsa returns an object. Although we can serialise the object, we still
     # have issues generating the proper format for twilio rest api.
     # so we do it old school.
-    ''' 
-        email_data = {
+    
+        '''   email_data = {
             'from_email':'',
             'to_email':'',
             'message.tempalte.data': {
                 'subject':'Winter Readiness',
-                'name' : user.firstname
+                'name' : gsa.firstname
             }
-        },
+        },'''
 
-        for user in gsa:
+    for user in gsa:
        
             message = Mail(
             from_email='paul.futher@outlook.com',
@@ -162,15 +162,15 @@ def bulk_email():
                 'name': user.firstname,
 
             }
-            
+            print(user.email)
             message.template_id = bm
             response = sg.send(message)
          
     # once completed. Do something.
 
-        return render_template("layout.html")
+    return render_template("layout.html")
 
-'''
+
 
 @app.route('/bulkms', methods = ['GET', 'POST'])
 @login_required
@@ -532,57 +532,36 @@ def searchschedule():
     hsdate1 = request.form.getlist('hidden-sdate')
     shifts = request.form.getlist('writtenhours')
     hoursworked = request.form.getlist('hours')
-    
     search_value = form.store.data
     
-    if 'Search' in request.form['action']:
-        if search_value != "Home Store":
+    hsdate1 = request.form.getlist('hidden-sdate')
+    store_id = Store.query.filter_by(number=search_value).first()
+    storeid = store_id.id
             
-            store_id = Store.query.filter_by(number=search_value).first()
-            storeid = store_id.id
+    gsa1 = Employee.query.filter_by(store_id=storeid)
             
-            gsa1 = Employee.query.filter_by(store_id=storeid)
-            
-            gsa = gsa1.order_by(Employee.store_id).all()
-            s_v = int(search_value)
-            for stuff in hsdate1:
-                newdate = datetime.strptime(stuff, '%b-%d-%Y')
-                nd = datetime.date(newdate)
-                s_s = staffschedule.query.filter_by(shift_date = nd)
-                #for r in s_s:
-                #    print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
-                
-                
-                #print(s_s.storeworked)
-                #(storeworked = search_value)\
-                #shift_date = t
-                #print(s_s.shift_date)
-                #for xs in s_s :
-                 #   print(xs.employee_id, xs.storeworked, xs.shift_description, xs.shift_hours)
-        #print(shifts)
-        #print(search_value)
-        #print(hoursworked)
-            return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form, s_s=s_s)
-   
-        if search_value == "Home Store":
-                gsa = Employee.query\
-                    .order_by(Employee.store_id).all()
+    gsa = gsa1.order_by(Employee.store_id).all()
+    s_v = int(search_value)
+    s_s = staffschedule.query.filter(staffschedule.shift_date.in_(hsdate1))
+    #s_s = staffschedule.query.filter(staffschedule.shift_date.in_(hsdate1)).\
+     #   group_by(staffschedule.shift_date)
 
-                #for staff in gsa:
-                #   print(staff.id)
-                return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form)
-            
-        search_value=int(search_value)
-        #print(search_value)
-        gsa1 = Employee.query.filter_by(store=search_value)
-        gsa = gsa1.order_by(Employee.store).all()
-        for x in gsa:
-           
-            existing_hours = staffschedule.query.filter_by(employee_id = x.id)
-            #print(x, x.id, existing_hours)
-        
-        return render_template('schedule.html', gsa=gsa, form=form)
+    gsas = []
+    for gsa in staffschedule.query.distinct(staffschedule.employee_id).group_by(staffschedule.employee_id):
+        gsas.append(gsa.employee_id)
+
+    #for r in s_s:
+    #                print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
     
+    df=pd.read_sql(s_s.statement,s_s.session.bind)
+
+    print(df)    
+                
+              
+    return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form, s_s=s_s, gsas=gsas)
+   
+        
+    '''
     elif 'submithours' in request.form['action']:
           
         store_id = Store.query.filter_by(number=search_value).first()
@@ -622,7 +601,7 @@ def searchschedule():
         db.session.commit()
             
         return render_template('schedule.html', form=form, gsa=gsa)
-    
+    '''
     return render_template('schedule.html')
 
 
