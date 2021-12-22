@@ -60,34 +60,23 @@
                      <div class ="schedulecontainer2">
 
                
-                        
-
-              
-
-                    
-                  <div class = "schedulenamesidebar">  </div>
                   
-
+                        {% for x in newdf %}
+                        {{ x[0] }}
                         <div class = "weeklyhours">
                             
-                            {% for x in gsas %}
-                            {{ x }}
+                            {% for y in range(7) %}
+
+                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Shift" value="{{ x[y+1] }} ">
                             {% endfor %}
-                            {% for y in s_s %}
-                            
-                            {{ y.shift_description}}
-                            
+
+                            {% for y in range(8,15) %}
+                            <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Hours", value="{{x[y]}}">
+                         
+                            {% endfor %}
                            
-                   
-                            {% endfor %}
-                           {% for x in s_s %}
-                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Hours", value={{x.shift_hours}}>
-                      
-                            {% endfor %}
-                            
-                
-                    </div>
-                    
+                        </div>
+                        {% endfor %}    
                 
 
     </div>

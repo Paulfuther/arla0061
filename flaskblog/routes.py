@@ -542,23 +542,24 @@ def searchschedule():
             
     gsa = gsa1.order_by(Employee.store_id).all()
     s_v = int(search_value)
-    s_s = staffschedule.query.filter(staffschedule.shift_date.in_(hsdate1))
-    #s_s = staffschedule.query.filter(staffschedule.shift_date.in_(hsdate1)).\
-     #   group_by(staffschedule.shift_date)
-
-    gsas = []
-    for gsa in staffschedule.query.distinct(staffschedule.employee_id).group_by(staffschedule.employee_id):
-        gsas.append(gsa.employee_id)
+    s_s = staffschedule.query.filter(staffschedule.shift_date.in_(hsdate1))\
+        .filter(staffschedule.storeworked==storeid)
+   
+    #gsas = []
+    #for gsa in staffschedule.query.distinct(staffschedule.employee_id).group_by(staffschedule.employee_id):
+    #    gsas.append(gsa.employee_id)
 
     #for r in s_s:
-    #                print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
+     #               print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
     
     df=pd.read_sql(s_s.statement,s_s.session.bind)
-
-    print(df)    
-                
-              
-    return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form, s_s=s_s, gsas=gsas)
+    df=df.pivot_table(index='employee_id',columns='shift_date', values=['shift_description'], aggfunc='first')\
+        .reset_index()
+        
+    newdf = df.values.tolist()       
+    print(newdf)      
+    print(df)   
+    return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form, s_s=s_s,  newdf=newdf)
    
         
     '''
