@@ -9,10 +9,10 @@ from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteInc
     grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, Incident, User, Customer, employee_schema, make_pdf,\
+        staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
             make_incident_pdf,celery, client, twilio_from, validate_twilio_request, sg, Mail, \
                 SendGridAPIClient, employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
-                    Attachment, FileContent, FileName, FileType, Disposition, DEFAULT_SENDER
+                    Attachment, FileContent, FileName, FileType, Disposition, DEFAULT_SENDER, Store
 
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
@@ -113,6 +113,25 @@ def new_mail():
         send_async_email2.apply_async(args=[email_data], countdown=30)
         print("we did it")
      return 'tasksent'
+
+'''app.route('/twilliocall', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def twilliocall():
+
+    site = db.session.query(Store.number,Store.phone).all()
+    for x in site:
+       
+        call = client.calls.create(
+                        twiml='<Response><Say>Hello, this is terry from petro canada. Please salt around the pumps and around the store. Thankyou</Say></Response>',
+                        to=x.phone,
+                        from_='+15484890144'
+                        )
+        print(x.number, x.phone)                        
+
+        print(call.sid)
+    return ("Success")
+ '''   
 
 @app.route('/bulkemail', methods = ['GET', 'POST'])
 @login_required
@@ -527,39 +546,83 @@ def schedule():
 @roles_accepted('Admin', 'Manager')
 def searchschedule():
     
-    form=Schedule()
+    
     #form = request.form
+    search_value= request.form.get("text")
+    
+    print(search_value)
     hsdate1 = request.form.getlist('hidden-sdate')
     shifts = request.form.getlist('writtenhours')
     hoursworked = request.form.getlist('hours')
-    search_value = form.store.data
+    #search_value = form.store.data
     
     hsdate1 = request.form.getlist('hidden-sdate')
     store_id = Store.query.filter_by(number=search_value).first()
     storeid = store_id.id
-            
-    gsa1 = Employee.query.filter_by(store_id=storeid)
+    
+    gsa1 = Employee.query.filter_by(store_id=storeid)\
+        .join(User, User.id==Employee.user_id)\
+            .filter(User.active==1)\
             
     gsa = gsa1.order_by(Employee.store_id).all()
-    s_v = int(search_value)
-    s_s = staffschedule.query.filter(staffschedule.shift_date.in_(hsdate1))\
-        .filter(staffschedule.storeworked==storeid)
-   
-    #gsas = []
-    #for gsa in staffschedule.query.distinct(staffschedule.employee_id).group_by(staffschedule.employee_id):
-    #    gsas.append(gsa.employee_id)
-
-    #for r in s_s:
-     #               print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
     
+    
+    s_v = int(search_value)
+    
+    s_s = Employee.query.filter(Employee.store_id==storeid)\
+        .join(User, User.id==Employee.user_id)\
+            .filter(User.active==1)\
+            .outerjoin(staffschedule, Employee.id==staffschedule.employee_id)\
+                    .add_columns(Employee.firstname,Employee.id,\
+                         staffschedule.shift_description, staffschedule.shift_hours,\
+                              staffschedule.shift_date, staffschedule.employee_id).all()
+    
+    for r in s_s:
+        print(r.shift_date, r.id, r.firstname, r.shift_description, r.shift_hours)
+
+
+    results = staffschedule_schema.dump(s_s)
+    result = jsonify(results)
+   
+    return result
+
+
+
+    return render_template('schedule.html', gsa=gsa, search_string=search_value,\
+         form=form, s_s=s_s)
+
+
+    for rr in s_s:
+        print(rr.firstname)
+
+    for r in s_s:
+        print(r.shift_date, r.id, r.firstname, r.shift_description, r.shift_hours)
+              
+
     df=pd.read_sql(s_s.statement,s_s.session.bind)
-    df=df.pivot_table(index='employee_id',columns='shift_date', values=['shift_description'], aggfunc='first')\
+    df=df.drop(df.columns[[1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,36]], axis=1)
+    print(df)
+    df3=df.values.tolist()
+    print(df3)
+
+  
+
+    df=df.pivot_table(index=['id','firstname'] ,columns='shift_date', \
+        values=['shift_description', 'shift_hours'], aggfunc='first')\
         .reset_index()
-        
-    newdf = df.values.tolist()       
-    print(newdf)      
-    print(df)   
-    return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form, s_s=s_s,  newdf=newdf)
+    print(df)  
+    newdf = df.values.tolist()  
+    ldf=len(df.columns)     
+    #print(newdf)      
+    
+    print(len(df.columns)) 
+
+
+    df2 = pd.read_sql(gsa1.statement,gsa1.session.bind)
+    df2=df2.pivot_table(index=['id','firstname'])
+    print(df2)
+    return render_template('schedule.html', ldf=ldf,gsa=gsa, search_string=search_value,\
+         form=form, s_s=s_s,  newdf=newdf)
    
         
     '''
@@ -931,6 +994,8 @@ def livesearch():
         Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
         .all()
     
+    for s in gsa:
+        print(s.firstname)
 
     results = employee_schema.dump(gsa)
     result = jsonify(results)

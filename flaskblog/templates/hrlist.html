@@ -17,7 +17,7 @@
                         {% else %}
 
                         <ul>
-                              <li> <a href="hrlist" class = "mhrlist">Search Employees By First Name, Last Name or Store</a></li>
+                              <li class = "mhrlist">Search Employees By First Name, Last Name or Store</li>
                         </ul>
                        
                        
@@ -59,6 +59,7 @@
                                 url:"/livesearch",
                                 data:{text:textinlivebox},
                                 success:function(res){
+                                    console.log(res)
                                     $('#tablecontainer').empty();
                                 
                                     let html = res.reduce(( acc, {number, firstname, lastname, email, store, store_id, image_file, id}) =>

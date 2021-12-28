@@ -11,8 +11,8 @@
                             <!--<input type ="text" autofocus="autofocus" name="search_string">-->
                            
                        
-                        <li> {{form.store( placeholder="All")}}    </li>   
-                        <li><input type ="submit"  formaction="/searchschedule" name="action" value = "Search" id="search_string"> 
+                         
+                        <li><input type ="text"  id = "storesearch" name = "storesearch" placeholder = " Search " class = "inputform" > 
                         </li>
                         <i class = "fas fa-angle-left previous" ></i>
                         <span class = "tooltiptext">Previous Day</span>
@@ -59,18 +59,18 @@
                
                      <div class ="schedulecontainer2">
 
-               
+               <div id="div1">hi</div>
                   
-                        {% for x in newdf %}
-                        {{ x[0] }}
+                        {% for x in s_s|unique %}
+                        {{ x[1] }}
                         <div class = "weeklyhours">
                             
                             {% for y in range(7) %}
 
-                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Shift" value="{{ x[y+1] }} ">
+                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Shift" value="{{ x[y+2] }} ">
                             {% endfor %}
 
-                            {% for y in range(8,15) %}
+                            {% for y in range(7) %}
                             <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Hours", value="{{x[y]}}">
                          
                             {% endfor %}
@@ -79,7 +79,7 @@
                         {% endfor %}    
                 
 
-    </div>
+                     </div>
  
 
  </form>
@@ -128,5 +128,119 @@
 
                 </script>
 
+                                <script>
+
+                        $(document).ready(function(){
+                        $("#storesearch").on("input",function(e){
+                                     
+                            storetext = $('#storesearch').val();
+                                       
+                                    
+                            $.ajax({
+                                        method:"POST",
+                                        url:"/searchschedule",
+                                        data: {text:storetext},
+                                        succss:function(res){
+                                            console.log(res)
+                                           
+                                            $('#tablecontainer').empty();
+                                
+                                let html = res.reduce(( acc, {firstname, id}) =>
+                                    acc += `
+                                    <div class = 'tablecard'>
+                                 
+                                    <div class = 'tablecard-inner'>
+                                 
+                                    <div class = 'hritem2'>
+                                    ${firstname}
+                                    </div>
+                                   
+                                    <div class = "tablecard-links">
+
+                                    <a   href="/updategsa${id}">Contact Info</a>
+                                    <a   href="/updategsatraining${id}">Training Info</a>
+                                    <a   href="/hrfile${id}">Create File</a>
+                                    <a   href="/existingemployeefile${id}">View File</a>
+                                    </div> 
+                                    </div>
+                                 
+                                    </div>`
+                                 
+
+                                , '');
+                                console.log(res.id)
+                                $('.tablecontainer').append(html);
+                                console.log(res);
+                             
+                            }
+                        })
+
+                    });
+                })
+
+
+
+                                  
+
+
+                                 
+                                </script>
+                                    <script>           
+
+                                 var data = [
+                                {
+                                    "firstname": "Paul", 
+                                    "id": 1, 
+                                    "shift_date": "2021-12-26", 
+                                    "shift_description": "3 to 11", 
+                                    "shift_hours": "8"
+                                }, 
+                                {
+                                    "firstname": "Paul", 
+                                    "id": 1, 
+                                    "shift_date": "2021-12-26", 
+                                    "shift_description": "7 to 3", 
+                                    "shift_hours": "5"
+                                }, 
+                                {
+                                    "firstname": "Abdul Karim", 
+                                    "id": 4, 
+                                    "shift_date": "2021-12-26", 
+                                    "shift_description": "7 to 3", 
+                                    "shift_hours": "8"
+                                }, 
+                                {
+                                    "firstname": "Moe", 
+                                    "id": 18, 
+                                    "shift_date": null, 
+                                    "shift_description": null, 
+                                    "shift_hours": null
+                                }, 
+                                {
+                                    "firstname": "Jim", 
+                                    "id": 72, 
+                                    "shift_date": null, 
+                                    "shift_description": null, 
+                                    "shift_hours": null
+                                }, 
+                                {
+                                    "firstname": "Dinal", 
+                                    "id": 102, 
+                                    "shift_date": null, 
+                                    "shift_description": null, 
+                                    "shift_hours": null
+                                }
+                                ]
+
+                            
+                           
+                            
+                            
+                       
                 
+                
+            
+            
+                    
+                </script>
 {% endblock %}

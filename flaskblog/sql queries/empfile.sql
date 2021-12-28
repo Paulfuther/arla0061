@@ -1,9 +1,16 @@
-select firstname, lastname, hrfiles.text
+select firstname, lastname, shift_description, number, active
 
-from employee
-    inner join Empfile on employee2_id = employee.id
-    inner join hrfiles on hrfiles.id = file_id
+from employee, store, user
+
+    
+    inner join staffschedule on employee_id = employee.id
+    inner join user on user.id = employee.user_id
+    
+    
+    where store.number = 33485 
+    
+    
     
     
 
-order by firstname
+order by employee.id

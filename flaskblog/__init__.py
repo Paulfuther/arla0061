@@ -456,6 +456,15 @@ class staffschedule(db.Model):
     shift_hours = db.Column(db.Integer())
     shift_date = db.Column(db.Date)
  
+class staffscheduleschema(ma.Schema):
+    class Meta:
+        model = staffschedule
+        
+        employee=ma.Nested("employee_schema")
+        fields = ('id', 'firstname', 'shift_description','shift_hours', 'shift_date')
+
+staffschedule_schema = staffscheduleschema(many=True)
+
 class Empfile(db.Model):
     id = db.Column(db.Integer(), primary_key = True)
     employee2_id = db.Column(Integer(), ForeignKey('employee.id'))
@@ -468,6 +477,7 @@ class Store(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer)
     carwash =  db.Column(db.Boolean, default = False)
+    phone = db.Column(db.String(), nullable=False)
     
     def __repr__(self):
         return str(self.number)
