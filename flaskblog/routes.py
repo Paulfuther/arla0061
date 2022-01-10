@@ -6,13 +6,14 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 from requests.api import options
 from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
-    grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm
+    grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, BulkCallForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
-            make_incident_pdf,celery, client, twilio_from, validate_twilio_request, sg, Mail, \
+            make_incident_pdf,send_bulk_email, celery, client, Client, twilio_from, validate_twilio_request, sg, Mail, \
                 SendGridAPIClient, employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
-                    Attachment, FileContent, FileName, FileType, Disposition, DEFAULT_SENDER, Store
+                    Attachment, FileContent, FileName, FileType, Disposition, DEFAULT_SENDER, Store,\
+                        Twimlmessages, store_schema
 
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
@@ -114,24 +115,36 @@ def new_mail():
         print("we did it")
      return 'tasksent'
 
-'''app.route('/twilliocall', methods = ['GET', 'POST'])
+@app.route('/twiliocall', methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
-def twilliocall():
+def twilio_call():
 
-    site = db.session.query(Store.number,Store.phone).all()
-    for x in site:
-       
-        call = client.calls.create(
-                        twiml='<Response><Say>Hello, this is terry from petro canada. Please salt around the pumps and around the store. Thankyou</Say></Response>',
-                        to=x.phone,
-                        from_='+15484890144'
-                        )
-        print(x.number, x.phone)                        
+    # form for bulk calls
+    form=BulkCallForm()
 
-        print(call.sid)
-    return ("Success")
- '''   
+    if request.method == "GET":
+        return render_template("twiliocalls.html", form=form)
+    else:
+        
+        twimlname = request.form['templatename']
+        bulk_call = Twimlmessages.query.get(twimlname)
+        twil_id = bulk_call.twimlid
+        #print(twil_id)
+        # this is using twilml machine learning text to speach.
+        # this only goes out to stores.
+        site = db.session.query(Store.number,Store.phone).all()
+
+        for x in site:
+            call = client.calls.create(
+                            url=twil_id,
+                            to=x.phone,
+                            from_=twilio_from
+        )              
+        #print(call.sid)
+        
+        return render_template("layout.html")
+   
 
 @app.route('/bulkemail', methods = ['GET', 'POST'])
 @login_required
@@ -145,49 +158,9 @@ def bulk_email():
         
         role_id = request.form['role']
         templatename = request.form['templatename']
+        send_bulk_email.apply_async(args=[role_id,templatename], countdown=10) 
         
-    # this is bulk sms using the notify api from twilio.
-    # first we grab all employees who are active users.
-    # we need to search specifically for mobile phone
-
-        bulkmessage = BulkEmailSendgrid.query.get(templatename)
-        bm = bulkmessage.templateid
-        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
-        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
-            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
-        .filter(User.active == 1)\
-            .filter(Role.id==role_id)\
-        .all()
-    # gsa returns an object. Although we can serialise the object, we still
-    # have issues generating the proper format for twilio rest api.
-    # so we do it old school.
-    
-        '''   email_data = {
-            'from_email':'',
-            'to_email':'',
-            'message.tempalte.data': {
-                'subject':'Winter Readiness',
-                'name' : gsa.firstname
-            }
-        },'''
-
-    for user in gsa:
-       
-            message = Mail(
-            from_email='paul.futher@outlook.com',
-            to_emails= user.email)
-            message.dynamic_template_data = {
-                'subject':'Winter Readiness',
-                'name': user.firstname,
-
-            }
-            print(user.email)
-            message.template_id = bm
-            response = sg.send(message)
-         
-    # once completed. Do something.
-
-    return render_template("layout.html")
+        return render_template("layout.html")
 
 
 
@@ -196,7 +169,6 @@ def bulk_email():
 @roles_required('Admin')
 def bulk_sms():
     form=CommsForm()
-    
     if request.method == "GET":
         return render_template("comms.html", form=form)
     else:
@@ -239,7 +211,7 @@ def bulk_sms():
         #for x in gsa:
             #print (x.mobilephone, x.firstname)
 
-        #send_bulk_sms(gsat, message)
+        send_bulk_sms(gsat, message)
 
     # once completed. Do something.
 
@@ -253,7 +225,7 @@ def two_fa():
 
     return "hello"
 
-#@app.route("/sms", methods=['GET', 'POST'])
+@app.route("/sms", methods=['GET', 'POST'])
 @validate_twilio_request
 def sms_reply():
     """Respond to incoming calls with a simple text message."""
@@ -261,7 +233,7 @@ def sms_reply():
     resp = MessagingResponse()
 
     # Add a message
-    resp.message("The Robots are coming! Head for the hills!")
+    resp.message("Thank you for the call")
 
     return str(resp)
 
@@ -975,6 +947,24 @@ def rolesearch():
 
    
     return result
+
+@app.route("/storesearch", methods = ['POST', "GET"])
+@login_required
+def storesearch():
+
+    searchbox = request.form.get("text")
+    
+
+    site = db.session.query(Store.number,Store.phone).all()
+
+    #for x in gsa:
+    #    print(x.firstname, x.mobilephone)
+    results = store_schema.dump(site)
+    result = jsonify(results)
+
+   
+    return result
+
 
 @app.route("/livesearch", methods = ["POST", "GET"])
 @login_required

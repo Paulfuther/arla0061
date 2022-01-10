@@ -103,38 +103,60 @@ dbx = dropbox.Dropbox(DROP_BOX_KEY)
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
 
-'''
+
 @celery.task
-def send_bulk_email(email_data):
+def send_bulk_email(role_id, templatename):
     with app.test_request_context():    
 
         
+        # this is bulk sms using the notify api from twilio.
+        # first we grab all employees who are active users.
+        # we need to search specifically for mobile phone
+        
+        bulkmessage = BulkEmailSendgrid.query.get(templatename)
+        bm = bulkmessage.templateid
         gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
-            .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
             .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
-            .filter(User.active == 1)\
+        .filter(User.active == 1)\
             .filter(Role.id==role_id)\
-            .all()
-    # gsa returns an object. Although we can serialise the object, we still
-    # have issues generating the proper format for twilio rest api.
-    # so we do it old school.
+        .all()
 
-    for user in gsa:
+        #print(bm)
+        
+        # gsa returns an object. Although we can serialise the object, we still
+        # have issues generating the proper format for twilio rest api.
+        # so we do it old school.
+    
+        with open('flaskblog/static/attachments/siteevaluation.pdf', 'rb') as f:
+            data = f.read()
+            f.close()
+        encoded_file = base64.b64encode(data).decode()
+        attachedFile = Attachment(
+                    FileContent(encoded_file),
+                    FileName('siteevaluation.pdf'),
+                    FileType('application/pdf'),
+                    Disposition('attachment')) 
+
        
+        for user in gsa:
             message = Mail(
-            from_email='paul.futher@outlook.com',
+            from_email=DEFAULT_SENDER,
             to_emails= user.email)
             message.dynamic_template_data = {
-                'subject':'Winter Readiness',
+                'subject':templatename,
                 'name': user.firstname,
 
             }
-            
+            print(user.email)
             message.template_id = bm
+            
             response = sg.send(message)
 
-       
-'''
+            print(user.email) 
+      
+
+        
 
 
 @celery.task
@@ -198,7 +220,7 @@ def make_pdf(staff_id):
     
 
 
-@celery.task
+celery.task
 def make_incident_pdf(file_id):
     with app.test_request_context():
         rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
@@ -353,6 +375,14 @@ class BulkEmailSendgrid(db.Model):
         return '%r' % (self.templatename)
         
  
+class Twimlmessages(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    twimlname = db.Column(db.String, unique=True)
+    twimlid = db.Column(db.String(200), unique=True)
+    
+    def __repr__(self):
+        return '%r' % (self.twimlname)
+
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
@@ -485,6 +515,8 @@ class Store(db.Model):
 class StoreSchema(ma.Schema):
     class Meta:
         model = Store
+        fields = ('number','phone')
+store_schema = StoreSchema(many=True)
         
     
 class reclaimtank(db.Model):
@@ -942,6 +974,16 @@ class MyModelView12(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
+class MyModelView14(ModelView):
+    can_export = True
+    can_delete = False
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
 # these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
@@ -957,6 +999,7 @@ admin.add_view(MyModelView8(Incidentnumbers, db.session, category = "Paul"))
 admin.add_view(MyModelView9(Saltlog, db.session))
 admin.add_view(MyModelViewReclaim(reclaimtank, db.session, category = "Paul"))
 admin.add_view(MyModelView12(BulkEmailSendgrid, db.session, category="Paul"))
+admin.add_view(MyModelView14(Twimlmessages, db.session, category="Paul"))
 admin.add_view(MyModelView10(cwmaintenance, db.session, category = "Paul"))
 #admin.add_view(MyModelView11(Employee, db.session))
 admin.add_view(EmailView(name = 'Email', endpoint='email'))
