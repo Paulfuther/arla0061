@@ -69,6 +69,7 @@ NOTIFY_SERVICE_SID = os.environ.get('TWILIO_NOTIFY_SERVICE_SID')
 twilio_from = os.environ['TWILIO_FROM']
 DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+SENDGRID_NEWHIRE_ID = os.environ.get('SENDGRID_NEWHIRE_ID')
 
 client = Client(account_sid, auth_token)
 
@@ -163,6 +164,7 @@ def send_bulk_email(role_id, templatename):
 def make_pdf(staff_id):
     with app.test_request_context():
         signatures = Empfile.query.filter_by(employee2_id = staff_id)
+        
         rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
         img = '/files/image-20201205212708-1.png'
 
@@ -206,15 +208,26 @@ def make_pdf(staff_id):
 
         for x in rol:
             email = x.email
-            message =  Mail(
-                from_email = DEFAULT_SENDER,
-                to_emails=email,
-                subject = 'A New Hire File has been created',
-                html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
+            message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= email,
+            subject = 'A New Hire File has been created',
+            html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
             )
+            
+            message.dynamic_template_data = {
+                
+                'name':gsa.firstname,
+                'userid':gsa.trainingid,
+                'password':gsa.trainingpassword
+
+            }
+        
+            message.template_id = SENDGRID_NEWHIRE_ID
             message.attachment=attachedFile
             response = sg.send(message)
-        
+
+            
         with file as f:    
             dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
     

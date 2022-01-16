@@ -541,21 +541,33 @@ def searchschedule():
     
     s_v = int(search_value)
     
-    s_s = Employee.query.filter(Employee.store_id==storeid)\
+    '''s_s = Employee.query.filter(Employee.store_id==storeid)\
         .join(User, User.id==Employee.user_id)\
             .filter(User.active==1)\
             .outerjoin(staffschedule, Employee.id==staffschedule.employee_id)\
                     .add_columns(Employee.firstname,Employee.id,\
                          staffschedule.shift_description, staffschedule.shift_hours,\
                               staffschedule.shift_date, staffschedule.employee_id).all()
-    
-    for r in s_s:
-        print(r.shift_date, r.id, r.firstname, r.shift_description, r.shift_hours)
+    '''
 
+    s_s =db.session.query(staffschedule)
+
+    #for r in s_s:
+     #   print(r.shift_date, type(r.shift_date), r.id, r.firstname, r.shift_description, r.shift_hours)
+
+
+    df=pd.read_sql(s_s.statement,s_s.session.bind)
+    #idx= pd.date_range('2021-12-21', '2021-12-29')
+    #df.index = pd.DatetimeIndex(df.index)
+    #df = df.reindex(idx, fill_value=0)
+    #f.loc[idx]
+    #df = df.set_index('shift_date')
+   
+    print(df)
 
     results = staffschedule_schema.dump(s_s)
     result = jsonify(results)
-   
+    print(result)
     return result
 
 
@@ -737,9 +749,10 @@ def hrfile(staff_id):
                 z += 1
                 
         db.session.commit()
+        
         flash("file completed. Thank you")
         make_pdf.apply_async(args=[staff_id], countdown=10)
-        return render_template('layout.html')
+        return ('success')
   
     #print("success")
   
@@ -989,7 +1002,7 @@ def livesearch():
 
     results = employee_schema.dump(gsa)
     result = jsonify(results)
-    
+    print(result)
     return result
 
 

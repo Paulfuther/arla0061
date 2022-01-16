@@ -57,6 +57,10 @@
 
         </div>
                
+
+        <div class = "tablecontainer" id ="tablecontainer">
+
+
                      <div class ="schedulecontainer2">
 
                <div id="div1">hi</div>
@@ -128,43 +132,34 @@
 
                 </script>
 
-                                <script>
+                    <script>
 
                         $(document).ready(function(){
-                        $("#storesearch").on("input",function(e){
+                            $("#storesearch").on("input",function(e){
                                      
-                            storetext = $('#storesearch').val();
+                                storetext = $("#storesearch").val();
                                        
                                     
                             $.ajax({
                                         method:"POST",
                                         url:"/searchschedule",
                                         data: {text:storetext},
-                                        succss:function(res){
+                                        success:function(res){
                                             console.log(res)
                                            
                                             $('#tablecontainer').empty();
                                 
-                                let html = res.reduce(( acc, {firstname, id}) =>
+                                let html = res.reduce(( acc, {firstname, shift_date, id}) =>
                                     acc += `
-                                    <div class = 'tablecard'>
-                                 
-                                    <div class = 'tablecard-inner'>
+                                   
                                  
                                     <div class = 'hritem2'>
                                     ${firstname}
-                                    </div>
                                    
-                                    <div class = "tablecard-links">
-
-                                    <a   href="/updategsa${id}">Contact Info</a>
-                                    <a   href="/updategsatraining${id}">Training Info</a>
-                                    <a   href="/hrfile${id}">Create File</a>
-                                    <a   href="/existingemployeefile${id}">View File</a>
-                                    </div> 
-                                    </div>
-                                 
+                                    ${shift_date}
                                     </div>`
+                                 
+                                    
                                  
 
                                 , '');
@@ -178,69 +173,7 @@
                     });
                 })
 
-
-
-                                  
-
-
                                  
                                 </script>
-                                    <script>           
-
-                                 var data = [
-                                {
-                                    "firstname": "Paul", 
-                                    "id": 1, 
-                                    "shift_date": "2021-12-26", 
-                                    "shift_description": "3 to 11", 
-                                    "shift_hours": "8"
-                                }, 
-                                {
-                                    "firstname": "Paul", 
-                                    "id": 1, 
-                                    "shift_date": "2021-12-26", 
-                                    "shift_description": "7 to 3", 
-                                    "shift_hours": "5"
-                                }, 
-                                {
-                                    "firstname": "Abdul Karim", 
-                                    "id": 4, 
-                                    "shift_date": "2021-12-26", 
-                                    "shift_description": "7 to 3", 
-                                    "shift_hours": "8"
-                                }, 
-                                {
-                                    "firstname": "Moe", 
-                                    "id": 18, 
-                                    "shift_date": null, 
-                                    "shift_description": null, 
-                                    "shift_hours": null
-                                }, 
-                                {
-                                    "firstname": "Jim", 
-                                    "id": 72, 
-                                    "shift_date": null, 
-                                    "shift_description": null, 
-                                    "shift_hours": null
-                                }, 
-                                {
-                                    "firstname": "Dinal", 
-                                    "id": 102, 
-                                    "shift_date": null, 
-                                    "shift_description": null, 
-                                    "shift_hours": null
-                                }
-                                ]
-
-                            
-                           
-                            
-                            
-                       
-                
-                
-            
-            
-                    
-                </script>
+                                   
 {% endblock %}
