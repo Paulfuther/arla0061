@@ -24,7 +24,7 @@ from flask_admin.menu import MenuLink
 from flask_bcrypt import Bcrypt, generate_password_hash
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
-    String, ForeignKey
+    String, ForeignKey, or_
 
 from flask_email_verifier import EmailVerifier
 from flask_login import  user_logged_out, user_logged_in
@@ -38,7 +38,7 @@ from twilio.rest import Client
 from functools import wraps
 from twilio.request_validator import RequestValidator
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
+from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
 from flask_mail import Message
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -49,7 +49,7 @@ app.config['SECRET_KEY'] =os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT')
-app.config['SECURITY_RECOVERABLE'] = False
+app.config['SECURITY_RECOVERABLE'] = True
 app.config['SECURITY_CHANGEABLE'] = False
 app.config['SECURITY_EMAIL_SENDER'] = ('valid_email@my_domain.com')
 app.config['MAIL_SERVER']= os.environ.get('MAIL_SERVER')
@@ -154,7 +154,7 @@ def send_bulk_email(role_id, templatename):
             
             response = sg.send(message)
 
-            print(user.email) 
+            #print(user.email) 
       
 
         
@@ -164,10 +164,15 @@ def send_bulk_email(role_id, templatename):
 def make_pdf(staff_id):
     with app.test_request_context():
         signatures = Empfile.query.filter_by(employee2_id = staff_id)
-        
-        rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
+        ## this is incorrect. Employeeid is not user id. correct before pbulishing.
+        rol =  User.query.filter(or_(User.roles.any(Role.id == 3), User.id==staff_id)).all()
         img = '/files/image-20201205212708-1.png'
 
+        for x in rol:
+            print(x.email)
+
+        return "done"
+        '''
         image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
         image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
         image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
@@ -230,7 +235,7 @@ def make_pdf(staff_id):
             
         with file as f:    
             dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
-    
+        '''
 
 
 celery.task

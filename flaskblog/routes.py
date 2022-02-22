@@ -10,15 +10,15 @@ from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteInc
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
-            make_incident_pdf,send_bulk_email, celery, client, Client, twilio_from, validate_twilio_request, sg, Mail, \
-                SendGridAPIClient, employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
-                    Attachment, FileContent, FileName, FileType, Disposition, DEFAULT_SENDER, Store,\
-                        Twimlmessages, store_schema
+            make_incident_pdf,send_bulk_email, celery, client, Client, twilio_from, validate_twilio_request, Mail, \
+                 employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
+                     DEFAULT_SENDER, Store,\
+                        Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID
 
 from flask_email_verifier import EmailVerifier
 from flask_security import roles_required, login_required, current_user, roles_accepted, Security
 from flask_security.utils import encrypt_password
-from flask_security.datastore import UserDatastore
+#from flask_security.datastore import UserDatastore
 from io import BytesIO
 import os
 import json
@@ -48,7 +48,7 @@ from flaskblog.utils.request import validate_body
 from flaskblog.utils.response import response, error_response
 from flaskblog.utils.sms import send_bulk_sms
 from flaskblog.utils.twofa import twofa
-
+from flask_login import current_user, login_user
 moment = Moment(app)
 CORS(app)
 
@@ -81,6 +81,8 @@ def home():
     
     return render_template('layout.html')
     #return render_template('home.html')
+
+
 
 @app.route('/commsmenu', methods = ['GET', 'PSOT'])
 @login_required
@@ -134,14 +136,15 @@ def twilio_call():
         # this is using twilml machine learning text to speach.
         # this only goes out to stores.
         site = db.session.query(Store.number,Store.phone).all()
-
+        for x in site:
+            print(x.number, x.phone)
         for x in site:
             call = client.calls.create(
                             url=twil_id,
                             to=x.phone,
                             from_=twilio_from
         )              
-        #print(call.sid)
+        print(call.sid)
         
         return render_template("layout.html")
    
@@ -1216,6 +1219,8 @@ def updategsa(staff_id):
 @login_required
 @roles_accepted('Admin', 'Manager')
 def addemployee():
+
+    
     form = EmployeeForm()   
     form2 = GradeForm()
     course = Course.query.all()
@@ -1374,8 +1379,35 @@ def addemployee():
 
         db.session.commit()
        
-    flash('Employee has been added to the database', 'success')
+        
+
+        
+
+        email = emp.email
+        message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= email,
+            subject = 'Welcome to Petro Canada',
+            
+            )
+            
+        message.dynamic_template_data = {
                 
+                'name':emp.firstname,
+                'userid':emp.trainingid,
+                'password':emp.trainingpassword,
+                'login':emp.email
+
+            }
+        
+        message.template_id = SENDGRID_NEWHIRE_ID
+            
+        response = sg.send(message)
+
+
+    flash('Employee has been added to the database', 'success')
+
+              
     return redirect(url_for('hrhome'))
    
     
