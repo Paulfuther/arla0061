@@ -39,7 +39,7 @@ from functools import wraps
 from twilio.request_validator import RequestValidator
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
-from flask_mail import Message
+#from flask_mail import Message
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 load_dotenv()
@@ -70,7 +70,7 @@ twilio_from = os.environ['TWILIO_FROM']
 DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
 SENDGRID_NEWHIRE_ID = os.environ.get('SENDGRID_NEWHIRE_ID')
-
+SENDGRID_NEW_HIRE_FILE_ID=os.environ.get('SENDGRID_NEW_HIRE_FILE_ID')
 client = Client(account_sid, auth_token)
 
 def validate_twilio_request(f):
@@ -129,7 +129,7 @@ def send_bulk_email(role_id, templatename):
         # have issues generating the proper format for twilio rest api.
         # so we do it old school.
     
-        with open('flaskblog/static/attachments/siteevaluation.pdf', 'rb') as f:
+        '''with open('flaskblog/static/attachments/siteevaluation.pdf', 'rb') as f:
             data = f.read()
             f.close()
         encoded_file = base64.b64encode(data).decode()
@@ -139,7 +139,7 @@ def send_bulk_email(role_id, templatename):
                     FileType('application/pdf'),
                     Disposition('attachment')) 
 
-       
+       '''
         for user in gsa:
             message = Mail(
             from_email=DEFAULT_SENDER,
@@ -228,7 +228,7 @@ def make_pdf(staff_id):
 
             }
         
-            message.template_id = SENDGRID_NEWHIRE_ID
+            message.template_id = SENDGRID_NEW_HIRE_FILE_ID
             message.attachment=attachedFile
             response = sg.send(message)
 
