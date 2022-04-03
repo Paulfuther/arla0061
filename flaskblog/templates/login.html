@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+
+   {{ moment.include_jquery() }}
+   
+
+
+    <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   <!-- Bootstrap CSS -->
+  
+ 
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/pikaday/pikaday.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0/css/all.min.css" integrity="sha256-ybRkN9dBjhcS2qrW1z+hfCxq+1aBdwyQM5wlQoQVt/0=" crossorigin="anonymous" />
+   <link rel = "stylesheet" href="/static/main.css"> 
+   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pikaday/css/pikaday.css">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+
+   
+   <!-- <link rel = "stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}"> -->
+  
+  </head>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'main.css') }}" ></link> 
+            
+     
+                <form id="loginform"  method="POST" action="" role="form">
+
+                    <div class = "login_container" >
+                    
+                          
+                  
+                                  <!-- class= "messagescontainer">  -->
+                                    {% with messages = get_flashed_messages()%}
+                                    {%if messages%}
+                                        {% for message in messages %}
+                                        <div class = "alerts">
+                                        {{ message }} 
+                                        </div>
+                                        {% endfor %}
+                                        
+                                        
+                                    {% endif %}
+                                    {% endwith %}
+                
+                                
+                           
+
+
+
+                        {{ form.hidden_tag() }}
+
+                        <div class = "loginheader"><h1>{{ ('Login') }}</h1>
+                        </div>
+
+                        <div class = "box-1" >
+                            {{ form.email(class='formscontrol', placeholder="email") }}
+                        </div>
+
+                        {% for error in form.email.errors %}
+                        <div class="alerts">[{{ error }}]</div>
+                        {% endfor %}
+                        
+                        <div class = "box-2" >
+                            {{ form.password (class ='formscontrol', placeholder="password") }}
+                        </div>  
+
+                        {% for error in form.password.errors %}
+                        <div class="alerts">[{{ error }}]</div>
+                        {% endfor %}
+
+                        <div class="login_remember" >
+                        <div class="login_remember_check">Remember Me</div>
+                        <input type="checkbox" name = "remember_me">
+                        </div>
+                        
+
+                        <div class = "box-3">
+                            <input class="formscontrol" type="submit" value="Submit">
+                        </div>
+
+                        <div>
+                            <a class="login_container_hover" href="/forgot_password">Reset Password</a>
+                            
+                            <a class="login_container_hover" href="/">Home</a>
+                        </div>
+                        
+                 
+                    </div>
+                </form>
+
+
+

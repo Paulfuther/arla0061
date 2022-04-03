@@ -4,30 +4,31 @@ from flask import Flask
 app = Flask(__name__)
 
 from dotenv import load_dotenv
+from time import time
+import jwt
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os, base64
 import json
+from functools import wraps
 from datetime import datetime
 from flask import render_template_string, make_response, url_for, redirect, send_from_directory, \
-     request, render_template, send_file, abort
+     request, render_template, send_file, abort, g
 from flask_admin import Admin, expose, BaseView
 from flask_admin.actions import action
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, \
-     UserMixin, RoleMixin, login_required, roles_required
-from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
 from flask_marshmallow import Marshmallow
 from marshmallow import Schema
 from flask_admin.menu import MenuLink
-from flask_bcrypt import Bcrypt, generate_password_hash
+from flask_bcrypt import Bcrypt, check_password_hash, generate_password_hash 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey, or_
-
 from flask_email_verifier import EmailVerifier
-from flask_login import  user_logged_out, user_logged_in
+from flask_login import  user_logged_out, user_logged_in, login_required,\
+     current_user, LoginManager
+from flask_user import roles_required, roles_accepted, UserMixin
 from celery import Celery
 from flaskblog.tasks import celery
 import dropbox
@@ -39,7 +40,8 @@ from functools import wraps
 from twilio.request_validator import RequestValidator
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
-#from flask_mail import Message
+
+bcrypt = Bcrypt(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 load_dotenv()
@@ -65,13 +67,16 @@ app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
-NOTIFY_SERVICE_SID = os.environ.get('TWILIO_NOTIFY_SERVICE_SID')
 twilio_from = os.environ['TWILIO_FROM']
-DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
-sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+
 SENDGRID_NEWHIRE_ID = os.environ.get('SENDGRID_NEWHIRE_ID')
 SENDGRID_NEW_HIRE_FILE_ID=os.environ.get('SENDGRID_NEW_HIRE_FILE_ID')
+NOTIFY_SERVICE_SID = os.environ.get('TWILIO_NOTIFY_SERVICE_SID')
+DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+TWILIO_VERIFY_SID = os.environ.get('TWILIO_VERIFY_SID')
+sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
 client = Client(account_sid, auth_token)
+verify = client.verify.services(TWILIO_VERIFY_SID)
 
 def validate_twilio_request(f):
     """Validates that incoming requests genuinely originated from Twilio"""
@@ -103,6 +108,12 @@ db = SQLAlchemy(app)
 dbx = dropbox.Dropbox(DROP_BOX_KEY)
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.session_protection="strong"
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 @celery.task
@@ -156,9 +167,6 @@ def send_bulk_email(role_id, templatename):
 
             #print(user.email) 
       
-
-        
-
 
 @celery.task
 def make_pdf(staff_id):
@@ -296,12 +304,9 @@ def make_incident_pdf(file_id):
             dbx.files_upload(f.read(), path=f"/SITEINCDIENTS/{filename}", mode=WriteMode('overwrite'))
     
     
-
 admin = Admin(app, name='Dashboard')
     
 bcrypt = Bcrypt(app)
-
-
 
 roles_users = db.Table(
     'roles_users',
@@ -363,11 +368,12 @@ class User(UserMixin, db.Model):
     active = db.Column(db.Boolean, default = True)
     confirmed_at = db.Column(db.DateTime)
     user_name = db.Column(db.String(100), nullable=False)
-    
+    phone = db.Column(db.String(100))
     # new additions 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow) 
-       
+    email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    email_confirmed_date = db.Column(db.DateTime)
     #employee = db.relationship('Customer', backref= 'user', uselist = False)
     roles = db.relationship('Role',  secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
@@ -377,13 +383,42 @@ class User(UserMixin, db.Model):
         super(User, self).__init__(**kwargs)
         if self.roles is  None:
             self.roles = Role.query.filter_by(name="GSA").first()
-    
+
     def has_roles(self, *args):
         return set(args).issubset({role.name for role in self.roles})
 
+    def is_active(self):
+        return self.active
+
     def __str__(self):
         return (self.user_name) 
+
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time()+ expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256')
     
+    def get_mail_confirm_token(self, expires_in=600):
+        return jwt.encode(
+            {'confirm_email': self.id, 'exp': time()+ expires_in},
+            app.config['SECRET_KEY'], algorithm="HS256")
+
+    @staticmethod
+    def verify_email_confirm_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],algorithms=['HS256'])['confirm_email']
+        except:
+            return
+        return User.query.get(id)
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
+
 class BulkEmailSendgrid(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     templatename = db.Column(db.String, unique=True)
@@ -402,7 +437,7 @@ class Twimlmessages(db.Model):
         return '%r' % (self.twimlname)
 
 
-class Role(db.Model, RoleMixin):
+class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     description = db.Column(db.String(255))
@@ -693,8 +728,10 @@ class Incident(db.Model):
 
 # here we initiate the datastore which is used in the Admin model
 
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
+
+# feb 27 2021
+#user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+#security = Security(app, user_datastore)
 
 #create a user to test with
 
@@ -715,32 +752,32 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ( 'user_name', 'active','created_on', 'updated_on', 'roles')
+    column_list = ( 'user_name', 'active','created_on', 'updated_on', 'email_confirmed', 'email_confirmed_date','roles', 'phone')
     column_searchable_list = ['user_name']
+    
     def is_accessible(self):
         return current_user.has_roles('Admin' )
     
-    
-
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('home'))
 
     def on_model_change(self, form, model, is_created):
         if is_created:
-            model.password = hash_password(form.password.data)
+            model.password = bcrypt.generate_password_hash(form.password.data)
         else:
             old_password = form.password.object_data
             # If password has been changed, hash password
             if not old_password == model.password:
-                model.password = hash_password(form.password.data)
+                model.password = bcrypt.generate_password_hash(form.password.data)
 
 class MyModelView2(ModelView):
+    create_modal = True
+    edit_modal = True
     can_export = True
     can_delete = False
-    #column_hide_backrefs = False
+    column_hide_backrefs = True
     #column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
-    column_searchable_list = ['firstname']
+    column_editable_list = ['firstname', 'lastname']
+    column_searchable_list = ['firstname', 'lastname']
     #list_columns = ['firstname','store']
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -872,7 +909,7 @@ class AdminViewStore(ModelView):
     
 class AdminViewClass(ModelView):
     
-    can_delete = False
+    can_delete = True
     
     @action('publish to all staff', 'Approve', 'Are you sure you want to add this course toa ll')
     def action_approve(self, ids):
@@ -886,7 +923,7 @@ class AdminViewClass(ModelView):
             check = Grade.query.filter_by(employee_id=gsas.id, course_id = id4, ).first()
             if not check:
                 print("emp" ,gsas.firstname, "nope")
-                newcourse = Grade(value="n", employee_id = gsas.id, course_id = id4)
+                newcourse = Grade(completed=0, employee_id = gsas.id, course_id = id4)
                 db.session.add(newcourse)
                 
             else:

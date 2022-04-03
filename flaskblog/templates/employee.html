@@ -41,29 +41,20 @@
             </div>
             
         </div>
-        <div class ="formtitle">Login Credentials</div>
-        <div></div>
-        <div  class="formtitle" >{{"Active:"}}</div>
-        <div> {{form.active(class = "form", placeholder="Active")}} 
-                    
-                    {% if form.active.errors %}
-                        {% for error in form.active.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        <div  class="formtitle" >{{"User Name:"}}</div>
-        <div> {{form.username(class = "form", placeholder="User Name")}}   
-                        {% if form.usernameerrors %}
-                        {% for error in form.usernameerrors %}
+        
+        <div  class="formtitle" >{{"First Name:"}}</div>
+        <div> {{form.firstname(class = "form", placeholder="First Name")}}   
+                        {% if form.firstnameerrors %}
+                        {% for error in form.firstnameerrors %}
                         <div class = "formerror">{{ error }}</div>
                         {% endfor %}  
                         {% endif %}
-        </div>
+        </div> 
 
-
-
-
+        <div  class="formtitle" >{{"Last Name:"}}</div>
+        <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
+        </div> 
+       
         <div  class="formtitle" >{{"Email:"}}</div>
         <div> {{form.email(class = "form",   id="emailinput", placeholder="E-Mail")}} 
             <input type="hidden" id="hiddenemail" name="hiddenemail">
@@ -83,37 +74,34 @@
                     {% endif %}
         </div>
 
+        <div  class="formtitle"  >{{"Phone Number:"}}</div>
+        <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
+            <input type="hidden" id="hiddenphone" name="hiddenphone"   >
+                    {% if form.mobilephone.errors %}
+                        {% for error in form.mobilephone.errors %}
+                        <div class = "formerror">{{ error }}</div>
+                        {% endfor %}        
+                    {% endif %}
+       
+        <div class="alert alert-info" style="display: none;"></div>
+        <div class="alert alert-error" style="display: none"></div>
+        <div class="alert alert3-info" style="display: none;"></div>
+        <div class="alert alert3-error" style="display: none"></div>
+        </div>
+
         <div></div>
         <div></div>
-
-
-
         
         <div></div>
         <div> </div>
         
         
 
-        
-
-        <div class ="formtitle">Employee Information</div>
-        <div></div>
-        <div  class="formtitle" >{{"First Name:"}}</div>
-        <div> {{form.firstname(class = "form", placeholder="First Name")}}   
-                        {% if form.firstnameerrors %}
-                        {% for error in form.firstnameerrors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}  
-                        {% endif %}
-        </div> 
-
         <div  class="formtitle" >{{"NickName:"}}</div>          
         <div> {{form.nickname(class = "form", placeholder="Nick Name")}}                   
         </div>       
 
-        <div  class="formtitle" >{{"Last Name:"}}</div>
-        <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
-        </div>  
+         
 
         <div  class="formtitle" >{{"Date of Birth:"}}</div>
         <div> {{form.dob(class = "form" ,placeholder="Date of Birth")}} </div>
@@ -129,20 +117,7 @@
         
 
 
-        <div  class="formtitle"  >{{"Phone Number:"}}</div>
-        <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
-            <input type="hidden" id="hiddenphone" name="hiddenphone"   >
-                    {% if form.mobilephone.errors %}
-                        {% for error in form.mobilephone.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}        
-                    {% endif %}
        
-        <div class="alert alert-info" style="display: none;"></div>
-        <div class="alert alert-error" style="display: none"></div>
-        <div class="alert alert3-info" style="display: none;"></div>
-        <div class="alert alert3-error" style="display: none"></div>
-        </div>
         <div  class="formtitle" >{{"Start Date:"}}</div>
         <div> {{form.Startdate(class = "form" ,placeholder="Start Date")}} </div>
 

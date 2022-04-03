@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: 'Seqoe UI', Verdana, Geneva, Tahoma, sans-serif;
+  font-family:'Open Sans' , sans-serif;
   background: white;
   color: #000;
   font-size: 16px;
@@ -210,8 +210,8 @@ table {
 
 
 .inctitle {
-  font-size: 16px;
-  padding: 10px 0px 10px 0px;
+  font-size: 20px;
+  padding: 10px 10px 10px 0px;
 }
 
 .incheader {
@@ -1075,14 +1075,51 @@ ul {
 
 /*--- Login Form --*/
 
-.loginform {
-  display: grid;
-  grid-template-columns: 250px;
-  justify-content: center;
-  justify-items: start;
+.login_container {
+  display: flex;
+  align-content: center;
+  flex-direction: column;
   margin-top: 100px;
   font-size: 25px;
+  align-items: center;
 }
+
+.login_container div{
+  padding:10px;
+  border:1px;
+}
+
+.login_container a{
+  font-size: 14px;
+}
+
+.login_container input{
+  font-size: 14px;
+}
+
+.login_container_hover:hover {
+  text-decoration: underline;
+}
+
+.login_containter a:hover {
+  text-decoration: underline;
+}
+
+.login_remember {
+  font-size: 14px;
+  display: flex;
+  align-items: baseline;
+  
+}
+
+.login_remember_check{
+  flex:none;
+  margin-right: 10px;
+}
+
+/*-- change password form --*/
+
+
 
 .changepassword {
   display: grid;
@@ -1117,7 +1154,7 @@ ul {
   text-align: justify;
 }
 
-
+/*
 .securityform {
   font-size: 25px;
 
@@ -1134,7 +1171,7 @@ input[type=password] {
 
 }
 
-
+*/
 .login {
   display: grid;
   align-content: center;
@@ -1146,7 +1183,8 @@ input[type=password] {
   width:250px;
   height: 40px;
   border-radius: 12px;
-  
+  font-size: 20px;
+  padding-left: 10px;
 
 }
 
@@ -1158,16 +1196,16 @@ input[type=password] {
 }
 
 .loginheader {
-  width: 200px;
+  width: 90%;
   text-align: center;
+  font-family:Open Sans Condensed, sans-serif;
 }
 
 
 .loginheader h1 {
-  font-family: "Comic Sans MS",
-  Sans,
-  Arial;
+  font-family:'Open Sans' , sans-serif;
   text-align:center;
+  font-size: 20px;
 }
 
 .flashes {
@@ -1854,6 +1892,7 @@ ul.a {
   color: black;
   padding-bottom: 50px;
   padding-left: 10px;
+  padding-top: 20px
 }
 
 .formcheckcontainer {
@@ -2153,7 +2192,7 @@ a.hrbutton {
   justify-content: space-between;
   height: 60px;
   padding: 20px 0;
-  font-size: 13px;
+  font-size: 20px;
 }
 
 .mobile-nav  {
@@ -2225,7 +2264,7 @@ a.hrbutton {
   justify-content: space-between;
   height: 60px;
   padding: 20px 0;
-  font-size: 14px;
+  font-size: 20px;
 }
 .app-nav ul {
   display: flex;
@@ -2596,8 +2635,9 @@ p.error {
     font-size: 18px;
     text-align: left;
     color: black;
-    padding-bottom: 50px;
+    padding-bottom: 40px;
     padding-left: 0px;
+    padding-top: 20px;
 
 
   }

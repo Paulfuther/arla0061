@@ -6,19 +6,17 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
 from requests.api import options
 from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
-    grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, BulkCallForm
+    grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, \
+        forgot_password_Form, BulkCallForm, reset_password_form, Confirm2faForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
             make_incident_pdf,send_bulk_email, celery, client, Client, twilio_from, validate_twilio_request, Mail, \
                  employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
-                     DEFAULT_SENDER, Store,\
-                        Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID
+                     DEFAULT_SENDER, Store,Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID, \
+                         login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient
 
 from flask_email_verifier import EmailVerifier
-from flask_security import roles_required, login_required, current_user, roles_accepted, Security
-from flask_security.utils import encrypt_password
-#from flask_security.datastore import UserDatastore
 from io import BytesIO
 import os
 import json
@@ -47,16 +45,227 @@ from flask_cors import CORS
 from flaskblog.utils.request import validate_body
 from flaskblog.utils.response import response, error_response
 from flaskblog.utils.sms import send_bulk_sms
-from flaskblog.utils.twofa import twofa
-from flask_login import current_user, login_user
+from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, check_verification_token
+from flask_login import current_user, login_user, logout_user
 moment = Moment(app)
 CORS(app)
 
 
+
+
 @app.route("/")
-@app.route("/home<int:user_id>")
-@login_required
 def home():
+    return render_template("layout.html")
+
+@app.route("/login", methods = ['GET', 'POST'])
+def login():
+    form=LoginForm()
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            flash('That email does not exits')
+        elif user.active == False:
+            flash('You are not an active user')
+            return render_template("login.html", form=form)
+        elif user is None or  not bcrypt.check_password_hash(user.password, form.password.data):
+            flash('invalid username or password')
+            return redirect(url_for('login', form=form)  )
+        elif user.email_confirmed == 0:      
+            send_email_confirmation(user)
+            flash('please confirm email')
+            return redirect(url_for('login'))
+        elif user and bcrypt.check_password_hash(user.password, form.password.data):
+            user_phone =db.session.query(Employee.mobilephone, User)\
+            .filter(Employee.user_id == user.id).first()
+            print(user.phone)
+            print(user.active)
+            request_verification_token(user.phone)
+            session['phone']=user.phone
+            #session['phone']=user_phone
+            return redirect(url_for('verify_2fa'))
+            #login_user(user)
+            #print(current_user)
+            #return render_template("layout.html", title="home")
+    #print("nope")    
+    return render_template("login.html", form=form)
+
+''' @app.route("/login", methods = ['GET', 'POST'])
+def login():
+    form=LoginForm()
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            flash('That email does not exits')
+        elif user.active == 0:
+            flash('You are not an active user')
+        elif user is None or  not bcrypt.check_password_hash(user.password, form.password.data):
+            flash('invalid username or password')
+            return redirect(url_for('login', form=form)  )
+        elif user.email_confirmed == 0:      
+            send_email_confirmation(user)
+            flash('please confirm email')
+            return redirect(url_for('login'))
+        elif user and bcrypt.check_password_hash(user.password, form.password.data):
+            #user_phone =db.session.query(Employee.mobilephone, User)\
+            #.filter(Employee.user_id == user.id).first()
+            print(user.phone)
+            
+            request_verification_token(user.phone)
+            session['phone']=user.phone
+            #session['phone']=user_phone
+            return redirect(url_for('verify_2fa'))
+            
+    #print("nope")    
+    return render_template("login.html", form=form)
+ '''   
+def send_email_confirmation(user):
+    token = user.get_mail_confirm_token()
+    email = user.email
+    message=Mail(
+        from_email = DEFAULT_SENDER,
+        to_emails=email,
+        subject = 'Please Verify Email for Petro Canada',
+        html_content=render_template('email/confirm_email.html', user=user, token=token)
+            )
+    response = sg.send(message)
+    
+
+
+@app.route('/verify2fa', methods=['GET', 'POST'])
+def verify_2fa():
+    form = Confirm2faForm()
+    if form.validate_on_submit():
+        print(form.token.data)
+        print("yes")
+        phone=session['phone']
+        if check_verification_token(phone, form.token.data):
+            user = User.query.filter_by(phone = phone).first()
+            login_user(user)
+            print(current_user)
+            return render_template("layout.html", title="home")
+        flash ('invalid code please login again')
+    print("huh")
+    return render_template('verify.html', form=form)
+
+@app.route("/forgot_password", methods = ['GET', 'POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    form = forgot_password_Form()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+            flash('Check your email for the instrucitons to reset your password')
+        else:
+            flash('Invalide Credentials')
+        return redirect(url_for('forgot_password'))
+    return render_template("forgot_password.html", title="Reset Password", form=form)
+
+def send_password_reset_email(user):
+    token=user.get_reset_password_token()
+    email = user.email
+    message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= email,
+            subject = 'Welcome to Petro Canada',
+            html_content=render_template('email/reset_password.html', user=user, token=token)
+            )
+    response = sg.send(message)
+
+@app.route('/reset_password/<token>', methods=['GET','POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    form = reset_password_form()
+    if form.validate_on_submit():
+        user.password = bcrypt.generate_password_hash(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Your password has been reset')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html', form=form, user=user)
+
+@app.route('/confirm_email/<token>', methods=['GET', 'POST'])
+def confirm_email(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_email_confirm_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    
+    user.email_confirmed = True
+    user.email_confirmed_date = datetime.utcnow()
+    db.session.add(user)
+    db.session.commit()
+    flash('Your email has been verified')
+    return redirect(url_for("login"))
+    
+@app.route('/updatephone')
+def update_phone():
+    newuser =  Employee.query.filter(Employee.mobilephone).all()
+    
+    for x in newuser:
+        print(x.firstname, x.mobilephone, x.user_id)
+        user=User.query.get(x.user_id)
+        print (user)
+        user.phone = x.mobilephone
+        db.session.commit()
+        print(user.phone)
+    
+    return "done"
+
+def fetch_sms():
+    return client.messages.stream()
+@app.route('/fetch_twilio')
+def fetch_twilio():
+    sms = fetch_sms()
+    return render_template("fetch_twilio.html", sms=sms)
+
+@app.route('/fetch_calls')
+def fecth_calls():
+    calls = client.calls.list(limit=20)
+    for record in calls:
+        print(record.sid)   
+    return "done"
+
+@app.route('/fetch_call_events')
+def fetch_call_events():
+    events = client.calls('CA7d4e808eed188f5c1754342cd9cdc1bb') \
+               .events \
+               .list(limit=20)
+
+    #for record in events:
+    #    print(record.request)
+    #    request_items = record.request.items()
+    #    print(type(record.request))
+    #    for item in request_items:
+    #        print(item)
+    for record in events:
+        #print(record.request)
+        print("------------")
+        json_string = json.dumps(record.request) 
+        stringone=json.loads(json_string)   
+        print(stringone['parameters'])
+        key =(stringone['parameters'])
+        print(key)
+        for x in key:
+            print(x[0])
+        #print(type(stringone))
+      
+  
+    #for key in events:
+     #  print(key)
+    return "done"
+
+@app.route("/home2<int:user_id>")
+@login_required
+def home2():
     print(current_user.id)
     gsaid = int(current_user.id)
     staff = Employee.query.filter_by(user_id=gsaid).first()
@@ -82,14 +291,17 @@ def home():
     return render_template('layout.html')
     #return render_template('home.html')
 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
-
-@app.route('/commsmenu', methods = ['GET', 'PSOT'])
+@app.route('/commsmenu', methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
 def comms_menu():
     return render_template('commsmenu.html')
-
 
 @app.route('/task2', methods = ['GET', 'POST'])
 @login_required
@@ -148,7 +360,6 @@ def twilio_call():
         
         return render_template("layout.html")
    
-
 @app.route('/bulkemail', methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
@@ -164,8 +375,6 @@ def bulk_email():
         send_bulk_email.apply_async(args=[role_id,templatename], countdown=10) 
         
         return render_template("layout.html")
-
-
 
 @app.route('/bulkms', methods = ['GET', 'POST'])
 @login_required
@@ -240,8 +449,6 @@ def sms_reply():
 
     return str(resp)
 
-
-
 @app.route('/testincident', methods = ['GET', 'POST'])
 @login_required
 def print_incident():
@@ -269,8 +476,6 @@ def email(email):
         
         resp = make_response('None', 404)
     return resp
-
-
 
 @app.route("/event", methods = ['GET', 'POST'])
 @login_required
@@ -453,7 +658,6 @@ def emailme():
    
     return render_template("layout.html")
 
-
 @app.route("/verifyemailtoday", methods = ['GET','POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -514,7 +718,6 @@ def schedule():
    
     
     return render_template('schedule.html', form=form)
-
 
 @app.route("/searchschedule", methods=['GET', 'POST'])
 @login_required
@@ -655,8 +858,6 @@ def searchschedule():
     '''
     return render_template('schedule.html')
 
-
-
 @app.route("/addtoschedule", methods = ['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -675,37 +876,9 @@ def addtoschedule():
 #@login_required
 #@roles_required('GSA')
 #def employeedashboard():
-    
-    
-    
 
 def storelist():
     return db.session.query(Store).all.order_by('number')
-
-#@app.route("/login", methods=['GET', 'POST'])
-#def login():
- #   if current_user.is_authenticated:
- #       return redirect(url_for('home'))
-
-  #  form = LoginForm()
-
-   # if form.validate_on_submit():
-   #     user = User.query.filter_by(email=form.email.data).first()
-
-    #    password = bcrypt.checkpw(user.password.encode(), user.passowrd.pwd.encode())
-        #print(user.password)
-        #print(password)
-        #hp = bcrypt.check_password_hash(user.password, password)
-        #print(hp)
-    #    if user and bcrypt.check_password_hash(user.password, form.password.data):
-
-     #       login_user(user, remember=form.remember.data)
-      #      return redirect(url_for('hrhome'))
-      #  return '<h1> Invalid Credentials </h1>'
-
-        #return render_template('home.html')
-
-   # return render_template('login.html', form=form)
 
 @app.route("/sendfile<int:staff_id>", methods =['GET', 'POST'])
 @login_required
@@ -804,7 +977,6 @@ def employeefile(staff_id):
     
     return render_template('employeecompletedfile.html', hrpage = hrpage, signatures=signatures, gsa=gsa)
 
-
 @app.route("/createpdfnewhire<int:staff_id>", methods = ['GET', 'POST'])
 @login_required
 def pdf_file(staff_id):
@@ -827,8 +999,6 @@ def pdf_file(staff_id):
        
     return "working"
     
-
-
 @app.route("/hrlist", methods =['GET', 'POST'])
 @login_required
 def hrlist():
@@ -850,7 +1020,6 @@ def trainingcompliance():
 
     
     return render_template('trainingcompliance.html', compliance = compliance)
-
 
 @app.route("/updategsatraining<int:staff_id>", methods=['GET', 'POST'])
 @login_required
@@ -895,7 +1064,8 @@ def updategsatraining(staff_id):
     if request.method == "POST":
         r = request.form.getlist("completeddate")
         g = request.form.getlist("myCheck2")
-        #print(r)
+        print(r)
+        print(g)
         form = request.form 
         f=staff_id
         yy=0
@@ -916,7 +1086,7 @@ def updategsatraining(staff_id):
                 else:
                     grade_check = 1
                     completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
-                    #print(grade_check, completeddate)
+                    print(grade_check, completeddate)
                 t.completed= grade_check
                 t.completeddate = r[yy]
                 #print(y,x, r[yy])
@@ -981,7 +1151,6 @@ def storesearch():
    
     return result
 
-
 @app.route("/livesearch", methods = ["POST", "GET"])
 @login_required
 def livesearch():
@@ -1008,9 +1177,6 @@ def livesearch():
     print(result)
     return result
 
-
- 
-
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
 def search():
@@ -1027,7 +1193,6 @@ def search():
     
    
     return render_template('hrlist.html', gsa=gsa, store_list = store_list, ugh2=ugh2)
-
 
 def save_hrpicture(form_hrpicture):
     # uses PIL from Pillow
@@ -1066,7 +1231,6 @@ def save_hrpicture(form_hrpicture):
     print(newi2.size)
     
     return hrpicture_fn
-
 
 @app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
 @login_required
@@ -1213,8 +1377,7 @@ def updategsa(staff_id):
 
         
     return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa )
-
-    
+  
 @app.route("/addemployee", methods=['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -1247,7 +1410,7 @@ def addemployee():
         # here we encrypt the password.
 
         newpass = request.form.get('password')
-        newpassword = encrypt_password(newpass)
+        newpassword = bcrypt.generate_password_hash(newpass)
         
         # here we enable the user
 
@@ -1267,7 +1430,8 @@ def addemployee():
         adduser = User(email=newuser,
                     password=newpassword,
                     active=active,
-                    user_name=user_name)
+                    user_name=user_name,
+                    phone=form.mobilephone.data)
 
         db.session.add(adduser)
         # flush will create an entry in the database that cannot be over written.
@@ -1379,10 +1543,6 @@ def addemployee():
 
         db.session.commit()
        
-        
-
-        
-
         email = emp.email
         message = Mail(
             from_email=DEFAULT_SENDER,
@@ -1410,9 +1570,8 @@ def addemployee():
               
     return redirect(url_for('hrhome'))
    
-    
 @app.route("/applications")
-#@login_required
+@login_required
 @roles_required('Admin')
 def Applications():
     return render_template('applications.html', title='Applications')

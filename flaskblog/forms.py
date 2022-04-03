@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy.sql.sqltypes import Date, String
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
 from wtforms.fields.html5 import DateField, TelField, TimeField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
 from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid, Twimlmessages
@@ -24,13 +24,25 @@ def mgr():
 def get_mgr_name(User):
     return f"{User.firstname} {User.lastname}"
 
+class Confirm2faForm(FlaskForm):
+    token = StringField()
+    submit = SubmitField('Verify')
+
+
 class LoginForm(FlaskForm):
-    email = StringField('email', validators = [InputRequired(), Length(min=4, max=200)])
+    email = StringField('email', validators = [InputRequired(), Length(min=4, max=200), Email()])
     password = PasswordField('password', validators = [InputRequired(), Length(min=8, max=80)])
-    remember = BooleanField('remember me')
+    remember_me = BooleanField('remember me')
     submit = SubmitField('Login')
 
+class forgot_password_Form(FlaskForm):
+    email = StringField('email', validators = [InputRequired(), Length(min=4, max=200), Email()])    
+    submit = SubmitField('Login')
 
+class reset_password_form(FlaskForm):
+    password = PasswordField('Password', validators = [InputRequired(), Length(min=8, max=80)])
+    password2 = PasswordField('Repeat Password', validators = [InputRequired(),Length(min=8, max=80), EqualTo('password')])
+    submit = SubmitField('Request Password Reset')
 
 class CommsForm(FlaskForm):
     role = (QuerySelectField(query_factory=lambda: Role.query.order_by(Role.name),
@@ -100,7 +112,7 @@ class EmployeeForm(FlaskForm):
     trainingpassword = StringField(
         'Training Password', validators=[DataRequired()])
     manager = QuerySelectField(
-        query_factory=lambda: User.query.join(User.roles).filter(Role.id==2).order_by(User.user_name),
+        query_factory=lambda: User.query.join(User.roles).filter(Role.id==2).order_by(User.user_name).filter(User.active ==1),
         allow_blank=False
     )
     
@@ -368,3 +380,6 @@ class SiteIncident(FlaskForm):
     waddress = StringField()
     wdate = DateField()
     submit = SubmitField('Submit Event Form')
+
+
+    
