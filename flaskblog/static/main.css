@@ -1796,7 +1796,7 @@ ul.a {
 }
 .form-hrinfo {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
+  grid-template-columns: repeat(1fr);
   margin: auto;
   justify-content: center;
   align-items: center;
@@ -1835,10 +1835,10 @@ ul.a {
   margin: 10px 0px 10px 0px;
   border-color: none;
   width: 95%;
-  height:75px;
+  height:75px !important;
   padding: 15px 15px 15px 15px;
   font-size: 20px;
-
+  -webkit-appearance: none;
 }
 
 .form-bad {
@@ -1868,6 +1868,13 @@ ul.a {
   padding: 5px 5px 5px 5px;
 
 }
+
+.iti {
+  position: relative;
+  display: block !important;
+}
+
+
 .input-container [data-error] {
   border-color: red;
   color: red;

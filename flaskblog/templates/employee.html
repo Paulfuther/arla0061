@@ -42,7 +42,7 @@
             
         </div>
         
-        <div  class="formtitle" >{{"First Name:"}}</div>
+       
         <div> {{form.firstname(class = "form", placeholder="First Name")}}   
                         {% if form.firstnameerrors %}
                         {% for error in form.firstnameerrors %}
@@ -51,11 +51,11 @@
                         {% endif %}
         </div> 
 
-        <div  class="formtitle" >{{"Last Name:"}}</div>
+        
         <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
         </div> 
        
-        <div  class="formtitle" >{{"Email:"}}</div>
+       
         <div> {{form.email(class = "form",   id="emailinput", placeholder="E-Mail")}} 
             <input type="hidden" id="hiddenemail" name="hiddenemail">
                   
@@ -65,7 +65,7 @@
         </div>
         
 
-        <div  class="formtitle" >{{"Password:"}}</div>
+        
         <div> {{form.password(class = "form", placeholder="Password")}} 
                     {% if form.password.errors %}
                         {% for error in form.password.errors %}
@@ -74,7 +74,7 @@
                     {% endif %}
         </div>
 
-        <div  class="formtitle"  >{{"Phone Number:"}}</div>
+        
         <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
             <input type="hidden" id="hiddenphone" name="hiddenphone"   >
                     {% if form.mobilephone.errors %}
@@ -95,19 +95,13 @@
         <div></div>
         <div> </div>
         
-        
-
-        <div  class="formtitle" >{{"NickName:"}}</div>          
-        <div> {{form.nickname(class = "form", placeholder="Nick Name")}}                   
-        </div>       
-
          
 
         <div  class="formtitle" >{{"Date of Birth:"}}</div>
         <div> {{form.dob(class = "form" ,placeholder="Date of Birth")}} </div>
 
         <div  class="formtitle" >{{"Home Store:"}}</div>
-        <div> {{form.store(class = "form", placeholder="Home Store")}} 
+        <div> {{form.store(class = "form")}} 
                     {% if form.store.errors %}
                         {% for error in form.store.errors %}
                         <div class = "formerror">{{ error }}</div>
@@ -124,28 +118,26 @@
         <div  class="formtitle" >{{"End Date:"}}</div>
         <div> {{form.Enddate(class = "form" ,placeholder="End Date")}} </div>
 
-        <div  class="formtitle" >{{"Address Line 1:"}}</div>
+       
         <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}}  </div>  
 
-        <div  class="formtitle" >{{"Address Line 2:"}}</div>
+        
         <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} </div>  
 
-        <div  class="formtitle" >{{"Unit/Apt:"}}</div>
+        
         <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
 
-        <div  class="formtitle" >{{"City:"}}</div>
+        
         <div> {{form.city(class = "form" ,placeholder="City")}} </div>
 
-        <div  class="formtitle" >{{"Province:"}}</div>
+        
         <div> {{form.province(class = "form" ,placeholder="Province")}} </div>    
 
-        <div  class="formtitle" >{{"Postal Code:"}}</div>
-        <div> {{form.postal(class = "form", placeholder="Postal Code")}} </div>
-
-        <div  class="formtitle" >{{"Country:"}}</div>
+        
         <div> {{form.country(class = "form" ,placeholder="Country")}} </div> 
 
-       
+        
+        <div> {{form.postal(class = "form", placeholder="Postal Code")}} </div>
       
 
          <div  class="formtitle" >{{"SIN Expiration:"}}</div>
@@ -170,10 +162,10 @@
         </div>
         
 
-        <div  class="formtitle" >{{"Online Training User ID:"}}</div>
+       
         
         
-        <div>{{form.trainingid(class = "form", placeholder="Training User ID")}} 
+        <div>{{form.trainingid(class = "form", placeholder="Online Training User ID")}} 
                     {% if form.trainingid.errors %}
                         {% for error in form.trainingid.errors %}
                         <div class = "formerror">{{ error }}</div>
@@ -181,9 +173,9 @@
                     {% endif %}
         
         </div>
-        <div  class="formtitle" >{{"Online Training Password:"}}</div>
         
-        <div>{{form.trainingpassword(class = "form", placeholder="Training Pasword")}} 
+        
+        <div>{{form.trainingpassword(class = "form", placeholder="Online Training Pasword")}} 
                     {% if form.trainingpassword.errors %}
                         {% for error in form.trainingpassword.errors %}
                         <div class = "formerror">{{ error }}</div>
@@ -193,9 +185,9 @@
         </div>
 
 
-        <div  class="formtitle" >{{"Iprism Code:"}}</div>
         
-        <div>{{form.iprismcode(class = "form", placeholder="iprismcode")}} 
+        
+        <div>{{form.iprismcode(class = "form", placeholder="Bulloch Code")}} 
                     {% if form.iprismcode.errors %}
                         {% for error in form.iprismcode.errors %}
                         <div class = "formerror">{{ error }}</div>
@@ -211,7 +203,7 @@
 
         
 
-        <div  class="formtitle" >{{"Monday Availability:"}}</div>
+        
         <div> {{form.monavail(class = "form", placeholder="Monday Availability")}} 
                     
                     {% if form.monavail.errors %}
@@ -221,7 +213,7 @@
                     {% endif %}
         </div>
 
-        <div  class="formtitle" >{{"Tuesday Availability:"}}</div>
+       
         <div> {{form.tueavail(class = "form", placeholder="Tuesday Availability")}} 
                     
                     {% if form.tueavail.errors %}
@@ -231,7 +223,7 @@
                     {% endif %}
         </div>
 
-        <div  class="formtitle" >{{"Wednesday Availability"}}</div>
+       
         <div> {{form.wedavail(class = "form", placeholder="Wednesday Availability")}} 
                     
                     {% if form.wedavail.errors %}
@@ -241,7 +233,7 @@
                     {% endif %}
         </div>
 
-        <div  class="formtitle" >{{"Thursday Availability"}}</div>
+        
         <div> {{form.thuavail(class = "form", placeholder="Thursday Availability")}} 
                     
                     {% if form.thuavail.errors %}
@@ -251,7 +243,7 @@
                     {% endif %}
         </div>
 
-        <div  class="formtitle" >{{"Friday Availability"}}</div>
+        
         <div> {{form.friavail(class = "form", placeholder="Friday Availability")}} 
                     
                     {% if form.friavail.errors %}
@@ -261,7 +253,7 @@
                     {% endif %}
         </div>
 
-    <div  class="formtitle" >{{"Saturday Availability"}}</div>
+    
         <div> {{form.satavail(class = "form", placeholder="Saturday Availability")}} 
                     
                     {% if form.satavail.errors %}
@@ -271,7 +263,7 @@
                     {% endif %}
         </div>
 
-        <div  class="formtitle" >{{"Sunday Availability"}}</div>
+        
         <div> {{form.sunavail(class = "form", placeholder="Sunday Availability")}} 
                     
                     {% if form.sunavail.errors %}
@@ -281,7 +273,7 @@
                     {% endif %}
         </div>
 
-        <!-- test delte after use-->
+        <!-- test delte after use
 
         <div class="formtitle">Course Title</div>
         <div class="formtitle">Check if Completed</div>
@@ -301,14 +293,8 @@
             
             {% endfor %}
 
-
+        -->
             
-
-
-       
-
-            
-    
     </form>
 
 

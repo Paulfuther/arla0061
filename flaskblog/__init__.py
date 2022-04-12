@@ -78,6 +78,12 @@ sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
 client = Client(account_sid, auth_token)
 verify = client.verify.services(TWILIO_VERIFY_SID)
 
+
+SESSION_COOKIE_SECURE = True
+REMEMBER_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+REMEMBER_COOKIE_HTTPONLY = True
+
 def validate_twilio_request(f):
     """Validates that incoming requests genuinely originated from Twilio"""
     @wraps(f)

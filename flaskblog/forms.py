@@ -77,7 +77,7 @@ class EmployeeForm(FlaskForm):
     firstname = StringField('Firstname', validators= [DataRequired(), Length(min=2, max=20)])
     nickname = StringField('Nickname', validators=[Optional()])
     lastname = StringField('Lastname', validators=[DataRequired(), Length(min=2, max=20)])
-    store = QuerySelectField(
+    store = QuerySelectField('Store',
         query_factory=lambda: Store.query.order_by(Store.number),
         allow_blank=False
     )

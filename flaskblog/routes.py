@@ -79,13 +79,13 @@ def login():
             .filter(Employee.user_id == user.id).first()
             print(user.phone)
             print(user.active)
-            request_verification_token(user.phone)
-            session['phone']=user.phone
+            ##request_verification_token(user.phone)
+            ##session['phone']=user.phone
             #session['phone']=user_phone
-            return redirect(url_for('verify_2fa'))
-            #login_user(user)
-            #print(current_user)
-            #return render_template("layout.html", title="home")
+            ##return redirect(url_for('verify_2fa'))
+            login_user(user)
+            print(current_user)
+            return render_template("layout.html", title="home")
     #print("nope")    
     return render_template("login.html", form=form)
 
@@ -160,7 +160,7 @@ def forgot_password():
             flash('Check your email for the instrucitons to reset your password')
         else:
             flash('Invalide Credentials')
-        return redirect(url_for('forgot_password'))
+        return redirect(url_for('login'))
     return render_template("forgot_password.html", title="Reset Password", form=form)
 
 def send_password_reset_email(user):
