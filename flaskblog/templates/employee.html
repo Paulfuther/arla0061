@@ -15,19 +15,15 @@
                        
                   </ul>
             </nav>
-
-
-
             
     <div   class="form-container">
 
-    <form id="userform"  method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+    <form id="userform" enctype="multipart/form-data" class = "form-hrinfo" data-multi-step>
     
         
         {{form.hidden_tag()}}
 
-        <div> <img class="gsaupdateimage" src="{{ image_file }}">
-        </div>
+        <div class="newhire_card" data-step>
         
         <div class="formcheckcontainer">
 
@@ -36,268 +32,242 @@
                 </div>
                 
             <div class="formbutton"> 
-            <button  id = "formtest"   class="formcheckbtn" >Verify </button>
+            <button  id = ""   class="formcheckbtn" >Verify </button>
 
             </div>
             
         </div>
         
        
-        <div> {{form.firstname(class = "form", placeholder="First Name")}}   
-                        {% if form.firstnameerrors %}
-                        {% for error in form.firstnameerrors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}  
+        
+
+            <div> {{form.firstname(class = "form", placeholder="First Name")}}   
+                            {% if form.firstnameerrors %}
+                            {% for error in form.firstnameerrors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}  
+                            {% endif %}
+            </div> 
+            <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
+            </div> 
+            <div> {{form.email(class = "form",   id="emailinput", placeholder="E-Mail")}} 
+                <input type="hidden" id="hiddenemail" name="hiddenemail">
+                    
+                        <div class="alert alert2-info" style="display: none;"></div>
+                        <div class="alert alert2-error" style="display: none"></div>      
+            </div>  
+            <div> {{form.password(class = "form", placeholder="Password")}} 
+                        {% if form.password.errors %}
+                            {% for error in form.password.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
                         {% endif %}
-        </div> 
-
-        
-        <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
-        </div> 
-       
-       
-        <div> {{form.email(class = "form",   id="emailinput", placeholder="E-Mail")}} 
-            <input type="hidden" id="hiddenemail" name="hiddenemail">
-                  
-                    <div class="alert alert2-info" style="display: none;"></div>
-                    <div class="alert alert2-error" style="display: none"></div>
-                    
+            </div>
+            <div class="formcheckcontainer">
+            <div class="formbutton2">
+            <button type="button" id="button_verify" class="formcheckbtn"data-next>Next</button>
+            </div>
+            </div>
         </div>
         
+        <div class="newhire_card" data-step>
 
+            <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
+                <input type="hidden" id="hiddenphone" name="hiddenphone"   >
+                        {% if form.mobilephone.errors %}
+                            {% for error in form.mobilephone.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}        
+                        {% endif %}
         
-        <div> {{form.password(class = "form", placeholder="Password")}} 
-                    {% if form.password.errors %}
-                        {% for error in form.password.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
+            <div class="alert alert-info" style="display: none;"></div>
+            <div class="alert alert-error" style="display: none"></div>
+            <div class="alert alert3-info" style="display: none;"></div>
+            <div class="alert alert3-error" style="display: none"></div>
+            </div>
+                <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+             
         </div>
 
-        
-        <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
-            <input type="hidden" id="hiddenphone" name="hiddenphone"   >
-                    {% if form.mobilephone.errors %}
-                        {% for error in form.mobilephone.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}        
-                    {% endif %}
-       
-        <div class="alert alert-info" style="display: none;"></div>
-        <div class="alert alert-error" style="display: none"></div>
-        <div class="alert alert3-info" style="display: none;"></div>
-        <div class="alert alert3-error" style="display: none"></div>
+        <div class="newhire_card" data-step>
+
+            <input class="form"  type="datetime-local" placeholder = "Date of Birth" name="dob">
+            <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}}  </div>  
+            <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} </div>  
+            <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
+            <div> {{form.city(class = "form" ,placeholder="City")}} </div>
+            <div> {{form.province(class = "form" ,placeholder="Province")}} </div>    
+            <div> {{form.country(class = "form" ,placeholder="Country")}} </div> 
+            <div> {{form.postal(class = "form", placeholder="Postal Code")}} </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+                
         </div>
 
-        <div></div>
-        <div></div>
+        <div class="newhire_card" data-step>
+
+           
         
-        <div></div>
-        <div> </div>
-        
-         
-
-        <div  class="formtitle" >{{"Date of Birth:"}}</div>
-        <div> {{form.dob(class = "form" ,placeholder="Date of Birth")}} </div>
-
-        <div  class="formtitle" >{{"Home Store:"}}</div>
-        <div> {{form.store(class = "form")}} 
-                    {% if form.store.errors %}
-                        {% for error in form.store.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}       
-                    {% endif %}
-        </div>
-        
-
-
-       
-        <div  class="formtitle" >{{"Start Date:"}}</div>
-        <div> {{form.Startdate(class = "form" ,placeholder="Start Date")}} </div>
-
-        <div  class="formtitle" >{{"End Date:"}}</div>
-        <div> {{form.Enddate(class = "form" ,placeholder="End Date")}} </div>
-
-       
-        <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}}  </div>  
-
-        
-        <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} </div>  
-
-        
-        <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
-
-        
-        <div> {{form.city(class = "form" ,placeholder="City")}} </div>
-
-        
-        <div> {{form.province(class = "form" ,placeholder="Province")}} </div>    
-
-        
-        <div> {{form.country(class = "form" ,placeholder="Country")}} </div> 
-
-        
-        <div> {{form.postal(class = "form", placeholder="Postal Code")}} </div>
-      
-
-         <div  class="formtitle" >{{"SIN Expiration:"}}</div>
-         <div> {{form.sinexpire(class = "form", placeholder="SIN Expiration")}} 
-                    {% if form.sinexpire.errors %}
-                        {% for error in form.sinexpire.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}           
-                    {% endif %}
-        </div>
-
-
-        
-        
-        <div  class="formtitle" >{{"Manager:"}}</div>
-        <div> {{form.manager(class = "form", placeholder="Manager")}} 
-                    {% if form.manager.errors %}
-                        {% for error in form.manager.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        
-
-       
-        
-        
-        <div>{{form.trainingid(class = "form", placeholder="Online Training User ID")}} 
-                    {% if form.trainingid.errors %}
-                        {% for error in form.trainingid.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-        
-        
-        <div>{{form.trainingpassword(class = "form", placeholder="Online Training Pasword")}} 
-                    {% if form.trainingpassword.errors %}
-                        {% for error in form.trainingpassword.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-
-
-        
-        
-        <div>{{form.iprismcode(class = "form", placeholder="Bulloch Code")}} 
-                    {% if form.iprismcode.errors %}
-                        {% for error in form.iprismcode.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-
-       
-         <div  class="formtitle" >{{"Profile Picture:"}}</div>
-         <div>  {{ form.hrpicture(class = "form")}}
-        </div>
-
-        
-
-        
-        <div> {{form.monavail(class = "form", placeholder="Monday Availability")}} 
-                    
-                    {% if form.monavail.errors %}
-                        {% for error in form.monavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-       
-        <div> {{form.tueavail(class = "form", placeholder="Tuesday Availability")}} 
-                    
-                    {% if form.tueavail.errors %}
-                        {% for error in form.tueavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-       
-        <div> {{form.wedavail(class = "form", placeholder="Wednesday Availability")}} 
-                    
-                    {% if form.wedavail.errors %}
-                        {% for error in form.wedavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        
-        <div> {{form.thuavail(class = "form", placeholder="Thursday Availability")}} 
-                    
-                    {% if form.thuavail.errors %}
-                        {% for error in form.thuavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        
-        <div> {{form.friavail(class = "form", placeholder="Friday Availability")}} 
-                    
-                    {% if form.friavail.errors %}
-                        {% for error in form.friavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-    
-        <div> {{form.satavail(class = "form", placeholder="Saturday Availability")}} 
-                    
-                    {% if form.satavail.errors %}
-                        {% for error in form.satavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        
-        <div> {{form.sunavail(class = "form", placeholder="Sunday Availability")}} 
-                    
-                    {% if form.sunavail.errors %}
-                        {% for error in form.sunavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <!-- test delte after use
-
-        <div class="formtitle">Course Title</div>
-        <div class="formtitle">Check if Completed</div>
-        <div></div><div></div>
-            {% for course in course %}
-
-            <div class = "formtitle"  >{{ course }}</div>
-            <input class = "check-box"  style="margin: 0px 0px 10px 20px" type="checkbox" name="myCheck2" onclick="testfunction()" id="myCheck2" >  
-         
+            <input class="form"  type="datetime-local" placeholder = "Start Date" name="Startdate">
+            <input class="form"  type="datetime-local" placeholder = "End Date" name="Enddate">
+            <input class="form"  type="datetime-local" placeholder = "Sin Expire Date" name="sinexpire">
+            <div  class="formtitle" >{{"Home Store:"}}</div>
+            <div> {{form.store(class = "form")}} 
+                        {% if form.store.errors %}
+                            {% for error in form.store.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}       
+                        {% endif %}
+            </div>
+            <div  class="formtitle" >{{"Manager:"}}</div>
+            <div> {{form.manager(class = "form", placeholder="Manager")}} 
+                        {% if form.manager.errors %}
+                            {% for error in form.manager.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div>{{form.trainingid(class = "form", placeholder="Online Training User ID")}} 
+                        {% if form.trainingid.errors %}
+                            {% for error in form.trainingid.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
             
-            <div class = "check-completed formtitle" style="display:none">Date Completed  </div> 
-            <div class = "check-placeholder" id="placeholder" style="display:show"></div>
-            <div class = "check-placeholder2" id="placeholder" style="display:show"></div>
-   
-            <input class = "form check-date" id="testingdiv" style="display:none" type = "date" class ="form"  name = "completeddate" value= {{completeddate}} >
-              
-            
-            {% endfor %}
+            </div>
+            <div>{{form.trainingpassword(class = "form", placeholder="Online Training Pasword")}} 
+                        {% if form.trainingpassword.errors %}
+                            {% for error in form.trainingpassword.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div>{{form.iprismcode(class = "form", placeholder="Bulloch Code")}} 
+                        {% if form.iprismcode.errors %}
+                            {% for error in form.iprismcode.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+           
+        </div>
+        
+        <div class="newhire_card" data-step=>
 
-        -->
+            <div> {{form.monavail(class = "form", placeholder="Monday Availability")}} 
+                        
+                        {% if form.monavail.errors %}
+                            {% for error in form.monavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+        
+            <div> {{form.tueavail(class = "form", placeholder="Tuesday Availability")}} 
+                        
+                        {% if form.tueavail.errors %}
+                            {% for error in form.tueavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+        
+            <div> {{form.wedavail(class = "form", placeholder="Wednesday Availability")}} 
+                        
+                        {% if form.wedavail.errors %}
+                            {% for error in form.wedavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
             
+            <div> {{form.thuavail(class = "form", placeholder="Thursday Availability")}} 
+                        
+                        {% if form.thuavail.errors %}
+                            {% for error in form.thuavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+            
+            <div> {{form.friavail(class = "form", placeholder="Friday Availability")}} 
+                        
+                        {% if form.friavail.errors %}
+                            {% for error in form.friavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+        
+            <div> {{form.satavail(class = "form", placeholder="Saturday Availability")}} 
+                        
+                        {% if form.satavail.errors %}
+                            {% for error in form.satavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+            
+            <div> {{form.sunavail(class = "form", placeholder="Sunday Availability")}} 
+                        
+                        {% if form.sunavail.errors %}
+                            {% for error in form.sunavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+                
+        </div>
+
+        <div class="newhire_card" data-step=>
+            <div  class="formtitle" >{{"Profile Picture:"}}</div>
+            <div>  {{ form.hrpicture(class = "form")}}
+            </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+               
+                </div>
+        </div>
     </form>
 
-
+       
         <script>
 
                     const phoneInputField = document.querySelector("#phone");
@@ -322,7 +292,7 @@
                         const finalsubmit = document.querySelector(".alert-send")
 
                        
-                        $('button').click(function(e){
+                        $('#button_verify').click(function(e){
                             info.style.display = "none";
                             error.style.display = "none";
                             info2.style.display = "none";
@@ -473,9 +443,62 @@
                     </script>
 
         
+                
+
+                    <script>
+                    config ={
+                    dateFormat: "Y-m-d",
+                    altInput: true,
+                    altFormat: "F j, Y",
+                    
+                    }
+                
+                    flatpickr("input[type=datetime-local]", config);
+                    </script>
 
 
+            <script>
 
+                const multiStepForm = document.querySelector("[data-multi-step]")
+                const formSteps = [...multiStepForm.querySelectorAll("[data-step]")]
+                let currentStep = formSteps.findIndex(step => {
+                    return step.classList.contains("active")
+                })
+                if (currentStep <0 ){
+                    currentStep=0
+                    showCurrentStep()
+                    
+                }
+
+                
+
+                multiStepForm.addEventListener("click", e => {
+                    let incrementor
+                    if (e.target.matches("[data-next]")){
+                        incrementor = 1
+                    } else if (e.target.matches("[data-previous]")){
+                        incrementor = -1
+                    } 
+                    
+                    if (incrementor == null) return
+                    const inputs = [...formSteps[currentStep].querySelectorAll("input")]
+                    const allValid = inputs.every(input => input.reportValidity())
+                    if (allValid) {
+                        currentStep += incrementor
+                        showCurrentStep()
+                    }
+                  
+                   
+                    console.log(currentStep)
+                })
+                
+                function showCurrentStep(){
+                    formSteps.forEach((step, index) => {
+                        step.classList.toggle("active", index === currentStep)
+                    })
+                }
+
+            </script>
 
 {% endblock content %}
 

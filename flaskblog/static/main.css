@@ -1783,6 +1783,20 @@ ul.a {
 
 /* Hr Form */
 
+.newhire_card {
+  background-color: white;
+  border: 1px solid #333;
+  border-radius: .5rem;
+  padding: .5rem;
+  width: 400px;
+  margin: 0 auto;
+  display: none;
+}
+
+.newhire_card.active {
+  display:block;
+}
+
 .form-container {
   display: grid;
   position: center;
@@ -1835,8 +1849,9 @@ ul.a {
   margin: 10px 0px 10px 0px;
   border-color: none;
   width: 95%;
-  height:75px !important;
+  height:60px !important;
   padding: 15px 15px 15px 15px;
+  border-radius: 5px;
   font-size: 20px;
   -webkit-appearance: none;
 }
@@ -1872,6 +1887,7 @@ ul.a {
 .iti {
   position: relative;
   display: block !important;
+  padding: 15px 0px 15px 0px;
 }
 
 
@@ -1927,10 +1943,10 @@ ul.a {
 
 
 .formbutton {
-  grid-column-start: 2;
-  grid-column-end: 3;
+  grid-column-start: 1;
+  grid-column-end: 2;
   text-align: right;
-  padding: 10px 0px 10px 10px;
+  padding: 10px 10px 10px 10px;
 }
 
 .formcheckbtn:hover {
@@ -1938,10 +1954,10 @@ ul.a {
 }
 
 .formbutton2 {
-  grid-column-start: 1;
-  grid-column-end: 2;
+  grid-column-start: 2;
+  grid-column-end: 3;
   text-align: left;
-  padding: 10px 10px 10px 0px;
+  padding: 10px 10px 10px 10px;
 }
 
 .emailverifydiv {
