@@ -40,7 +40,7 @@ body {
   color: #31708f;
   background-color: #d9edf7;
   width: 95%;
-  margin-bottom: 14px;
+  margin: 10px;
 }
 
 .alert-error {
@@ -48,7 +48,7 @@ body {
   background-color: #f2dede;
   border-color: #ebccd1;
   width: 95%;
-  margin-bottom: 14px;
+  margin: 10px;
 }
 
 .alert2-info {
@@ -56,7 +56,7 @@ body {
   color: #31708f;
   background-color: #d9edf7;
   width: 95%;
-  margin-bottom: 14px;
+  margin: 10px;
 }
 
 .alert2-error {
@@ -64,14 +64,14 @@ body {
   background-color: #f2dede;
   border-color: #ebccd1;
   width: 95%;
-  margin-bottom: 14px;
+  margin: 10px;
 }
 .alert3-info {
   border-color: #bce8f1;
   color: #31708f;
   background-color: #d9edf7;
   width: 95%;
-  margin-bottom: 14px;
+  margin:10px;
 }
 
 .alert3-error {
@@ -79,7 +79,7 @@ body {
   background-color: #f2dede;
   border-color: #ebccd1;
   width: 95%;
-  margin-bottom: 14px;
+  margin: 10px;
 }
 /* pdf of employee file */
 
@@ -1846,7 +1846,7 @@ ul.a {
 }
 
 .form {
-  margin: 10px 0px 10px 0px;
+  margin: 10px;
   border-color: none;
   width: 95%;
   height:60px !important;
@@ -1857,7 +1857,7 @@ ul.a {
 }
 
 .form-bad {
-  margin: 10px 0px 10px 0px;
+  margin: 10px;
   width: 95%;
   padding: 15px 15px 15px 15px;
   font-size: 20px;
@@ -1866,7 +1866,7 @@ ul.a {
 }
 
 .form-good {
-  margin: 10px 0px 10px 0px;
+  margin: 10px;
   width: 95%;
   padding: 15px 15px 15px 15px;
   font-size: 20px;
@@ -1887,7 +1887,8 @@ ul.a {
 .iti {
   position: relative;
   display: block !important;
-  padding: 15px 0px 15px 0px;
+  margin: 10px;
+  width: 95%;
 }
 
 
@@ -1919,7 +1920,7 @@ ul.a {
 }
 
 .formcheckcontainer {
-  width: 95%;
+  width: 100%;
   border:black;
   display:grid;
   grid-template-columns: repeat(2,1fr);
@@ -1930,7 +1931,7 @@ ul.a {
 .formcheckbtn {
   
   background-color: #d9edf7;
-  width: 100%;
+  width: 95%;
   color: black;
   padding: 15px 32px 10px 10px;
   text-align: center;
@@ -1938,6 +1939,7 @@ ul.a {
   display: inline-block;
   font-size: 16px;
   border-radius: 4px;
+  margin: 10px;
 }
 
 
@@ -1946,7 +1948,8 @@ ul.a {
   grid-column-start: 1;
   grid-column-end: 2;
   text-align: right;
-  padding: 10px 10px 10px 10px;
+ 
+  margin: 10px;
 }
 
 .formcheckbtn:hover {
@@ -1957,7 +1960,8 @@ ul.a {
   grid-column-start: 2;
   grid-column-end: 3;
   text-align: left;
-  padding: 10px 10px 10px 10px;
+  
+  margin: 10px;
 }
 
 .emailverifydiv {

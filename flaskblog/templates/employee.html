@@ -18,28 +18,19 @@
             
     <div   class="form-container">
 
-    <form id="userform" enctype="multipart/form-data" class = "form-hrinfo" data-multi-step>
+    <form id="userform" method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo" data-multi-step>
     
         
         {{form.hidden_tag()}}
 
-        <div class="newhire_card" data-step>
+       
         
         <div class="formcheckcontainer">
 
-            <div style="display:none" id="form-submit" class="alert-send formbutton2" >
-                {{form.submit2(class_="formcheckbtn")}}
-                </div>
                 
-            <div class="formbutton"> 
-            <button  id = ""   class="formcheckbtn" >Verify </button>
-
-            </div>
-            
         </div>
-        
        
-        
+        <div class="newhire_card" data-step>
 
             <div> {{form.firstname(class = "form", placeholder="First Name")}}   
                             {% if form.firstnameerrors %}
@@ -49,27 +40,39 @@
                             {% endif %}
             </div> 
             <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
+           
+                
+           
             </div> 
+            <div class="formcheckcontainer">
+                <div class="formbutton2">
+                <button type="button"  class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+        </div>
+        
+        <div class="newhire_card" data-step>
             <div> {{form.email(class = "form",   id="emailinput", placeholder="E-Mail")}} 
-                <input type="hidden" id="hiddenemail" name="hiddenemail">
+                <input type="hidden" id="hiddenemail" name="hiddenemail"><div class="formbutton"> 
+                    <button  id="button_verify2"  style="display:none" class="formcheckbtn" >Verify Email </button>
+    
+                    </div>
                     
                         <div class="alert alert2-info" style="display: none;"></div>
                         <div class="alert alert2-error" style="display: none"></div>      
             </div>  
-            <div> {{form.password(class = "form", placeholder="Password")}} 
-                        {% if form.password.errors %}
-                            {% for error in form.password.errors %}
-                            <div class = "formerror">{{ error }}</div>
-                            {% endfor %}            
-                        {% endif %}
-            </div>
+           
             <div class="formcheckcontainer">
+                <div class="formbutton">
+                    <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                    </div>
             <div class="formbutton2">
-            <button type="button" id="button_verify" class="formcheckbtn"data-next>Next</button>
+            <button type="button"  id="password_check" style="display: none"class="formcheckbtn"data-next>Next</button>
             </div>
             </div>
+
         </div>
-        
+
         <div class="newhire_card" data-step>
 
             <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
@@ -85,12 +88,14 @@
             <div class="alert alert3-info" style="display: none;"></div>
             <div class="alert alert3-error" style="display: none"></div>
             </div>
+
+            <button  id="phone_button_verify"   class="formcheckbtn" >Verify Phone </button>
                 <div class="formcheckcontainer">
                 <div class="formbutton">
                 <button type="button" class="formcheckbtn"data-previous>Previous</button>
                 </div>
                 <div class="formbutton2">
-                <button type="button" class="formcheckbtn"data-next>Next</button>
+                <button type="button" id="phone_check" style="display:none" class="formcheckbtn"data-next>Next</button>
                 </div>
                 </div>
              
@@ -260,156 +265,197 @@
             </div>
             <div class="formcheckcontainer">
                 <div class="formbutton">
-                <button type="button" class="formcheckbtn"data-previous>Previous</button>
-                </div>
-               
+                    <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                    </div>
+                <div class="formbutton2">
+                    <div id="form-submit" class="alert-send formbutton2" >
+                        {{form.submit2(class_="formcheckbtn")}}
+                        </div>
+                
                 </div>
         </div>
     </form>
 
-       
-        <script>
 
-                    const phoneInputField = document.querySelector("#phone");
-                    const phoneInput = window.intlTelInput(phoneInputField, {
-                    preferredCountries: ["ca"],
-                    utilsScript:
-                    "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-                });
-
-                
-
-                $(function makevalidate(){
-                
-
-
-                        const info = document.querySelector(".alert-info");
-                        const error = document.querySelector(".alert-error");
+                    <script>
+                        
                         const info2 = document.querySelector(".alert2-info");
-                        const error2 = document.querySelector(".alert2-error");
-                        const info3 = document.querySelector(".alert3-info");
-                        const error3 = document.querySelector(".alert3-error");
-                        const finalsubmit = document.querySelector(".alert-send")
+                        const error2 = document.querySelector(".alert2-error")
+                        const message = document.querySelector("#emailinput") 
+                        const button = document.querySelector("#button_verify2")
+                        const email_button = document.querySelector("#password_check")
+                        var email_data = document.querySelector("#emailinput").value
+                        var regx =/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
 
-                       
-                        $('#button_verify').click(function(e){
-                            info.style.display = "none";
-                            error.style.display = "none";
-                            info2.style.display = "none";
-                            error2.style.display = "none";
-                            info3.style.display = "none";
-                            error3.style.display = "none";
-                            var checkphone = 0;
-                            
-                            {
-                           
-                           const phoneNumber = phoneInput.getNumber();
-                           document.getElementById("hiddenphone").value = phoneNumber;
-                           info.style.display = "none";
-                           error.style.display = "none";
-                       
-                           const data = new URLSearchParams();
-                           data.append("phone", phoneNumber);
-                            
-                           fetch("https://phone-look-up-4269.twil.io/lookup", {
-                           method: "POST",
-                           body: data,
-                           
-                           })
-                           .then((response) => response.json())
-                           .then((json) => {
-                           if (json.success) {
-                            
-                           } else {
-                           console.log(json.error);
-                           error.style.display = "";
-                           error.innerHTML = `Invalid phone number.`;
-                           info3.style.display = "none";
-                           document.getElementById("emailinput").style.borderColor = "#a9442";
-                           checkphone = 1;
-                           console.log(checkphone);
-                            return;
-                           }
-                           
-                        })
-                           .catch((err) => {
-                               error.style.display = "";
-                               error.innerHTML = `Something went wrong: ${err}`;
-                           });
-                          
-                       } 
-
-                      
-                        e.preventDefault();
-                        $.ajax({
-                            url: '/verifyemailtoday',
-                            data : {
-                                email : $('#emailinput').val(), 
-                                mobilephone : $('#phone').val(),
-                                mobilephone2 :$('#hiddenphone').val(),
-                               
-                            },
-                            type: 'POST',
-                                success: function(response, response2){
-                                info2.style.display = "none";
+                        message.addEventListener('input', function(e){
+                            console.log(this.value);
+                            if(regx.test(this.value)){
+                                button.style.display = 'block'
+                            }
+                            else
+                                button.style.display = 'none'
                                 error2.style.display = "none";
-                              console.log(response, response2)
-                                if (response[0] == 0){ 
-                                    error2.style.display = "";
-                                    error2.innerHTML = `Pleaes Enter an Email`; 
-                                    document.getElementById("emailinput").className = "form-bad";
-                                 
-                                    }
-                                else if (response[0] == 1) {
+                        
+                        })
+
+                        button.addEventListener("click", function(e) {
+                            e.preventDefault;
+                            $.ajax({
+                                        url: '/verifyemailtoday',
+                                        data : {
+                                            email : $('#emailinput').val(), 
+                                        },
+                                        type: 'POST',
+                                            success: function(response){
+                                            info2.style.display = "none";
+                                            error2.style.display = "none";
+                                            console.log(response)
+
+                                            if (response == 0){ 
+                                                error2.style.display = "";
+                                                error2.innerHTML = `Pleaes Enter an Email`; 
+                                                document.getElementById("emailinput").className = "form-bad";
+                                            
+                                                }
+                                            else if (response == 1) {
+                                                    
+                                                error2.style.display = "";
+                                                error2.innerHTML = `Email Already In Use`;
+                                                document.getElementById("emailinput").className = "form-bad";
+                                                
+                                                }
+                                            else if (response == 2){ 
+                                                error2.style.display = "";
+                                                error2.innerHTML = `Email Is Not valid`;
+                                                document.getElementById("emailinput").className = "form-bad";
+                                                
+                                                }
+                                            else if ( response == 3){ 
+                                                info2.style.display="";
+                                                info2.innerHTML = 'Email is good';
+                                                document.getElementById("emailinput").readOnly = true;
+                                                document.getElementById("emailinput").style.borderColor = "#a9442";
+                                                holdemail = document.getElementById("emailinput").value;
+                                                document.getElementById("hiddenemail").value = holdemail;
+                                                document.querySelector("#password_check").style.display="block";
+                                                document.getElementById("emailinput").className = "form-good";
+                                                button.style.display="none";
+                        
+                                                }
+                                            }
+                                    })    
+                        });
+
+
+                    </script>
+       
+                    <script>
+
+                                const info = document.querySelector(".alert-info");
+                                const error = document.querySelector(".alert-error");
+                                const info3 = document.querySelector(".alert3-info");
+                                const error3 = document.querySelector(".alert3-error");
+                                const finalsubmit = document.querySelector(".alert-send");
+                                const phone_button = document.querySelector("#phone_button_verify");
+                                const phoneInputField = document.querySelector("#phone");
+                                const phoneInput = window.intlTelInput(phoneInputField, {
+                                preferredCountries: ["ca"],
+                                utilsScript:
+                                "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                                });
+    
+                                phone_button.addEventListener("click" ,async function(e){
+                                    await CheckPhone();
+                                    ValidatePhone()
+                                })
+
+                                async function CheckPhone(){
+                                    info.style.display = "none";
+                                    error.style.display = "none";
+                                    info3.style.display = "none";
+                                    error3.style.display = "none";
+                                    //var checkphone = 1;
+                                    //console.log(checkphone);
+                                    
+                                    {
+                                    
+                                    const phoneNumber = phoneInput.getNumber();
+                                    document.getElementById("hiddenphone").value = phoneNumber;
+                                    info.style.display = "none";
+                                    error.style.display = "none";
+                                
+                                    const data = new URLSearchParams();
+                                    data.append("phone", phoneNumber);
                                         
-                                    error2.style.display = "";
-                                    error2.innerHTML = `Email Already In Use`;
-                                    document.getElementById("emailinput").className = "form-bad";
-                                     
-                                    }
-                                else if (response[0] == 2){ 
-                                    error2.style.display = "";
-                                    error2.innerHTML = `Email Is Not valid`;
-                                    document.getElementById("emailinput").className = "form-bad";
-                                      
-                                    }
-                                else if ( response[0] == 3){ 
-                                    info2.style.display="";
-                                    info2.innerHTML = 'Email is good';
-                                    document.getElementById("emailinput").className = "form-good";
+                                    await fetch("https://phone-look-up-4269.twil.io/lookup", {
+                                    method: "POST",
+                                    body: data,
+                                    
+                                    })
+                                    .then((response) => response.json())
+                                    .then((json) => {
+                                    if (json.success) {
+                                    checkphone = 0;
+                                    console.log(checkphone);
+                                    } 
+                                    else {
+                                    console.log(json.error);
+                                    error.style.display = "";
+                                    error.innerHTML = `Invalid phone number.`;
+                                    info3.style.display = "none";
+                                    document.getElementById("phone").readOnly = false;
+                                    checkphone = 1;
+                                    console.log(checkphone);
+                                        return;
                                     }
                                     
-                                if ( response[1] == 5){
-                                    error3.style.display = "";
-                                    error3.innerHTML = `Phone number in already used`; 
-                                    info.style.display = "none"
-                                   
-                                    }
-                                else if ( response[1] == 6 && checkphone==0 && response[0]==3){
-                                    info2.style.display="";
-                                    info2.innerHTML = 'Email is good';
-                                    document.getElementById("emailinput").className = "form-good";
-                                    info3.style.display="";
-                                    info3.innerHTML = 'Phone # is good';
-                                    document.getElementById("emailinput").readOnly = true;
-                                    holdemail = document.getElementById("emailinput").value;
-                                    document.getElementById("hiddenemail").value = holdemail;
-                                    document.getElementById("phone").readOnly = true;
-                                    finalsubmit.style.display="block";
-                                   
-                                    }
-                                else if ( response[1] == 7){
-                           
-                                    error3.style.display = "";
-                                    error3.innerHTML = `Please Enter a phonenumber`; 
-                                   
-                                    }                              
-                                },                                   
-                        })                       
-                    })                                 
-                });
-                    
-        </script>
+                                    })
+                                    .catch((err) => {
+                                        error.style.display = "";
+                                        error.innerHTML = `Something went wrong: ${err}`;
+                                    });
+                                    
+                                    }  
+                                }
+
+                                async function ValidatePhone(){
+                                    //e.preventDefault();
+                                    $.ajax({
+                                        url: '/verifyphonetoday',
+                                        data : {
+                                            mobilephone : $('#phone').val(),
+                                            mobilephone2 :$('#hiddenphone').val(),                  
+                                        },
+                                        type: 'POST',
+                                            success: function(response){
+                                            info3.style.display = "none";
+                                            error3.style.display = "none";
+                                            console.log("api" + response) 
+                                            //console.log("checkphone" + checkphone)   
+                                            if ( response == 5){
+                                                error3.style.display = "";
+                                                error3.innerHTML = `Phone number in already used`; 
+                                                info.style.display = "none"
+                                                }
+                                            else if ( response == 6 && checkphone==0){
+                                                info3.style.display="";
+                                                info3.innerHTML = 'Phone # is good';
+                                                document.querySelector("#phone_check").style.display="block";
+                                                document.getElementById("phone").readOnly = true;
+                                                phone_button.style.display="none"
+                                                console.log("hello")
+                                                }
+                                            else if ( response == 7){
+                                                error3.style.display = "";
+                                                error3.innerHTML = `Please Enter a phonenumber`; 
+                                            
+                                                }                              
+                                            },                                   
+                                    })                       
+                                }                                
+                            
+                                
+                    </script>
 
                     <script>
 
@@ -443,8 +489,6 @@
                     </script>
 
         
-                
-
                     <script>
                     config ={
                     dateFormat: "Y-m-d",
@@ -457,7 +501,7 @@
                     </script>
 
 
-            <script>
+                    <script>
 
                 const multiStepForm = document.querySelector("[data-multi-step]")
                 const formSteps = [...multiStepForm.querySelectorAll("[data-step]")]
@@ -475,6 +519,7 @@
                 multiStepForm.addEventListener("click", e => {
                     let incrementor
                     if (e.target.matches("[data-next]")){
+
                         incrementor = 1
                     } else if (e.target.matches("[data-previous]")){
                         incrementor = -1
@@ -498,7 +543,11 @@
                     })
                 }
 
-            </script>
+                    </script>
+
+                    <script>
+                        /// finalsubmit.style.display="block";
+                    </script>
 
 {% endblock content %}
 

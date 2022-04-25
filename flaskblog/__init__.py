@@ -372,6 +372,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(200), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean, default = True)
+    firstname = db.Column(db.String(100), nullable=False)
+    lastname = db.Column(db.String(100), nullable=False)
     confirmed_at = db.Column(db.DateTime)
     user_name = db.Column(db.String(100), nullable=False)
     phone = db.Column(db.String(100))

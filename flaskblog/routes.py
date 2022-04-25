@@ -18,7 +18,7 @@ from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
-import os
+import os, string, secrets
 import json
 import pdfkit
 from werkzeug.utils import secure_filename
@@ -658,17 +658,43 @@ def emailme():
    
     return render_template("layout.html")
 
+@app.route("/verifyphonetoday", methods = ['GET','POST'])
+@login_required
+@roles_accepted('Admin', 'Manager')
+def verifyphone():
+    form = EmployeeForm()
+
+    # get mobile numbers passed from the form
+    # the h264 version is in hidden number
+    # send back json response for front end to use as a key to 
+    # assign the proper alert message
+    # proper emails and phone numbers are then locked in the form
+
+    mobile = request.form['mobilephone']
+    hiddenmobile = request.form['mobilephone2']
+    #print(mobile,hiddenmobile)
+    if mobile == "":
+        response = (7)
+    else:    
+        user = User.query.filter(or_(User.phone==mobile, User.phone==hiddenmobile)).first()
+        #print(user)
+        if user:
+            response = (5)
+        else:
+            response = (6)
+    
+    #rint(response)
+    return jsonify(response)
+
 @app.route("/verifyemailtoday", methods = ['GET','POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
 def verify():
     form = EmployeeForm()
     email = request.form['email']
-    mobile = request.form['mobilephone']
-    hiddenmobile = request.form['mobilephone2']
     emailcheck = User.query.filter_by(email=form.email.data).first()
     email_address_info = verifier.verify(email)
-    print(email,mobile, hiddenmobile)
+    print(email)
     print(emailcheck)
         
     #check to see if email is blank
@@ -683,31 +709,9 @@ def verify():
 
     else:
          response = (3)
-    #elif email_address_info is not None:
-    #    data = dumps(loads(email_address_info.json_string), indent=4)
-    #    resp = make_response(data, 200)
-    #    resp.headers['Content-Type'] = 'application/json'
- 
-    #    value1 = json.loads(data)
-    #    print (value1['formatCheck'],value1['smtpCheck'])
-    #    if value1['smtpCheck']=='false':
-    #        print("bad email")
-    #        response = (2)
-    #    else:
-    #        response = (3)
-
     
-    if mobile == "":
-        response2 = (7)
-    else:    
-        user = Employee.query.filter(or_(Employee.mobilephone==mobile, Employee.mobilephone==hiddenmobile)).first()
-        if user:
-            response2 = (5)
-        else:
-            response2 = (6)
-    
-    print(response, response2)
-    return jsonify(response, response2)
+    print(response)#, response2)
+    return jsonify(response)#, response2)
 
 @app.route("/schedule", methods = ['GET', 'POST'])
 @login_required
@@ -1383,21 +1387,19 @@ def updategsa(staff_id):
 @roles_accepted('Admin', 'Manager')
 def addemployee():
 
-    
     form = EmployeeForm()   
-    form2 = GradeForm()
-    course = Course.query.all()
     coursecount = int(Course.query.count())
     print(coursecount)
     # the get is for the first load of the page
-
+    
     if request.method=="GET":
-        return render_template('employee.html', title='Employee Information',form=form, form2=form2, course=course)
+        return render_template('employee.html', title='Employee Information',form=form)
 
     # here we submit a form...which should be valid
 
     if form.validate_on_submit():
-   
+        print("success")
+       
         target=request.form.get('hiddenphone')
         form.mobilephone.data = target
         #print(target)
@@ -1407,30 +1409,41 @@ def addemployee():
         #print(teststore.id)
         newuser = request.form.get('hiddenemail')
 
+        # generate a randome password
+
+        symbols = ['*', '%', '£'] # Can add more
+        password = ""
+        for _ in range(9):
+            password += secrets.choice(string.ascii_lowercase)
+            password += secrets.choice(string.ascii_uppercase)
+            password += secrets.choice(string.digits)
+            password += secrets.choice(symbols)
+            print(password)
         # here we encrypt the password.
 
-        newpass = request.form.get('password')
+        newpass = password
         newpassword = bcrypt.generate_password_hash(newpass)
         
         # here we enable the user
 
-        active = request.form.get('checkbox')
+        #active = request.form.get('checkbox')
         #print(active)
-        active = 1
-        if checker:
-            active = 1
-        else:
-            active = 0
+        #active = 1
+        #if checker:
+        #    active = 1
+        #else:
+        #    active = 0
         #print(active)
-        user_name = request.form.get('username')
+        #user_name = request.form.get('username')
 
         #print(active, newuser, newpassword)
         # now add the user to the database
 
         adduser = User(email=newuser,
                     password=newpassword,
-                    active=active,
-                    user_name=user_name,
+                    active=1,
+                    firstname=form.firstname.data,
+                    lastname=form.lastname.data,
                     phone=form.mobilephone.data)
 
         db.session.add(adduser)
@@ -1491,8 +1504,8 @@ def addemployee():
         # we can add the raining information     
         db.session.flush()
         
-        #print(emp.store, emp.manager)
-        #print(type(form.store.data))
+        print(emp.store, emp.manager)
+        print(type(form.store.data))
         
         # here we are adding the training courses and the compelted dates.
         # adding the dates requires some work.
@@ -1500,37 +1513,24 @@ def addemployee():
 
         # need all of this  
     
-        r = request.form.getlist("completeddate")
-        g = request.form.getlist("myCheck2")
+        #r = request.form.getlist("completeddate")
+        #g = request.form.getlist("myCheck2")
         f = emp.id
         
         print(emp.id)
-        
         yy = 0
         y=1
         
-        for x in r:
-            
-            grade_date = r[yy]
-            if grade_date == "":
-                grade_check = 0
-                completeddate = ''
-                print(g,"X")
-
-            else:
-                grade_check = 1
-                completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
-                print(g,completeddate)
-          
+        '''for x in coursecount:
             empgrade = Grade(
                              employee_id=f,
                              course_id=y,
-                             completed = grade_check,
-                             completeddate =  completeddate)  
-            print(f, y, x, completeddate, grade_check)
+                             completed = 0
+                             )  
+            print(f, y)
             db.session.add(empgrade)
             y += 1
-            yy += 1
+            yy += 1'''
            
         #print(emp)
             
@@ -1543,7 +1543,7 @@ def addemployee():
 
         db.session.commit()
        
-        email = emp.email
+        ''' email = emp.email
         message = Mail(
             from_email=DEFAULT_SENDER,
             to_emails= email,
@@ -1563,7 +1563,7 @@ def addemployee():
         message.template_id = SENDGRID_NEWHIRE_ID
             
         response = sg.send(message)
-
+        '''
 
     flash('Employee has been added to the database', 'success')
 

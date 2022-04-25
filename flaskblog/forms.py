@@ -67,11 +67,9 @@ class TelephoneForm(FlaskForm):
     number = IntegerField('Number', validators=[DataRequired(), Length(min=7, max=7)] )
 
 class EmployeeForm(FlaskForm):
-    username = StringField('Username', validators=[
-                            DataRequired(), Length(min=2, max=100)])
+    
     email = EmailField('Email', validators=[DataRequired(), Email()])
-    password = StringField('Password', validators=[
-        DataRequired(), Length(min=2, max=100)])
+   
     active = BooleanField(default="checked")
     firstname = StringField('Firstname', validators= [DataRequired(), Length(min=2, max=20)])
     nickname = StringField('Nickname', validators=[Optional()])
