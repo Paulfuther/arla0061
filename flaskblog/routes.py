@@ -118,6 +118,7 @@ def login():
     #print("nope")    
     return render_template("login.html", form=form)
  '''   
+
 def send_email_confirmation(user):
     token = user.get_mail_confirm_token()
     email = user.email
@@ -129,7 +130,26 @@ def send_email_confirmation(user):
             )
     response = sg.send(message)
     
+@app.route('/newhire_verify2fa', methods=['GET', 'POST'])
+def newhire_verify_2fa():
+    phone=request.form['phone']    
+    print(phone)
+    print("yes")
+    request_verification_token(phone)
+    print("requesting code")
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
 
+@app.route('/newhire_verify2fa_check', methods=['GET','POST'])
+def newhire_verify2f1_check():
+    token=request.form['token']
+    phone=request.form['phone']
+    if check_verification_token(phone,token):
+            response = 1
+            return (jsonify(response))
+    print("huh")
+    response = 0
+    return (jsonify(response))
+    
 
 @app.route('/verify2fa', methods=['GET', 'POST'])
 def verify_2fa():
@@ -1397,6 +1417,9 @@ def addemployee():
 
     # here we submit a form...which should be valid
 
+    #this is for testing. take out return hello
+    return"hello"
+    
     if form.validate_on_submit():
         print("success")
        

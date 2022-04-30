@@ -49,24 +49,11 @@
                                           <div class = "formtitle"> {{ x.name }}  
                                           </div> 
                                                 
-                                                <div class="form"name = "completed">
-                                                {% if x.completed  %}
-                                                <input class = "check-box"  style="margin: 0px 0px 10px 20px" type="checkbox" name="myCheck2" id="myCheck2" value="{{x.completed}}" checked>
+                                             
+                                                <div></div>
                                                 
-                                                {% else %}
-                                                <input class = "check-box"  style="margin: 0px 0px 10px 20px" type="checkbox" name="myCheck2" id="myCheck2" value="{{x.completed}}" >
-                                                
-                                                {% endif %}
-                                                <!--<option value="{{ x.completed }}" > {{ x.completed}} </option> 
-                                                <option value = "n">N</option>
-                                                <option value = "y">Y</option> -->
-                                                
-                                                
-                                                </div>
-                                                <div class = "formtitle" > {{ x.name}} Completed  
-                                                </div> 
-                                                <input type = "date" class ="form" name = "completeddate" value={{x.completeddate}}  >
-                                          
+                                                <!--<input type = "date" class ="form" name = "completeddate" value={{x.completeddate}} >-->
+                                                <input class="form"  type="datetime-local" placeholder = "Enter Completion Date" name="dob" value="{{x.completeddate}}">
 
                                                 
 
@@ -79,6 +66,17 @@
       </div>
 </div>
       
+<script>
+      config ={
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "F j, Y",
+      
+      }
+  
+      flatpickr("input[type=datetime-local]", config);
+      </script>
+
 
  
 

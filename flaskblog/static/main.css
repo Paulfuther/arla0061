@@ -81,6 +81,22 @@ body {
   width: 95%;
   margin: 10px;
 }
+
+.alert4-info {
+  border-color: #bce8f1;
+  color: #31708f;
+  background-color: #d9edf7;
+  width: 95%;
+  margin:10px;
+}
+
+.alert4-error {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  width: 95%;
+  margin: 10px;
+}
 /* pdf of employee file */
 
 
@@ -1341,7 +1357,7 @@ input[type=password] {
  .tablecard {
    display: grid;
    grid-template-columns: 75px 1fr;
-   width: 70%;
+   width: 90%;
    margin:auto;
    margin-top: 10px;
    padding-top: 10px;
@@ -2305,8 +2321,9 @@ a.hrbutton {
  
 }
 .app-nav ul li:hover {
-  background-color: rgb(236, 234, 234);
-
+  
+  border-bottom: 2px solid #262626;
+  
 }
 .app.nav ul.app-menu {
   flex: 1;

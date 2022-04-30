@@ -103,6 +103,24 @@
 
         <div class="newhire_card" data-step>
 
+            <input id="two_fa_code" class="form"  placeholder = "Two Factor Code" name="two_fa_code">
+                <div class="alert alert4-info" style="display: none;"></div>
+                <div class="alert alert4-error" style="display: none;"></div>
+            <button id="get_two_fa_token" class="formcheckbtn" >Click for 2fa Code</button>
+            <button  id="get_two_fa_token_verify"   class="formcheckbtn" >Verify Code </button>
+                <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" id="two_fa_phone_check_next" style="display:none" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+             
+        </div>
+
+        <div class="newhire_card" data-step>
+
             <input class="form"  type="datetime-local" placeholder = "Date of Birth" name="dob">
             <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}}  </div>  
             <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} </div>  
@@ -276,6 +294,56 @@
         </div>
     </form>
 
+
+                    <script>
+                        const two_fa_request = document.querySelector("#get_two_fa_token")
+                        two_fa_request.addEventListener('click', function(e){
+                            e.preventDefault,
+                            console.log("requesting code")
+                            $.ajax({
+                                url:'/newhire_verify2fa',
+                                data: {
+                                    phone: $('#hiddenphone').val(),
+                                },
+                                type:'POST',
+                                success: console.log("you did it")
+                            })
+                        })
+                    </script>
+
+                    <script>
+                        const two_fa_request_token = document.querySelector("#get_two_fa_token_verify")
+                        const info2fa = document.querySelector(".alert4-info");
+                        const error2fa = document.querySelector(".alert4-error");
+                        two_fa_request_token.addEventListener('click', function(e){
+                            console.log("requesting code")
+                            $.ajax({
+                                url:'/newhire_verify2fa_check',
+                                data: {
+                                    phone: $('#hiddenphone').val(),
+                                    token: $('#two_fa_code').val(),
+                                },
+                                type:'POST',
+                                success: function(response){
+                                    info2fa.style.display = "none";
+                                    error2fa.style.display = "none";
+                                    console.log(response)
+                                    if (response == 0){
+                                        error2fa.style.display="";
+                                        error2fa.innerHTML='Invalide code. Please Try Again';
+                                }
+                                    else if (response ==1){
+                                        info2fa.style.display="";
+                                        info2fa.innerHTML='Authentication Complete. Click Next';
+                                        two_fa_request_token.style.display='none';
+                                        two_fa_request.style.display='none';
+                                        document.querySelector('#two_fa_phone_check_next').style.display="block",
+                                        console.log("code excepted")
+                                }
+                            }
+                            })
+                        })
+                    </script>
 
                     <script>
                         

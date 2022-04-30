@@ -99,7 +99,7 @@ class EmployeeForm(FlaskForm):
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
                               DataRequired()])
-    
+    token = StringField()
     sinexpire = DateField('Sin Expire', format='%Y-%m-%d', validators=[Optional()])
     Startdate = DateField('Start Date', format='%Y-%m-%d',
                           validators=[DataRequired()])
