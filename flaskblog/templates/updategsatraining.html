@@ -23,45 +23,46 @@
                         
                         
             </nav>
-
+          
     <div   class="form-container">
 
-                  <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+                  <form method = "POST"  enctype="multipart/form-data" class = "form-hrinfo">
                   
                         
+                              
+                               
+
                         <div> <img class="gsaupdateimage" src="{{ image_file }}">
                         </div>
-                        <div></div>
-
-                        
+                              <div></div>
+                              
+                              
                               <label class="formtitle">First Name  </label>
-                              <input type="text"  class="form" name = "firstname"  value = {{gsa.firstname}} required>
+                              <input type="text"  id="gsa_name" class="form" name = "firstname"  value = {{gsa.firstname}} data-gsa="{{gsa.id}}" readonly>
                         
-
-                              <label class="formtitle" >Nickname</label>
-                              <input type="text" class="form"name = "nickname">
                         
                               <label class="formtitle" >Last Name</label>
-                              <input type="text" class="form"name = "lastname" value = {{gsa.lastname}} required >
+                              <input type="text" class="form"name = "lastname" value = {{gsa.lastname}} readonly >
 
-                             
+                              <div></div>
+                              
+                              <div>
+                                    
+                              <button type = "submit" id="update_training" class = "formcheckbtn">Submit </button>
+                                          
+                              </div>
+                       
                               {% for x in gradelist %}
                                           <div class = "formtitle"> {{ x.name }}  
                                           </div> 
-                                                
+                                                <div id="first">
                                              
-                                                <div></div>
+                                                <input class="form form-date" id="form-date"  type="datetime-local" placeholder = "Enter Completion Date" name="completeddate" value="{{x.completeddate}}">
+                                                  
+                                                </div>
                                                 
-                                                <!--<input type = "date" class ="form" name = "completeddate" value={{x.completeddate}} >-->
-                                                <input class="form"  type="datetime-local" placeholder = "Enter Completion Date" name="dob" value="{{x.completeddate}}">
-
-                                                
-
                                           {% endfor %}
-                                    
-                                          <div>
-                                          <button type = "submit" class = "button">Submit </button>
-                                          </div>
+                                     
                   </form>
       </div>
 </div>
@@ -77,10 +78,33 @@
       flatpickr("input[type=datetime-local]", config);
       </script>
 
+      <script>
+            const info_update = document.querySelector(".alert2-info");
+            const btn_push = document.querySelector("#update_training");
+            btn_push.addEventListener('click', function(e){
+                  var training_date = $('#first input').serializeArray();
+                  console.log(training_date)
+                  var gsa_identifier = document.querySelector('#gsa_name');
+                  var id = gsa_identifier.dataset.gsa;
+                  e.preventDefault()
+                  console.log(id);
+                  $.ajax({
+                        url:'/updategsatraining2'+id,
+                        data: training_date,
+                        type:'POST',
+                        success: function(response){
+                        console.log("yes you posted it"),
+                        alert('Successfully Updated')
+                        }
+                       
+                        
 
+                  })
+            })
+      </script>
  
 
-
+ 
 
 
 

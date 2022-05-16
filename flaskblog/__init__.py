@@ -459,9 +459,7 @@ class Role(db.Model):
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    
     firstname = db.Column(db.String(20), nullable=False)
-    nickname = db.Column(db.String(20), nullable=True)
     lastname = db.Column(db.String(20), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
     store = db.relationship('Store', backref = 'store')
@@ -478,8 +476,8 @@ class Employee(db.Model):
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
         db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    enddate = db.Column(db.DateTime(), nullable=True)
+    
+   
     postal = db.Column(db.String(6), nullable=False)
     trainingid = db.Column(db.String(),unique=True, nullable=False)
     trainingpassword = db.Column(db.String(), nullable=False)
@@ -488,8 +486,7 @@ class Employee(db.Model):
                            default='default.jpg')
     
     iprismcode = db.Column(db.String(9), nullable=False)
-    dob = db.Column(db.DateTime(), nullable=True)
-   
+    
     mon_avail = db.Column(db.String(100), nullable=False)
     tue_avail = db.Column(db.String(100), nullable=False)
     wed_avail = db.Column(db.String(100), nullable=False)

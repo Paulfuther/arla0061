@@ -84,40 +84,40 @@ def login():
             #session['phone']=user_phone
             ##return redirect(url_for('verify_2fa'))
             login_user(user)
+            if current_user.has_roles('GSA'):
+                gsaid = int(current_user.id)
+                staff = Employee.query.filter_by(user_id=gsaid).first()
+                exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+                return render_template("gsadashboard.html", staff=staff, exists=exists)
             print(current_user)
             return render_template("layout.html", title="home")
     #print("nope")    
     return render_template("login.html", form=form)
 
-''' @app.route("/login", methods = ['GET', 'POST'])
-def login():
-    form=LoginForm()
-    if form.validate_on_submit():
-        user=User.query.filter_by(email=form.email.data).first()
-        if user is None:
-            flash('That email does not exits')
-        elif user.active == 0:
-            flash('You are not an active user')
-        elif user is None or  not bcrypt.check_password_hash(user.password, form.password.data):
-            flash('invalid username or password')
-            return redirect(url_for('login', form=form)  )
-        elif user.email_confirmed == 0:      
-            send_email_confirmation(user)
-            flash('please confirm email')
-            return redirect(url_for('login'))
-        elif user and bcrypt.check_password_hash(user.password, form.password.data):
-            #user_phone =db.session.query(Employee.mobilephone, User)\
-            #.filter(Employee.user_id == user.id).first()
-            print(user.phone)
-            
-            request_verification_token(user.phone)
-            session['phone']=user.phone
-            #session['phone']=user_phone
-            return redirect(url_for('verify_2fa'))
-            
-    #print("nope")    
-    return render_template("login.html", form=form)
- '''   
+@app.route("/home22", methods = ['GET', 'POST'])
+@login_required
+def home22():
+    print(current_user.id)
+    gsaid = int(current_user.id)
+    staff = Employee.query.filter_by(user_id=gsaid).first()
+    if current_user.has_roles('GSA'):
+        print(staff.id)
+        exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+        if exists:    
+            return render_template('gsadashboard.html', staff=staff, exists=exists)
+        else:
+            print("no")
+            flash("no file exists") 
+            #print('user is gsa')
+            return render_template('gsadashboard.html', staff=staff, exists=exists)
+    
+    #return render_template('testsig.html')
+    
+    return render_template('layout.html')
+    #return render_template('home.html')
+
+
+
 
 def send_email_confirmation(user):
     token = user.get_mail_confirm_token()
@@ -226,22 +226,9 @@ def confirm_email(token):
     flash('Your email has been verified')
     return redirect(url_for("login"))
     
-@app.route('/updatephone')
-def update_phone():
-    newuser =  Employee.query.filter(Employee.mobilephone).all()
-    
-    for x in newuser:
-        print(x.firstname, x.mobilephone, x.user_id)
-        user=User.query.get(x.user_id)
-        print (user)
-        user.phone = x.mobilephone
-        db.session.commit()
-        print(user.phone)
-    
-    return "done"
-
 def fetch_sms():
     return client.messages.stream()
+
 @app.route('/fetch_twilio')
 def fetch_twilio():
     sms = fetch_sms()
@@ -323,31 +310,6 @@ def logout():
 def comms_menu():
     return render_template('commsmenu.html')
 
-@app.route('/task2', methods = ['GET', 'POST'])
-@login_required
-@roles_accepted('Admin', 'Manager')
-def new_mail():
-
-    #this is for testing purposed. 
-    # testing for HR users.
-
-     email = os.environ.get('MAIL_DEFAULT_SENDER')
-
-     rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
-
-     for x in rol:
-        print(x.email)
-
-        email = x.email
-        print(email)
-        email_data = {
-             'subject': 'testing 10',
-             'to': email,
-             'body': 'testing a loop on delay {} '.format(email)
-            }
-        send_async_email2.apply_async(args=[email_data], countdown=30)
-        print("we did it")
-     return 'tasksent'
 
 @app.route('/twiliocall', methods = ['GET', 'POST'])
 @login_required
@@ -449,13 +411,6 @@ def bulk_sms():
 
         return render_template("layout.html")
 
-@app.route('/twofa', methods = ['GET', 'POST'])
-@login_required
-@roles_required('Admin')
-def two_fa():
-    twofa('+15196707469')
-
-    return "hello"
 
 @app.route("/sms", methods=['GET', 'POST'])
 @validate_twilio_request
@@ -520,7 +475,7 @@ def eventreport():
                             eventdate = form.eventdate.data,
                             eventtime = time2,
                             reportedby = form.reportedby.data,
-                            reportedbynumber = form.reportedby.data,
+                            reportedbynumber = form.reportedbynumber.data,
                             suncoremployee = form.suncoremployee.data,
                             contractor = form.contractor.data,
                             associate = form.associate.data,
@@ -651,33 +606,6 @@ def nofileexcel():
 
     return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
 
-@app.route("/sendgridsend", methods = ['GET', 'POST'])
-@login_required
-@roles_required('Admin')
-def emailme():
-    
-    gsa = User.query.join(roles_users).join(Role)\
-        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
-            .filter(Role.id == 5)\
-                .filter(User.active == 1)\
-                .order_by(User.user_name).all()
-
-    for user in gsa:
-
-        #message = Mail(
-        #from_email='paul.futher@outlook.com',
-        #to_emails= user.email,
-        #subject='Winter Readiness')
-       
-        #message.template_id = 'd-d97855409101488ea4432a1baccc7f45'
-  
-        print(user, user.email, user.roles)
-        #print(user.firstname, user.email)
-        #response = sg.send(message)
-   
-   
-    return render_template("layout.html")
-
 @app.route("/verifyphonetoday", methods = ['GET','POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -715,7 +643,7 @@ def verify():
     emailcheck = User.query.filter_by(email=form.email.data).first()
     email_address_info = verifier.verify(email)
     print(email)
-    print(emailcheck)
+    #print(emailcheck)
         
     #check to see if email is blank
 
@@ -936,7 +864,6 @@ def hrfile(staff_id):
         y = 1
         z = 0
         for x in hrpage:
-              
                 empfile = Empfile(employee2_id= f,
                                 file_id= y,
                                 sig_data = sigs[z])
@@ -958,48 +885,10 @@ def hrfile(staff_id):
   
     return render_template('ckfile.html', hrpage=hrpage, gsa=gsa)
 
-#@app.route("/sig")
-#@login_required
-#def sig():
-#    return render_template ('sig.html')
-
 @app.route("/hrhome")
 @login_required
 def hrhome(): 
     return render_template('hrhome.html')
-
-@app.route("/existingemployeefile<int:staff_id>", methods = ['GET', 'POST'])
-@login_required
-def employeefile(staff_id):
-    
-    # here we need to get the signatures for each file and pass to html 
-    # we alos need the employee name which is stored in gsa variable
-    # we also need the list of files which are stored in the hr page varaible
-    # and we need to test if a file even exists 
-    # if not we need to return with and error message
-    
-    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
-    if exists:
-        print("yes")
-        
-    else:
-        #print("no", staff_id)
-        flash("No file exists. Please create a file. Thank you.")
-        return redirect(url_for("hrlist"))
-    
-    signatures = Empfile.query.filter_by(employee2_id = staff_id)
-    
-    
-    x=signatures
-    hrpage = hrfiles.query.all()
-    gsa = Employee.query.get(staff_id)
-    #for x in signatures:
-    #    print (type(x.sig_data))
-    #    print(x.file_id, x)
-    #    print(x.sig_data)
-   
-    
-    return render_template('employeecompletedfile.html', hrpage = hrpage, signatures=signatures, gsa=gsa)
 
 @app.route("/createpdfnewhire<int:staff_id>", methods = ['GET', 'POST'])
 @login_required
@@ -1067,29 +956,57 @@ def updategsatraining(staff_id):
         .order_by(Grade.course_id)
     
     #for x in gradelist:
+    #    print(x.name,x.completed, x.completeddate)     
+    
+    # this is the GET line. Create the dashboard for the employee with the data from 
+    # gsa, store, course and gradelist, done up top.
+    
+    return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
+
+
+@app.route("/updategsatraining2<int:staff_id>", methods=['GET', 'POST'])
+@login_required
+def updategsatraining2(staff_id):
+    
+    # get employee information form the database
+
+    gsa = Employee.query.get(staff_id)
+    store = Store.query.all()
+    course = Course.query.all()
+    #for x in course:
+    #    print(x.id, x.name)
+        
+    # get course infomraiton and grade by empployee
+
+    gradelist = Grade.query\
+        .filter_by(employee_id=staff_id)\
+        .join(Employee, Employee.id == Grade.employee_id)\
+        .join(Course, Course.id == Grade.course_id)\
+        .add_columns(Course.name, Grade.completed, Grade.completeddate)\
+        .order_by(Grade.course_id)
+    
+    #for x in gradelist:
     #    print(x.name,x.completed, x.completeddate)
     
     # here we are updating the training grade information
     # we get an object that we can alter. Use the .first to do this
-    # we need two parameter though, the emp id and the course id
+    # we need two parameters though, the emp id and the course id
     # that will lead us to one result (assuming only one course per emp by course number)
     # we then loop over the POST values using form.getlist for the variable "completed"
     # then increment course by 1
     # then commit
     
-    # There are two things to receive, the compelted date and the check box information
-    # one has the id of completeddate and the other has the id of myCheck2
+    # We receive the compelted date.
+    # We have the id of completeddate.
     # we then loop over the number of courses to enter new competed dates.
-    # note. check boxes will not exist if they are not checked.
-    # We need to check the completed date first, then create a value for the checkbox.
+    # We need to check the completed date first.
     # then enter this information into the database
 
 
     if request.method == "POST":
-        r = request.form.getlist("completeddate")
-        g = request.form.getlist("myCheck2")
-        print(r)
-        print(g)
+        r = request.form.getlist('completeddate')
+       
+        #print(r)
         form = request.form 
         f=staff_id
         yy=0
@@ -1101,40 +1018,29 @@ def updategsatraining(staff_id):
                 # any changes made will over write the exisiting data.
                 # we are not creating a duplicate entry.
 
-                t=Grade.query.filter_by(employee_id=staff_id).filter_by(course_id=y).first()
-                grade_date = r[yy]
-                if grade_date=="":
-                    completeddate = ''
-                    grade_check = 0
-                
-                else:
-                    grade_check = 1
-                    completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
-                    print(grade_check, completeddate)
-                t.completed= grade_check
-                t.completeddate = r[yy]
-                #print(y,x, r[yy])
-                #print(t.__dict__)
-                #print(x,r)
-                y+=1 
-                yy +=1
-                db.session.commit()
+            t=Grade.query.filter_by(employee_id=staff_id).filter_by(course_id=y).first()
+            grade_date = r[yy]
+                #print(grade_date,y)
+            if grade_date=='None' or grade_date=="" or grade_date==0 or grade_date=="N":
+                completeddate = ''
+            else:
+                    #grade_check = 1
+                completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
+                    #print(completeddate)
+            t.completeddate = r[yy]
+            #print(y,x, r[yy])
+            y+=1 
+            yy +=1
+            db.session.commit()
 
-        flash('Employee Training Compliance Has Been Updated', 'success')
         
-        if current_user.has_roles('GSA'):
-            gsaid = int(current_user.id)
-            staff = Employee.query.filter_by(user_id=gsaid).first()
-            exists = Empfile.query.filter_by(employee2_id=staff.id).first()
-
-            return render_template('gsadashboard.html', staff=staff, exists=exists)
-
-        return redirect(url_for('hrhome'))
-    
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+      
     # this is the GET line. Create the dashboard for the employee with the data from 
     # gsa, store, course and gradelist, done up top.
+    
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
 
-    return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
 
 @app.route("/rolesearch", methods = ['POST', "GET"])
 @login_required
@@ -1157,6 +1063,39 @@ def rolesearch():
 
    
     return result
+
+@app.route("/existingemployeefile<int:staff_id>", methods = ['GET', 'POST'])
+@login_required
+def employeefile(staff_id):
+    
+    # here we need to get the signatures for each file and pass to html 
+    # we alos need the employee name which is stored in gsa variable
+    # we also need the list of files which are stored in the hr page varaible
+    # and we need to test if a file even exists 
+    # if not we need to return with and error message
+    
+    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
+    if exists:
+        print("yes")
+        
+    else:
+        #print("no", staff_id)
+        flash("No file exists. Please create a file. Thank you.")
+        return redirect(url_for("hrlist"))
+    
+    signatures = Empfile.query.filter_by(employee2_id = staff_id)
+    
+    
+    x=signatures
+    hrpage = hrfiles.query.all()
+    gsa = Employee.query.get(staff_id)
+    #for x in signatures:
+    #    print (type(x.sig_data))
+    #    print(x.file_id, x)
+    #    print(x.sig_data)
+   
+    
+    return render_template('employeecompletedfile.html', hrpage = hrpage, signatures=signatures, gsa=gsa)
 
 @app.route("/storesearch", methods = ['POST', "GET"])
 @login_required
@@ -1408,8 +1347,8 @@ def updategsa(staff_id):
 def addemployee():
 
     form = EmployeeForm()   
-    coursecount = int(Course.query.count())
-    print(coursecount)
+    coursecount = Course.query.all()
+    #print(coursecount)
     # the get is for the first load of the page
     
     if request.method=="GET":
@@ -1418,7 +1357,7 @@ def addemployee():
     # here we submit a form...which should be valid
 
     #this is for testing. take out return hello
-    return"hello"
+    #return"hello"
     
     if form.validate_on_submit():
         print("success")
@@ -1426,7 +1365,7 @@ def addemployee():
         target=request.form.get('hiddenphone')
         form.mobilephone.data = target
         #print(target)
-        checker = form.active.data
+        
         #print("checker",checker)
         teststore = form.store.data
         #print(teststore.id)
@@ -1447,19 +1386,6 @@ def addemployee():
         newpass = password
         newpassword = bcrypt.generate_password_hash(newpass)
         
-        # here we enable the user
-
-        #active = request.form.get('checkbox')
-        #print(active)
-        #active = 1
-        #if checker:
-        #    active = 1
-        #else:
-        #    active = 0
-        #print(active)
-        #user_name = request.form.get('username')
-
-        #print(active, newuser, newpassword)
         # now add the user to the database
 
         adduser = User(email=newuser,
@@ -1479,7 +1405,7 @@ def addemployee():
 
         newid = adduser.id
         
-        #print(newid)
+        print(newid)
         
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
@@ -1493,10 +1419,8 @@ def addemployee():
 
         emp = Employee(user_id=newid,
                        firstname=form.firstname.data,
-                       nickname=form.nickname.data,
                        lastname=form.lastname.data,
                        store=form.store.data,
-                       dob=form.dob.data,
                        addressone=form.addressone.data,
                        addresstwo=form.addresstwo.data,
                        apt=form.apt.data,
@@ -1507,8 +1431,6 @@ def addemployee():
                        email=form.email.data,
                        mobilephone=form.mobilephone.data,
                        sinexpire=form.sinexpire.data,
-                       startdate=form.Startdate.data,
-                       enddate=form.Enddate.data,
                        trainingid=form.trainingid.data,
                        trainingpassword=form.trainingpassword.data,
                        manager=form.manager.data.id,
@@ -1544,7 +1466,7 @@ def addemployee():
         yy = 0
         y=1
         
-        '''for x in coursecount:
+        for x in coursecount:
             empgrade = Grade(
                              employee_id=f,
                              course_id=y,
@@ -1553,7 +1475,7 @@ def addemployee():
             print(f, y)
             db.session.add(empgrade)
             y += 1
-            yy += 1'''
+            yy += 1
            
         #print(emp)
             
@@ -1588,10 +1510,11 @@ def addemployee():
         response = sg.send(message)
         '''
 
-    flash('Employee has been added to the database', 'success')
+        flash('Employee has been added to the database', 'success')
 
               
-    return redirect(url_for('hrhome'))
+        return redirect(url_for('hrhome'))
+    return render_template('employee.html', form=form)
    
 @app.route("/applications")
 @login_required

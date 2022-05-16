@@ -16,9 +16,9 @@
                   </ul>
             </nav>
             
-    <div   class="form-container">
+    <div   class="form-hrinfo-add-emp">
 
-    <form id="userform" method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo" data-multi-step>
+    <form id="userform" method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo-add-emp" data-multi-step>
     
         
         {{form.hidden_tag()}}
@@ -121,7 +121,7 @@
 
         <div class="newhire_card" data-step>
 
-            <input class="form"  type="datetime-local" placeholder = "Date of Birth" name="dob">
+            <input class="form"  type="datetime-local" placeholder = "Date of Birth Required" name="dob">
             <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}}  </div>  
             <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} </div>  
             <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
@@ -144,7 +144,7 @@
 
            
         
-            <input class="form"  type="datetime-local" placeholder = "Start Date" name="Startdate">
+            <input class="form"  type="datetime-local" placeholder = "Start Date Requierd" name="Startdate" >
             <input class="form"  type="datetime-local" placeholder = "End Date" name="Enddate">
             <input class="form"  type="datetime-local" placeholder = "Sin Expire Date" name="sinexpire">
             <div  class="formtitle" >{{"Home Store:"}}</div>

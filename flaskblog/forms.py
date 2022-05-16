@@ -69,18 +69,13 @@ class TelephoneForm(FlaskForm):
 class EmployeeForm(FlaskForm):
     
     email = EmailField('Email', validators=[DataRequired(), Email()])
-   
-    active = BooleanField(default="checked")
     firstname = StringField('Firstname', validators= [DataRequired(), Length(min=2, max=20)])
-    nickname = StringField('Nickname', validators=[Optional()])
     lastname = StringField('Lastname', validators=[DataRequired(), Length(min=2, max=20)])
     store = QuerySelectField('Store',
         query_factory=lambda: Store.query.order_by(Store.number),
         allow_blank=False
     )
-   
-    dob = DateField('Date of Birth', format='%Y-%m-%d',
-                    validators=[DataRequired()])
+    
     addressone = StringField('Address Line 1', validators=[
                              DataRequired(), Length(min=2, max=100)])
     addresstwo = StringField('Address Line 2', validators=[
@@ -101,9 +96,8 @@ class EmployeeForm(FlaskForm):
                               DataRequired()])
     token = StringField()
     sinexpire = DateField('Sin Expire', format='%Y-%m-%d', validators=[Optional()])
-    Startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[DataRequired()])
-    Enddate = DateField('End Date', format='%m/%d/%Y', validators=[Optional()])
+    
+   
 
     trainingid = StringField('Training ID', validators=[DataRequired()])
     trainingpassword = StringField(
@@ -112,22 +106,7 @@ class EmployeeForm(FlaskForm):
         query_factory=lambda: User.query.join(User.roles).filter(Role.id==2).order_by(User.user_name).filter(User.active ==1),
         allow_blank=False
     )
-    
-   # gradelist = Grade.query\
-    #    .filter_by(employee_id=staff_id)\
-     #   .join(Employee, Employee.id == Grade.employee_id)\
-     #   .join(Course, Course.id == Grade.course_id)\
-     #   .add_columns(Course.name, Grade.value, Grade.completeddate)\
-     #   .order_by(Grade.course_id)
-    
-    
-    #manager = SelectField('manager', choices=[(
-    #                      'Manager Name', 'Manager Name'), ('Terry', "Terry"),
-    #    ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
-    #    ('Paul', 'Paul')])
     hrpicture = FileField(validators=[FileAllowed(['jpg', 'jpeg','png', 'HEIC'])])
-    
-   
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
     monavail = StringField('Monday Availability', validators=[

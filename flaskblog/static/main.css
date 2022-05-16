@@ -1826,17 +1826,19 @@ ul.a {
 }
 .form-hrinfo {
   display: grid;
-  grid-template-columns: repeat(1fr);
+  grid-template-columns: 1fr 1fr;
   margin: auto;
   justify-content: center;
   align-items: center;
   padding: 15px 15px 15px 15px;
 }
-/*.form-hrinfo  div {
-  align-items: center;
-  padding-top: 5px 5px 5px 5px;
-}*/
 
+.form-hrinfo-add-emp {
+  display: grid;
+  justify-content:center;
+  margin: auto;
+  padding: 15px 15px 15px 15px;
+}
 
 .inputform {
   
