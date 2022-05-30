@@ -261,8 +261,8 @@ table {
 .inc120 {
   grid-column-start: 3;
   grid-column-end: 4;
-  grid-row-start: 54;
-  grid-row-end: 55;
+  grid-row-start: 57;
+  grid-row-end: 58;
   text-align: center;
 }
 
@@ -840,6 +840,38 @@ table {
   grid-row-end: 53;
   text-align: right;
 }
+
+.inc92 {
+  grid-column-start:1;
+  grid-column-end:6;
+  grid-row-start: 54;
+  grid-row-end:55;
+  text-align: center;
+}
+
+.inc93 {
+  grid-column-start:1;
+  grid-column-end:6;
+  grid-row-start: 55;
+  grid-row-end:56;
+  text-align: center;
+}
+
+.thumbnail {
+  height: 100px;
+  margin: 10px;
+}
+
+.inc_pic_display {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20 20 20 20;
+
+}
+
+
+
 
 /* ---- */
 /*------------------------------*/

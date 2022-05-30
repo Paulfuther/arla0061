@@ -554,9 +554,19 @@
                         
                         
                 </table>
+             <table>
+               
+               
+               
+                {% for x in picture %}
+                <td>
+                <img src= '/Users/paulfuther/arla0061/flaskblog/static/incidentpictures/{{ x.image}}' class="inc_pic_display">
+                </td>
+                <tr></tr>
+
+                {% endfor %}
                 
-                
-        
+                </table>
 
         </main>
 </body>

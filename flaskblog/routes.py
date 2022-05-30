@@ -14,7 +14,8 @@ from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
             make_incident_pdf,send_bulk_email, celery, client, Client, twilio_from, validate_twilio_request, Mail, \
                  employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
                      DEFAULT_SENDER, Store,Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID, \
-                         login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient
+                         login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient,\
+                             basedir,INCIDENT_UPLOAD_PATH, incident_files
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
@@ -45,7 +46,8 @@ from flask_cors import CORS
 from flaskblog.utils.request import validate_body
 from flaskblog.utils.response import response, error_response
 from flaskblog.utils.sms import send_bulk_sms
-from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, check_verification_token
+from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, \
+                    check_verification_token, request_verification_token_whatsapp
 from flask_login import current_user, login_user, logout_user
 moment = Moment(app)
 CORS(app)
@@ -54,12 +56,15 @@ CORS(app)
 
 
 @app.route("/")
-def home():
+def home(): 
     return render_template("layout.html")
+
 
 @app.route("/login", methods = ['GET', 'POST'])
 def login():
     form=LoginForm()
+    if current_user.is_authenticated:
+        return render_template("layout.html")
     if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
         if user is None:
@@ -79,11 +84,13 @@ def login():
             .filter(Employee.user_id == user.id).first()
             print(user.phone)
             print(user.active)
+            #request_verification_token_whatsapp(user.phone)
             ##request_verification_token(user.phone)
-            ##session['phone']=user.phone
+            #session['phone']=user.phone
             #session['phone']=user_phone
-            ##return redirect(url_for('verify_2fa'))
-            login_user(user)
+            #return redirect(url_for('verify_2fa'))
+            login_user(user, remember=form.remember_me.data)
+            next_page = request.args.get('next')
             if current_user.has_roles('GSA'):
                 gsaid = int(current_user.id)
                 staff = Employee.query.filter_by(user_id=gsaid).first()
@@ -428,11 +435,12 @@ def sms_reply():
 @login_required
 def print_incident():
     form=SiteIncident()
-    x=int(1)
+    x=int(42)
     gsa = Incident.query.get(x)
-    print(gsa)
-    
-    return render_template('eventreportpdf.html' , form=form, gsa=gsa)
+    ident = gsa.id
+    print(ident)
+    picture = incident_files.query.filter_by(incident_id=ident)
+    return render_template('eventreportpdf.html' , form=form, gsa=gsa, picture=picture)
 
 @app.route('/email/<email>')
 @login_required
@@ -457,10 +465,30 @@ def email(email):
 @roles_accepted('Admin', 'Manager')
 def eventreport():
     form = SiteIncident()
-
+    
     # get all of the information from the form
 
     if form.validate_on_submit():
+            pics= request.files.getlist('incimage')
+            print (pics)
+            #filename = secure_filename(pics.filename)
+            #print(INCIDENT_UPLOAD_PATH)
+            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
+           
+            for pic in pics:
+                i=Image.open(pic)
+
+                 #= Image.open(pic)
+                i.thumbnail((300,300), Image.LANCZOS)
+                #i.save(picture_paththumb)
+                print(i.size)
+
+
+
+                #new_pic = image.resize(300,300)
+                i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
+        
+            #return render_template('layout.html')
             newtime=str(form.eventtime.data)
             time2 =datetime.strptime(newtime, '%H:%M:%S').time()
             inc=Incident(injuryorillness=form.injuryorillness.data,
@@ -546,6 +574,13 @@ def eventreport():
                             
             db.session.add(inc)
             db.session.flush()
+            #db.session.commit()
+
+            for pic in  pics:
+
+                incimage = incident_files(image=secure_filename(pic.filename),
+                                    incident_id = inc.id)
+                db.session.add(incimage)
             db.session.commit()
 
             print(inc.id)
@@ -2122,4 +2157,19 @@ def save_picture(form_picture):
     return picture_fn
     
 
+def save_inc_picture(form_picture):
+    
 
+    random_hex = secrets.token_hex(8)
+
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+
+    picture_path_inc = os.path.join(
+        app.root_path, 'static/incidentpictures', picture_fn)
+   
+    picture_fn.save(picture_path_inc)
+    print(picture_fn.size)
+
+    return picture_fn
+    

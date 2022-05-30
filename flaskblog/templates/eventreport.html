@@ -5,7 +5,7 @@
 
     
 
-        <form method = "POST" action  = "" enctype="multipart/form-data" class = "report-container">
+        <form method = "POST" id="form" action  = "" enctype="multipart/form-data" class = "report-container">
         
         {{ form.hidden_tag() }}
 
@@ -132,11 +132,20 @@
         <div  class="inctitle inc90" >{{form.direction}} {{"Direction of Travel"}}  </div>
         <div  class="inctitle inc91" >{{form.damage}} {{"Damage/Rust"}}  </div>
 
+        <div class = "inc92">
+        <input type="file" id="files" name ="incimage" accept="image/*" multiple="multiple">
+        
+        <output id="result"></output>
+        
+                </div>
+
+
         <div class="inctitle inc120">
                 {{form.submit(class_="hrbutton")}}
                 </div>
-
         </form>
+
+        
 
 {% endblock %}
 

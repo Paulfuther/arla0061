@@ -22,6 +22,12 @@ def request_verification_token(phone):
     except TwilioException:
         verify.verifications.create(to=phone, channel='call')
 
+def request_verification_token_whatsapp(phone):
+    verify = _get_twilio_verify_client()
+    try:
+        verify.verifications.create(to=phone, channel='whatsapp')
+    except TwilioException:
+        verify.verifications.create(to=phone, channel='call')
 
 def check_verification_token(phone, token):
     verify = _get_twilio_verify_client()

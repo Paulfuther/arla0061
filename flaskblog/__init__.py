@@ -65,9 +65,14 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
+INCIDENT_UPLOAD_PATH=os.path.join(basedir, 'static/incidentpictures')
+app.config['INCIDENT_UPLOAD_PATH'] = INCIDENT_UPLOAD_PATH
+
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 twilio_from = os.environ['TWILIO_FROM']
+
+
 
 SENDGRID_NEWHIRE_ID = os.environ.get('SENDGRID_NEWHIRE_ID')
 SENDGRID_NEW_HIRE_FILE_ID=os.environ.get('SENDGRID_NEW_HIRE_FILE_ID')
@@ -116,10 +121,11 @@ ma = Marshmallow(app)
 ckeditor = CKEditor(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view='login'
 login_manager.session_protection="strong"
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User.query.get(user_id)
 
 
 @celery.task
@@ -252,7 +258,7 @@ def make_pdf(staff_id):
         '''
 
 
-celery.task
+@celery.task
 def make_incident_pdf(file_id):
     with app.test_request_context():
         rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
@@ -268,7 +274,10 @@ def make_incident_pdf(file_id):
         id = file_id
         #print(fdate)
         gsa = Incident.query.get(file_id)
-        rendered = render_template('eventreportpdf.html',gsa=gsa, css=css)
+        ident = gsa.id
+        print(ident)
+        picture = incident_files.query.filter_by(incident_id=file_id)
+        rendered = render_template('eventreportpdf.html',gsa=gsa, css=css, picture=picture)
         options = {'enable-local-file-access': None,
             '--keep-relative-links': '',
             '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
@@ -292,17 +301,17 @@ def make_incident_pdf(file_id):
                 FileType('application/pdf'),
                 Disposition('attachment')) 
 
-        for x in rol:
-                
-            email = x.email
-            message = Mail(
-            from_email = DEFAULT_SENDER,
-            to_emails=email,
-            subject ='A new incident report has been filed',
-            html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
-            message.attachment = attachedFile
-            response = sg.send(message)
-            print(response.status_code, response.body, response.headers)
+        #for x in rol:
+        #        
+        #    email = x.email
+        #    message = Mail(
+        #    from_email = DEFAULT_SENDER,
+        #    to_emails=email,
+        #    subject ='A new incident report has been filed',
+        #    html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
+        #    message.attachment = attachedFile
+        #    response = sg.send(message)
+        #    print(response.status_code, response.body, response.headers)
 
             # upload to drop box
 
@@ -618,7 +627,11 @@ class Incidentnumbers(db.Model):
      
      def __repr__(self):
          return '%r' % (self.details)
-       
+
+
+
+
+
 # salt log
        
 class Saltlog(db.Model):
@@ -727,9 +740,12 @@ class Incident(db.Model):
      bumpersticker = db.Column(db.String())
      direction = db.Column(db.String())
      damage = db.Column(db.String())
+     incident_images = db.relationship('incident_files', backref='incident_images', lazy=True)
 
-
-
+class incident_files(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    image = db.Column(db.String(100), nullable=False)
+    incident_id = db.Column(db.Integer, db.ForeignKey('incident.id'))
 
 # here we initiate the datastore which is used in the Admin model
 
