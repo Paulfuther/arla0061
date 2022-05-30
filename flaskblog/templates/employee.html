@@ -15,437 +15,607 @@
                        
                   </ul>
             </nav>
-
-
-
             
-    <div   class="form-container">
+    <div   class="form-hrinfo-add-emp">
 
-    <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+    <form id="userform" method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo-add-emp" data-multi-step>
     
         
         {{form.hidden_tag()}}
 
-        <div> <img class="gsaupdateimage" src="{{ image_file }}">
-        </div>
-        <div></div>
-
-        <div class ="formtitle">Login Credentials</div>
-        <div></div>
-        <div  class="formtitle" >{{"Active:"}}</div>
-        <div> {{form.active(class = "form", placeholder="Active")}} 
-                    
-                    {% if form.active.errors %}
-                        {% for error in form.active.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        <div  class="formtitle" >{{"User Name:"}}</div>
-        <div> {{form.username(class = "form", placeholder="User Name")}}   
-                        {% if form.usernameerrors %}
-                        {% for error in form.usernameerrors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}  
-                        {% endif %}
-        </div>
-
-        {% if emailpass == "1" %}
-
-        <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form",  readonly=true, id="emailinput", placeholder="E-Mail")}} 
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-                    <input type="hidden" id="hiddenemail" name="hiddenemail">
-                    <input type="hidden" id="emailpass" name="emailpass", val="1">           
-        </div>
-
-        {% else %}
-
-        <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form",id="emailinput", placeholder="E-Mail")}} 
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        <input type="hidden" id="hiddenemail" name="hiddenemail">
-        <input type="hidden" id="emailpass" name="emailpass", val="0">
-        {% endif %}
-
-      
-
-        <div  class="formtitle" >{{"Password:"}}</div>
-        <div> {{form.password(class = "form", placeholder="Password")}} 
-                    {% if form.password.errors %}
-                        {% for error in form.password.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div></div>
-
+       
+        
         <div class="formcheckcontainer">
 
-        
-            <div class="emailverifydiv">Verify Email</div>
-            <div class="formbutton"> 
-                <button id = formtest class="formcheckbtn"> Verify </button>
+                
+        </div>
+       
+        <div class="newhire_card" data-step>
 
-            </div>
-        
-        
-        
-            <div class="emailverifydiv">Is Email Valid</div>
-
-            <input type="hidden" id="emailv" name="emailv" value= "0">
-            <div class="circlebox">
-
-                {% if emailcheck1 == "1" %} 
-                <div class="circleem11", id="circleem11"> </div>
-                {% else %}
-
-            <div class="circleem1", id="circleem1"> </div>
+            <div> {{form.firstname(class = "form", placeholder="First Name")}}   
+                            {% if form.firstnameerrors %}
+                            {% for error in form.firstnameerrors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}  
+                            {% endif %}
+            </div> 
+            <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
            
-                {% endif %}
-
-            </div>
-       
-       
-        
-            <div class="emailverifydiv">Is Email Unique</div>
-            <input type="hidden" id="emailvu" name="emailvu" value="0">
-            <div class="circlebox">
-
-                {% if emailcheck2 == "1" %}
-                <div class="circleem21", id="circleem21"></div>
-                {% else %}
-            <div class="circleem2", id="circleem2"></div>
-            {% endif %}
-            </div>
-            
-        </div>
-        <div></div>
-        <div> </div>
-        <div></div>
-        <div class = "emailverifydiv2">
-            Both dots must be green
-        </div>
-
-        
-
-        <div class ="formtitle">Employee Information</div>
-        <div></div>
-        <div  class="formtitle" >{{"First Name:"}}</div>
-        <div> {{form.firstname(class = "form", placeholder="First Name")}}   
-                        {% if form.firstnameerrors %}
-                        {% for error in form.firstnameerrors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}  
-                        {% endif %}
-        </div> 
-
-        <div  class="formtitle" >{{"NickName:"}}</div>          
-        <div> {{form.nickname(class = "form", placeholder="Nick Name")}}                   
-        </div>       
-
-        <div  class="formtitle" >{{"Last Name:"}}</div>
-        <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
-        </div>  
-
-        <div  class="formtitle" >{{"Date of Birth:"}}</div>
-        <div> {{form.dob(class = "form" ,placeholder="Date of Birth")}} </div>
-
-        <div  class="formtitle" >{{"Home Store:"}}</div>
-        <div> {{form.store(class = "form", placeholder="Home Store")}} 
-                    {% if form.store.errors %}
-                        {% for error in form.store.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}       
-                    {% endif %}
+                
+           
+            </div> 
+            <div class="formcheckcontainer">
+                <div class="formbutton2">
+                <button type="button"  class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
         </div>
         
-
-
-        <div  class="formtitle" >{{"Phone Number:"}}</div>
-        <div> {{form.mobilephone(class = "form" ,placeholder="Phone Number")}} 
-                    {% if form.mobilephone.errors %}
-                        {% for error in form.mobilephone.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}        
-                    {% endif %}
-        </div>
-        <div  class="formtitle" >{{"Start Date:"}}</div>
-        <div> {{form.Startdate(class = "form" ,placeholder="Start Date")}} </div>
-
-        <div  class="formtitle" >{{"End Date:"}}</div>
-        <div> {{form.Enddate(class = "form" ,placeholder="End Date")}} </div>
-
-        <div  class="formtitle" >{{"Address Line 1:"}}</div>
-        <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}}  </div>  
-
-        <div  class="formtitle" >{{"Address Line 2:"}}</div>
-        <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} </div>  
-
-        <div  class="formtitle" >{{"Unit/Apt:"}}</div>
-        <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
-
-        <div  class="formtitle" >{{"City:"}}</div>
-        <div> {{form.city(class = "form" ,placeholder="City")}} </div>
-
-        <div  class="formtitle" >{{"Province:"}}</div>
-        <div> {{form.province(class = "form" ,placeholder="Province")}} </div>    
-
-        <div  class="formtitle" >{{"Postal Code:"}}</div>
-        <div> {{form.postal(class = "form", placeholder="Postal Code")}} </div>
-
-        <div  class="formtitle" >{{"Country:"}}</div>
-        <div> {{form.country(class = "form" ,placeholder="Country")}} </div> 
-
-       
-      
-
-         <div  class="formtitle" >{{"SIN Expiration:"}}</div>
-         <div> {{form.sinexpire(class = "form", placeholder="SIN Expiration")}} 
-                    {% if form.sinexpire.errors %}
-                        {% for error in form.sinexpire.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}           
-                    {% endif %}
-        </div>
-
-
-        
-        
-        <div  class="formtitle" >{{"Manager:"}}</div>
-        <div> {{form.manager(class = "form", placeholder="Manager")}} 
-                    {% if form.manager.errors %}
-                        {% for error in form.manager.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        
-
-        <div  class="formtitle" >{{"Online Training User ID:"}}</div>
-        
-        
-        <div>{{form.trainingid(class = "form", placeholder="Training User ID")}} 
-                    {% if form.trainingid.errors %}
-                        {% for error in form.trainingid.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-        <div  class="formtitle" >{{"Online Training Password:"}}</div>
-        
-        <div>{{form.trainingpassword(class = "form", placeholder="Training Pasword")}} 
-                    {% if form.trainingpassword.errors %}
-                        {% for error in form.trainingpassword.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-
-
-        <div  class="formtitle" >{{"Iprism Code:"}}</div>
-        
-        <div>{{form.iprismcode(class = "form", placeholder="iprismcode")}} 
-                    {% if form.iprismcode.errors %}
-                        {% for error in form.iprismcode.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-
-       
-         <div  class="formtitle" >{{"Profile Picture:"}}</div>
-         <div>  {{ form.hrpicture(class = "form")}}
-        </div>
-
-        
-
-        <div  class="formtitle" >{{"Monday Availability:"}}</div>
-        <div> {{form.monavail(class = "form", placeholder="Monday Availability")}} 
-                    
-                    {% if form.monavail.errors %}
-                        {% for error in form.monavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Tuesday Availability:"}}</div>
-        <div> {{form.tueavail(class = "form", placeholder="Tuesday Availability")}} 
-                    
-                    {% if form.tueavail.errors %}
-                        {% for error in form.tueavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Wednesday Availability"}}</div>
-        <div> {{form.wedavail(class = "form", placeholder="Wednesday Availability")}} 
-                    
-                    {% if form.wedavail.errors %}
-                        {% for error in form.wedavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Thursday Availability"}}</div>
-        <div> {{form.thuavail(class = "form", placeholder="Thursday Availability")}} 
-                    
-                    {% if form.thuavail.errors %}
-                        {% for error in form.thuavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Friday Availability"}}</div>
-        <div> {{form.friavail(class = "form", placeholder="Friday Availability")}} 
-                    
-                    {% if form.friavail.errors %}
-                        {% for error in form.friavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Saturday Availability"}}</div>
-        <div> {{form.satavail(class = "form", placeholder="Saturday Availability")}} 
-                    
-                    {% if form.satavail.errors %}
-                        {% for error in form.satavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Sunday Availability"}}</div>
-        <div> {{form.sunavail(class = "form", placeholder="Sunday Availability")}} 
-                    
-                    {% if form.sunavail.errors %}
-                        {% for error in form.sunavail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <!-- test delte after use-->
-
-
-         {% for course in course %}
-
-            <div class = "formtitle" >{{ course }}</div>
-            <select class="form"name = "completed">
-                <option value = "n">N</option>
-                <option value = "y">Y</option>
-            </select>
-
-            </select>
-                <div class = "formtitle" >Date Completed  
-                </div> 
-                <input type = "date" class ="form"  name = "completeddate" value= {{completeddate}} >
-
-            
-            {% endfor %}
-
-
-            
-
-
-       
-
-            <div>
-            {{form.submit(class_="hrbutton")}}
-            </div>
-            <div>
-            <!-- <a class = "hrbutton" <a href="{{ url_for('home')}}">Edit an Employee</a> -->
-            </div>
+        <div class="newhire_card" data-step>
+            <div> {{form.email(class = "form",   id="emailinput", placeholder="E-Mail")}} 
+                <input type="hidden" id="hiddenemail" name="hiddenemail"><div class="formbutton"> 
+                    <button  id="button_verify2"  style="display:none" class="formcheckbtn" >Verify Email </button>
     
+                    </div>
+                    
+                        <div class="alert alert2-info" style="display: none;"></div>
+                        <div class="alert alert2-error" style="display: none"></div>      
+            </div>  
+           
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                    <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                    </div>
+            <div class="formbutton2">
+            <button type="button"  id="password_check" style="display: none"class="formcheckbtn"data-next>Next</button>
+            </div>
+            </div>
+
+        </div>
+
+        <div class="newhire_card" data-step>
+
+            <div> {{form.mobilephone(class = "form" ,id="phone", type="tel")}} 
+                <input type="hidden" id="hiddenphone" name="hiddenphone"   >
+                        {% if form.mobilephone.errors %}
+                            {% for error in form.mobilephone.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}        
+                        {% endif %}
+        
+            <div class="alert alert-info" style="display: none;"></div>
+            <div class="alert alert-error" style="display: none"></div>
+            <div class="alert alert3-info" style="display: none;"></div>
+            <div class="alert alert3-error" style="display: none"></div>
+            </div>
+
+            <button  id="phone_button_verify"   class="formcheckbtn" >Verify Phone </button>
+                <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" id="phone_check" style="display:none" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+             
+        </div>
+
+        <div class="newhire_card" data-step>
+
+            <input id="two_fa_code" class="form"  placeholder = "Two Factor Code" name="two_fa_code">
+                <div class="alert alert4-info" style="display: none;"></div>
+                <div class="alert alert4-error" style="display: none;"></div>
+            <button id="get_two_fa_token" class="formcheckbtn" >Click for 2fa Code</button>
+            <button  id="get_two_fa_token_verify"   class="formcheckbtn" >Verify Code </button>
+                <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" id="two_fa_phone_check_next" style="display:none" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+             
+        </div>
+
+        <div class="newhire_card" data-step>
+
+            <input class="form"  type="datetime-local" placeholder = "Date of Birth Required" name="dob">
+            <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}}  </div>  
+            <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} </div>  
+            <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
+            <div> {{form.city(class = "form" ,placeholder="City")}} </div>
+            <div> {{form.province(class = "form" ,placeholder="Province")}} </div>    
+            <div> {{form.country(class = "form" ,placeholder="Country")}} </div> 
+            <div> {{form.postal(class = "form", placeholder="Postal Code")}} </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+                
+        </div>
+
+        <div class="newhire_card" data-step>
+
+           
+        
+            <input class="form"  type="datetime-local" placeholder = "Start Date Requierd" name="Startdate" >
+            <input class="form"  type="datetime-local" placeholder = "End Date" name="Enddate">
+            <input class="form"  type="datetime-local" placeholder = "Sin Expire Date" name="sinexpire">
+            <div  class="formtitle" >{{"Home Store:"}}</div>
+            <div> {{form.store(class = "form")}} 
+                        {% if form.store.errors %}
+                            {% for error in form.store.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}       
+                        {% endif %}
+            </div>
+            <div  class="formtitle" >{{"Manager:"}}</div>
+            <div> {{form.manager(class = "form", placeholder="Manager")}} 
+                        {% if form.manager.errors %}
+                            {% for error in form.manager.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div>{{form.trainingid(class = "form", placeholder="Online Training User ID")}} 
+                        {% if form.trainingid.errors %}
+                            {% for error in form.trainingid.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            
+            </div>
+            <div>{{form.trainingpassword(class = "form", placeholder="Online Training Pasword")}} 
+                        {% if form.trainingpassword.errors %}
+                            {% for error in form.trainingpassword.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div>{{form.iprismcode(class = "form", placeholder="Bulloch Code")}} 
+                        {% if form.iprismcode.errors %}
+                            {% for error in form.iprismcode.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+           
+        </div>
+        
+        <div class="newhire_card" data-step=>
+
+            <div> {{form.monavail(class = "form", placeholder="Monday Availability")}} 
+                        
+                        {% if form.monavail.errors %}
+                            {% for error in form.monavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+        
+            <div> {{form.tueavail(class = "form", placeholder="Tuesday Availability")}} 
+                        
+                        {% if form.tueavail.errors %}
+                            {% for error in form.tueavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+        
+            <div> {{form.wedavail(class = "form", placeholder="Wednesday Availability")}} 
+                        
+                        {% if form.wedavail.errors %}
+                            {% for error in form.wedavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+            
+            <div> {{form.thuavail(class = "form", placeholder="Thursday Availability")}} 
+                        
+                        {% if form.thuavail.errors %}
+                            {% for error in form.thuavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+            
+            <div> {{form.friavail(class = "form", placeholder="Friday Availability")}} 
+                        
+                        {% if form.friavail.errors %}
+                            {% for error in form.friavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+        
+            <div> {{form.satavail(class = "form", placeholder="Saturday Availability")}} 
+                        
+                        {% if form.satavail.errors %}
+                            {% for error in form.satavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+
+            
+            <div> {{form.sunavail(class = "form", placeholder="Sunday Availability")}} 
+                        
+                        {% if form.sunavail.errors %}
+                            {% for error in form.sunavail.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}            
+                        {% endif %}
+            </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                </div>
+                <div class="formbutton2">
+                <button type="button" class="formcheckbtn"data-next>Next</button>
+                </div>
+                </div>
+                
+        </div>
+
+        <div class="newhire_card" data-step=>
+            <div  class="formtitle" >{{"Profile Picture:"}}</div>
+            <div>  {{ form.hrpicture(class = "form")}}
+            </div>
+            <div class="formcheckcontainer">
+                <div class="formbutton">
+                    <button type="button" class="formcheckbtn"data-previous>Previous</button>
+                    </div>
+                <div class="formbutton2">
+                    <div id="form-submit" class="alert-send formbutton2" >
+                        {{form.submit2(class_="formcheckbtn")}}
+                        </div>
+                
+                </div>
+        </div>
     </form>
 
-    
-    <script>
-        $(function(){
-            $('button').click(function(e){
-                e.preventDefault();
-                $.ajax({
-                    url: '/verifyemailtoday',
-                    data : {
-                        email : $('#emailinput').val()
-                    },
-                    
-                    type: 'POST',
-                
-                    success: function(response){
-                        if (response[0] == 1){ 
-                            alert("valid"),
-                            $('#circleem1').css('background', 'green'),
-                            $("#emailv").val(1);
-                    }
-                       else {
-                           alert("not valid"),
-                            $('#circleem1').css('background', 'red')
-                            $("#emailv").val(0);
-                       };
-                      
-                       console.log(response);
 
-                       if (response[1] == 1){ 
-                           alert("unique"),
-                            $('#circleem2').css('background', 'green'),
-                            $("#emailvu").val(1);
-                    }
-                       else {
-                           alert("not unique"),
-                            $('#circleem2').css('background', 'red');
-                            $("#emailvu").val(0);
-                       };
+                    <script>
+                        const two_fa_request = document.querySelector("#get_two_fa_token")
+                        two_fa_request.addEventListener('click', function(e){
+                            e.preventDefault,
+                            console.log("requesting code")
+                            $.ajax({
+                                url:'/newhire_verify2fa',
+                                data: {
+                                    phone: $('#hiddenphone').val(),
+                                },
+                                type:'POST',
+                                success: console.log("you did it")
+                            })
+                        })
+                    </script>
 
-                        if ( response[0]&&response[1] == 1){
+                    <script>
+                        const two_fa_request_token = document.querySelector("#get_two_fa_token_verify")
+                        const info2fa = document.querySelector(".alert4-info");
+                        const error2fa = document.querySelector(".alert4-error");
+                        two_fa_request_token.addEventListener('click', function(e){
+                            console.log("requesting code")
+                            $.ajax({
+                                url:'/newhire_verify2fa_check',
+                                data: {
+                                    phone: $('#hiddenphone').val(),
+                                    token: $('#two_fa_code').val(),
+                                },
+                                type:'POST',
+                                success: function(response){
+                                    info2fa.style.display = "none";
+                                    error2fa.style.display = "none";
+                                    console.log(response)
+                                    if (response == 0){
+                                        error2fa.style.display="";
+                                        error2fa.innerHTML='Invalide code. Please Try Again';
+                                }
+                                    else if (response ==1){
+                                        info2fa.style.display="";
+                                        info2fa.innerHTML='Authentication Complete. Click Next';
+                                        two_fa_request_token.style.display='none';
+                                        two_fa_request.style.display='none';
+                                        document.querySelector('#two_fa_phone_check_next').style.display="block",
+                                        console.log("code excepted")
+                                }
+                            }
+                            })
+                        })
+                    </script>
+
+                    <script>
                         
-                            l = document.getElementById("emailinput").value;
-                            document.getElementById("emailinput").readOnly=true;
-                            $('#hiddenemail').val(l);
-                            $('#emailpass').val(1);                            
-                        }   
-                        else {
-                            
-                            alert("please fix email");
-                        };
-                    },
-                         
+                        const info2 = document.querySelector(".alert2-info");
+                        const error2 = document.querySelector(".alert2-error")
+                        const message = document.querySelector("#emailinput") 
+                        const button = document.querySelector("#button_verify2")
+                        const email_button = document.querySelector("#password_check")
+                        var email_data = document.querySelector("#emailinput").value
+                        var regx =/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+
+                        message.addEventListener('input', function(e){
+                            console.log(this.value);
+                            if(regx.test(this.value)){
+                                button.style.display = 'block'
+                            }
+                            else
+                                button.style.display = 'none'
+                                error2.style.display = "none";
+                        
+                        })
+
+                        button.addEventListener("click", function(e) {
+                            e.preventDefault;
+                            $.ajax({
+                                        url: '/verifyemailtoday',
+                                        data : {
+                                            email : $('#emailinput').val(), 
+                                        },
+                                        type: 'POST',
+                                            success: function(response){
+                                            info2.style.display = "none";
+                                            error2.style.display = "none";
+                                            console.log(response)
+
+                                            if (response == 0){ 
+                                                error2.style.display = "";
+                                                error2.innerHTML = `Pleaes Enter an Email`; 
+                                                document.getElementById("emailinput").className = "form-bad";
+                                            
+                                                }
+                                            else if (response == 1) {
+                                                    
+                                                error2.style.display = "";
+                                                error2.innerHTML = `Email Already In Use`;
+                                                document.getElementById("emailinput").className = "form-bad";
+                                                
+                                                }
+                                            else if (response == 2){ 
+                                                error2.style.display = "";
+                                                error2.innerHTML = `Email Is Not valid`;
+                                                document.getElementById("emailinput").className = "form-bad";
+                                                
+                                                }
+                                            else if ( response == 3){ 
+                                                info2.style.display="";
+                                                info2.innerHTML = 'Email is good';
+                                                document.getElementById("emailinput").readOnly = true;
+                                                document.getElementById("emailinput").style.borderColor = "#a9442";
+                                                holdemail = document.getElementById("emailinput").value;
+                                                document.getElementById("hiddenemail").value = holdemail;
+                                                document.querySelector("#password_check").style.display="block";
+                                                document.getElementById("emailinput").className = "form-good";
+                                                button.style.display="none";
+                        
+                                                }
+                                            }
+                                    })    
+                        });
 
 
-                    error: function(error){
-                        console.log(error)
-                    },
-                 
-                });
-            });
+                    </script>
+       
+                    <script>
 
-        });
-
-
-    </script>
-
-</div>
-      
+                                const info = document.querySelector(".alert-info");
+                                const error = document.querySelector(".alert-error");
+                                const info3 = document.querySelector(".alert3-info");
+                                const error3 = document.querySelector(".alert3-error");
+                                const finalsubmit = document.querySelector(".alert-send");
+                                const phone_button = document.querySelector("#phone_button_verify");
+                                const phoneInputField = document.querySelector("#phone");
+                                const phoneInput = window.intlTelInput(phoneInputField, {
+                                preferredCountries: ["ca"],
+                                utilsScript:
+                                "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                                });
     
+                                phone_button.addEventListener("click" ,async function(e){
+                                    await CheckPhone();
+                                    ValidatePhone()
+                                })
 
+                                async function CheckPhone(){
+                                    info.style.display = "none";
+                                    error.style.display = "none";
+                                    info3.style.display = "none";
+                                    error3.style.display = "none";
+                                    //var checkphone = 1;
+                                    //console.log(checkphone);
+                                    
+                                    {
+                                    
+                                    const phoneNumber = phoneInput.getNumber();
+                                    document.getElementById("hiddenphone").value = phoneNumber;
+                                    info.style.display = "none";
+                                    error.style.display = "none";
+                                
+                                    const data = new URLSearchParams();
+                                    data.append("phone", phoneNumber);
+                                        
+                                    await fetch("https://phone-look-up-4269.twil.io/lookup", {
+                                    method: "POST",
+                                    body: data,
+                                    
+                                    })
+                                    .then((response) => response.json())
+                                    .then((json) => {
+                                    if (json.success) {
+                                    checkphone = 0;
+                                    console.log(checkphone);
+                                    } 
+                                    else {
+                                    console.log(json.error);
+                                    error.style.display = "";
+                                    error.innerHTML = `Invalid phone number.`;
+                                    info3.style.display = "none";
+                                    document.getElementById("phone").readOnly = false;
+                                    checkphone = 1;
+                                    console.log(checkphone);
+                                        return;
+                                    }
+                                    
+                                    })
+                                    .catch((err) => {
+                                        error.style.display = "";
+                                        error.innerHTML = `Something went wrong: ${err}`;
+                                    });
+                                    
+                                    }  
+                                }
+
+                                async function ValidatePhone(){
+                                    //e.preventDefault();
+                                    $.ajax({
+                                        url: '/verifyphonetoday',
+                                        data : {
+                                            mobilephone : $('#phone').val(),
+                                            mobilephone2 :$('#hiddenphone').val(),                  
+                                        },
+                                        type: 'POST',
+                                            success: function(response){
+                                            info3.style.display = "none";
+                                            error3.style.display = "none";
+                                            console.log("api" + response) 
+                                            //console.log("checkphone" + checkphone)   
+                                            if ( response == 5){
+                                                error3.style.display = "";
+                                                error3.innerHTML = `Phone number in already used`; 
+                                                info.style.display = "none"
+                                                }
+                                            else if ( response == 6 && checkphone==0){
+                                                info3.style.display="";
+                                                info3.innerHTML = 'Phone # is good';
+                                                document.querySelector("#phone_check").style.display="block";
+                                                document.getElementById("phone").readOnly = true;
+                                                phone_button.style.display="none"
+                                                console.log("hello")
+                                                }
+                                            else if ( response == 7){
+                                                error3.style.display = "";
+                                                error3.innerHTML = `Please Enter a phonenumber`; 
+                                            
+                                                }                              
+                                            },                                   
+                                    })                       
+                                }                                
+                            
+                                
+                    </script>
+
+                    <script>
+
+                        function testfunction(){
+                    
+                            let checkBox = document.querySelectorAll(".check-box");
+                            let T = document.querySelectorAll('.check-date');
+                            let S = document.querySelectorAll('.check-placeholder');
+                            let U = document.querySelectorAll('.check-completed')
+                            let V = document.querySelectorAll('.check-placeholder2');
+
+                            
+                        for( let i = 0; i < checkBox.length; i++ ){
+                            
+                        console.log(checkBox[i].value)
+                        if (checkBox[i].checked == true){
+                                
+                            T[i].style.display = "block";
+                            S[i].style.display= "none"; 
+                            U[i].style.display="block";
+                            V[i].style.display="none";
+                        } else
+                        {
+                            T[i].style.display = "none";
+                            S[i].style.display= "block";
+                            U[i].style.display = "none";
+                            V[i].style.display = "block";
+                        }
+                        }
+                        }
+                    </script>
+
+        
+                    <script>
+                    config ={
+                    dateFormat: "Y-m-d",
+                    altInput: true,
+                    altFormat: "F j, Y",
+                    
+                    }
+                
+                    flatpickr("input[type=datetime-local]", config);
+                    </script>
+
+
+                    <script>
+
+                const multiStepForm = document.querySelector("[data-multi-step]")
+                const formSteps = [...multiStepForm.querySelectorAll("[data-step]")]
+                let currentStep = formSteps.findIndex(step => {
+                    return step.classList.contains("active")
+                })
+                if (currentStep <0 ){
+                    currentStep=0
+                    showCurrentStep()
+                    
+                }
+
+                
+
+                multiStepForm.addEventListener("click", e => {
+                    let incrementor
+                    if (e.target.matches("[data-next]")){
+
+                        incrementor = 1
+                    } else if (e.target.matches("[data-previous]")){
+                        incrementor = -1
+                    } 
+                    
+                    if (incrementor == null) return
+                    const inputs = [...formSteps[currentStep].querySelectorAll("input")]
+                    const allValid = inputs.every(input => input.reportValidity())
+                    if (allValid) {
+                        currentStep += incrementor
+                        showCurrentStep()
+                    }
+                  
+                   
+                    console.log(currentStep)
+                })
+                
+                function showCurrentStep(){
+                    formSteps.forEach((step, index) => {
+                        step.classList.toggle("active", index === currentStep)
+                    })
+                }
+
+                    </script>
+
+                    <script>
+                        /// finalsubmit.style.display="block";
+                    </script>
 
 {% endblock content %}
 

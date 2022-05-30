@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+<div   class="comms-container">
+<form method = "post">
+
+  
+
+    <div  class="formtitle" >{{"Message to be Sent to all Stores:"}}</div>
+    <div> {{form.templatename(class = "form", placeholder="Message")}} 
+              
+    </div>
+
+
+   
+    <input type = "submit" name="send" class="comms-button" >
+    
+</form>
+
+        
+
+        <div class = "tablecontainer" id ="tablecontainer"> </div>
+
+
+</div>
+
+<script>
+            
+    $("#userrole").change(function (){
+        role=$(this).val();
+        $.ajax({
+                method:"POST",
+                url:"/storesearch",
+                data:{text:role},
+                success:function(res){
+                    $('#tablecontainer').empty();
+                                
+                        let html = res.reduce(( acc, {number, phone}) =>
+                            acc += `
+                                        <div class = 'comms-list'>
+                                        ${number +"   "+ phone}
+                                        </div>`
+                                    , '');
+
+                    console.log(res)
+                    $('.tablecontainer').append(html);
+                }})
+        });
+
+</script>
+
+
+{% endblock content %}

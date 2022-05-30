@@ -1,0 +1,28 @@
+{% extends 'layout.html' %} 
+{% block content %}
+
+<form id="two_fa" method="POST" action = "" >
+    <div class = "login_container">
+    {{ form.hidden_tag() }}
+    <div class="loginheader">
+    <h1>Two-Factor Authentication</h1>
+    </div>
+    <div class="loginheader">
+    <p>Please enter the token that was sent to your phone.</p>
+    </div>
+    <div class="row">
+        <div class="box-1">
+            {{ form.token (class='formscontrol')}}
+        </div>
+            {% for error in form.token.errors %}
+            <div class="alerts">[{{ error }}]</div>
+            {% endfor %}
+        <div class="box-2">
+            {{ form.submit (class='formscontrol')}}
+                   
+        </div>
+    </div>
+    </div>
+    
+</form>    
+{% endblock %}

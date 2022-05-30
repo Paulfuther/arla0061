@@ -77,7 +77,7 @@
 
        
         <div  class="formtitle" >{{"Phone Number:"}}</div>
-        <div> {{form.mobilephone(class = "form" ,placeholder="Phone Number")}} 
+        <div> {{form.mobilephone(class = "form" ,placeholder="Phone Number", readonly=true)}} 
                     {% if form.mobilephone.errors %}
                         {% for error in form.mobilephone.errors %}
                         <div class = "formerror">{{ error }}</div>
@@ -141,7 +141,7 @@
         </div>           
      
         <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form", placeholder="E-Mail")}} 
+        <div> {{form.email(class = "form", placeholder="E-Mail", readonly=true)}} 
                     {% if form.email.errors %}
                         {% for error in form.email.errors %}
                         <div class = "formerror">{{ error }}</div>

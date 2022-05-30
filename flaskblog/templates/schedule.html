@@ -11,8 +11,8 @@
                             <!--<input type ="text" autofocus="autofocus" name="search_string">-->
                            
                        
-                        <li> {{form.store( placeholder="All")}}    </li>   
-                        <li><input type ="submit"  formaction="/searchschedule" name="action" value = "Search" id="search_string"> 
+                         
+                        <li><input type ="text"  id = "storesearch" name = "storesearch" placeholder = " Search " class = "inputform" > 
                         </li>
                         <i class = "fas fa-angle-left previous" ></i>
                         <span class = "tooltiptext">Previous Day</span>
@@ -57,32 +57,33 @@
 
         </div>
                
+
+        <div class = "tablecontainer" id ="tablecontainer">
+
+
                      <div class ="schedulecontainer2">
 
-                
-                     
+               <div id="div1">hi</div>
+                  
+                        {% for x in s_s|unique %}
+                        {{ x[1] }}
+                        <div class = "weeklyhours">
+                            
+                            {% for y in range(7) %}
 
-                {% for staff in gsa %}
-
-                  <div class = "schedulenamesidebar">  {{staff.firstname}} </div>
-
-                    <div class = "weeklyhours">
-                        {% for x in range(7) %}
-                        
-                        <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Shift", value={{x.writtenhours}}>
-
-                        {% endfor %}
-
-                            {% for x in ss %}
-                         
-                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Hours", value={{x.shift_hours}}>
+                            <input type="text" class = "hours" id = "hours" name = "hours" placeholder = "Shift" value="{{ x[y+2] }} ">
                             {% endfor %}
+
+                            {% for y in range(7) %}
+                            <input type="text" class="writtenhours" id = "writtenhours" name = "writtenhours" placeholder = "Hours", value="{{x[y]}}">
+                         
+                            {% endfor %}
+                           
+                        </div>
+                        {% endfor %}    
                 
-                    </div>
 
-                {% endfor %}
-
-    </div>
+                     </div>
  
 
  </form>
@@ -104,12 +105,12 @@
                      for (i=0; i< 7; i++){
                         
                         this_day =  dayNames[one.getDay()];
-                        this_month = (monthNames[(one.getMonth() %12) ]);
+                        this_month = (one.getMonth() %12)+1;
                         this_year = (one.getFullYear() );
                         this_date = (one.getDate()  );
                         
                         divs[i].innerHTML = this_day;
-                        this_dates = this_month + "-" + this_date +"-" + this_year;
+                        this_dates = this_year + "-" + this_month +"-" + this_date;
                         divs2[i].innerHTML = this_dates;
                         divshidden[i].value = this_dates;
 
@@ -131,5 +132,48 @@
 
                 </script>
 
-                
+                    <script>
+
+                        $(document).ready(function(){
+                            $("#storesearch").on("input",function(e){
+                                     
+                                storetext = $("#storesearch").val();
+                                       
+                                    
+                            $.ajax({
+                                        method:"POST",
+                                        url:"/searchschedule",
+                                        data: {text:storetext},
+                                        success:function(res){
+                                            console.log(res)
+                                           
+                                            $('#tablecontainer').empty();
+                                
+                                let html = res.reduce(( acc, {firstname, shift_date, id}) =>
+                                    acc += `
+                                   
+                                 
+                                    <div class = 'hritem2'>
+                                    ${firstname}
+                                   
+                                    ${shift_date}
+                                    </div>`
+                                 
+                                    
+                                 
+
+                                , '');
+                                console.log(res.id)
+                                $('.tablecontainer').append(html);
+                                console.log(res);
+                             
+                            }
+                        })
+
+                    });
+                })
+
+                                 
+                                </script>
+                                   
 {% endblock %}

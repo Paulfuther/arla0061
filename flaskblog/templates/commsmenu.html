@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+<body>
+
+            
+    <div class= "container">
+
+          <!-- Applications Nav Bar -->       
+
+          <nav class="app-nav">
+
+                <ul class = "app-menu">
+                      <ul>
+                            <li> <a href="{{ url_for('bulk_sms')}}">Bulk SMS</a></li>
+                      </ul>
+                      
+                      <ul>      
+                            <li> <a href="{{ url_for('bulk_email')}}">Bulk Email</a></li>
+                      </ul>
+                      <ul>      
+                        <li> <a href="{{ url_for('twilio_call')}}">Bulk Phonecall</a></li>
+                  </ul>
+                </ul>
+          </nav>
+
+    </div>  
+          
+</body>
+
+
+
+
+{% endblock content %}

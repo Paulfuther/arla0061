@@ -4,37 +4,44 @@ from flask import Flask
 app = Flask(__name__)
 
 from dotenv import load_dotenv
+from time import time
+import jwt
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
-import os
+import os, base64
 import json
+from functools import wraps
 from datetime import datetime
 from flask import render_template_string, make_response, url_for, redirect, send_from_directory, \
-     request, render_template, send_file
+     request, render_template, send_file, abort, g
 from flask_admin import Admin, expose, BaseView
 from flask_admin.actions import action
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask_security import Security, SQLAlchemyUserDatastore, auth_required, current_user, \
-     UserMixin, RoleMixin, login_required, roles_required
-from flask_security.utils import hash_password
 from flask_admin.contrib.sqla import ModelView
 from flask_marshmallow import Marshmallow
 from marshmallow import Schema
 from flask_admin.menu import MenuLink
-from flask_bcrypt import Bcrypt, generate_password_hash
+from flask_bcrypt import Bcrypt, check_password_hash, generate_password_hash 
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import Boolean, DateTime, Column, Integer, \
-    String, ForeignKey
-from flask_mail import Mail, Message
+    String, ForeignKey, or_
 from flask_email_verifier import EmailVerifier
-from flask_login import  user_logged_out, user_logged_in
+from flask_login import  user_logged_out, user_logged_in, login_required,\
+     current_user, LoginManager
+from flask_user import roles_required, roles_accepted, UserMixin
 from celery import Celery
 from flaskblog.tasks import celery
 import dropbox
 from dropbox.files import WriteMode
 import pdfkit
 from io import BytesIO
+from twilio.rest import Client
+from functools import wraps
+from twilio.request_validator import RequestValidator
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
 
+bcrypt = Bcrypt(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 load_dotenv()
@@ -44,7 +51,7 @@ app.config['SECRET_KEY'] =os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('SQLALCHEMY_DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECURITY_PASSWORD_SALT'] = os.environ.get('SECURITY_PASSWORD_SALT')
-app.config['SECURITY_RECOVERABLE'] = False
+app.config['SECURITY_RECOVERABLE'] = True
 app.config['SECURITY_CHANGEABLE'] = False
 app.config['SECURITY_EMAIL_SENDER'] = ('valid_email@my_domain.com')
 app.config['MAIL_SERVER']= os.environ.get('MAIL_SERVER')
@@ -58,6 +65,52 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
+INCIDENT_UPLOAD_PATH=os.path.join(basedir, 'static/incidentpictures')
+app.config['INCIDENT_UPLOAD_PATH'] = INCIDENT_UPLOAD_PATH
+
+account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+twilio_from = os.environ['TWILIO_FROM']
+
+
+
+SENDGRID_NEWHIRE_ID = os.environ.get('SENDGRID_NEWHIRE_ID')
+SENDGRID_NEW_HIRE_FILE_ID=os.environ.get('SENDGRID_NEW_HIRE_FILE_ID')
+NOTIFY_SERVICE_SID = os.environ.get('TWILIO_NOTIFY_SERVICE_SID')
+DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+TWILIO_VERIFY_SID = os.environ.get('TWILIO_VERIFY_SID')
+sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+client = Client(account_sid, auth_token)
+verify = client.verify.services(TWILIO_VERIFY_SID)
+
+
+SESSION_COOKIE_SECURE = True
+REMEMBER_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+REMEMBER_COOKIE_HTTPONLY = True
+
+def validate_twilio_request(f):
+    """Validates that incoming requests genuinely originated from Twilio"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Create an instance of the RequestValidator class
+        validator = RequestValidator(os.environ.get('TWILIO_AUTH_TOKEN'))
+
+        # Validate the request using its URL, POST data,
+        # and X-TWILIO-SIGNATURE header
+        request_valid = validator.validate(
+            request.url,
+            request.form,
+            request.headers.get('X-TWILIO-SIGNATURE', ''))
+
+        # Continue processing the request if it's valid, return a 403 error if
+        # it's not
+        if request_valid:
+            return f(*args, **kwargs)
+        else:
+            return abort(403)
+    return decorated_function
+
 
 DROP_BOX_KEY = os.environ.get('DROP_BOX_KEY')
 
@@ -66,40 +119,80 @@ db = SQLAlchemy(app)
 dbx = dropbox.Dropbox(DROP_BOX_KEY)
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
-mail = Mail(app)
-
-@celery.task
-def send_async_email(email_data):
-    """Background task to send an email with Flask-Mail."""
-    msg = Message(email_data['subject'],
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
-                  recipients=[email_data['to']])
-    msg.body = email_data['body']
-    with app.app_context():
-        mail.send(msg)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view='login'
+login_manager.session_protection="strong"
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 
 @celery.task
-def send_async_email2(email_data):
-    """Background task to send an email with Flask-Mail."""
-    msg = Message(email_data['subject'],
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
-                  recipients=[email_data['to']])
-    msg.body = email_data['body']
-    with app.app_context():
-        mail.send(msg)
+def send_bulk_email(role_id, templatename):
+    with app.test_request_context():    
+
+        
+        # this is bulk sms using the notify api from twilio.
+        # first we grab all employees who are active users.
+        # we need to search specifically for mobile phone
+        
+        bulkmessage = BulkEmailSendgrid.query.get(templatename)
+        bm = bulkmessage.templateid
+        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+        .all()
+
+        #print(bm)
+        
+        # gsa returns an object. Although we can serialise the object, we still
+        # have issues generating the proper format for twilio rest api.
+        # so we do it old school.
+    
+        '''with open('flaskblog/static/attachments/siteevaluation.pdf', 'rb') as f:
+            data = f.read()
+            f.close()
+        encoded_file = base64.b64encode(data).decode()
+        attachedFile = Attachment(
+                    FileContent(encoded_file),
+                    FileName('siteevaluation.pdf'),
+                    FileType('application/pdf'),
+                    Disposition('attachment')) 
+
+       '''
+        for user in gsa:
+            message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= user.email)
+            message.dynamic_template_data = {
+                'subject':templatename,
+                'name': user.firstname,
+
+            }
+            print(user.email)
+            message.template_id = bm
+            
+            response = sg.send(message)
+
+            #print(user.email) 
+      
 
 @celery.task
 def make_pdf(staff_id):
     with app.test_request_context():
         signatures = Empfile.query.filter_by(employee2_id = staff_id)
-        rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
-    
-         
-
-
+        ## this is incorrect. Employeeid is not user id. correct before pbulishing.
+        rol =  User.query.filter(or_(User.roles.any(Role.id == 3), User.id==staff_id)).all()
         img = '/files/image-20201205212708-1.png'
 
+        for x in rol:
+            print(x.email)
+
+        return "done"
+        '''
         image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
         image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
         image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
@@ -118,8 +211,6 @@ def make_pdf(staff_id):
     
         rendered = render_template('employeefilepdf.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, signatures=signatures, gsa=gsa)
     
-        
-
         options = {'enable-local-file-access': None,
             '--keep-relative-links': '',
             '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
@@ -133,51 +224,104 @@ def make_pdf(staff_id):
         created_on = datetime.now().strftime('%Y-%m-%d')
         filename = f" {lname} {fname}  ID  {id} {created_on}.pdf"
 
-        #response = make_response(pdf)
-        #response.headers['Content-Type']='application/pdf'
-        #response.headers['Content-Disposition']='inline'
+        encoded_file = base64.b64encode(pdf).decode()
+        attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName(filename),
+                FileType('application/pdf'),
+                Disposition('attachment')) 
 
         for x in rol:
             email = x.email
-            email_data = {
-                'subject': 'A new hire file has been created',
-                'to': email,
-                'body': 'A new hire file has been created and uploaded to dropbox. {}'.format(filename),
-               
-            }
+            message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= email,
+            subject = 'A New Hire File has been created',
+            html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
+            )
+            
+            message.dynamic_template_data = {
+                
+                'name':gsa.firstname,
+                'userid':gsa.trainingid,
+                'password':gsa.trainingpassword
 
-            msg = Message(email_data['subject'],
-                  sender=app.config['MAIL_DEFAULT_SENDER'],
-                  recipients=[email_data['to']])
-            msg.body = email_data['body']
-            msg.attach("pdf","application/pdf", pdf)
-            mail.send(msg)
+            }
         
+            message.template_id = SENDGRID_NEW_HIRE_FILE_ID
+            message.attachment=attachedFile
+            response = sg.send(message)
+
+            
         with file as f:    
             dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
+        '''
+
+
+@celery.task
+def make_incident_pdf(file_id):
+    with app.test_request_context():
+        rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
+        print(file_id)
+        img = '/Users/paulfuther/arla0061/flaskblog/static/images/SECURITYPERSON.jpg'
+        css = "flaskblog/static/main.css"
+        file = Incident.query.get(file_id)
+        fdate1 = file.eventdate
+        #print(fdate1)
+        fdate= datetime.strftime(fdate1,'%Y-%m-%d')
+        #print(fdate)
+        fstore = file.location
+        id = file_id
+        #print(fdate)
+        gsa = Incident.query.get(file_id)
+        ident = gsa.id
+        print(ident)
+        picture = incident_files.query.filter_by(incident_id=file_id)
+        rendered = render_template('eventreportpdf.html',gsa=gsa, css=css, picture=picture)
+        options = {'enable-local-file-access': None,
+            '--keep-relative-links': '',
+            '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
+            'encoding' : "UTF-8"
+        }
+        css = "flaskblog/static/main.css"
+        
+        pdf = pdfkit.from_string(rendered, False, options=options, css=css)
+
+        file = BytesIO(pdf)
+            #print(type(file))
+        created_on = datetime.now().strftime('%Y-%m-%d')
+        filename = f" {fstore} {fdate}  ID  {id} {created_on}.pdf"
+
+        # need to create a bytes file to use as an attachment for sendgrid
+
+        encoded_file = base64.b64encode(pdf).decode()
+        attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName(filename),
+                FileType('application/pdf'),
+                Disposition('attachment')) 
+
+        #for x in rol:
+        #        
+        #    email = x.email
+        #    message = Mail(
+        #    from_email = DEFAULT_SENDER,
+        #    to_emails=email,
+        #    subject ='A new incident report has been filed',
+        #    html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
+        #    message.attachment = attachedFile
+        #    response = sg.send(message)
+        #    print(response.status_code, response.body, response.headers)
+
+            # upload to drop box
+
+        with file as f:    
+            dbx.files_upload(f.read(), path=f"/SITEINCDIENTS/{filename}", mode=WriteMode('overwrite'))
     
-        
-        #file = BytesIO(pdf)
-        #return (file),{
-        #    'Content-Type': 'application/pdf',
-        #    'Content-Disposition': 'inline'
-        #   }
-        
-        
-        #return send_file(file,
-        #         attachment_filename=filename,
-        #         mimetype='application/pdf',
-        #         as_attachment=True,
-        #         cache_timeout=1
-        #          )      
-
-       
-
+    
 admin = Admin(app, name='Dashboard')
     
 bcrypt = Bcrypt(app)
-
-
 
 roles_users = db.Table(
     'roles_users',
@@ -237,13 +381,16 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(200), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean, default = True)
+    firstname = db.Column(db.String(100), nullable=False)
+    lastname = db.Column(db.String(100), nullable=False)
     confirmed_at = db.Column(db.DateTime)
     user_name = db.Column(db.String(100), nullable=False)
-    
+    phone = db.Column(db.String(100))
     # new additions 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow) 
-       
+    email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    email_confirmed_date = db.Column(db.DateTime)
     #employee = db.relationship('Customer', backref= 'user', uselist = False)
     roles = db.relationship('Role',  secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
@@ -253,18 +400,61 @@ class User(UserMixin, db.Model):
         super(User, self).__init__(**kwargs)
         if self.roles is  None:
             self.roles = Role.query.filter_by(name="GSA").first()
-    
+
     def has_roles(self, *args):
         return set(args).issubset({role.name for role in self.roles})
 
+    def is_active(self):
+        return self.active
+
     def __str__(self):
         return (self.user_name) 
+
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time()+ expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256')
     
+    def get_mail_confirm_token(self, expires_in=600):
+        return jwt.encode(
+            {'confirm_email': self.id, 'exp': time()+ expires_in},
+            app.config['SECRET_KEY'], algorithm="HS256")
+
+    @staticmethod
+    def verify_email_confirm_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],algorithms=['HS256'])['confirm_email']
+        except:
+            return
+        return User.query.get(id)
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
+
+class BulkEmailSendgrid(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    templatename = db.Column(db.String, unique=True)
+    templateid = db.Column(db.String(200), unique=True)
     
+    def __repr__(self):
+        return '%r' % (self.templatename)
         
  
+class Twimlmessages(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    twimlname = db.Column(db.String, unique=True)
+    twimlid = db.Column(db.String(200), unique=True)
+    
+    def __repr__(self):
+        return '%r' % (self.twimlname)
 
-class Role(db.Model, RoleMixin):
+
+class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     description = db.Column(db.String(255))
@@ -278,9 +468,7 @@ class Role(db.Model, RoleMixin):
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    
     firstname = db.Column(db.String(20), nullable=False)
-    nickname = db.Column(db.String(20), nullable=True)
     lastname = db.Column(db.String(20), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
     store = db.relationship('Store', backref = 'store')
@@ -290,15 +478,15 @@ class Employee(db.Model):
     city = db.Column(db.String(20), nullable=False)
     province = db.Column(db.String(20), nullable=False)
     country = db.Column(db.String(20), nullable=False)
-    mobilephone = db.Column(db.String(10), nullable=False)
+    mobilephone = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(120), nullable=False)
    
     sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
         db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    startdate = db.Column(db.DateTime(), nullable=True)
-    enddate = db.Column(db.DateTime(), nullable=True)
+    
+   
     postal = db.Column(db.String(6), nullable=False)
     trainingid = db.Column(db.String(),unique=True, nullable=False)
     trainingpassword = db.Column(db.String(), nullable=False)
@@ -307,8 +495,7 @@ class Employee(db.Model):
                            default='default.jpg')
     
     iprismcode = db.Column(db.String(9), nullable=False)
-    dob = db.Column(db.DateTime(), nullable=True)
-   
+    
     mon_avail = db.Column(db.String(100), nullable=False)
     tue_avail = db.Column(db.String(100), nullable=False)
     wed_avail = db.Column(db.String(100), nullable=False)
@@ -326,10 +513,18 @@ class EmployeeSchema(ma.Schema):
     class Meta:
         model = Employee
         store = ma.Nested("StoreSchema", exclude=("store",))
-        fields = ('id', 'firstname', 'lastname', 'email', 'store_id', 'image_file', 'number')
+        fields = ('id', 'firstname', 'lastname', 'mobilephone','email', 'store_id', 'image_file', 'number')
         
         
 employee_schema = EmployeeSchema(many=True)
+
+class EmployeeSMSSchema(ma.Schema):
+    class Meta:
+        model = Employee
+        fields = ('id','mobilephone')
+employeeSMS_schema = EmployeeSMSSchema(many=True)
+
+
 
 class Course(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -341,12 +536,13 @@ class Course(db.Model):
    
 class Grade(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    value = db.Column(db.String(), default="n")
+    
     employee_id = db.Column(Integer(), ForeignKey('employee.id'))
     employee = db.relationship('Employee', backref = 'grades')
     course_id = db.Column(db.Integer(), ForeignKey('course.id'))
     course = db.relationship('Course', backref='grade')
-    completeddate = db.Column(db.String(),  nullable=True)
+    completed = db.Column(db.Boolean, default = False)
+    completeddate = db.Column(db.String(), nullable=True)
       
 class staffschedule(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -357,6 +553,15 @@ class staffschedule(db.Model):
     shift_hours = db.Column(db.Integer())
     shift_date = db.Column(db.Date)
  
+class staffscheduleschema(ma.Schema):
+    class Meta:
+        model = staffschedule
+        
+        employee=ma.Nested("employee_schema")
+        fields = ('id', 'firstname', 'shift_description','shift_hours', 'shift_date')
+
+staffschedule_schema = staffscheduleschema(many=True)
+
 class Empfile(db.Model):
     id = db.Column(db.Integer(), primary_key = True)
     employee2_id = db.Column(Integer(), ForeignKey('employee.id'))
@@ -369,6 +574,7 @@ class Store(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer)
     carwash =  db.Column(db.Boolean, default = False)
+    phone = db.Column(db.String(), nullable=False)
     
     def __repr__(self):
         return str(self.number)
@@ -376,6 +582,8 @@ class Store(db.Model):
 class StoreSchema(ma.Schema):
     class Meta:
         model = Store
+        fields = ('number','phone')
+store_schema = StoreSchema(many=True)
         
     
 class reclaimtank(db.Model):
@@ -419,7 +627,11 @@ class Incidentnumbers(db.Model):
      
      def __repr__(self):
          return '%r' % (self.details)
-       
+
+
+
+
+
 # salt log
        
 class Saltlog(db.Model):
@@ -435,12 +647,112 @@ class Saltlog(db.Model):
          return '%r' % (self.area)      
 
 
+class Incident(db.Model):
+     id = db.Column(db.Integer, primary_key=True)
+     injuryorillness = db.Column(db.Boolean, default = False)
+     environmental = db.Column(db.Boolean, default = False)
+     regulatory = db.Column(db.Boolean, default = False)
+     economicdamage = db.Column(db.Boolean, default = False)
+     reputation = db.Column(db.Boolean, default = False)
+     security = db.Column(db.Boolean, default = False)
+     fire = db.Column(db.Boolean, default = False)
 
+     location = db.Column(db.String())
+
+     eventdetails = db.Column(db.String())
+     eventdate = db.Column(db.DateTime(), nullable = True)
+     eventtime = db.Column(db.Time())
+     reportedby = db.Column(db.String())
+     reportedbynumber = db.Column(db.String())
+
+     suncoremployee = db.Column(db.Boolean, default = False)
+     contractor = db.Column(db.Boolean, default = False)
+     associate = db.Column(db.Boolean, default = False)
+     generalpublic = db.Column(db.Boolean, default = False)
+     other = db.Column(db.Boolean, default = False)
+     othertext = db.Column(db.String())
+
+     actionstaken = db.Column(db.String())
+     correctiveactions = db.Column(db.String())
+
+     sno = db.Column(db.Boolean, default = False)
+     syes = db.Column(db.Boolean, default = False)
+     scomment = db.Column(db.String())
+
+     rna = db.Column(db.Boolean, default = False)
+     rno = db.Column(db.Boolean, default = False)
+     ryes = db.Column(db.Boolean, default = False)
+     rcomment = db.Column(db.String())
+
+     gas = db.Column(db.Boolean, default = False)
+     diesel = db.Column(db.Boolean, default = False)
+     sewage = db.Column(db.Boolean, default = False)
+     chemical = db.Column(db.Boolean, default = False)
+     chemcomment = db.Column(db.String())
+     deiselexhaustfluid = db.Column(db.Boolean, default = False)
+     sother = db.Column(db.Boolean, default = False)
+     s2comment = db.Column(db.String())
+
+     air = db.Column(db.Boolean, default = False)
+     water = db.Column(db.Boolean, default = False)
+     wildlife = db.Column(db.Boolean, default = False)
+     land = db.Column(db.Boolean, default = False)
+     volumerelease = db.Column(db.String())
+
+     pyes = db.Column(db.Boolean, default = False)
+     pno = db.Column(db.Boolean, default = False)
+     pna = db.Column(db.Boolean, default = False)
+     pcase = db.Column(db.String())
+
+     stolentransactions = db.Column(db.Boolean, default = False)
+     stoltransactions = db.Column(db.String())
+     stolencards = db.Column(db.Boolean, default = False)
+     stolcards = db.Column(db.String())
+     stolentobacco = db.Column(db.Boolean, default = False)
+     stoltobacco = db.Column(db.String())
+     stolenlottery = db.Column(db.Boolean, default = False)
+     stollottery = db.Column(db.String())
+     stolenfuel = db.Column(db.Boolean, default = False)
+     stolfuel = db.Column(db.String())
+     stolenother = db.Column(db.Boolean, default = False)
+     stolother = db.Column(db.String())
+     stolenothervalue = db.Column(db.String())
+     stolenna = db.Column(db.Boolean, default = False)
+
+     gender = db.Column(db.String())
+     height = db.Column(db.String())
+     weight = db.Column(db.String())
+     haircolor = db.Column(db.String())
+     haircut= db.Column(db.String())
+     complexion = db.Column(db.String())
+     beardmoustache = db.Column(db.String())
+     eyeeyeglasses = db.Column(db.String())
+     licencenumber = db.Column(db.String())
+     makemodel = db.Column(db.String())
+     color = db.Column(db.String())
+     scars = db.Column(db.String())
+     tatoos = db.Column(db.String())
+     hat = db.Column(db.String())
+     shirt = db.Column(db.String())
+     trousers = db.Column(db.String())
+     shoes = db.Column(db.String())
+     voice = db.Column(db.String())
+     bumpersticker = db.Column(db.String())
+     direction = db.Column(db.String())
+     damage = db.Column(db.String())
+     incident_images = db.relationship('incident_files', backref='incident_images', lazy=True)
+
+class incident_files(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    image = db.Column(db.String(100), nullable=False)
+    incident_id = db.Column(db.Integer, db.ForeignKey('incident.id'))
 
 # here we initiate the datastore which is used in the Admin model
 
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
+
+# feb 27 2021
+#user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+#security = Security(app, user_datastore)
 
 #create a user to test with
 
@@ -461,32 +773,32 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ( 'user_name', 'active','created_on', 'updated_on', 'roles')
+    column_list = ( 'user_name', 'active','created_on', 'updated_on', 'email_confirmed', 'email_confirmed_date','roles', 'phone')
     column_searchable_list = ['user_name']
+    
     def is_accessible(self):
         return current_user.has_roles('Admin' )
     
-    
-
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('home'))
 
     def on_model_change(self, form, model, is_created):
         if is_created:
-            model.password = hash_password(form.password.data)
+            model.password = bcrypt.generate_password_hash(form.password.data)
         else:
             old_password = form.password.object_data
             # If password has been changed, hash password
             if not old_password == model.password:
-                model.password = hash_password(form.password.data)
+                model.password = bcrypt.generate_password_hash(form.password.data)
 
 class MyModelView2(ModelView):
+    create_modal = True
+    edit_modal = True
     can_export = True
     can_delete = False
-    #column_hide_backrefs = False
+    column_hide_backrefs = True
     #column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
-    column_searchable_list = ['firstname']
+    column_editable_list = ['firstname', 'lastname']
+    column_searchable_list = ['firstname', 'lastname']
     #list_columns = ['firstname','store']
     def is_accessible(self):
         return current_user.has_roles('Admin')
@@ -618,7 +930,7 @@ class AdminViewStore(ModelView):
     
 class AdminViewClass(ModelView):
     
-    can_delete = False
+    can_delete = True
     
     @action('publish to all staff', 'Approve', 'Are you sure you want to add this course toa ll')
     def action_approve(self, ids):
@@ -632,7 +944,7 @@ class AdminViewClass(ModelView):
             check = Grade.query.filter_by(employee_id=gsas.id, course_id = id4, ).first()
             if not check:
                 print("emp" ,gsas.firstname, "nope")
-                newcourse = Grade(value="n", employee_id = gsas.id, course_id = id4)
+                newcourse = Grade(completed=0, employee_id = gsas.id, course_id = id4)
                 db.session.add(newcourse)
                 
             else:
@@ -728,8 +1040,26 @@ class EmailView(BaseView):
     def is_accessible(self):
         return current_user.has_roles('Admin')
     
+class MyModelView12(ModelView):
+    can_export = True
+    can_delete = False
 
-    
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
+class MyModelView14(ModelView):
+    can_export = True
+    can_delete = False
+
+    def is_accessible(self):
+        return current_user.has_roles('Admin')
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('home'))
+
 # these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
@@ -744,6 +1074,8 @@ admin.add_view(hreditor(hrfiles, db.session))
 admin.add_view(MyModelView8(Incidentnumbers, db.session, category = "Paul"))
 admin.add_view(MyModelView9(Saltlog, db.session))
 admin.add_view(MyModelViewReclaim(reclaimtank, db.session, category = "Paul"))
+admin.add_view(MyModelView12(BulkEmailSendgrid, db.session, category="Paul"))
+admin.add_view(MyModelView14(Twimlmessages, db.session, category="Paul"))
 admin.add_view(MyModelView10(cwmaintenance, db.session, category = "Paul"))
 #admin.add_view(MyModelView11(Employee, db.session))
 admin.add_view(EmailView(name = 'Email', endpoint='email'))

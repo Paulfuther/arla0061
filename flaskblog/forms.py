@@ -1,12 +1,16 @@
+from typing import Text
+from flask_security.utils import get_post_login_redirect
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField, DateField, SelectField, IntegerField, DecimalField
-from wtforms.fields.html5 import DateField, TelField
+from sqlalchemy.sql.elements import BooleanClauseList
+from sqlalchemy.sql.sqltypes import Date, String
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
+from wtforms.fields.html5 import DateField, TelField, TimeField, EmailField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
-from flaskblog import  Employee, db, Store, User, Role
+from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid, Twimlmessages
 from flask_login import current_user
 import wtforms
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 import phonenumbers
 import re
 
@@ -20,35 +24,58 @@ def mgr():
 def get_mgr_name(User):
     return f"{User.firstname} {User.lastname}"
 
+class Confirm2faForm(FlaskForm):
+    token = StringField()
+    submit = SubmitField('Verify')
+
+
 class LoginForm(FlaskForm):
-    email = StringField('email', validators = [InputRequired(), Length(min=4, max=200)])
+    email = StringField('email', validators = [InputRequired(), Length(min=4, max=200), Email()])
     password = PasswordField('password', validators = [InputRequired(), Length(min=8, max=80)])
-    remember = BooleanField('remember me')
+    remember_me = BooleanField('remember me')
     submit = SubmitField('Login')
 
+class forgot_password_Form(FlaskForm):
+    email = StringField('email', validators = [InputRequired(), Length(min=4, max=200), Email()])    
+    submit = SubmitField('Login')
+
+class reset_password_form(FlaskForm):
+    password = PasswordField('Password', validators = [InputRequired(), Length(min=8, max=80)])
+    password2 = PasswordField('Repeat Password', validators = [InputRequired(),Length(min=8, max=80), EqualTo('password')])
+    submit = SubmitField('Request Password Reset')
+
+class CommsForm(FlaskForm):
+    role = (QuerySelectField(query_factory=lambda: Role.query.order_by(Role.name),
+        allow_blank=False))
+    message_body = TextAreaField('Message', validators=[DataRequired()])
     
+class BulkEmailSendgridForm(FlaskForm):
+    role = (QuerySelectField(query_factory=lambda: Role.query.order_by(Role.name),
+        allow_blank=False))
+    templatename = (QuerySelectField(query_factory=lambda: BulkEmailSendgrid.query.order_by(BulkEmailSendgrid.templatename),
+        allow_blank=False))
+   
+class BulkCallForm(FlaskForm):
+    role = (QuerySelectField(query_factory=lambda: Role.query.order_by(Role.name),
+        allow_blank=False))
+    templatename = (QuerySelectField(query_factory=lambda: Twimlmessages.query.order_by(Twimlmessages.twimlname),
+        allow_blank=False))
+
+
 class TelephoneForm(FlaskForm):
     area_code = IntegerField('Area Code', validators=[DataRequired()])
     number = IntegerField('Number', validators=[DataRequired(), Length(min=7, max=7)] )
 
 class EmployeeForm(FlaskForm):
-    username = StringField('Username', validators=[
-                            DataRequired(), Length(min=2, max=100)])
-    email = StringField('Email',validators=[
-                        Optional()])
-    password = StringField('Password', validators=[
-        DataRequired(), Length(min=2, max=100)])
-    active = BooleanField(default="checked")
+    
+    email = EmailField('Email', validators=[DataRequired(), Email()])
     firstname = StringField('Firstname', validators= [DataRequired(), Length(min=2, max=20)])
-    nickname = StringField('Nickname', validators=[Optional()])
     lastname = StringField('Lastname', validators=[DataRequired(), Length(min=2, max=20)])
-    store = QuerySelectField(
+    store = QuerySelectField('Store',
         query_factory=lambda: Store.query.order_by(Store.number),
         allow_blank=False
     )
-   
-    dob = DateField('Date of Birth', format='%Y-%m-%d',
-                    validators=[DataRequired()])
+    
     addressone = StringField('Address Line 1', validators=[
                              DataRequired(), Length(min=2, max=100)])
     addresstwo = StringField('Address Line 2', validators=[
@@ -66,36 +93,20 @@ class EmployeeForm(FlaskForm):
     email = StringField('Email', validators=[
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
-                              DataRequired(), Length(min=9, max=12)])
-    
+                              DataRequired()])
+    token = StringField()
     sinexpire = DateField('Sin Expire', format='%Y-%m-%d', validators=[Optional()])
-    Startdate = DateField('Start Date', format='%Y-%m-%d',
-                          validators=[DataRequired()])
-    Enddate = DateField('End Date', format='%m/%d/%Y', validators=[Optional()])
+    
+   
 
     trainingid = StringField('Training ID', validators=[DataRequired()])
     trainingpassword = StringField(
         'Training Password', validators=[DataRequired()])
     manager = QuerySelectField(
-        query_factory=lambda: User.query.join(User.roles).filter(Role.id==2).order_by(User.user_name),
+        query_factory=lambda: User.query.join(User.roles).filter(Role.id==2).order_by(User.user_name).filter(User.active ==1),
         allow_blank=False
     )
-    
-   # gradelist = Grade.query\
-    #    .filter_by(employee_id=staff_id)\
-     #   .join(Employee, Employee.id == Grade.employee_id)\
-     #   .join(Course, Course.id == Grade.course_id)\
-     #   .add_columns(Course.name, Grade.value, Grade.completeddate)\
-     #   .order_by(Grade.course_id)
-    
-    
-    #manager = SelectField('manager', choices=[(
-    #                      'Manager Name', 'Manager Name'), ('Terry', "Terry"),
-    #    ('Steph', 'Steph'), ('Wanda', 'Wanda'), ('Sahib', 'Sahib'),
-    #    ('Paul', 'Paul')])
     hrpicture = FileField(validators=[FileAllowed(['jpg', 'jpeg','png', 'HEIC'])])
-    
-   
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
     monavail = StringField('Monday Availability', validators=[
@@ -112,44 +123,9 @@ class EmployeeForm(FlaskForm):
                            DataRequired(), Length(min=2, max=100)])
     sunavail = StringField('Sunday Availability', validators=[
                            DataRequired(), Length(min=2, max=100)])
-    submit = SubmitField('Add Employee')
+    submit2 = SubmitField('Add Employee')
 
    
-
-        
-    def validate_mobilephone(self, mobilephone):
-        user = Employee.query.filter_by(mobilephone=mobilephone.data).first()
-        if user:
-            raise ValidationError( 'That mobile is Taken')
-
-    
-
-    
-
-    
-        
-    def validate_trainingid(self, trainingid):
-        user = Employee.query.filter_by(trainingid=trainingid.data).first()
-        if user:
-            raise ValidationError('That id is Taken')
-
-    def validate_store(self, store):
-        if store.data == "Home Store":
-            raise ValidationError('Please Enter a Store')
-
-    def validate_active(self, active):
-
-        if active.data == "Active":
-            print("homestore")
-            raise ValidationError('Must indicate active or not')
-
-    def validate_manager(self, manager):
-
-        if manager.data == "Manager Name":
-            print("Manager Name")
-            raise ValidationError('Must Select a Manager')
-   
-    
   
 class EmployeeUpdateForm(FlaskForm):
    
@@ -270,8 +246,116 @@ class schedule_start(FlaskForm):
                                           ('65077', '65077'), ('65231', '65231')])
  
 class GradeForm(FlaskForm):
-    completed = SelectField('Completed', choices=[
-                         ('Completed Y or N?', 'Completed Y or N?'), ('Y', 'Y'), ('N', 'N')], default="N")
+    completed = BooleanField('Check If Completed', default=False)
     
     completeddate = DateField('Completed Date', format='%Y-%m-%d',
                           )
+
+
+class SiteIncident(FlaskForm):
+    injuryorillness = BooleanField()
+    environmental = BooleanField()
+    regulatory = BooleanField()
+    economicdamage = BooleanField()
+    reputation = BooleanField()
+    security = BooleanField()
+    fire = BooleanField()
+
+    location = StringField('Location', validators=[DataRequired(), Length(min=1, max= 100)])
+
+    eventdetails = TextAreaField('Details', validators=[DataRequired()])
+    eventdate = DateField('EvenDate', validators=[DataRequired()])
+    eventtime = TimeField('EvenTime', validators=[DataRequired()])
+    reportedby = StringField('Reported by', validators=[DataRequired()])
+    reportedbynumber = StringField('Phone NUmber', validators=[DataRequired()])
+
+    suncoremployee = BooleanField()
+    contractor = BooleanField()
+    associate = BooleanField()
+    generalpublic = BooleanField()
+    other = BooleanField()
+    othertext = StringField('Other')
+
+    actionstaken = TextAreaField('Actions Taken')
+    correctiveactions = TextAreaField('Corrective Actions', validators=[DataRequired()])
+
+    sno = BooleanField()
+    syes = BooleanField()
+    scomment = StringField()
+
+    rna = BooleanField()
+    rno = BooleanField()
+    ryes = BooleanField()
+    rcomment = StringField()
+
+    gas = BooleanField()
+    diesel = BooleanField()
+    sewage = BooleanField()
+    chemical = BooleanField()
+    chemcomment = StringField()
+    deiselexhaustfluid = BooleanField()
+    sother = BooleanField()
+    s2comment = StringField()
+
+    air = BooleanField()
+    water = BooleanField()
+    wildlife = BooleanField()
+    land = BooleanField()
+    volumerelease = StringField()
+
+    pyes = BooleanField()
+    pno = BooleanField()
+    pna = BooleanField()
+    pcase = StringField()
+
+    stolentransactions = BooleanField()
+    stoltransactions = StringField()
+    stolencards = BooleanField()
+    stolcards = StringField()
+    stolentobacco = BooleanField()
+    stoltobacco = StringField()
+    stolenlottery = BooleanField()
+    stollottery = StringField()
+    stolenfuel = BooleanField()
+    stolfuel = StringField()
+    stolenother = BooleanField()
+    stolother = StringField()
+    stolenothervalue = StringField()
+    stolenna = BooleanField()
+
+    gender = StringField()
+    height = StringField()
+    weight = StringField()
+    haircolor = StringField()
+    haircut= StringField()
+    complexion = StringField()
+    beardmoustache = StringField()
+    eyeeyeglasses = StringField()
+    licencenumber = StringField()
+    makemodel = StringField()
+    color = StringField()
+    scars = StringField()
+    tatoos = StringField()
+    hat = StringField()
+    shirt = StringField()
+    trousers = StringField()
+    shoes = StringField()
+    voice = StringField()
+    bumpersticker = StringField()
+    direction = StringField()
+    damage = StringField()
+
+    wgsa = BooleanField()
+    wcontractor = BooleanField()
+    wassociate = BooleanField()
+    wpublic = BooleanField()
+    wother = BooleanField()
+    wothertext = StringField()
+    wname = StringField()
+    wnumber = StringField()
+    waddress = StringField()
+    wdate = DateField()
+    submit = SubmitField('Submit Event Form')
+
+
+    

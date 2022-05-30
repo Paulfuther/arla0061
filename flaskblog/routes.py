@@ -5,18 +5,21 @@ from flask import Flask, render_template, jsonify, request, send_file, url_for, 
     flash, abort, send_from_directory, make_response, session, current_app, app
 from requests.api import options
 from sqlalchemy.sql.functions import current_time
-from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, \
-    grade_form, schedule_start, Schedule, GradeForm
+from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
+    grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, \
+        forgot_password_Form, BulkCallForm, reset_password_form, Confirm2faForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
-        staffschedule, User, Customer, employee_schema, send_async_email, send_async_email2, \
-            make_pdf, celery
+        staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
+            make_incident_pdf,send_bulk_email, celery, client, Client, twilio_from, validate_twilio_request, Mail, \
+                 employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
+                     DEFAULT_SENDER, Store,Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID, \
+                         login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient,\
+                             basedir,INCIDENT_UPLOAD_PATH, incident_files
+
 from flask_email_verifier import EmailVerifier
-from flask_security import roles_required, login_required, current_user, roles_accepted, Security
-from flask_security.utils import encrypt_password
-from flask_security.datastore import UserDatastore
 from io import BytesIO
-import os
+import os, string, secrets
 import json
 import pdfkit
 from werkzeug.utils import secure_filename
@@ -26,7 +29,7 @@ import openpyxl
 import xlrd
 import xlwt
 import xlsxwriter
-from flaskblog import datetime, mail, verifier
+from flaskblog import datetime, verifier
 from flask_moment import Moment
 import secrets
 from PIL import Image
@@ -37,17 +40,246 @@ from sqlalchemy import extract
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flask_mail import Message
 from json import dumps, loads
+from twilio.twiml.messaging_response import MessagingResponse
 import time
-#from flaskblog.tasks import celery
-
+from flask_cors import CORS
+from flaskblog.utils.request import validate_body
+from flaskblog.utils.response import response, error_response
+from flaskblog.utils.sms import send_bulk_sms
+from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, \
+                    check_verification_token, request_verification_token_whatsapp
+from flask_login import current_user, login_user, logout_user
 moment = Moment(app)
+CORS(app)
+
 
 
 
 @app.route("/")
-@app.route("/home<int:user_id>")
+def home(): 
+    return render_template("layout.html")
+
+
+@app.route("/login", methods = ['GET', 'POST'])
+def login():
+    form=LoginForm()
+    if current_user.is_authenticated:
+        return render_template("layout.html")
+    if form.validate_on_submit():
+        user=User.query.filter_by(email=form.email.data).first()
+        if user is None:
+            flash('That email does not exits')
+        elif user.active == False:
+            flash('You are not an active user')
+            return render_template("login.html", form=form)
+        elif user is None or  not bcrypt.check_password_hash(user.password, form.password.data):
+            flash('invalid username or password')
+            return redirect(url_for('login', form=form)  )
+        elif user.email_confirmed == 0:      
+            send_email_confirmation(user)
+            flash('please confirm email')
+            return redirect(url_for('login'))
+        elif user and bcrypt.check_password_hash(user.password, form.password.data):
+            user_phone =db.session.query(Employee.mobilephone, User)\
+            .filter(Employee.user_id == user.id).first()
+            print(user.phone)
+            print(user.active)
+            #request_verification_token_whatsapp(user.phone)
+            ##request_verification_token(user.phone)
+            #session['phone']=user.phone
+            #session['phone']=user_phone
+            #return redirect(url_for('verify_2fa'))
+            login_user(user, remember=form.remember_me.data)
+            next_page = request.args.get('next')
+            if current_user.has_roles('GSA'):
+                gsaid = int(current_user.id)
+                staff = Employee.query.filter_by(user_id=gsaid).first()
+                exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+                return render_template("gsadashboard.html", staff=staff, exists=exists)
+            print(current_user)
+            return render_template("layout.html", title="home")
+    #print("nope")    
+    return render_template("login.html", form=form)
+
+@app.route("/home22", methods = ['GET', 'POST'])
 @login_required
-def home():
+def home22():
+    print(current_user.id)
+    gsaid = int(current_user.id)
+    staff = Employee.query.filter_by(user_id=gsaid).first()
+    if current_user.has_roles('GSA'):
+        print(staff.id)
+        exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+        if exists:    
+            return render_template('gsadashboard.html', staff=staff, exists=exists)
+        else:
+            print("no")
+            flash("no file exists") 
+            #print('user is gsa')
+            return render_template('gsadashboard.html', staff=staff, exists=exists)
+    
+    #return render_template('testsig.html')
+    
+    return render_template('layout.html')
+    #return render_template('home.html')
+
+
+
+
+def send_email_confirmation(user):
+    token = user.get_mail_confirm_token()
+    email = user.email
+    message=Mail(
+        from_email = DEFAULT_SENDER,
+        to_emails=email,
+        subject = 'Please Verify Email for Petro Canada',
+        html_content=render_template('email/confirm_email.html', user=user, token=token)
+            )
+    response = sg.send(message)
+    
+@app.route('/newhire_verify2fa', methods=['GET', 'POST'])
+def newhire_verify_2fa():
+    phone=request.form['phone']    
+    print(phone)
+    print("yes")
+    request_verification_token(phone)
+    print("requesting code")
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+
+@app.route('/newhire_verify2fa_check', methods=['GET','POST'])
+def newhire_verify2f1_check():
+    token=request.form['token']
+    phone=request.form['phone']
+    if check_verification_token(phone,token):
+            response = 1
+            return (jsonify(response))
+    print("huh")
+    response = 0
+    return (jsonify(response))
+    
+
+@app.route('/verify2fa', methods=['GET', 'POST'])
+def verify_2fa():
+    form = Confirm2faForm()
+    if form.validate_on_submit():
+        print(form.token.data)
+        print("yes")
+        phone=session['phone']
+        if check_verification_token(phone, form.token.data):
+            user = User.query.filter_by(phone = phone).first()
+            login_user(user)
+            print(current_user)
+            return render_template("layout.html", title="home")
+        flash ('invalid code please login again')
+    print("huh")
+    return render_template('verify.html', form=form)
+
+@app.route("/forgot_password", methods = ['GET', 'POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    form = forgot_password_Form()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+            flash('Check your email for the instrucitons to reset your password')
+        else:
+            flash('Invalide Credentials')
+        return redirect(url_for('login'))
+    return render_template("forgot_password.html", title="Reset Password", form=form)
+
+def send_password_reset_email(user):
+    token=user.get_reset_password_token()
+    email = user.email
+    message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= email,
+            subject = 'Welcome to Petro Canada',
+            html_content=render_template('email/reset_password.html', user=user, token=token)
+            )
+    response = sg.send(message)
+
+@app.route('/reset_password/<token>', methods=['GET','POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    form = reset_password_form()
+    if form.validate_on_submit():
+        user.password = bcrypt.generate_password_hash(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Your password has been reset')
+        return redirect(url_for('login'))
+
+    return render_template('reset_password.html', form=form, user=user)
+
+@app.route('/confirm_email/<token>', methods=['GET', 'POST'])
+def confirm_email(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_email_confirm_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    
+    user.email_confirmed = True
+    user.email_confirmed_date = datetime.utcnow()
+    db.session.add(user)
+    db.session.commit()
+    flash('Your email has been verified')
+    return redirect(url_for("login"))
+    
+def fetch_sms():
+    return client.messages.stream()
+
+@app.route('/fetch_twilio')
+def fetch_twilio():
+    sms = fetch_sms()
+    return render_template("fetch_twilio.html", sms=sms)
+
+@app.route('/fetch_calls')
+def fecth_calls():
+    calls = client.calls.list(limit=20)
+    for record in calls:
+        print(record.sid)   
+    return "done"
+
+@app.route('/fetch_call_events')
+def fetch_call_events():
+    events = client.calls('CA7d4e808eed188f5c1754342cd9cdc1bb') \
+               .events \
+               .list(limit=20)
+
+    #for record in events:
+    #    print(record.request)
+    #    request_items = record.request.items()
+    #    print(type(record.request))
+    #    for item in request_items:
+    #        print(item)
+    for record in events:
+        #print(record.request)
+        print("------------")
+        json_string = json.dumps(record.request) 
+        stringone=json.loads(json_string)   
+        print(stringone['parameters'])
+        key =(stringone['parameters'])
+        print(key)
+        for x in key:
+            print(x[0])
+        #print(type(stringone))
+      
+  
+    #for key in events:
+     #  print(key)
+    return "done"
+
+@app.route("/home2<int:user_id>")
+@login_required
+def home2():
     print(current_user.id)
     gsaid = int(current_user.id)
     staff = Employee.query.filter_by(user_id=gsaid).first()
@@ -73,60 +305,142 @@ def home():
     return render_template('layout.html')
     #return render_template('home.html')
 
-
-@app.route('/task', methods = ['GET', 'POST'])
+@app.route("/logout")
 @login_required
-@roles_accepted('Admin', 'Manager')
-def add_task():
-    if request.method == 'GET':
-        return render_template('getemail.html', email=session.get('email', ''))
-    email = request.form['email']
-    session['email'] = email
-    #send the email
-    email_data = {
-        'subject': 'Hello from Flask',
-        'to': email,
-        'body': 'nothing here'
-    }
-    if request.form['submit'] == 'Send':
-        # send right away
-        send_async_email(email_data)
-        flash('Sending email to {0}'.format(email))
-        print(email)
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+@app.route('/commsmenu', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def comms_menu():
+    return render_template('commsmenu.html')
+
+
+@app.route('/twiliocall', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def twilio_call():
+
+    # form for bulk calls
+    form=BulkCallForm()
+
+    if request.method == "GET":
+        return render_template("twiliocalls.html", form=form)
     else:
-        # send in one minute
-        send_async_email.apply_async(args=[email_data], countdown=30)
-        flash('An email will be sent to {0} in one minute'.format(email))
-
-    return redirect(url_for('add_task'))
-
-@app.route('/task2', methods = ['GET', 'POST'])
+        
+        twimlname = request.form['templatename']
+        bulk_call = Twimlmessages.query.get(twimlname)
+        twil_id = bulk_call.twimlid
+        #print(twil_id)
+        # this is using twilml machine learning text to speach.
+        # this only goes out to stores.
+        site = db.session.query(Store.number,Store.phone).all()
+        for x in site:
+            print(x.number, x.phone)
+        for x in site:
+            call = client.calls.create(
+                            url=twil_id,
+                            to=x.phone,
+                            from_=twilio_from
+        )              
+        print(call.sid)
+        
+        return render_template("layout.html")
+   
+@app.route('/bulkemail', methods = ['GET', 'POST'])
 @login_required
-@roles_accepted('Admin', 'Manager')
-def new_mail():
+@roles_required('Admin')
+def bulk_email():
+    form=BulkEmailSendgridForm()
+    
+    if request.method == "GET":
+        return render_template("commsemail.html", form=form)
+    else:
+        
+        role_id = request.form['role']
+        templatename = request.form['templatename']
+        send_bulk_email.apply_async(args=[role_id,templatename], countdown=10) 
+        
+        return render_template("layout.html")
 
-    #this is for testing purposed. 
-    # testing for HR users.
+@app.route('/bulkms', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def bulk_sms():
+    form=CommsForm()
+    if request.method == "GET":
+        return render_template("comms.html", form=form)
+    else:
+        
+        role_id = request.form['role']
+        message_to_send = request.form['message_body']
+        print(message_to_send)
+        print(role_id)
+        
+    # this is bulk sms using the notify api from twilio.
+    # first we grab all employees who are active users.
+    # we need to search specifically for mobile phone
 
-     email = os.environ.get('MAIL_DEFAULT_SENDER')
+        gsa = db.session.query(Employee.mobilephone, Employee.firstname,User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+        .all()
+    # gsa returns an object. Although we can serialise the object, we still
+    # have issues generating the proper format for twilio rest api.
+    # so we do it old school.
 
-     rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
+        gsat = []
+        for id in gsa:
+            gsatt = id.mobilephone
+            print(gsatt, id.firstname)
+            gsat.append(gsatt)
 
-     for x in rol:
-        print(x.email)
+    # we need a message to send. This will be a variable.
 
-        email = x.email
-        print(email)
-        email_data = {
-             'subject': 'testing 10',
-             'to': email,
-             'body': 'testing a loop on delay {} '.format(email)
-            }
-        send_async_email2.apply_async(args=[email_data], countdown=30)
-        print("we did it")
-     return 'tasksent'
+        message = message_to_send
+        print(message)
+                    
+    
+    # call the function send_bulk_sms.
+    # it is a file in the utils section.
+    # this will create the list needed by twilio.
+    # we are sending a payload called a binding.
+        #for x in gsa:
+            #print (x.mobilephone, x.firstname)
+
+        send_bulk_sms(gsat, message)
+
+    # once completed. Do something.
+
+        return render_template("layout.html")
 
 
+@app.route("/sms", methods=['GET', 'POST'])
+@validate_twilio_request
+def sms_reply():
+    """Respond to incoming calls with a simple text message."""
+    # Start our TwiML response
+    resp = MessagingResponse()
+
+    # Add a message
+    resp.message("Thank you for the call")
+
+    return str(resp)
+
+@app.route('/testincident', methods = ['GET', 'POST'])
+@login_required
+def print_incident():
+    form=SiteIncident()
+    x=int(42)
+    gsa = Incident.query.get(x)
+    ident = gsa.id
+    print(ident)
+    picture = incident_files.query.filter_by(incident_id=ident)
+    return render_template('eventreportpdf.html' , form=form, gsa=gsa, picture=picture)
 
 @app.route('/email/<email>')
 @login_required
@@ -146,6 +460,141 @@ def email(email):
         resp = make_response('None', 404)
     return resp
 
+@app.route("/event", methods = ['GET', 'POST'])
+@login_required
+@roles_accepted('Admin', 'Manager')
+def eventreport():
+    form = SiteIncident()
+    
+    # get all of the information from the form
+
+    if form.validate_on_submit():
+            pics= request.files.getlist('incimage')
+            print (pics)
+            #filename = secure_filename(pics.filename)
+            #print(INCIDENT_UPLOAD_PATH)
+            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
+           
+            for pic in pics:
+                i=Image.open(pic)
+
+                 #= Image.open(pic)
+                i.thumbnail((300,300), Image.LANCZOS)
+                #i.save(picture_paththumb)
+                print(i.size)
+
+
+
+                #new_pic = image.resize(300,300)
+                i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
+        
+            #return render_template('layout.html')
+            newtime=str(form.eventtime.data)
+            time2 =datetime.strptime(newtime, '%H:%M:%S').time()
+            inc=Incident(injuryorillness=form.injuryorillness.data,
+                            environmental =form.environmental.data,
+                            regulatory =form.regulatory.data,
+                            economicdamage = form.economicdamage.data,
+                            reputation = form.reputation.data,
+                            security = form.security.data,
+                            fire = form.fire.data,
+                            location = form.location.data,
+                            eventdetails = form.eventdetails.data,
+                            eventdate = form.eventdate.data,
+                            eventtime = time2,
+                            reportedby = form.reportedby.data,
+                            reportedbynumber = form.reportedbynumber.data,
+                            suncoremployee = form.suncoremployee.data,
+                            contractor = form.contractor.data,
+                            associate = form.associate.data,
+                            generalpublic = form.generalpublic.data,
+                            other = form.other.data,
+                            othertext = form.othertext.data,
+                            actionstaken = form.actionstaken.data,
+                            correctiveactions = form.correctiveactions.data,
+                            sno = form.sno.data,
+                            syes = form.syes.data,
+                            scomment = form.scomment.data,
+                            rna = form.rna.data,
+                            rno = form.rno.data,
+                            ryes = form.ryes.data,
+                            rcomment = form.rcomment.data,
+                            gas = form.gas.data,
+                            diesel = form.diesel.data,
+                            sewage = form.sewage.data,
+                            chemical = form.chemical.data,
+                            chemcomment = form.chemcomment.data,
+                            deiselexhaustfluid = form.deiselexhaustfluid.data,
+                            sother = form.sother.data,
+                            s2comment = form.scomment.data,
+                            air = form.air.data,
+                            water = form.water.data,
+                            wildlife = form.wildlife.data,
+                            land = form.land.data,
+                            volumerelease = form.volumerelease.data,
+                            pyes = form.pyes.data,
+                            pno = form.pno.data,
+                            pna = form.pna.data,
+                            pcase = form.pcase.data,
+                            stolentransactions = form.stolentransactions.data,
+                            stoltransactions = form.stoltransactions.data,
+                            stolencards = form.stolencards.data,
+                            stolcards = form.stolcards.data,
+                            stolentobacco = form.stolentobacco.data,
+                            stoltobacco = form.stoltobacco.data,
+                            stolenlottery = form.stolenlottery.data,
+                            stollottery = form.stollottery.data,
+                            stolenfuel = form.stolenfuel.data,
+                            stolfuel = form.stolfuel.data,
+                            stolenother = form.stolenother.data,
+                            stolother = form.stolother.data,
+                            stolenothervalue = form.stolenothervalue.data,
+                            stolenna = form.stolenna.data,
+                            gender = form.gender.data,
+                            height = form.height.data,
+                            weight = form.weight.data,
+                            haircolor = form.haircolor.data,
+                            haircut= form.haircut.data,
+                            complexion = form.complexion.data,
+                            beardmoustache = form.beardmoustache.data,
+                            eyeeyeglasses = form.eyeeyeglasses.data,
+                            licencenumber = form.licencenumber.data,
+                            makemodel = form.makemodel.data,
+                            color = form.color.data,
+                            scars = form.scars.data,
+                            tatoos = form.tatoos.data,
+                            hat = form.hat.data,
+                            shirt = form.shirt.data,
+                            trousers = form.trousers.data,
+                            shoes = form.shoes.data,
+                            voice = form.voice.data,
+                            bumpersticker = form.bumpersticker.data,
+                            direction = form.direction.data,
+                            damage = form.damage.data)
+                            
+            db.session.add(inc)
+            db.session.flush()
+            #db.session.commit()
+
+            for pic in  pics:
+
+                incimage = incident_files(image=secure_filename(pic.filename),
+                                    incident_id = inc.id)
+                db.session.add(incimage)
+            db.session.commit()
+
+            print(inc.id)
+            file_id = int(inc.id)
+            flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
+            
+            # once the data has been written to the database, we create a pdf.
+            # we call a task mamanger to do this. That is the apply_async 
+            make_incident_pdf.apply_async(args=[file_id], countdown=10)
+
+
+            return render_template('layout.html')
+           
+    return render_template('eventreport.html', form=form)
 
 @app.route("/nofile")
 @login_required
@@ -192,29 +641,33 @@ def nofileexcel():
 
     return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
 
-@app.route("/emailme", methods = ['GET', 'POST'])
+@app.route("/verifyphonetoday", methods = ['GET','POST'])
 @login_required
-@roles_required('Admin')
-def emailme():
-    
-    gsa = db.session.query(Employee, User)\
-            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
-        .filter(User.active == 1)\
-        .add_columns(Employee.firstname, Employee.lastname, Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
-        .all()
-    
-    with mail.connect() as conn:
-        for user in gsa:
-            data = request.form['content']
-            dataheader = request.form['emheader']
-            msg = Message(dataheader, sender='paul.futher@gmail.com',
-                  recipients=[user.email])
+@roles_accepted('Admin', 'Manager')
+def verifyphone():
+    form = EmployeeForm()
 
-            msg.html = data
-            mail.send(msg)
-    flash('Email Sent')
-    return redirect(request.referrer)
+    # get mobile numbers passed from the form
+    # the h264 version is in hidden number
+    # send back json response for front end to use as a key to 
+    # assign the proper alert message
+    # proper emails and phone numbers are then locked in the form
 
+    mobile = request.form['mobilephone']
+    hiddenmobile = request.form['mobilephone2']
+    #print(mobile,hiddenmobile)
+    if mobile == "":
+        response = (7)
+    else:    
+        user = User.query.filter(or_(User.phone==mobile, User.phone==hiddenmobile)).first()
+        #print(user)
+        if user:
+            response = (5)
+        else:
+            response = (6)
+    
+    #rint(response)
+    return jsonify(response)
 
 @app.route("/verifyemailtoday", methods = ['GET','POST'])
 @login_required
@@ -222,44 +675,29 @@ def emailme():
 def verify():
     form = EmployeeForm()
     email = request.form['email']
+    emailcheck = User.query.filter_by(email=form.email.data).first()
+    email_address_info = verifier.verify(email)
     print(email)
+    #print(emailcheck)
+        
+    #check to see if email is blank
+
     if email == "":
         response = (0)
-        response2 = (0)
-        return jsonify(response, response2)
+        print("no email")
+    # check to see if email is already in use in the database.    
+    elif emailcheck:
+        response = (1)
+    # check to see if email is valid using service 
 
-    emailcheck = User.query.filter_by(email=form.email.data).first()
-    if emailcheck:
-        response2 = (0)
     else:
-        response2 = (1)
-
+         response = (3)
     
-    
-    email_address_info = verifier.verify(email)
-    if email_address_info is not None:
-        data = dumps(loads(email_address_info.json_string), indent=4)
-        resp = make_response(data, 200)
-        resp.headers['Content-Type'] = 'application/json'
- 
-        value1 = json.loads(data)
-        print (value1['formatCheck'],value1['smtpCheck'])
-        if value1['smtpCheck'] == 'false':
-            #flash("please chekck your email. It does not work")
-            print("bad email")
-            #return render_template('employee.html', form=form)
-            response =(0)
-            return jsonify(response, response2)
-    else:
-        pass
-    print("test")
-    response = (1)
-    print(response, response2)
-    return jsonify(response, response2)
+    print(response)#, response2)
+    return jsonify(response)#, response2)
 
 @app.route("/schedule", methods = ['GET', 'POST'])
 @login_required
-
 @roles_accepted('Admin', 'Manager')
 def schedule():
     
@@ -268,68 +706,103 @@ def schedule():
     
     return render_template('schedule.html', form=form)
 
-
 @app.route("/searchschedule", methods=['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
 def searchschedule():
     
-    form=Schedule()
+    
     #form = request.form
+    search_value= request.form.get("text")
+    
+    print(search_value)
     hsdate1 = request.form.getlist('hidden-sdate')
     shifts = request.form.getlist('writtenhours')
     hoursworked = request.form.getlist('hours')
+    #search_value = form.store.data
     
-    search_value = form.store.data
+    hsdate1 = request.form.getlist('hidden-sdate')
+    store_id = Store.query.filter_by(number=search_value).first()
+    storeid = store_id.id
     
-    if 'Search' in request.form['action']:
-        if search_value != "Home Store":
+    gsa1 = Employee.query.filter_by(store_id=storeid)\
+        .join(User, User.id==Employee.user_id)\
+            .filter(User.active==1)\
             
-            store_id = Store.query.filter_by(number=search_value).first()
-            storeid = store_id.id
-            
-            gsa1 = Employee.query.filter_by(store_id=storeid)
-            
-            gsa = gsa1.order_by(Employee.store_id).all()
-            s_v = int(search_value)
-            for stuff in hsdate1:
-                newdate = datetime.strptime(stuff, '%b-%d-%Y')
-                nd = datetime.date(newdate)
-                s_s = staffschedule.query.filter_by(shift_date = nd)
-                #for r in s_s:
-                #    print(r.shift_date, r.employee_id, r.shift_description, r.shift_hours)
-                
-                
-                #print(s_s.storeworked)
-                #(storeworked = search_value)\
-                #shift_date = t
-                #print(s_s.shift_date)
-                #for xs in s_s :
-                 #   print(xs.employee_id, xs.storeworked, xs.shift_description, xs.shift_hours)
-        #print(shifts)
-        #print(search_value)
-        #print(hoursworked)
-            return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form, s_s=s_s)
-   
-        if search_value == "Home Store":
-                gsa = Employee.query\
-                    .order_by(Employee.store_id).all()
+    gsa = gsa1.order_by(Employee.store_id).all()
+    
+    
+    s_v = int(search_value)
+    
+    '''s_s = Employee.query.filter(Employee.store_id==storeid)\
+        .join(User, User.id==Employee.user_id)\
+            .filter(User.active==1)\
+            .outerjoin(staffschedule, Employee.id==staffschedule.employee_id)\
+                    .add_columns(Employee.firstname,Employee.id,\
+                         staffschedule.shift_description, staffschedule.shift_hours,\
+                              staffschedule.shift_date, staffschedule.employee_id).all()
+    '''
 
-                #for staff in gsa:
-                #   print(staff.id)
-                return render_template('schedule.html', gsa=gsa, search_string=search_value, form=form)
-            
-        search_value=int(search_value)
-        #print(search_value)
-        gsa1 = Employee.query.filter_by(store=search_value)
-        gsa = gsa1.order_by(Employee.store).all()
-        for x in gsa:
-           
-            existing_hours = staffschedule.query.filter_by(employee_id = x.id)
-            #print(x, x.id, existing_hours)
-        
-        return render_template('schedule.html', gsa=gsa, form=form)
+    s_s =db.session.query(staffschedule)
+
+    #for r in s_s:
+     #   print(r.shift_date, type(r.shift_date), r.id, r.firstname, r.shift_description, r.shift_hours)
+
+
+    df=pd.read_sql(s_s.statement,s_s.session.bind)
+    #idx= pd.date_range('2021-12-21', '2021-12-29')
+    #df.index = pd.DatetimeIndex(df.index)
+    #df = df.reindex(idx, fill_value=0)
+    #f.loc[idx]
+    #df = df.set_index('shift_date')
+   
+    print(df)
+
+    results = staffschedule_schema.dump(s_s)
+    result = jsonify(results)
+    print(result)
+    return result
+
+
+
+    return render_template('schedule.html', gsa=gsa, search_string=search_value,\
+         form=form, s_s=s_s)
+
+
+    for rr in s_s:
+        print(rr.firstname)
+
+    for r in s_s:
+        print(r.shift_date, r.id, r.firstname, r.shift_description, r.shift_hours)
+              
+
+    df=pd.read_sql(s_s.statement,s_s.session.bind)
+    df=df.drop(df.columns[[1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,36]], axis=1)
+    print(df)
+    df3=df.values.tolist()
+    print(df3)
+
+  
+
+    df=df.pivot_table(index=['id','firstname'] ,columns='shift_date', \
+        values=['shift_description', 'shift_hours'], aggfunc='first')\
+        .reset_index()
+    print(df)  
+    newdf = df.values.tolist()  
+    ldf=len(df.columns)     
+    #print(newdf)      
     
+    print(len(df.columns)) 
+
+
+    df2 = pd.read_sql(gsa1.statement,gsa1.session.bind)
+    df2=df2.pivot_table(index=['id','firstname'])
+    print(df2)
+    return render_template('schedule.html', ldf=ldf,gsa=gsa, search_string=search_value,\
+         form=form, s_s=s_s,  newdf=newdf)
+   
+        
+    '''
     elif 'submithours' in request.form['action']:
           
         store_id = Store.query.filter_by(number=search_value).first()
@@ -369,10 +842,8 @@ def searchschedule():
         db.session.commit()
             
         return render_template('schedule.html', form=form, gsa=gsa)
-    
+    '''
     return render_template('schedule.html')
-
-
 
 @app.route("/addtoschedule", methods = ['GET', 'POST'])
 @login_required
@@ -392,37 +863,9 @@ def addtoschedule():
 #@login_required
 #@roles_required('GSA')
 #def employeedashboard():
-    
-    
-    
 
 def storelist():
     return db.session.query(Store).all.order_by('number')
-
-#@app.route("/login", methods=['GET', 'POST'])
-#def login():
- #   if current_user.is_authenticated:
- #       return redirect(url_for('home'))
-
-  #  form = LoginForm()
-
-   # if form.validate_on_submit():
-   #     user = User.query.filter_by(email=form.email.data).first()
-
-    #    password = bcrypt.checkpw(user.password.encode(), user.passowrd.pwd.encode())
-        #print(user.password)
-        #print(password)
-        #hp = bcrypt.check_password_hash(user.password, password)
-        #print(hp)
-    #    if user and bcrypt.check_password_hash(user.password, form.password.data):
-
-     #       login_user(user, remember=form.remember.data)
-      #      return redirect(url_for('hrhome'))
-      #  return '<h1> Invalid Credentials </h1>'
-
-        #return render_template('home.html')
-
-   # return render_template('login.html', form=form)
 
 @app.route("/sendfile<int:staff_id>", methods =['GET', 'POST'])
 @login_required
@@ -456,7 +899,6 @@ def hrfile(staff_id):
         y = 1
         z = 0
         for x in hrpage:
-              
                 empfile = Empfile(employee2_id= f,
                                 file_id= y,
                                 sig_data = sigs[z])
@@ -469,23 +911,193 @@ def hrfile(staff_id):
                 z += 1
                 
         db.session.commit()
+        
         flash("file completed. Thank you")
         make_pdf.apply_async(args=[staff_id], countdown=10)
-        return render_template('layout.html')
+        return ('success')
   
     #print("success")
   
     return render_template('ckfile.html', hrpage=hrpage, gsa=gsa)
 
-#@app.route("/sig")
-#@login_required
-#def sig():
-#    return render_template ('sig.html')
-
 @app.route("/hrhome")
 @login_required
 def hrhome(): 
     return render_template('hrhome.html')
+
+@app.route("/createpdfnewhire<int:staff_id>", methods = ['GET', 'POST'])
+@login_required
+def pdf_file(staff_id):
+    
+    # here we need to get the signatures for each file and pass to html 
+    # we alos need the employee name which is stored in gsa variable
+    # we also need the list of files which are stored in the hr page varaible
+    # and we need to test if a file even exists 
+    # if not we need to return with and error message
+    
+    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
+    if exists:
+        print("yes")
+    else:
+        print("no", staff_id)
+        flash("no file exists")
+        return redirect(url_for("hrlist"))
+    
+    make_pdf.apply_async(args=[staff_id], countdown=10)
+       
+    return "working"
+    
+@app.route("/hrlist", methods =['GET', 'POST'])
+@login_required
+def hrlist():
+   return render_template('hrlist.html')
+
+@app.route("/trainingcompliance", methods=['GET', 'POST'])
+@roles_accepted('Admin', 'Manager')
+@login_required
+def trainingcompliance():
+    
+    compliance = Grade.query\
+            .filter_by(value="n")\
+            .join(Employee, Employee.id==Grade.employee_id)\
+            .join(Course, Course.id == Grade.course_id)\
+            .add_columns(Grade.employee_id, Employee.firstname\
+            ,Employee.lastname, Employee.store\
+            , Course.name, Grade.value)\
+                .order_by(Employee.store)
+
+    
+    return render_template('trainingcompliance.html', compliance = compliance)
+
+@app.route("/updategsatraining<int:staff_id>", methods=['GET', 'POST'])
+@login_required
+def updategsatraining(staff_id):
+    
+    # get employee information form the database
+
+    gsa = Employee.query.get(staff_id)
+    store = Store.query.all()
+    course = Course.query.all()
+    #for x in course:
+    #    print(x.id, x.name)
+        
+    # get course infomraiton and grade by empployee
+
+    gradelist = Grade.query\
+        .filter_by(employee_id=staff_id)\
+        .join(Employee, Employee.id == Grade.employee_id)\
+        .join(Course, Course.id == Grade.course_id)\
+        .add_columns(Course.name, Grade.completed, Grade.completeddate)\
+        .order_by(Grade.course_id)
+    
+    #for x in gradelist:
+    #    print(x.name,x.completed, x.completeddate)     
+    
+    # this is the GET line. Create the dashboard for the employee with the data from 
+    # gsa, store, course and gradelist, done up top.
+    
+    return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
+
+
+@app.route("/updategsatraining2<int:staff_id>", methods=['GET', 'POST'])
+@login_required
+def updategsatraining2(staff_id):
+    
+    # get employee information form the database
+
+    gsa = Employee.query.get(staff_id)
+    store = Store.query.all()
+    course = Course.query.all()
+    #for x in course:
+    #    print(x.id, x.name)
+        
+    # get course infomraiton and grade by empployee
+
+    gradelist = Grade.query\
+        .filter_by(employee_id=staff_id)\
+        .join(Employee, Employee.id == Grade.employee_id)\
+        .join(Course, Course.id == Grade.course_id)\
+        .add_columns(Course.name, Grade.completed, Grade.completeddate)\
+        .order_by(Grade.course_id)
+    
+    #for x in gradelist:
+    #    print(x.name,x.completed, x.completeddate)
+    
+    # here we are updating the training grade information
+    # we get an object that we can alter. Use the .first to do this
+    # we need two parameters though, the emp id and the course id
+    # that will lead us to one result (assuming only one course per emp by course number)
+    # we then loop over the POST values using form.getlist for the variable "completed"
+    # then increment course by 1
+    # then commit
+    
+    # We receive the compelted date.
+    # We have the id of completeddate.
+    # we then loop over the number of courses to enter new competed dates.
+    # We need to check the completed date first.
+    # then enter this information into the database
+
+
+    if request.method == "POST":
+        r = request.form.getlist('completeddate')
+       
+        #print(r)
+        form = request.form 
+        f=staff_id
+        yy=0
+        y = 1
+        z=1
+        for x in course:
+                
+                # here we get the course infomration for the employee.
+                # any changes made will over write the exisiting data.
+                # we are not creating a duplicate entry.
+
+            t=Grade.query.filter_by(employee_id=staff_id).filter_by(course_id=y).first()
+            grade_date = r[yy]
+                #print(grade_date,y)
+            if grade_date=='None' or grade_date=="" or grade_date==0 or grade_date=="N":
+                completeddate = ''
+            else:
+                    #grade_check = 1
+                completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
+                    #print(completeddate)
+            t.completeddate = r[yy]
+            #print(y,x, r[yy])
+            y+=1 
+            yy +=1
+            db.session.commit()
+
+        
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+      
+    # this is the GET line. Create the dashboard for the employee with the data from 
+    # gsa, store, course and gradelist, done up top.
+    
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+
+
+@app.route("/rolesearch", methods = ['POST', "GET"])
+@login_required
+def rolesearch():
+
+    searchbox = request.form.get("text")
+    
+
+    gsa = db.session.query(Employee.mobilephone, Employee.firstname,Employee.lastname,User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==searchbox)\
+        .all()
+
+    #for x in gsa:
+    #    print(x.firstname, x.mobilephone)
+    results = employee_schema.dump(gsa)
+    result = jsonify(results)
+
+   
+    return result
 
 @app.route("/existingemployeefile<int:staff_id>", methods = ['GET', 'POST'])
 @login_required
@@ -520,124 +1132,22 @@ def employeefile(staff_id):
     
     return render_template('employeecompletedfile.html', hrpage = hrpage, signatures=signatures, gsa=gsa)
 
-
-@app.route("/createpdfnewhire<int:staff_id>", methods = ['GET', 'POST'])
+@app.route("/storesearch", methods = ['POST', "GET"])
 @login_required
-def pdf_file(staff_id):
-    
-    # here we need to get the signatures for each file and pass to html 
-    # we alos need the employee name which is stored in gsa variable
-    # we also need the list of files which are stored in the hr page varaible
-    # and we need to test if a file even exists 
-    # if not we need to return with and error message
-    
-    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
-    if exists:
-        print("yes")
-    else:
-        print("no", staff_id)
-        flash("no file exists")
-        return redirect(url_for("hrlist"))
-    
-    make_pdf.apply_async(args=[staff_id], countdown=10)
-       
-    return "working"
+def storesearch():
+
+    searchbox = request.form.get("text")
     
 
+    site = db.session.query(Store.number,Store.phone).all()
 
-@app.route("/hrlist", methods =['GET', 'POST'])
-@login_required
-def hrlist():
-   return render_template('hrlist.html')
+    #for x in gsa:
+    #    print(x.firstname, x.mobilephone)
+    results = store_schema.dump(site)
+    result = jsonify(results)
 
-@app.route("/trainingcompliance", methods=['GET', 'POST'])
-@roles_accepted('Admin', 'Manager')
-@login_required
-def trainingcompliance():
-    
-    compliance = Grade.query\
-            .filter_by(value="n")\
-            .join(Employee, Employee.id==Grade.employee_id)\
-            .join(Course, Course.id == Grade.course_id)\
-            .add_columns(Grade.employee_id, Employee.firstname\
-            ,Employee.lastname, Employee.store\
-            , Course.name, Grade.value)\
-                .order_by(Employee.store)
-
-    
-    return render_template('trainingcompliance.html', compliance = compliance)
-
-
-@app.route("/updategsatraining<int:staff_id>", methods=['GET', 'POST'])
-@login_required
-def updategsatraining(staff_id):
-    
-    gsa = Employee.query.get(staff_id)
-    store = Store.query.all()
-    course = Course.query.all()
-    for x in course:
-        print(x.id, x.name)
-        
-    gradelist = Grade.query\
-        .filter_by(employee_id=staff_id)\
-        .join(Employee, Employee.id == Grade.employee_id)\
-        .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value, Grade.completeddate)\
-        .order_by(Grade.course_id)
-    
-    for x in gradelist:
-        print(x.name,x.value, x.completeddate)
-    
-    # here we are updating the training grade information
-    # we get an object that we can alter. Use the .first to do this
-    # we need two parameter though, the emp id and the course id
-    # that will lead us to one result (assuming only one course per emp by course number)
-    # we then loop over the POST values using form.getlist for the variable "completed"
-    # then increment course by 1
-    # then commit
-    
-    if request.method == "POST":
-        r = request.form.getlist("completeddate")
-        
-        form = request.form 
-        f=staff_id
-        yy=0
-        y = 1
-        z=1
-        for x in request.form.getlist("completed"):
-                
-                t=Grade.query.filter_by(employee_id=staff_id).filter_by(course_id=y).first()
-                t.value = x
-                t.completeddate = r[yy]
-                print(y,x, r[yy])
-                #print(t.__dict__)
-                #print(x,r)
-                y+=1 
-                yy +=1
-                db.session.commit()
-
-            #pdfkit.from_url('127.0.0.1:5000/hrfile6' , 'out.pdf')
-
-            #db.session.commit()
-
-        flash('Employee Training Compliance Has Been Updated', 'success')
-        
-        if current_user.has_roles('GSA'):
-            gsaid = int(current_user.id)
-            staff = Employee.query.filter_by(user_id=gsaid).first()
-            exists = Empfile.query.filter_by(employee2_id=staff.id).first()
-
-            return render_template('gsadashboard.html', staff=staff, exists=exists)
-
-        return redirect(url_for('hrhome'))
-    
-    
-    return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
-
-
-
-
-
+   
+    return result
 
 @app.route("/livesearch", methods = ["POST", "GET"])
 @login_required
@@ -657,13 +1167,13 @@ def livesearch():
         Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
         .all()
     
+    for s in gsa:
+        print(s.firstname)
 
     results = employee_schema.dump(gsa)
     result = jsonify(results)
+    print(result)
     return result
-
-
- 
 
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
@@ -681,7 +1191,6 @@ def search():
     
    
     return render_template('hrlist.html', gsa=gsa, store_list = store_list, ugh2=ugh2)
-
 
 def save_hrpicture(form_hrpicture):
     # uses PIL from Pillow
@@ -721,7 +1230,6 @@ def save_hrpicture(form_hrpicture):
     
     return hrpicture_fn
 
-
 @app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
 @login_required
 def updategsa(staff_id):
@@ -742,7 +1250,7 @@ def updategsa(staff_id):
         .filter_by(employee_id = staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
         .join(Course, Course.id == Grade.course_id)\
-        .add_columns(Course.name, Grade.value)
+        .add_columns(Course.name, Grade.completed)
   
     
     image_file = url_for(
@@ -867,82 +1375,72 @@ def updategsa(staff_id):
 
         
     return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa )
-
-    
+  
 @app.route("/addemployee", methods=['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
 def addemployee():
-    
-    # here we set the appropriate forms
 
     form = EmployeeForm()   
-    form2 = GradeForm()
-    course = Course.query.all()
+    coursecount = Course.query.all()
+    #print(coursecount)
+    # the get is for the first load of the page
     
-    # email check 1 and 2 is for validation. May need to return back to the form
-    # if so, then we want to hold the validation flags.
+    if request.method=="GET":
+        return render_template('employee.html', title='Employee Information',form=form)
 
-    emailcheck1 = request.form.get('emailv')
-    emailcheck2 = request.form.get('emailvu')
-    emailpass = request.form.get('emailpass')
-    #print("hah", emailcheck1, emailcheck2, emailpass)
+    # here we submit a form...which should be valid
 
-    # if email has failed valid or unique then the emailpass is null or 0
-    # if so then return back. However, we need to hold the status flagas
-    # and the email input to readOnly
-    # we do not want to change an email once it has been properly validated
-
-    if emailpass == 0 or emailpass == "":
-        flash ('Email needs to be verified','success')
-        return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
-
-    else:
-        pass
+    #this is for testing. take out return hello
+    #return"hello"
     
-    # if we made it this far then the email is good. It is both uniqe and valid
-    # email pass is set to 1. This is reflected in an if loop in the jinja template.
-    # we do not want anyone to change the email address once it has been validated.
-
-
     if form.validate_on_submit():
-        checker = form.active.data
-        #print(checker)
+        print("success")
+       
+        target=request.form.get('hiddenphone')
+        form.mobilephone.data = target
+        #print(target)
+        
+        #print("checker",checker)
         teststore = form.store.data
         #print(teststore.id)
         newuser = request.form.get('hiddenemail')
 
+        # generate a randome password
+
+        symbols = ['*', '%', '£'] # Can add more
+        password = ""
+        for _ in range(9):
+            password += secrets.choice(string.ascii_lowercase)
+            password += secrets.choice(string.ascii_uppercase)
+            password += secrets.choice(string.digits)
+            password += secrets.choice(symbols)
+            print(password)
         # here we encrypt the password.
 
-        newpass = request.form.get('password')
-        newpassword = encrypt_password(newpass)
+        newpass = password
+        newpassword = bcrypt.generate_password_hash(newpass)
         
-        #active = request.form.get('checkbox')
-        #print(active)
-        active = 1
-        if checker:
-            active = 1
-        else:
-            active = 0
-        #print(active)
-        user_name = request.form.get('username')
-
-        #print(active, newuser, newpassword)
+        # now add the user to the database
 
         adduser = User(email=newuser,
                     password=newpassword,
-                    active=active,
-                    user_name=user_name)
+                    active=1,
+                    firstname=form.firstname.data,
+                    lastname=form.lastname.data,
+                    phone=form.mobilephone.data)
 
         db.session.add(adduser)
+        # flush will create an entry in the database that cannot be over written.
+        # flush then gives us the user id. 
+        # we need the user id to go along with the employee id.
+
         db.session.flush()
-        #db.session.commit()
+        db.session.commit()
 
         newid = adduser.id
         
-        #user_datastore.add_role_to_user(newid,5)
-        
-        #print(newid)
+        print(newid)
         
         if form.hrpicture.data:
            picture_file = save_hrpicture(form.hrpicture.data) 
@@ -951,13 +1449,13 @@ def addemployee():
        
         #print (form.manager.data.id)
         #print (form.store.data.id)
-            
+
+        # Here we create the new employee in the database.
+
         emp = Employee(user_id=newid,
                        firstname=form.firstname.data,
-                       nickname=form.nickname.data,
                        lastname=form.lastname.data,
                        store=form.store.data,
-                       dob=form.dob.data,
                        addressone=form.addressone.data,
                        addresstwo=form.addresstwo.data,
                        apt=form.apt.data,
@@ -968,8 +1466,6 @@ def addemployee():
                        email=form.email.data,
                        mobilephone=form.mobilephone.data,
                        sinexpire=form.sinexpire.data,
-                       startdate=form.Startdate.data,
-                       enddate=form.Enddate.data,
                        trainingid=form.trainingid.data,
                        trainingpassword=form.trainingpassword.data,
                        manager=form.manager.data.id,
@@ -986,36 +1482,32 @@ def addemployee():
         db.session.add(emp)  
         # flush will get the id of the pending user so that
         # we can add the raining information     
-        #db.session.flush()
+        db.session.flush()
         
-        #print(emp.store, emp.manager)
-        #print(type(form.store.data))
+        print(emp.store, emp.manager)
+        print(type(form.store.data))
         
         # here we are adding the training courses and the compelted dates.
         # adding the dates requires some work.
         # the data has to be in the format that the database can read.
 
-
-        r = request.form.getlist("completeddate")
+        # need all of this  
+    
+        #r = request.form.getlist("completeddate")
+        #g = request.form.getlist("myCheck2")
         f = emp.id
         
-        #print(emp.id)
-        
-        y = 1
+        print(emp.id)
         yy = 0
-        for x in request.form.getlist("completed"):
-            grade_date = r[yy]
-           
-            #print(f, y, x, r[yy])
-            
-            if grade_date == '':
-                completeddate = ''
-            else:
-                completeddate = datetime.strptime(grade_date, '%Y-%m-%d')
-            empgrade = Grade(value=x,
+        y=1
+        
+        for x in coursecount:
+            empgrade = Grade(
                              employee_id=f,
                              course_id=y,
-                             completeddate =  completeddate)                
+                             completed = 0
+                             )  
+            print(f, y)
             db.session.add(empgrade)
             y += 1
             yy += 1
@@ -1028,18 +1520,39 @@ def addemployee():
         
         addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
         db.session.execute(addrole)
+
         db.session.commit()
        
-        flash('Employee has been added to the database', 'success')
+        ''' email = emp.email
+        message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= email,
+            subject = 'Welcome to Petro Canada',
+            
+            )
+            
+        message.dynamic_template_data = {
                 
+                'name':emp.firstname,
+                'userid':emp.trainingid,
+                'password':emp.trainingpassword,
+                'login':emp.email
+
+            }
+        
+        message.template_id = SENDGRID_NEWHIRE_ID
+            
+        response = sg.send(message)
+        '''
+
+        flash('Employee has been added to the database', 'success')
+
+              
         return redirect(url_for('hrhome'))
-    
-    #print(form.errors.items())
-    return render_template('employee.html', title='Employee Information', form=form, form2=form2, course=course, emailcheck1=emailcheck1, emailcheck2=emailcheck2, emailpass=emailpass)
-
-
+    return render_template('employee.html', form=form)
+   
 @app.route("/applications")
-#@login_required
+@login_required
 @roles_required('Admin')
 def Applications():
     return render_template('applications.html', title='Applications')
@@ -1644,4 +2157,19 @@ def save_picture(form_picture):
     return picture_fn
     
 
+def save_inc_picture(form_picture):
+    
 
+    random_hex = secrets.token_hex(8)
+
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+
+    picture_path_inc = os.path.join(
+        app.root_path, 'static/incidentpictures', picture_fn)
+   
+    picture_fn.save(picture_path_inc)
+    print(picture_fn.size)
+
+    return picture_fn
+    
