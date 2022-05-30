@@ -842,8 +842,8 @@ table {
 }
 
 .inc92 {
-  grid-column-start:1;
-  grid-column-end:6;
+  grid-column-start:2;
+  grid-column-end:5;
   grid-row-start: 54;
   grid-row-end:55;
   text-align: center;
@@ -3166,7 +3166,7 @@ text-align: center;
 
 .inc120 {
   grid-column-start: 1;
-  grid-column-end: 3;
+  grid-column-end: 4;
   grid-row-start: 96;
   grid-row-end: 97;
   text-align: center;
@@ -3741,7 +3741,13 @@ grid-row-start: 94;
 grid-row-end: 95;
 text-align: right;
 }
-
+.inc92 {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  grid-row-start: 95;
+  grid-row-end: 96;
+  text-align: center;
+}
 
 /* comms container */
 
