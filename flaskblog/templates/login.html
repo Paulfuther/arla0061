@@ -79,15 +79,31 @@
                         <div class="alerts">[{{ error }}]</div>
                         {% endfor %}
 
-                        <div class="login_remember" >
-                        <div class="login_remember_check">Remember Me</div>
-                        <input type="checkbox" name = "remember_me">
+                        <div class="login_card">
+                                <div class="loginheader">
+                                <h1>Select 2 Factor Channel</h1>
+                                </div>
+
+                                <div>
+                                    {{ form.two_fa (class='form_check')}}
+                                </div>
+
+                                {% for error in form.two_fa.errors %}
+                                <div class="two_fa_alerts">[{{ error }}]</div>
+                                {% endfor %}
+
+                                
+                        </div>
+                        <div class="two_fa_submit">
+                        <input class="two_fa_formcheckbtn" type="submit" value="Submit">                            
                         </div>
                         
+                        <div class="login_remember" >
+                            <div class="login_remember_check">Remember Me</div>
+                            <input type="checkbox" name = "remember_me">
+                            </div>
 
-                        <div class = "box-3">
-                            <input class="formscontrol" type="submit" value="Submit">
-                        </div>
+                        
 
                         <div>
                             <a class="login_container_hover" href="/forgot_password">Reset Password</a>
