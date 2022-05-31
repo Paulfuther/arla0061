@@ -4,7 +4,8 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy.sql.sqltypes import Date, String
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
+        RadioField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
 from wtforms.fields.html5 import DateField, TelField, TimeField, EmailField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
 from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid, Twimlmessages
@@ -33,6 +34,7 @@ class LoginForm(FlaskForm):
     email = StringField('email', validators = [InputRequired(), Length(min=4, max=200), Email()])
     password = PasswordField('password', validators = [InputRequired(), Length(min=8, max=80)])
     remember_me = BooleanField('remember me')
+    two_fa = RadioField('Label', choices=[('sms', 'SMS'), ('whatsapp', 'WhatsApp')])
     submit = SubmitField('Login')
 
 class forgot_password_Form(FlaskForm):

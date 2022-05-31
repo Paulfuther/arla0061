@@ -63,6 +63,8 @@ def home():
 @app.route("/login", methods = ['GET', 'POST'])
 def login():
     form=LoginForm()
+
+    
     if current_user.is_authenticated:
         return render_template("layout.html")
     if form.validate_on_submit():
@@ -84,11 +86,20 @@ def login():
             .filter(Employee.user_id == user.id).first()
             print(user.phone)
             print(user.active)
-            #request_verification_token_whatsapp(user.phone)
-            ##request_verification_token(user.phone)
-            #session['phone']=user.phone
+            print(form.two_fa.data)
+            if form.two_fa.data=="sms":
+                request_verification_token(user.phone)
+                session['phone']=user.phone
+                return redirect(url_for('verify_2fa'))
+            elif form.two_fa.data=="whatsapp":
+                request_verification_token_whatsapp(user.phone)
+                session['phone']=user.phone
+                return redirect(url_for('verify_2fa'))
+            else:
+                flash('you need to select a 2fa channel')
+                #return redirect(url_for('lodin'))
             #session['phone']=user_phone
-            #return redirect(url_for('verify_2fa'))
+            return redirect(url_for('login', form=form))
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if current_user.has_roles('GSA'):
@@ -123,9 +134,6 @@ def home22():
     return render_template('layout.html')
     #return render_template('home.html')
 
-
-
-
 def send_email_confirmation(user):
     token = user.get_mail_confirm_token()
     email = user.email
@@ -157,7 +165,6 @@ def newhire_verify2f1_check():
     response = 0
     return (jsonify(response))
     
-
 @app.route('/verify2fa', methods=['GET', 'POST'])
 def verify_2fa():
     form = Confirm2faForm()
@@ -417,7 +424,6 @@ def bulk_sms():
     # once completed. Do something.
 
         return render_template("layout.html")
-
 
 @app.route("/sms", methods=['GET', 'POST'])
 @validate_twilio_request
