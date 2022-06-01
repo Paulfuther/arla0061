@@ -63,8 +63,6 @@ def home():
 @app.route("/login", methods = ['GET', 'POST'])
 def login():
     form=LoginForm()
-
-    
     if current_user.is_authenticated:
         return render_template("layout.html")
     if form.validate_on_submit():
@@ -441,11 +439,14 @@ def sms_reply():
 @login_required
 def print_incident():
     form=SiteIncident()
-    x=int(42)
+    x=int(53)
     gsa = Incident.query.get(x)
     ident = gsa.id
     print(ident)
     picture = incident_files.query.filter_by(incident_id=ident)
+    for x in picture:
+        print( x.image)
+    print (basedir)
     return render_template('eventreportpdf.html' , form=form, gsa=gsa, picture=picture)
 
 @app.route('/email/<email>')
@@ -482,17 +483,17 @@ def eventreport():
             #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
            
             for pic in pics:
-                i=Image.open(pic)
+                if not pic:
+                    pass
+                else:
+                    i=Image.open(pic)
 
-                 #= Image.open(pic)
-                i.thumbnail((300,300), Image.LANCZOS)
-                #i.save(picture_paththumb)
-                print(i.size)
-
-
-
-                #new_pic = image.resize(300,300)
-                i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
+                    #= Image.open(pic)
+                    i.thumbnail((300,300), Image.LANCZOS)
+                    #i.save(picture_paththumb)
+                    print(i.size)
+                    #new_pic = image.resize(300,300)
+                    i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
         
             #return render_template('layout.html')
             newtime=str(form.eventtime.data)
@@ -583,10 +584,13 @@ def eventreport():
             #db.session.commit()
 
             for pic in  pics:
+                if not pic:
+                    pass
+                else:
 
-                incimage = incident_files(image=secure_filename(pic.filename),
+                    incimage = incident_files(image=secure_filename(pic.filename),
                                     incident_id = inc.id)
-                db.session.add(incimage)
+                    db.session.add(incimage)
             db.session.commit()
 
             print(inc.id)
@@ -595,7 +599,7 @@ def eventreport():
             
             # once the data has been written to the database, we create a pdf.
             # we call a task mamanger to do this. That is the apply_async 
-            make_incident_pdf.apply_async(args=[file_id], countdown=10)
+           # make_incident_pdf.apply_async(args=[file_id], countdown=10)
 
 
             return render_template('layout.html')

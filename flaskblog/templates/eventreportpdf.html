@@ -523,7 +523,7 @@
                 <table>
                         <tr>     
                                 <td style= "width:25%;">Gener/Estimated Age: {{gsa.gender}} </td>
-                                <td style = "width:50%; text-align: center" rowspan="10"> <img src='/Users/paulfuther/arla0061/flaskblog/static/images/SECURITYPERSON.jpg'></td>
+                                <td style = "width:50%; text-align: center" rowspan="10"> <img src="{{ url_for( 'static' ,filename='images/SECURITYPERSON.JPG')}} "></td>
                                 <td style="width:25%; text-align:right; padding-right:10px">{{gsa.scars}}  :Visible Scars </td>
                         </tr>
                         <tr><td>Height: {{gsa.height}} </td>
@@ -552,22 +552,25 @@
                         </tr> 
                        
                         
-                        
                 </table>
              <table>
                
-               
-               
+                <img src='flaskblog/static/incidentpictures/IMG_5672.jpg'>
+          
                 {% for x in picture %}
                 <td>
-                <img src= '/Users/paulfuther/arla0061/flaskblog/static/incidentpictures/{{ x.image}}' class="inc_pic_display">
+                <img src= "{{ url_for( 'static' ,filename='incidentpictures/'+ x.image)}} " class="inc_pic_display">
+
+                
+                
                 </td>
                 <tr></tr>
 
                 {% endfor %}
                 
+              
                 </table>
-
+            
         </main>
 </body>
 

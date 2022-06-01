@@ -261,7 +261,7 @@ def make_pdf(staff_id):
 @celery.task
 def make_incident_pdf(file_id):
     with app.test_request_context():
-        rol =  User.query.filter(User.roles.any(Role.id == 3)).all()
+        rol =  User.query.filter(User.roles.any(Role.id == 9)).all()
         print(file_id)
         img = '/Users/paulfuther/arla0061/flaskblog/static/images/SECURITYPERSON.jpg'
         css = "flaskblog/static/main.css"
@@ -301,17 +301,17 @@ def make_incident_pdf(file_id):
                 FileType('application/pdf'),
                 Disposition('attachment')) 
 
-        #for x in rol:
-        #        
-        #    email = x.email
-        #    message = Mail(
-        #    from_email = DEFAULT_SENDER,
-        #    to_emails=email,
-        #    subject ='A new incident report has been filed',
-        #    html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
-        #    message.attachment = attachedFile
-        #    response = sg.send(message)
-        #    print(response.status_code, response.body, response.headers)
+        for x in rol:
+                
+            email = x.email
+            message = Mail(
+            from_email = DEFAULT_SENDER,
+            to_emails=email,
+            subject ='A new incident report has been filed',
+            html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
+            message.attachment = attachedFile
+            response = sg.send(message)
+            print(response.status_code, response.body, response.headers)
 
             # upload to drop box
 
