@@ -172,7 +172,7 @@ def verify_2fa():
         phone=session['phone']
         if check_verification_token(phone, form.token.data):
             user = User.query.filter_by(phone = phone).first()
-            login_user(user)
+            login_user(user, remember=True)
             print(current_user)
             return render_template("layout.html", title="home")
         flash ('invalid code please login again')
