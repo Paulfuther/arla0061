@@ -27,7 +27,7 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey, or_
 from flask_email_verifier import EmailVerifier
 from flask_login import  user_logged_out, user_logged_in, login_required,\
-     current_user, LoginManager
+        current_user, LoginManager, fresh_login_required
 from flask_user import roles_required, roles_accepted, UserMixin
 from celery import Celery
 from flaskblog.tasks import celery
@@ -126,7 +126,11 @@ ckeditor = CKEditor(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view='login'
-login_manager.session_protection="strong"
+login_manager.session_protection="basic"
+login_manager.login_message = 'You need to login first'
+login_manager.refresh_view = 'login'
+login_manager.needs_refresh_message = 'This is a sensitive area. You need to login aagin to continue'
+login_manager.needs_refresh_message_category = 'info'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
@@ -472,19 +476,20 @@ class Role(db.Model):
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    firstname = db.Column(db.String(20), nullable=False)
-    lastname = db.Column(db.String(20), nullable=False)
+    firstname = db.Column(db.String(), nullable=False)
+    lastname = db.Column(db.String(), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
     store = db.relationship('Store', backref = 'store')
     addressone = db.Column(db.String(20), nullable=False)
     addresstwo = db.Column(db.String(20), nullable=True)
     apt = db.Column(db.String(20), nullable=True)
-    city = db.Column(db.String(20), nullable=False)
-    province = db.Column(db.String(20), nullable=False)
-    country = db.Column(db.String(20), nullable=False)
+    city = db.Column(db.String(), nullable=False)
+    province = db.Column(db.String(), nullable=False)
+    country = db.Column(db.String(), nullable=False)
     mobilephone = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(120), nullable=False)
-   
+    dob = db.Column(db.DateTime(),nullable=True)
+    startdate = db.Column(db.DateTime(),nullable=True)
     sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
@@ -633,9 +638,6 @@ class Incidentnumbers(db.Model):
          return '%r' % (self.details)
 
 
-
-
-
 # salt log
        
 class Saltlog(db.Model):
@@ -777,21 +779,21 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ( 'user_name', 'active','created_on', 'updated_on', 'email_confirmed', 'email_confirmed_date','roles', 'phone')
-    column_searchable_list = ['user_name']
+    column_list = ( 'firstname','lastname','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
+    column_searchable_list = ['lastname']
     
     def is_accessible(self):
         return current_user.has_roles('Admin' )
     
 
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            model.password = bcrypt.generate_password_hash(form.password.data)
-        else:
-            old_password = form.password.object_data
-            # If password has been changed, hash password
-            if not old_password == model.password:
-                model.password = bcrypt.generate_password_hash(form.password.data)
+    #def on_model_change(self, form, model, is_created):
+    #    if is_created:
+    #        model.password = bcrypt.generate_password_hash(form.password.data)
+    #    else:
+    #        old_password = form.password.object_data
+    #        # If password has been changed, hash password
+    #        if not old_password == model.password:
+    #            model.password = bcrypt.generate_password_hash(form.password.data)
 
 class MyModelView2(ModelView):
     create_modal = True

@@ -48,7 +48,7 @@ from flaskblog.utils.response import response, error_response
 from flaskblog.utils.sms import send_bulk_sms
 from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, \
                     check_verification_token, request_verification_token_whatsapp
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, fresh_login_required
 moment = Moment(app)
 CORS(app)
 
@@ -85,6 +85,11 @@ def login():
             print(user.phone)
             print(user.active)
             print(form.two_fa.data)
+            # testing
+            #login_user(user, remember=form.remember_me.data)
+            #return render_template("layout.html", title="home")
+
+            # end here
             if form.two_fa.data=="sms":
                 request_verification_token(user.phone)
                 session['phone']=user.phone
@@ -131,6 +136,12 @@ def home22():
     
     return render_template('layout.html')
     #return render_template('home.html')
+
+#@app.route('/new_hire_hr_list', methods = ['GET','POST'])
+#def new_hire_hr_list():
+    #emp = Employee.query.get(3)
+    #print(emp.firstname)
+    #return render_template('newhirehomehr.html', emp=emp)
 
 def send_email_confirmation(user):
     token = user.get_mail_confirm_token()
@@ -319,8 +330,10 @@ def logout():
 @app.route('/commsmenu', methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
+@fresh_login_required
 def comms_menu():
-    return render_template('commsmenu.html')
+    if not fresh_login_required:
+        return render_template('commsmenu.html')
 
 
 @app.route('/twiliocall', methods = ['GET', 'POST'])
@@ -933,7 +946,10 @@ def hrfile(staff_id):
 @app.route("/hrhome")
 @login_required
 def hrhome(): 
-    return render_template('hrhome.html')
+    emp = Employee.query.get(3)
+    print(emp.firstname)
+    return render_template('hrhome.html', emp=emp)
+    
 
 @app.route("/createpdfnewhire<int:staff_id>", methods = ['GET', 'POST'])
 @login_required
@@ -1243,9 +1259,6 @@ def save_hrpicture(form_hrpicture):
 @app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
 @login_required
 def updategsa(staff_id):
-    
-    
-    
     # Here we are getting the row of data based on the index, which is staff_id and
     #generatating a query under gsa
     #form is then populated with that data and published
@@ -1253,8 +1266,10 @@ def updategsa(staff_id):
     #when changes are made the form.data attribut is changed also
     #you can then compare the new form data using .data with old data use gsa.data
     #note below that some data is int and some is text. they need to be the same for the compares
+    
+    
     gsa = Employee.query.get(staff_id)
-        
+    print(gsa.dob)
     
     gradelist = Grade.query\
         .filter_by(employee_id = staff_id)\
@@ -1270,23 +1285,33 @@ def updategsa(staff_id):
     form = EmployeeUpdateForm(obj=gsa)
     
     if request.method == "GET":
+        print(form.dob.data)
         return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa)
  
-
-    else:
-        image_file = url_for(
-        'static', filename='empfiles/mobile/' + gsa.image_file)
-
-        gsaphone = gsa.mobilephone
+@app.route("/update_gsa_contact<int:staff_id>", methods=['GET','POST'])
+@login_required
+def update_gsa_contact(staff_id):
+    if request.method == "POST":
+        r=request.form.to_dict()
         
+        gsa = Employee.query.get(staff_id)
+    
+        form = EmployeeUpdateForm(obj=gsa)
+        image_file = url_for('static', filename='empfiles/mobile/' + gsa.image_file)
+        if form.hrpicture.data:
+           picture_file = save_hrpicture(form.hrpicture.data) 
+           print(form.hrpicture.data)
+        else:
+            picture_file = '3d611379cfdf5a89.jpg'
+        gsaphone = gsa.mobilephone
+        print(form.addressone.data)
         gsaemail = gsa.email
         gsapostal = gsa.postal
         gsatrainingid = gsa.trainingid
         gsatrainingpassword = gsa.trainingpassword
         gsaiprism = gsa.iprismcode
 
-        phone = form.mobilephone.data
-        
+        phone = form.mobilephone.data        
         postal = form.postal.data
         trainingid = form.trainingid.data
         trainingpassword = form.trainingpassword.data
@@ -1294,98 +1319,71 @@ def updategsa(staff_id):
 
         emp = Employee.query.filter_by(mobilephone=text(phone)).first()
         emailcheck = Employee.query.filter_by(email=form.email.data).first()
-    
+        
         postalcheck = Employee.query.filter_by(postal=postal).first()
         trainingidcheck = Employee.query.filter_by(trainingid=trainingid).first()
         trainingpasswordcheck = Employee.query.filter_by(
-            trainingpassword=trainingpassword).first()
+                trainingpassword=trainingpassword).first()
         iprismcheck = Employee.query.filter_by(iprismcode=iprismcodecheck).first()
 
         if gsaphone == phone:
             print("same mobile")
         else:
             if emp:
-                flash("mobile already used")
-                return render_template('employeeupdate.html', form=form, gsa=gsa)
+                    flash("mobile already used")
+            return render_template('employeeupdate.html', form=form, gsa=gsa)
 
         if gsa.email == form.email.data:
-            print("same email")
+                print("same email")
         else:
             if emailcheck:
-                flash("email already used")
-                return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-        if gsa.postal == form.postal.data:
-            print("same postal code")
-        else:
-            if postalcheck:
-                flash("postal already exists")
-                return render_template('employeeupdate.html', form=form, gsa=gsa)
+                    flash("email already used")
+            return render_template('employeeupdate.html', form=form, gsa=gsa)
 
         if gsa.trainingid == form.trainingid.data:
-            print("same user id ")
+                print("same user id ")
         else:
             if trainingidcheck:
-                flash("user id already exists")
-                return render_template('employeeupdate.html', form=form, gsa=gsa)
+                    flash("user id already exists")
+            return render_template('employeeupdate.html', form=form, gsa=gsa)
 
         if gsa.trainingpassword == form.trainingpassword.data:
-            print("same training password")
+                print("same training password")
         else:
             if trainingpasswordcheck:
-                flash("training password already exists")
-                return render_template('employeeupdate.html', form=form, gsa=gsa)
+                    flash("training password already exists")
+            return render_template('employeeupdate.html', form=form, gsa=gsa)
         
-   
-    
-        print('validate')
-        if form.submit.data:
-            #print(form.manager.data.id, form.store.data.id)
-            
-            #form.populate_obj(gsa)
-            #print(form)
-            if form.hrpicture.data:
-                        picture_file = save_hrpicture(form.hrpicture.data)
-                        gsa.image_file = picture_file
-            else:
-                picture_file = url_for(
-                    'static', filename='empfiles/mobile/' + gsa.image_file)
-        
-        
-        # here we take the data of the employee from the database
-        # that is called an object. Here we call it gsa.
-        # that object was created above.
-        # we then pass the form data to the obj and populate_obj
-        # however, we have two drop down lists.
-        # we need to pass the id of the value from that last
-        # in both store and manager
-        
-            form.populate_obj(gsa)
-            #print(form.store.data)
-            
-            #gsa.manager = form.manager.data.id
-            #print(gsa.manager)
-            #gsa.store = form.store.data.id
-            #print(gsa.store)
-            
-                
-            db.session.commit()
-                #print("committed")
-                #print(Employee.manager)
-            flash("info updated")
-            
-            if current_user.has_roles('GSA'):
-                gsaid = int(current_user.id)
-                staff = Employee.query.filter_by(user_id=gsaid).first()
-                exists = Empfile.query.filter_by(employee2_id=staff.id).first()
-            
-                return render_template('gsadashboard.html', staff=staff, exists=exists)
-            
-            return render_template('hrhome.html')
+        #print(request.form)
+        #for x,y in r.items():
+        #    print (x,y)
+        gsa.dob=form.dob.data
+        gsa.startdate=form.startdate.data
+        gsa.addressone=form.addressone.data
+        gsa.addresstwo=form.addresstwo.data
+        gsa.apt=form.apt.data
+        gsa.city=form.city.data
+        gsa.province=form.province.data
+        gsa.postal=form.postal.data
+        gsa.country=form.country.data
+        gsa.trainingid=form.trainingid.data
+        gsa.trainingpassword=form.trainingpassword.data
+        gsa.iprismcode=form.iprismcode.data
+        gsa.mon_avail=form.mon_avail.data
+        gsa.tue_avail=form.tue_avail.data
+        gsa.wed_avail=form.wed_avail.data
+        gsa.thu_avail=form.thu_avail.data
+        gsa.fri_avail=form.fri_avail.data
+        gsa.sat_avail=form.sat_avail.data
+        gsa.sun_avail=form.sun_avail.data
+        gsa.image_file=picture_file
+                                     
+        db.session.commit()
 
-        
-    return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa )
-  
+
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+    return "none"
+    
 @app.route("/addemployee", methods=['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -1557,8 +1555,8 @@ def addemployee():
 
         flash('Employee has been added to the database', 'success')
 
-              
-        return redirect(url_for('hrhome'))
+        
+        return render_template('newhirehomehr.html',emp=emp)
     return render_template('employee.html', form=form)
    
 @app.route("/applications")

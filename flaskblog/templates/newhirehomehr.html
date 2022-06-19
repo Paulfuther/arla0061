@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+
+<div class="container">
+
+
+    
+
+            
+           
+             <nav class="app-nav">
+
+                  <ul class = "app-menu">
+
+                        {% if current_user.has_roles('GSA') %}
+                        {% else %}
+
+                        <ul>
+                              <li> <a href="hrlist">Search Employees</a></li>
+                        </ul>
+                       
+                        <ul>      
+                              <li> <a href="addemployee">Add Employee</a></li>
+                        </ul>
+                        <ul>
+                              <li> <a href="nofile">Employees Without a File</a></li>
+                        </ul>
+                       {% endif %}
+                  </ul>
+            </nav>
+
+            
+
+
+</div>
+
+
+
+                  {% if emp is defined  %}
+                  <div class = 'tablecard'>
+                  <div class = 'tablecard-image'>
+
+            
+                  <img src =' /static/empfiles/thumb/${image_file}' class = 'hrlistimage' > 
+                  </div>
+                  <div class = 'tablecard-inner'>
+                  
+                  <div class = 'hritem1'>
+                  {{emp.phone}}
+                  </div>
+                  <div class = 'hritem2'>
+                  {{emp.firstname}} {{emp.lastname}}
+                  </div>
+                  <div class = 'hritem3'>
+                  {{emp.email}}
+                  </div> 
+                  <div class = "tablecard-links">
+
+                  <a   href="/updategsa{{emp.id}}">Contact Info</a>
+                  <a   href="/updategsatraining{{emp.id}}">Training Info</a>
+                  <a   href="/hrfile{{emp.id}}">Create File</a>
+                  <a   href="/existingemployeefile{{emp.id}}">View File</a>
+                  </div> 
+                  </div>
+            
+                  </div>
+                  {% else %}
+                  {% endif %}
+
+
+
+
+
+
+
+
+
+
+{% endblock content %}
