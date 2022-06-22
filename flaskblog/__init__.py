@@ -128,7 +128,7 @@ login_manager.init_app(app)
 login_manager.login_view='login'
 login_manager.session_protection="basic"
 login_manager.login_message = 'You need to login first'
-login_manager.refresh_view = 'login'
+login_manager.refresh_view = 'logout'
 login_manager.needs_refresh_message = 'This is a sensitive area. You need to login aagin to continue'
 login_manager.needs_refresh_message_category = 'info'
 @login_manager.user_loader

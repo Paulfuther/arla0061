@@ -330,11 +330,12 @@ def logout():
 @app.route('/commsmenu', methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
-@fresh_login_required
+#@fresh_login_required
 def comms_menu():
-    if not fresh_login_required:
-        return render_template('commsmenu.html')
-
+    #if not fresh_login_required:
+    return render_template('commsmenu.html')
+    #else:
+    #return redirect(url_for('logout'))
 
 @app.route('/twiliocall', methods = ['GET', 'POST'])
 @login_required

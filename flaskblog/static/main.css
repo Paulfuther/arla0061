@@ -44,6 +44,37 @@ body {
   font-size: 16px;
 }
 
+/* progress bar */
+
+.progress_container {
+  display:block;
+  margin-left: auto;
+  margin-right: auto;
+  width:80%;
+}
+
+.progress {
+  background-color:#F5F5F5;
+  border-radius: 13px;
+  /* (height of inner div) / 2 + padding */
+  
+}
+
+.progress-bar {
+
+  width: 1%;
+  height: 60px;
+  background-color: dodgerblue;
+  text-align: center;
+  line-height: 50px;
+  border-radius: 13px;
+  color: white;
+  padding: 5px;
+  
+}
+
+
+
 
 /* Buttons */
 
@@ -240,6 +271,18 @@ body {
   display: inline-block;
   font-size: 16px;
   border-radius: 4px;
+}
+
+/* progress bar */
+
+.Progress_Status {
+  width: 50%;
+  background-color: #ddd;
+}
+.myprogressBar {
+  width: 2%;
+  height: 20px;
+  background-color: #4CAF50;
 }
 
 /* report container*/
