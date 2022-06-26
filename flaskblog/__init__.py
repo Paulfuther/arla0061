@@ -1,4 +1,5 @@
 
+from pyexpat.errors import messages
 from flask import Flask
 
 app = Flask(__name__)
@@ -30,6 +31,7 @@ from flask_login import  user_logged_out, user_logged_in, login_required,\
         current_user, LoginManager, fresh_login_required
 from flask_user import roles_required, roles_accepted, UserMixin
 from celery import Celery
+from celery.schedules import crontab
 from flaskblog.tasks import celery
 import dropbox
 from dropbox.files import WriteMode
@@ -68,13 +70,23 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 INCIDENT_UPLOAD_PATH=os.path.join(basedir, 'static/incidentpictures')
 app.config['INCIDENT_UPLOAD_PATH'] = INCIDENT_UPLOAD_PATH
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=5)
+#CELERY_ENABLE_UTC = False
+#USE_TZ=True
+#CELERY_TIMEZONE = 'Canada/Eastern'
+app.config['CELERYBEAT_SCHEDULE']= {
+    'call_stores_monthly': {
+        'task':'call_stores_monthly',
+        'schedule': crontab(day_of_month="1-7",hour="12,20"),
+        },
+    }
+
 
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 twilio_from = os.environ['TWILIO_FROM']
 
 
-
+celery.conf.update(app.config)
 #global COOKIE_TIME_OUT
 #COOKIE_TIME_OUT = 60*60*24*7 #5 days
 
@@ -135,6 +147,36 @@ login_manager.needs_refresh_message_category = 'info'
 def load_user(user_id):
     return User.query.get(user_id)
 
+@celery.task(name="print_hello")
+def print_hello():
+    return print("hello")
+
+
+@celery.task(name="send_sms_testing")
+def send_sms_testing():
+    message=client.messages\
+        .create(
+            body="Hello from Paul",
+            from_=twilio_from,
+            to='+15196707469'
+        )
+    
+@celery.task(name="call_stores_monthly")
+def call_stores_monthly():
+    twimlname = 'Monthly Mystershop and Site Evaluation'
+    bulk_call = Twimlmessages.query.get(twimlname)
+    twil_id = bulk_call.twimlid
+        #print(twil_id)
+        # this is using twilml machine learning text to speach.
+        # this only goes out to stores.
+    site = db.session.query(Store.number,Store.phone).all()
+    for x in site:
+            call = client.calls.create(
+                            url=twil_id,
+                            to=x.phone,
+                            from_=twilio_from
+        )              
+      
 
 @celery.task
 def send_bulk_email(role_id, templatename):
