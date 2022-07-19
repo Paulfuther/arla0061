@@ -12,13 +12,13 @@
     </div>
     <div class="row">
         <div class="box-1">
-            {{ form.token (class='formscontrol')}}
+            {{ form.token (class='two_fa_form_input')}}
         </div>
             {% for error in form.token.errors %}
             <div class="alerts">[{{ error }}]</div>
             {% endfor %}
         <div class="box-2">
-            {{ form.submit (class='formscontrol')}}
+            {{ form.submit (class='two_fa_formcheckbtn')}}
                    
         </div>
     </div>

@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+        <div class= "container">
+
+            <!-- Applications Nav Bar -->       
+
+            <nav class="app-nav"  >
+
+                  <ul class = "app-menu" >
+                        <ul>
+                              <li> <a href="hrlist" class = "hrmenumobile">List of Employees</a></li>
+                        </ul>
+                        <ul>
+                              <li> <a href="hrhome" class = "hrmenumobile">HR Main Page</a></li>
+                        </ul>
+                        <ul>      
+                              <li> <a href="addemployee" class = "hrmenumobile">Add Employee</a></li>
+                        </ul>
+                        <ul>
+                              <li> <a href="nofile" class = "hrmenumobile">Employee Without a File</a></li>
+                        </ul>
+                       
+                  </ul>
+            </nav>
+
+      </div>  
+            
+                  <table id = "nofile">
+              
+
+                       <tr>
+                              <th> Store</th>
+                              <th> Frist Name</th>
+                  
+                              <th> Last Name</th>
+                           
+                              <th> <a href="/activebystoreexcel"> <i class="far fa-file-excel fa-lg" ></i></th>
+                        
+                   
+                        </tr>
+                          
+
+                        {% for staff in activebystore %}
+
+                        <tr>
+
+                        <td> {{staff.number}}</td>
+                       
+                        <td> {{staff.firstname}}</td> 
+                        <td> {{staff.lastname}}</td> 
+                        
+                        <tr>
+
+                        {% endfor %}
+                </table>
+{% endblock content %}
+
+

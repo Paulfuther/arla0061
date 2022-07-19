@@ -7,7 +7,8 @@ from sqlalchemy.sql.sqltypes import Date, String
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
         RadioField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
 from wtforms.fields.html5 import DateField, TelField, TimeField, EmailField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, InputRequired, NumberRange
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, \
+            InputRequired, NumberRange
 from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid, Twimlmessages
 from flask_login import current_user
 import wtforms
@@ -71,8 +72,8 @@ class TelephoneForm(FlaskForm):
 class EmployeeForm(FlaskForm):
     
     email = EmailField('Email', validators=[DataRequired(), Email()])
-    firstname = StringField('Firstname', validators= [DataRequired(), Length(min=2, max=20)])
-    lastname = StringField('Lastname', validators=[DataRequired(), Length(min=2, max=20)])
+    firstname = StringField('Firstname', validators= [DataRequired()])
+    lastname = StringField('Lastname', validators=[DataRequired()])
     store = QuerySelectField('Store',
         query_factory=lambda: Store.query.order_by(Store.number),
         allow_blank=False
@@ -87,8 +88,7 @@ class EmployeeForm(FlaskForm):
                        DataRequired(), Length(min=2, max=20)])
     province = StringField('Province', validators=[
                            DataRequired(), Length(min=2, max=20)])
-    country = StringField('Country', validators=[
-                          DataRequired(), Length(min=2, max=20)])
+    country = StringField('Country', validators=[Optional()])
 
     postal = StringField('Postal Code', validators=[
                          DataRequired(), Length(min=6, max=7)])
@@ -111,38 +111,30 @@ class EmployeeForm(FlaskForm):
     hrpicture = FileField(validators=[FileAllowed(['jpg', 'jpeg','png', 'HEIC'])])
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
-    monavail = StringField('Monday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    tueavail = StringField('Tuesday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    wedavail = StringField('Wednesday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    thuavail = StringField('Thursday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    friavail = StringField('Friday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    satavail = StringField('Saturday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    sunavail = StringField('Sunday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
+    monavail = StringField('Monday Availability', validators= [Optional()])
+    tueavail = StringField('Tuesday Availability', validators=[Optional()])
+    wedavail = StringField('Wednesday Availability', validators=[Optional()])
+    thuavail = StringField('Thursday Availability', validators=[Optional()])
+    friavail = StringField('Friday Availability', validators=[Optional()])
+    satavail = StringField('Saturday Availability', validators=[Optional()])
+    sunavail = StringField('Sunday Availability', validators=[Optional()])
     submit2 = SubmitField('Add Employee')
 
    
   
 class EmployeeUpdateForm(FlaskForm):
    
-    username = StringField('Username', validators=[
-        DataRequired(), Length(min=2, max=100)])
+    #username = StringField('Username', validators=[
+    #    DataRequired(), Length(min=2, max=100)])
     email = StringField('Email', validators=[
                         DataRequired(), Length(min=10, max=100), Email()])
     password = StringField('Password', validators=[
         DataRequired(), Length(min=2, max=100)])
     
     firstname = StringField('Firstname', validators=[
-                            DataRequired(), Length(min=2, max=20)])
+                            DataRequired()])
     nickname = StringField('Nickname', validators=[Optional()])
-    lastname = StringField('Lastname', validators=[
-                           DataRequired(), Length(min=2, max=20)])
+    lastname = StringField('Lastname', validators=[DataRequired()])
     dob = DateField('DOB', format='%Y-%m-%d',
                     validators=[DataRequired()])
     store = QuerySelectField(
@@ -159,7 +151,7 @@ class EmployeeUpdateForm(FlaskForm):
     province = StringField('Province', validators=[
                            DataRequired(), Length(min=2, max=20)])
     country = StringField('Country', validators=[
-                          DataRequired(), Length(min=2, max=20)])
+                          Optional()])
     
     mobilephone = StringField('mobile', validators=[
                               DataRequired(), Length(min=9, max=12) ])
@@ -183,21 +175,18 @@ class EmployeeUpdateForm(FlaskForm):
     
     iprismcode = StringField('Iprism Code', validators=[
                              DataRequired(), Length(min=1, max=9)])
-    mon_avail = StringField('Monday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    tue_avail = StringField('Tuesday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    wed_avail = StringField('Wednesday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    thu_avail = StringField('Thursday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    fri_avail = StringField('Friday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    sat_avail = StringField('Saturday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
-    sun_avail = StringField('Sunday Availability', validators=[
-                           DataRequired(), Length(min=2, max=100)])
+    mon_avail = StringField('Monday Availability', validators= [Optional()])
+    tue_avail = StringField('Tuesday Availability', validators=[Optional()])
+    wed_avail = StringField('Wednesday Availability', validators=[Optional()])
+    thu_avail = StringField('Thursday Availability', validators=[Optional()])
+    fri_avail = StringField('Friday Availability', validators=[Optional()])
+    sat_avail = StringField('Saturday Availability', validators=[Optional()])
+    sun_avail = StringField('Sunday Availability', validators=[Optional()])
     submit = SubmitField('Update Employee')
+
+    def validate_mon_avail(self, mon_avail):
+        if mon_avail.Length < 3:
+            raise ValidationError('Must be 3 characters or more')
 
 class Schedule(FlaskForm):
     store = SelectField('Store', choices=[('Home Store', 'Home Store'), ("396", "396"), ('398', '398'),

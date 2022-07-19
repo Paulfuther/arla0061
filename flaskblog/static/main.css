@@ -44,6 +44,125 @@ body {
   font-size: 16px;
 }
 
+/* progress bar */
+
+.progress_container {
+  display:block;
+  margin-left: auto;
+  margin-right: auto;
+  width:80%;
+}
+
+.progress {
+  background-color:#F5F5F5;
+  border-radius: 13px;
+  /* (height of inner div) / 2 + padding */
+  
+}
+
+.progress-bar {
+
+  width: 1%;
+  height: 60px;
+  background-color: dodgerblue;
+  text-align: center;
+  line-height: 50px;
+  border-radius: 13px;
+  color: white;
+  padding: 5px;
+  
+}
+
+
+
+
+/* Buttons */
+
+.formcheckbtn {
+  
+  background-color: #d9edf7;
+  width: 95%;
+  color: black;
+  padding: 15px 32px 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 4px;
+  margin: 10px;
+}
+
+
+
+.formbutton {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  text-align: right;
+ 
+  margin: 10px;
+}
+
+.formcheckbtn:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.formbutton2 {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  text-align: left;
+  margin: 10px;
+}
+
+.two_fa_formcheckbtn {
+  
+  background-color: #d9edf7;
+  width: 95%;
+  color: black;
+  padding: 15px 10px 10px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 4px;
+  margin: 1rem;
+}
+
+.two_fa_formcheckbtn:hover {
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.two_fa_form_input {
+  
+  background-color: white;
+  width: 95%;
+  color: black;
+  padding: 15px 10px 10px 10px;
+  text-align: left;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 4px;
+  margin: 1rem;
+}
+
+
+.formscontrol {
+  width:250px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 20px;
+  padding-left: 10px;
+
+}
+
+.formscontrol:focus {
+   width:250px;
+   height: 40px;
+   border-radius: 12px;
+   outline-style: none;
+}
+
+
 
 /* employee add css */
 
@@ -152,6 +271,18 @@ body {
   display: inline-block;
   font-size: 16px;
   border-radius: 4px;
+}
+
+/* progress bar */
+
+.Progress_Status {
+  width: 50%;
+  background-color: #ddd;
+}
+.myprogressBar {
+  width: 2%;
+  height: 20px;
+  background-color: #4CAF50;
 }
 
 /* report container*/
@@ -1209,19 +1340,7 @@ ul {
   width:250px;
 }
 
-.two_fa_formcheckbtn {
-  
-  background-color: #d9edf7;
-  width: 95%;
-  color: black;
-  padding: 15px 10px 10px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  border-radius: 4px;
-  margin: 1rem;
-}
+
 
 
 /*-- change password form --*/
@@ -1286,21 +1405,6 @@ input[type=password] {
 
 }
 
-.formscontrol {
-  width:250px;
-  height: 40px;
-  border-radius: 12px;
-  font-size: 20px;
-  padding-left: 10px;
-
-}
-
-.formscontrol:focus {
-   width:250px;
-   height: 40px;
-   border-radius: 12px;
-   outline-style: none;
-}
 
 .loginheader {
   width: 90%;
@@ -2035,43 +2139,6 @@ ul.a {
   grid-template-columns: repeat(2,1fr);
 }
 
-
-
-.formcheckbtn {
-  
-  background-color: #d9edf7;
-  width: 95%;
-  color: black;
-  padding: 15px 32px 10px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  border-radius: 4px;
-  margin: 10px;
-}
-
-
-
-.formbutton {
-  grid-column-start: 1;
-  grid-column-end: 2;
-  text-align: right;
- 
-  margin: 10px;
-}
-
-.formcheckbtn:hover {
-  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-}
-
-.formbutton2 {
-  grid-column-start: 2;
-  grid-column-end: 3;
-  text-align: left;
-  
-  margin: 10px;
-}
 
 .emailverifydiv {
   grid-column-start: 1;

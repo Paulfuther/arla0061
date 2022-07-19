@@ -3,7 +3,7 @@ def update_phone():
 
     #this route copied all 
 
-    newuser =  Employee.query.filter(Employee.mobilephone).all()
+    newuser =  Employee.query.filter(Employee.firstname).all()
     
     for x in newuser:
         print(x.firstname, x.mobilephone, x.user_id)

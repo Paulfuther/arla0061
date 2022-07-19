@@ -27,7 +27,7 @@
 
 
 <div   class="form-container">
-    <form method = "POST" action  = "" enctype="multipart/form-data" class = "form-hrinfo">
+    <form id = "gsa_data" method = "POST" enctype="multipart/form-data" class = "form-hrinfo">
     
         
         
@@ -44,27 +44,21 @@
        
 
 
-        <div  class="formtitle" >{{"First Name:"}}</div>
-        <div> {{form.firstname(class = "form", placeholder="First Name")}}   
-                        {% if form.firstname.errors %}
-                        {% for error in form.firstname.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}  
-                        {% endif %}
-        </div> 
-        <div  class="formtitle" >{{"NickName:"}}</div>          
-        <div> {{form.nickname(class = "form", placeholder="Nick Name")}}                   
-        </div>           
-        <div  class="formtitle" >{{"Last Name:"}}</div>
-        <div> {{form.lastname(class = "form" ,placeholder="Last Name")}} 
-                    {% if form.lastname.errors %}
-                        {% for error in form.lastname.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}       
-                    {% endif %}
-        </div>      
+        <label class="formtitle">First Name :  </label>
+        <input type="text"  id="gsa_name" class="form" name = "firstname"  value = {{gsa.firstname}} data-gsa="{{gsa.id}}" readonly>
+                
+        <div  class="formtitle" >Last Name :</div>
+        <input type="text"  id="gsa_last_name" class="form" name = "lastname"  value = {{gsa.lastname}}  readonly>
+        <div></div>
+        <div>
+                                    
+            <button type = "submit" id="update_contact_info" class = "formcheckbtn">Submit </button>
+                        
+            </div>
+
+
         <div  class="formtitle" >{{"Date of Birth:"}}</div>
-        <div> {{form.dob(class = "form", placeholder="dob")}}   
+        <div> {{form.dob(class = "form")}}   
                         {% if form.dob.errors %}
                         {% for error in form.dob.errors %}
                         <div class = "formerror">{{ error }}</div>
@@ -263,16 +257,6 @@
                     {% endif %}
         </div>
 
-            
-                  
-
-                        <div>
-                  
-                        {{form.submit(class_="hrbutton")}}
-                        </div>
-
-            
-
             <div>
             <!-- <a class = "hrbutton" <a href="{{ url_for('home')}}">Edit an Employee</a> -->
             </div>
@@ -282,7 +266,32 @@
 
 
 
+                <script>
+                    const info_update = document.querySelector(".alert2-info");
+                    const btn_push = document.querySelector("#update_contact_info");
+                    btn_push.addEventListener('click', function(e){
+                        
+                        var form = $('#gsa_data');
+                    
+                        var gsa_identifier = document.querySelector('#gsa_name');
+                        var id = gsa_identifier.dataset.gsa;
+                        e.preventDefault()
+                        console.log(id);
+                        console.log(form);
+                        $.ajax({
+                                url:'/update_gsa_contact'+id,
+                                data: form.serialize(),
+                                type:'POST',
+                                success: function(response){
+                                console.log("yes you posted it"),
+                                alert('Successfully Updated')
+                                }
+                            
+                                
 
+                        })
+                    })
+                </script>
 
 
 

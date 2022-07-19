@@ -1,4 +1,5 @@
 
+from pyexpat.errors import messages
 from flask import Flask
 
 app = Flask(__name__)
@@ -27,9 +28,10 @@ from sqlalchemy import Boolean, DateTime, Column, Integer, \
     String, ForeignKey, or_
 from flask_email_verifier import EmailVerifier
 from flask_login import  user_logged_out, user_logged_in, login_required,\
-     current_user, LoginManager
+        current_user, LoginManager, fresh_login_required
 from flask_user import roles_required, roles_accepted, UserMixin
 from celery import Celery
+from celery.schedules import crontab
 from flaskblog.tasks import celery
 import dropbox
 from dropbox.files import WriteMode
@@ -68,13 +70,23 @@ app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 INCIDENT_UPLOAD_PATH=os.path.join(basedir, 'static/incidentpictures')
 app.config['INCIDENT_UPLOAD_PATH'] = INCIDENT_UPLOAD_PATH
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=5)
+#CELERY_ENABLE_UTC = False
+#USE_TZ=True
+#CELERY_TIMEZONE = 'Canada/Eastern'
+app.config['CELERYBEAT_SCHEDULE']= {
+    'call_stores_monthly': {
+        'task':'call_stores_monthly',
+        'schedule': crontab(day_of_month="1-7",hour="12,20"),
+        },
+    }
+
 
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 twilio_from = os.environ['TWILIO_FROM']
 
 
-
+celery.conf.update(app.config)
 #global COOKIE_TIME_OUT
 #COOKIE_TIME_OUT = 60*60*24*7 #5 days
 
@@ -126,11 +138,45 @@ ckeditor = CKEditor(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view='login'
-login_manager.session_protection="strong"
+login_manager.session_protection="basic"
+login_manager.login_message = 'You need to login first'
+login_manager.refresh_view = 'logout'
+login_manager.needs_refresh_message = 'This is a sensitive area. You need to login aagin to continue'
+login_manager.needs_refresh_message_category = 'info'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
 
+@celery.task(name="print_hello")
+def print_hello():
+    return print("hello")
+
+
+@celery.task(name="send_sms_testing")
+def send_sms_testing():
+    message=client.messages\
+        .create(
+            body="Hello from Paul",
+            from_=twilio_from,
+            to='+15196707469'
+        )
+    
+@celery.task(name="call_stores_monthly")
+def call_stores_monthly():
+    twimlname = 'Monthly Mystershop and Site Evaluation'
+    bulk_call = Twimlmessages.query.get(twimlname)
+    twil_id = bulk_call.twimlid
+        #print(twil_id)
+        # this is using twilml machine learning text to speach.
+        # this only goes out to stores.
+    site = db.session.query(Store.number,Store.phone).all()
+    for x in site:
+            call = client.calls.create(
+                            url=twil_id,
+                            to=x.phone,
+                            from_=twilio_from
+        )              
+      
 
 @celery.task
 def send_bulk_email(role_id, templatename):
@@ -472,19 +518,20 @@ class Role(db.Model):
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    firstname = db.Column(db.String(20), nullable=False)
-    lastname = db.Column(db.String(20), nullable=False)
+    firstname = db.Column(db.String(), nullable=False)
+    lastname = db.Column(db.String(), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
     store = db.relationship('Store', backref = 'store')
     addressone = db.Column(db.String(20), nullable=False)
     addresstwo = db.Column(db.String(20), nullable=True)
     apt = db.Column(db.String(20), nullable=True)
-    city = db.Column(db.String(20), nullable=False)
-    province = db.Column(db.String(20), nullable=False)
-    country = db.Column(db.String(20), nullable=False)
+    city = db.Column(db.String(), nullable=False)
+    province = db.Column(db.String(), nullable=False)
+    country = db.Column(db.String(), nullable=False)
     mobilephone = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(120), nullable=False)
-   
+    dob = db.Column(db.DateTime(),nullable=True)
+    startdate = db.Column(db.DateTime(),nullable=True)
     sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
@@ -633,9 +680,6 @@ class Incidentnumbers(db.Model):
          return '%r' % (self.details)
 
 
-
-
-
 # salt log
        
 class Saltlog(db.Model):
@@ -777,21 +821,21 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ( 'user_name', 'active','created_on', 'updated_on', 'email_confirmed', 'email_confirmed_date','roles', 'phone')
-    column_searchable_list = ['user_name']
+    column_list = ( 'firstname','lastname','store','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
+    column_searchable_list = ['lastname']
     
     def is_accessible(self):
         return current_user.has_roles('Admin' )
     
 
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            model.password = bcrypt.generate_password_hash(form.password.data)
-        else:
-            old_password = form.password.object_data
-            # If password has been changed, hash password
-            if not old_password == model.password:
-                model.password = bcrypt.generate_password_hash(form.password.data)
+    #def on_model_change(self, form, model, is_created):
+    #    if is_created:
+    #        model.password = bcrypt.generate_password_hash(form.password.data)
+    #    else:
+    #        old_password = form.password.object_data
+    #        # If password has been changed, hash password
+    #        if not old_password == model.password:
+    #            model.password = bcrypt.generate_password_hash(form.password.data)
 
 class MyModelView2(ModelView):
     create_modal = True
