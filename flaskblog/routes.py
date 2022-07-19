@@ -53,7 +53,23 @@ moment = Moment(app)
 CORS(app)
 
 
+@app.route('/updatefirstname')
+def update_phone():
 
+    #this route copied all 
+
+    newuser =  Employee.query.filter(Employee.id)
+    
+    for x in newuser:
+        print(x.firstname, x.mobilephone, x.user_id)
+        user=User.query.get(x.user_id)
+        print (user)
+        user.firstname = x.firstname
+        user.lastname = x.lastname
+        db.session.commit()
+        print(user.firstname, user.lastname)
+    
+    return "done"
 
 @app.route("/")
 def home(): 
@@ -637,6 +653,49 @@ def nofile():
         
 
     return render_template('nofile.html', nofile=nofile)
+
+@app.route("/activebystore")
+@login_required
+@roles_accepted('Admin', 'Manager')
+def activebystore():
+    
+    
+    activebystore = Employee.query.filter(Employee.id)\
+        .join(Store, Store.id == Employee.store_id)\
+            .join(User, Employee.user_id == User.id)\
+        .filter(User.active == 1)\
+        .add_columns(Store.number, Employee.firstname, Employee.lastname, User.active)\
+        .order_by(Store.number)
+        
+    for x in activebystore:
+        print(x.firstname, x.lastname, x.number, x.active)
+
+    return render_template('activebystore.html', activebystore=activebystore)
+
+@app.route("/activebystoreexcel")
+@login_required
+@roles_accepted('Admin', 'Manager')
+def activebystoreexcel():
+    activebystore = Employee.query.filter(Employee.id)\
+        .join(Store, Store.id == Employee.store_id)\
+            .join(User, Employee.user_id == User.id)\
+        .filter(User.active == 1)\
+        .add_columns(Store.number, Employee.firstname, Employee.lastname, User.active)\
+        .order_by(Store.number)
+    
+    
+    out = BytesIO()
+    writer = pd.ExcelWriter(out, engine = 'xlsxwriter')
+    df = pd.read_sql(activebystore.statement, activebystore.session.bind)
+    df = df[['number','firstname','lastname']]
+    df.to_excel(writer, index=False)
+    writer.save()
+    out.seek(0)
+    
+    
+
+    return send_file(out, attachment_filename="activebystore.xlsx", as_attachment=True)
+
 
 @app.route("/nofileexcel")
 @login_required

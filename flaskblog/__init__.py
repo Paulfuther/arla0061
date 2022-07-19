@@ -821,7 +821,7 @@ class MyModelView(ModelView):
     can_delete = False
     #column_sortable_list = ['lastname']
     column_hide_backrefs = False
-    column_list = ( 'firstname','lastname','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
+    column_list = ( 'firstname','lastname','store','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
     column_searchable_list = ['lastname']
     
     def is_accessible(self):
