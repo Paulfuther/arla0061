@@ -231,18 +231,19 @@ def send_bulk_email(role_id, templatename):
       
 
 @celery.task
-def make_pdf(staff_id):
+def make_pdf(staff_id, sigs):
     with app.test_request_context():
-        signatures = Empfile.query.filter_by(employee2_id = staff_id)
+        signatures = sigs#Empfile.query.filter_by(employee2_id = staff_id)
         ## this is incorrect. Employeeid is not user id. correct before pbulishing.
-        rol =  User.query.filter(or_(User.roles.any(Role.id == 3), User.id==staff_id)).all()
+        #rol =  User.query.filter(or_(User.roles.any(Role.id == 3), User.id==staff_id)).all()
         img = '/files/image-20201205212708-1.png'
 
-        for x in rol:
-            print(x.email)
+        print(sigs)
+        #for x in rol:
+        #    print(x.email)
 
-        return "done"
-        '''
+        #return "done"
+        
         image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
         image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
         image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
@@ -259,7 +260,7 @@ def make_pdf(staff_id):
         id = gsa.id
         print(fname)
     
-        rendered = render_template('employeefilepdf.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, signatures=signatures, gsa=gsa)
+        rendered = render_template('employeefilepdf2.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, sigs=sigs, gsa=gsa)
     
         options = {'enable-local-file-access': None,
             '--keep-relative-links': '',
@@ -281,31 +282,31 @@ def make_pdf(staff_id):
                 FileType('application/pdf'),
                 Disposition('attachment')) 
 
-        for x in rol:
-            email = x.email
-            message = Mail(
-            from_email=DEFAULT_SENDER,
-            to_emails= email,
-            subject = 'A New Hire File has been created',
-            html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
-            )
+        #for x in rol:
+        #    email = x.email
+        #    message = Mail(
+        #    from_email=DEFAULT_SENDER,
+        #    to_emails= email,
+        #    subject = 'A New Hire File has been created',
+        #    html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
+        #    )
             
-            message.dynamic_template_data = {
-                
-                'name':gsa.firstname,
-                'userid':gsa.trainingid,
-                'password':gsa.trainingpassword
+         #   message.dynamic_template_data = {
+         #       
+         #       'name':gsa.firstname,
+         #       'userid':gsa.trainingid,
+         #       'password':gsa.trainingpassword
 
-            }
+          #  }
         
-            message.template_id = SENDGRID_NEW_HIRE_FILE_ID
-            message.attachment=attachedFile
-            response = sg.send(message)
+            #message.template_id = SENDGRID_NEW_HIRE_FILE_ID
+            #message.attachment=attachedFile
+            #response = sg.send(message)
 
             
         with file as f:    
             dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
-        '''
+    
 
 
 @celery.task
@@ -445,6 +446,8 @@ class User(UserMixin, db.Model):
     roles = db.relationship('Role',  secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
+    check_in_out = db.relationship('checkinout', backref='user', lazy=True)
+
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -470,6 +473,9 @@ class User(UserMixin, db.Model):
             {'confirm_email': self.id, 'exp': time()+ expires_in},
             app.config['SECRET_KEY'], algorithm="HS256")
 
+    def __repr__(self):
+        return self.firstname
+
     @staticmethod
     def verify_email_confirm_token(token):
         try:
@@ -485,6 +491,13 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.get(id)
+
+class UserSchema(ma.Schema):
+    class Meta:
+        model = User
+        fields = ('id', 'email')
+user_schema = UserSchema(many=True)
+
 
 class BulkEmailSendgrid(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -565,8 +578,6 @@ class EmployeeSchema(ma.Schema):
         model = Employee
         store = ma.Nested("StoreSchema", exclude=("store",))
         fields = ('id', 'firstname', 'lastname', 'mobilephone','email', 'store_id', 'image_file', 'number')
-        
-        
 employee_schema = EmployeeSchema(many=True)
 
 class EmployeeSMSSchema(ma.Schema):
@@ -626,6 +637,8 @@ class Store(db.Model):
     number = db.Column(db.Integer)
     carwash =  db.Column(db.Boolean, default = False)
     phone = db.Column(db.String(), nullable=False)
+    check_in_out = db.relationship('checkinout', backref='store', lazy=True)
+
     
     def __repr__(self):
         return str(self.number)
@@ -794,6 +807,16 @@ class incident_files(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     image = db.Column(db.String(100), nullable=False)
     incident_id = db.Column(db.Integer, db.ForeignKey('incident.id'))
+
+
+class checkinout(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    startdate = db.Column(db.DateTime(), nullable = True)
+    starttime = db.Column(db.Time())
+    enddate = db.Column(db.DateTime(), nullable = True)
+    endtime = db.Column(db.Time())
+    check_store = db.Column(db.Integer, db.ForeignKey('store.id'))
+    check_user = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 # here we initiate the datastore which is used in the Admin model
 
@@ -1108,6 +1131,17 @@ class MyModelView14(ModelView):
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('home'))
 
+class MyModelView15(ModelView):
+    can_export = True
+    can_delete = False
+    #column_sortable_list = ['lastname']
+    column_hide_backrefs = False
+    #column_list = ( 'firstname','lastname','store','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
+    #column_searchable_list = ['store']
+    
+    def is_accessible(self):
+        return current_user.has_roles('Admin' )
+
 # these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
@@ -1125,6 +1159,7 @@ admin.add_view(MyModelViewReclaim(reclaimtank, db.session, category = "Paul"))
 admin.add_view(MyModelView12(BulkEmailSendgrid, db.session, category="Paul"))
 admin.add_view(MyModelView14(Twimlmessages, db.session, category="Paul"))
 admin.add_view(MyModelView10(cwmaintenance, db.session, category = "Paul"))
+admin.add_view(MyModelView15(checkinout, db.session, category = "Paul"))
 #admin.add_view(MyModelView11(Employee, db.session))
 admin.add_view(EmailView(name = 'Email', endpoint='email'))
 #admin.add_sub_category(name = "Links", parent_name="Team")

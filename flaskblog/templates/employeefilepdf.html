@@ -1183,7 +1183,51 @@
                   </br>
                    <!-- end of page  -->
                   <!--  document 25 -->
+                  <div class = "requiredgrid">
 
+                    <div>{{ hrpage[24].title|safe}}</div>
+
+                   <br/>
+
+                   <div class = "hrheaderdata">
+                   <p>Effective Date:    {{hrpage[24].effective_date|safe}}
+                   <p>Last Reviewed by Owner:    {{hrpage[24].date_of_review|safe}}
+                   </div>
+                   <br/>
+
+                   {{hrpage[24].text | safe}}
+
+                   </br>
+
+                  <div  class="sigPad23" id = "sigs">
+                                     <div class="sigWrapper">
+                                       
+                                         <canvas  class="sig"  width="200" height="55"></canvas>
+                                     </div>
+                                     <div class = "sigcontainer">
+                                 <div class = "signame">
+                                     
+                                     {{gsa.firstname }} {{""}} {{gsa.lastname}}    
+                                 </div>
+                          </div>
+
+                         <div class = "sigdate">
+                             {{gsa.startdate}}
+                         </div> 
+                 </div>
+                               
+                            <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
+                             <script>
+                                 $(document).ready(function() {
+                                 var sigdata23 = {{signatures[24].sig_data | tojson}}                             
+                                 $('.sigPad23').signaturePad({displayOnly:true}).regenerate(sigdata24);
+                                 });
+                             </script>
+                             <script src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
+                 
+                 </div>
+                  
+                 </br>
                    
                    <!-- end of page  -->
 
