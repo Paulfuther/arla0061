@@ -1499,9 +1499,6 @@ def staff_register():
     return redirect('emailsearch.html', form=form)
     
     
-
-
-
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
 def search():
