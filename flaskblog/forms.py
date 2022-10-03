@@ -6,7 +6,7 @@ from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy.sql.sqltypes import Date, String
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
         RadioField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
-from wtforms.fields.html5 import DateField, TelField, TimeField, EmailField
+from wtforms.fields.html5 import DateField, TelField, TimeField, EmailField, DateTimeLocalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, \
             InputRequired, NumberRange
 from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid, Twimlmessages
@@ -68,6 +68,34 @@ class BulkCallForm(FlaskForm):
 class TelephoneForm(FlaskForm):
     area_code = IntegerField('Area Code', validators=[DataRequired()])
     number = IntegerField('Number', validators=[DataRequired(), Length(min=7, max=7)] )
+
+class checkinoutForm(FlaskForm):
+    start_date = DateField('EvenDate', validators=[DataRequired()])
+    start_time = TimeField('EvenTime', validators=[DataRequired()])
+    end_date = DateField('EvenDate', validators=[DataRequired()])
+    end_time = TimeField('EvenTime', validators=[DataRequired()])
+    store = QuerySelectField(
+        query_factory=lambda: Store.query.order_by(Store.number),
+        allow_blank=False
+    )
+
+class NewRegisterForm(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    firstname = StringField('Firstname', validators= [DataRequired()])
+    lastname = StringField('Lastname', validators=[DataRequired()])
+    mobilephone = StringField('mobile', validators=[
+                              DataRequired()])
+    submit2 = SubmitField('Create Account')
+    password = StringField('Password', validators= [DataRequired()])
+    passwordconfirm = StringField('Password Confirm', validators= [DataRequired()])
+    monavail = StringField('Monday Availability', validators= [Optional()])
+    tueavail = StringField('Tuesday Availability', validators=[Optional()])
+    wedavail = StringField('Wednesday Availability', validators=[Optional()])
+    thuavail = StringField('Thursday Availability', validators=[Optional()])
+    friavail = StringField('Friday Availability', validators=[Optional()])
+    satavail = StringField('Saturday Availability', validators=[Optional()])
+    sunavail = StringField('Sunday Availability', validators=[Optional()])
+
 
 class EmployeeForm(FlaskForm):
     

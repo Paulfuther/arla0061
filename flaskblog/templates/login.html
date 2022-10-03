@@ -25,7 +25,9 @@
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
-
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+   
    
    <!-- <link rel = "stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}"> -->
   
@@ -33,10 +35,28 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename = 'main.css') }}" ></link> 
             
-     
-                <form id="loginform"  method="POST" action="" role="form">
+  <nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" >Paul Futher</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{url_for('home')}}">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{url_for('login')}}">Log In</a>
+          </li>
+         
+        </ul>
+      </div>
+    </div>
+  </nav>
+                <form id="loginform"   method="POST" action="" role="form">
 
-                    <div class = "login_container" >
+                    <div class = "login_container"  >
                     
                           
                   
@@ -54,17 +74,15 @@
                                     {% endwith %}
                 
                                 
-                           
-
-
-
                         {{ form.hidden_tag() }}
 
-                        <div class = "loginheader"><h1>{{ ('Login') }}</h1>
-                        </div>
+                        <div class=" mx-auto mt-1" style="width: 25rem">
+
+                         <h2 class="text-center"> Login </h2>
+                        
 
                         <div class = "box-1" >
-                            {{ form.email(class='formscontrol', placeholder="email") }}
+                            {{ form.email(class='form-control form-control-lg mb-1', placeholder="email") }}
                         </div>
 
                         {% for error in form.email.errors %}
@@ -72,20 +90,20 @@
                         {% endfor %}
                         
                         <div class = "box-2" >
-                            {{ form.password (class ='formscontrol', placeholder="password") }}
+                            {{ form.password (class ='form-control form-control-lg mb-1', placeholder="password") }}
                         </div>  
 
                         {% for error in form.password.errors %}
                         <div class="alerts">[{{ error }}]</div>
                         {% endfor %}
 
-                        <div class="login_card">
+                   
                                 <div class="loginheader">
-                                <h1>Select 2 Factor Channel</h1>
+                                <h1>You Must Select Either SMS (text) or Whatsapp for 2 Factor Authorisation</h1>
                                 </div>
 
                                 <div>
-                                    {{ form.two_fa (class='form_check')}}
+                                    {{ form.two_fa (class='form-control form-control-lg mb-1')}}
                                 </div>
 
                                 {% for error in form.two_fa.errors %}
@@ -93,23 +111,20 @@
                                 {% endfor %}
 
                                 
-                        </div>
-                        <div class="two_fa_submit">
-                        <input class="two_fa_formcheckbtn" type="submit" value="Submit">                            
+                        
+                        <div class="d-grid gap-2">
+                            <button type="button submit"  value="Submit" class="btn btn-primary" >Submit</button>
                         </div>
                         
-                        <div class="login_remember" >
-                            <div class="login_remember_check">Remember Me</div>
-                            <input type="checkbox" name = "remember_me">
-                            </div>
-
                         
 
-                        <div>
-                            <a class="login_container_hover" href="/forgot_password">Reset Password</a>
-                            
-                            <a class="login_container_hover" href="/">Home</a>
+                        <div class="row">
+                        <a class=" col md-auto login_container_hover text-center" href="/forgot_password">Reset Password</a>
                         </div>
+                        <div class="row">
+                        <a class=" col md-auto login_container_hover text-center" href="/">Home</a>
+                        </div>
+                        
                         
                  
                     </div>

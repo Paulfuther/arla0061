@@ -7,7 +7,8 @@ from requests.api import options
 from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
     grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, \
-        forgot_password_Form, BulkCallForm, reset_password_form, Confirm2faForm
+        forgot_password_Form, BulkCallForm, reset_password_form, Confirm2faForm, checkinoutForm,\
+            NewRegisterForm
 from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
     db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
@@ -15,7 +16,7 @@ from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
                  employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
                      DEFAULT_SENDER, Store,Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID, \
                          login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient,\
-                             basedir,INCIDENT_UPLOAD_PATH, incident_files
+                             basedir,INCIDENT_UPLOAD_PATH, incident_files, checkinout, user_schema
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
@@ -53,6 +54,50 @@ moment = Moment(app)
 CORS(app)
 
 
+@app.route('/clock_in_out', methods=['GET','POST'])
+@login_required
+def clock_in_out():
+    form = checkinoutForm()
+    store = Store.query.all()
+    if request.method == 'GET':
+        cleaning = checkinout.query.filter(checkinout.id)\
+        .join( User, checkinout.check_user == User.id)\
+            .join(Store, checkinout.check_store==Store.id)\
+        .add_columns(User.firstname, Store.number, checkinout.startdate,checkinout.starttime, checkinout.enddate,
+         checkinout.endtime).order_by(checkinout.startdate.desc())
+        return render_template('clickinout.html', form=form, store=store, cleaning=cleaning)
+    if request.method =='POST':
+        form_data = request.form
+        start_date = form.start_date.data
+        end_date = form.end_date.data
+        store = form.store.data
+        newstarttime=str(form.start_time.data)
+        newstarttime =datetime.strptime(newstarttime, '%H:%M:%S').time()
+        newendtime=str(form.end_time.data)
+        newendtime=datetime.strptime(newendtime, '%H:%M:%S').time()
+        newstartdate1=str(form.start_date.data)
+        newstartdate=datetime.strptime(newstartdate1, '%Y-%m-%d').date()
+        #newstartdate = start_date.date()
+        print(form.start_date.data, form.start_time.data, form.store.data.id, current_user, newstartdate)
+
+        clockin = checkinout(check_user = current_user.id, 
+                            check_store = form.store.data.id,
+                            startdate = newstartdate,
+                            starttime = newstarttime,
+                            enddate= end_date,
+                            endtime=newendtime)
+        db.session.add(clockin)
+        db.session.commit()
+        #cleaning = checkinout.query.all()
+        
+        cleaning = checkinout.query.filter(checkinout.id)\
+        .join( User, checkinout.check_user == User.id)\
+            .join(Store, checkinout.check_store==Store.id)\
+        .add_columns(User.firstname, Store.number, checkinout.startdate,checkinout.starttime, checkinout.enddate,
+         checkinout.endtime).order_by(checkinout.startdate.desc())
+        flash("Time Submitted. Thank")
+        return redirect(url_for('clock_in_out'))
+
 @app.route('/updatefirstname')
 def update_phone():
 
@@ -73,7 +118,7 @@ def update_phone():
 
 @app.route("/")
 def home(): 
-    return render_template("layout.html")
+    return render_template("home.html")
 
 
 @app.route("/login", methods = ['GET', 'POST'])
@@ -102,8 +147,8 @@ def login():
             print(user.active)
             print(form.two_fa.data)
             # testing
-            #login_user(user, remember=form.remember_me.data)
-            #return render_template("layout.html", title="home")
+            login_user(user, remember=form.remember_me.data)
+            return render_template("layout.html", title="home")
 
             # end here
             if form.two_fa.data=="sms":
@@ -236,10 +281,10 @@ def send_password_reset_email(user):
 @app.route('/reset_password/<token>', methods=['GET','POST'])
 def reset_password(token):
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     user = User.verify_reset_password_token(token)
     if not user:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     form = reset_password_form()
     if form.validate_on_submit():
         user.password = bcrypt.generate_password_hash(form.password.data)
@@ -253,10 +298,10 @@ def reset_password(token):
 @app.route('/confirm_email/<token>', methods=['GET', 'POST'])
 def confirm_email(token):
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     user = User.verify_email_confirm_token(token)
     if not user:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
     
     user.email_confirmed = True
     user.email_confirmed_date = datetime.utcnow()
@@ -725,8 +770,6 @@ def nofileexcel():
     return send_file(out, attachment_filename="nofile.xlsx", as_attachment=True)
 
 @app.route("/verifyphonetoday", methods = ['GET','POST'])
-@login_required
-@roles_accepted('Admin', 'Manager')
 def verifyphone():
     form = EmployeeForm()
 
@@ -965,10 +1008,11 @@ def sendfile(staff_id):
 @login_required
 def hrfile(staff_id):
     gsa = Employee.query.get(staff_id)
-    #hrpage = hrfiles.query.limit(3).all()
-    hrpage = hrfiles.query.all()
-    #print(gsa.firstname)
+    hrpage = hrfiles.query.limit(3).all()
     
+    #print(gsa.firstname)
+    for x in hrpage:
+        print(x.id)
     exists = Empfile.query.filter_by(employee2_id = staff_id).first()
     if exists:
         print("yes")
@@ -976,15 +1020,22 @@ def hrfile(staff_id):
         return redirect(url_for("hrlist"))
 
     if request.method == "POST":
-        sigs = request.form.getlist('output')
-       
+        #sigs = request.form.getlist('output')
+        signature = request.form.getlist('output')
+        #signatures = json.dumps(signature)
+        hrpage = hrfiles.query.limit(3).all()
+        #sigs2 = json.dumps(sigs)
+        #print(sigs)
+        
+        #for x in sigs:
+        #   print(x)
         f = (staff_id)
         y = 1
         z = 0
         for x in hrpage:
                 empfile = Empfile(employee2_id= f,
                                 file_id= y,
-                                sig_data = sigs[z])
+                                sig_data = signature[z])
           
                 data = request.form['output']
                 #print(data)
@@ -994,9 +1045,12 @@ def hrfile(staff_id):
                 z += 1
                 
         db.session.commit()
-        
+        signatures = Empfile.query.filter_by(employee2_id = staff_id)
+        for x in signatures:
+            print (x)
         flash("file completed. Thank you")
-        make_pdf.apply_async(args=[staff_id], countdown=10)
+        #make_pdf.apply_async(args=[staff_id, sigs], countdown=10)
+        return render_template('employeefilepdf2.html', hrpage=hrpage ,signatures=signatures, staff_id = staff_id, gsa=gsa)
         return ('success')
   
     #print("success")
@@ -1261,6 +1315,193 @@ def livesearch():
     print(result)
     return result
 
+@app.route("/live_email", methods =['GET', 'POST'])
+@login_required
+def live_email():
+    form=NewRegisterForm()
+    return render_template('emailsearch.html', form=form)
+
+
+@app.route("/email_livesearch", methods = ["POST", "GET"])
+def email_livesearch():
+    
+    # search by first name, last name or store number
+    # you need to serialise the result to pass it on as json.
+
+    searchbox = request.form.get("text")
+    gsa = User.query.filter(or_(User.email.like('%' + searchbox + '%')))\
+        .filter(User.active == 1)\
+        .add_columns(User.email, User.id)\
+        .all()
+    for s in gsa:
+        print(s.email)
+    results = user_schema.dump(gsa) # need to jsonify results to pass back. 
+                                    # done in the User creation model.
+    result = jsonify(results)
+    
+    print(result)
+    return result
+
+
+@app.route("/staff_register", methods=["GET", "POST"])
+def staff_register():
+    form = NewRegisterForm()
+    coursecount = Course.query.all()
+    #print(coursecount)
+    # the get is for the first load of the page
+    if request.method == "GET":
+        return render_template('emailsearch.html', form=form)
+    if request.method == "POST":
+        gsa_register = request.form['hiddenphone']
+        if form.validate_on_submit:
+            # here we submit a form...which should be valid
+
+            #this is for testing. take out return hello
+            #return"hello"
+            staff_email = User.query.filter_by(email=form.email.data).first()
+            if staff_email:
+                flash("email already used")
+                return render_template('emailsearch.html', form=form)
+            else:
+                target=request.form.get('hiddenphone')
+                form.mobilephone.data = target
+                newuser = request.form.get('hiddenemail')
+
+                print("good stuff")
+                print(gsa_register)
+                
+                newpass = request.form.get('password')
+                newpassword = bcrypt.generate_password_hash(newpass)
+                
+                # now add the user to the database
+                
+                adduser = User(email=form.email.data,
+                    password=newpassword,
+                    active=1,
+                    firstname=form.firstname.data,
+                    lastname=form.lastname.data,
+                    phone=form.mobilephone.data)
+
+                db.session.add(adduser)
+                print(form.sunavail.data)
+                print(form.monavail.data)
+                # flush will create an entry in the database that cannot be over written.
+                # flush then gives us the user id. 
+                # we need the user id to go along with the employee id.
+
+                db.session.flush()
+                db.session.commit()
+
+                newid = adduser.id
+                
+                print(newid)
+                picture_file = '3d611379cfdf5a89.jpg'
+
+                # Here we create the new employee in the database.
+
+                emp = Employee(user_id=newid,
+                                firstname=form.firstname.data,
+                                lastname=form.lastname.data,
+                                store_id=1,
+                                addressone="tbd",
+                                addresstwo="tbd",
+                                apt="tbd",
+                                city="tbd",
+                                province="tbd",
+                                country="tbd",
+                                postal="tbdtbd",
+                                email=form.email.data,
+                                mobilephone=form.mobilephone.data,
+                                trainingid="tbd",
+                                trainingpassword="tbd",
+                                image_file=picture_file,
+                                iprismcode="tbd",
+                                mon_avail=form.monavail.data,
+                                tue_avail=form.tueavail.data,
+                                wed_avail=form.wedavail.data,
+                                thu_avail=form.thuavail.data,
+                                fri_avail=form.friavail.data,
+                                sat_avail=form.satavail.data,
+                                sun_avail=form.sunavail.data)
+                                     
+                db.session.add(emp)  
+                        # flush will get the id of the pending user so that
+                        # we can add the raining information     
+                db.session.flush()
+
+                # here we are adding the training courses and the compelted dates.
+                # adding the dates requires some work.
+                # the data has to be in the format that the database can read.
+
+                # need all of this  
+            
+                #r = request.form.getlist("completeddate")
+                #g = request.form.getlist("myCheck2")
+                f = emp.id
+                
+                print(emp.id)
+                yy = 0
+                y=1
+                
+                for x in coursecount:
+                    empgrade = Grade(
+                                employee_id=f,
+                                course_id=y,
+                                completed = 0
+                                )  
+                    print(f, y)
+                    db.session.add(empgrade)
+                    y += 1
+                    yy += 1
+           
+                #print(emp)
+                    
+                # here we add the defuault role of GSA to new hire
+                # you cannot add to the association table 
+                # instead you insert
+        
+                addrole = roles_users.insert().values(user_id = newid, role_id= 5)        
+                db.session.execute(addrole)
+
+                db.session.commit()
+       
+            ''' email = emp.email
+                message = Mail(
+                from_email=DEFAULT_SENDER,
+                to_emails= email,
+                subject = 'Welcome to Petro Canada',
+                
+                )
+                
+                message.dynamic_template_data = {
+                    
+                    'name':emp.firstname,
+                    'userid':emp.trainingid,
+                    'password':emp.trainingpassword,
+                    'login':emp.email
+
+                }
+            
+                message.template_id = SENDGRID_NEWHIRE_ID
+            
+                response = sg.send(message)
+            '''
+
+            message=client.messages\
+            .create(
+            body="Hello. This is Terry from Petro Canada. Thank you for registering your account. Please go to www.paulfuther.com to log in. We need you to complete your empoloyee file. Please talk to your manager if you have any questions.",
+            from_=twilio_from,
+            to=target
+            )
+        flash("Account Created")
+        return redirect(url_for('login'))
+              
+    return redirect('emailsearch.html', form=form)
+    
+    
+
+
+
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
 def search():
@@ -1277,6 +1518,7 @@ def search():
     
    
     return render_template('hrlist.html', gsa=gsa, store_list = store_list, ugh2=ugh2)
+
 
 def save_hrpicture(form_hrpicture):
     # uses PIL from Pillow
@@ -1711,6 +1953,8 @@ def tpfileupload():
 def SecurityFileconvert():
     return render_template('securityfileconvert.html', title='Security File Converter')
 
+
+
 @app.route("/securityfileupload", methods=['POST'])
 @login_required
 def securityfileupload():
@@ -1791,6 +2035,62 @@ def securityfilenegupload():
                 df.columns = ['Text']
                 df['Date'] = df['Text'].str.extract('(.. ... ..)', expand=False).copy()
                 df2 = df[df['Text'].str.contains('NEGATIVE', na=False)].copy()
+                #if df2.empty:
+                #    flash('No Negative Sales')
+                #    return render_template('applications.html') 
+
+                df2['Store'] = b
+                print(df2)
+                newdf.append(df2)
+
+                print(newdf)
+
+            newdf = pd.concat(newdf)
+
+            newdf['Date'] = pd.to_datetime(
+            newdf['Date'], dayfirst=True)  # .dt.strftime('%d %m %Y')
+
+            newdf['Time'] = newdf['Text'].str.extract(r"([\d]{1,2}\:[\d]{1,2}\:[\d]{1,2})")
+            newdf['Time'] = pd.to_datetime(newdf['Time'], format='%H:%M:%S').dt.time
+            newdf.set_index('Date', inplace=True)
+        except:
+            flash('Something went wrong')
+            return render_template('applications.html')
+        
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    newdf.to_excel(writer)
+    writer.save()
+    output.seek(0)
+
+    return send_file(output, attachment_filename="sfoutput.xlsx", as_attachment=True)
+
+@app.route("/securityfilevoidconvert")
+@login_required
+def SecurityFilevoidconvert():
+    return render_template('securityfilevoidconvert.html', title='Security File Converter')
+
+@app.route("/securityfilevoidupload", methods=['POST'])
+@login_required
+def securityfilevoidupload():
+
+    if request.method == "POST":
+
+        try:
+            files = request.files.getlist('securityfilevoidinputFile[]')
+            newdf = []
+
+            for file in files:
+                inputfilename = file
+                print(inputfilename)
+                excel_file = inputfilename
+                store_number = file
+                a = str(store_number)
+                b = re.search('\d+', a).group()
+                df = pd.read_csv(excel_file, sep='\t', header=None)
+                df.columns = ['Text']
+                df['Date'] = df['Text'].str.extract('(.. ... ..)', expand=False).copy()
+                df2 = df[df['Text'].str.contains('Voided', na=False)].copy()
                 #if df2.empty:
                 #    flash('No Negative Sales')
                 #    return render_template('applications.html') 

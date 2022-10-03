@@ -1,0 +1,100 @@
+{% extends "layout.html" %}
+
+{% block content%}      
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.6.0/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/b-print-2.2.3/r-2.3.0/datatables.min.css"/>
+ 
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.6.0/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/b-print-2.2.3/r-2.3.0/datatables.min.js"></script>
+
+    
+
+
+
+</head>
+    <div class = 'checkcontainer'>
+                <div class = "checkgrid">
+  
+
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <ul class=flashes>
+                            {% for message in messages %}
+                            <li>{{ message }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% endwith %}
+                        {% block body %}{% endblock %}
+
+                    <form id="check_in_out" method = "POST" action  = "" enctype="multipart/form-data"  >
+                        {{form.hidden_tag()}}
+                        <div class="clockheader"> {{ current_user }}{{ current_user.store }} <div>
+                        <div class="clockheader">Store:</div>
+                        <div>{{ form.store(class='form_clock_in') }} </div>
+                        <div class="clockheader">Start Date:</div> 
+                        <div >{{form.start_date(class = 'form_clock_in')}} </div>
+                        <div class="clockheader"> Start Time</div>
+                        <div> {{form.start_time(class= 'form_clock_in')}} </div>
+                        <div class="clockheader">End Date: </div> 
+                        <div >{{form.end_date(class='form_clock_in')}} </div>
+                        <div class="clockheader">End Time </div>
+                        <div> {{form.end_time(class='form_clock_in')}} </div>
+                        <div >
+                            <button type="submit"  id="clock_in" class="clock_in_btn">Submit</button>
+                        </div>
+
+                    </form>
+                </div>
+    </div>
+   <div class="table-container">
+                <table id="table_id" class="display" >
+                    <thead>
+                        <tr>
+                            <th>Staff</th>
+                            <th>Store</th>
+                            <th>Date Started</th>
+                            <th>Time Started</th>
+                            <th>Date Ended</th>
+                            <th>Time Ended</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                    {% for x in cleaning %}
+                <tr>
+                    <td>{{ x.firstname }}</td>
+                    <td>{{ x.number }}</td>
+                    <td> {{ x.startdate.strftime('%Y-%m-%d')}} </td>
+                    <td>{{ x.starttime}} </td>
+                    <td>{{x.enddate.strftime('%Y-%m-%d')}}</td>
+                    <td>{{ x.endtime }}</td>
+                </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+    </div>
+
+
+    
+
+
+    <script>
+        $(document).ready( function () {
+        $('#table_id').DataTable({
+            order: [[2, 'desc']],
+            dom: 'Bfrtip',
+            responsive: true,
+            buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+        });
+        });
+    </script>
+
+   
+
+{% endblock content %}
+

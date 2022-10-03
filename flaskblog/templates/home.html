@@ -26,19 +26,35 @@
    <link rel="preconnect" href="https://fonts.googleapis.com">
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
-
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
    
    <!-- <link rel = "stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}"> -->
   
   </head>
   
 
-<div class="homecontainer">
-    
-    welcome to paul futher dot com
 
-    <a href="/login">Login</a>
-    
+
+
+
+
+<div class="container">
+  
+  <div class="card mx-auto mt-5" style="width: 18rem;">
+    <img class="card-img-top" src="/static/images/PaulFuther.jpg" alt="Card image cap">
+    <div class="card-body">
+      <h5 class="card-title text-center">Welcome</h5>
+      <p class="card-text ">This is the home of Paul Futher</p>
+      <p class="card-text ">If you are a Petro Canada employee who has an account, click Login</p>
+      <p class="card-text ">If you are a Petro Canada new hire who has not registered for an account, click Register</p>
+      <div class="d-grid gap-2">
+     
+      <a href="{{url_for('login')}}" class="btn btn-primary">Login</a>
+      <a href="{{url_for('staff_register')}}" class="btn btn-primary">Register</a>
+      </div>
+    </div>
+ 
+  </div>
+   
 </div>
-
-
