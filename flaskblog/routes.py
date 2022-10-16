@@ -133,7 +133,7 @@ def login():
         elif user.active == False:
             flash('You are not an active user')
             return render_template("login.html", form=form)
-        elif user is None or  not bcrypt.check_password_hash(user.password, form.password.data):
+        elif user is None or not bcrypt.check_password_hash(user.password, form.password.data):
             flash('invalid username or password')
             return redirect(url_for('login', form=form)  )
         elif user.email_confirmed == 0:      
@@ -514,7 +514,7 @@ def sms_reply():
 @login_required
 def print_incident():
     form=SiteIncident()
-    x=int(53)
+    x=int(85)
     gsa = Incident.query.get(x)
     ident = gsa.id
     print(ident)
@@ -542,6 +542,30 @@ def email(email):
         resp = make_response('None', 404)
     return resp
 
+
+@app.route("/process_images", methods = ['GET', 'POST'])
+@login_required
+def process_images():
+    form = SiteIncident()
+    pics= request.files.getlist('photos[]')
+    print (pics)
+            #filename = secure_filename(pics.filename)
+            #print(INCIDENT_UPLOAD_PATH)
+            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
+           
+    for pic in pics:
+        if not pic:
+            pass
+        else:
+            i=Image.open(pic)
+            i.thumbnail((300,300), Image.LANCZOS)  
+            print(i.size)    
+            i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
+    return render_template('eventreport.html', form=form)
+
+
+
+
 @app.route("/event", methods = ['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -551,24 +575,25 @@ def eventreport():
     # get all of the information from the form
 
     if form.validate_on_submit():
-            pics= request.files.getlist('incimage')
+            pics= request.files.getlist('photos[]')
             print (pics)
+            print(form.location.data)
             #filename = secure_filename(pics.filename)
             #print(INCIDENT_UPLOAD_PATH)
             #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
            
-            for pic in pics:
-                if not pic:
-                    pass
-                else:
-                    i=Image.open(pic)
+            #for pic in pics:
+            #    if not pic:
+            #        pass
+            #    else:
+            #        i=Image.open(pic)#
 
                     #= Image.open(pic)
-                    i.thumbnail((300,300), Image.LANCZOS)
+            #        i.thumbnail((300,300), Image.LANCZOS)
                     #i.save(picture_paththumb)
-                    print(i.size)
+            #        print(i.size)
                     #new_pic = image.resize(300,300)
-                    i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
+             #       i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
         
             #return render_template('layout.html')
             newtime=str(form.eventtime.data)
@@ -580,7 +605,7 @@ def eventreport():
                             reputation = form.reputation.data,
                             security = form.security.data,
                             fire = form.fire.data,
-                            location = form.location.data,
+                            location = str(form.location.data),
                             eventdetails = form.eventdetails.data,
                             eventdate = form.eventdate.data,
                             eventtime = time2,
@@ -676,7 +701,7 @@ def eventreport():
             # we call a task mamanger to do this. That is the apply_async 
            # make_incident_pdf.apply_async(args=[file_id], countdown=10)
 
-
+            return("good")
             return render_template('layout.html')
            
     return render_template('eventreport.html', form=form)
@@ -1008,7 +1033,7 @@ def sendfile(staff_id):
 @login_required
 def hrfile(staff_id):
     gsa = Employee.query.get(staff_id)
-    hrpage = hrfiles.query.limit(3).all()
+    hrpage = hrfiles.query.all()
     
     #print(gsa.firstname)
     for x in hrpage:

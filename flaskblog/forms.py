@@ -88,13 +88,13 @@ class NewRegisterForm(FlaskForm):
     submit2 = SubmitField('Create Account')
     password = StringField('Password', validators= [DataRequired()])
     passwordconfirm = StringField('Password Confirm', validators= [DataRequired()])
-    monavail = StringField('Monday Availability', validators= [Optional()])
-    tueavail = StringField('Tuesday Availability', validators=[Optional()])
-    wedavail = StringField('Wednesday Availability', validators=[Optional()])
-    thuavail = StringField('Thursday Availability', validators=[Optional()])
-    friavail = StringField('Friday Availability', validators=[Optional()])
-    satavail = StringField('Saturday Availability', validators=[Optional()])
-    sunavail = StringField('Sunday Availability', validators=[Optional()])
+    monavail = StringField('Monday Availability', validators= [DataRequired()])
+    tueavail = StringField('Tuesday Availability', validators=[DataRequired()])
+    wedavail = StringField('Wednesday Availability', validators=[DataRequired()])
+    thuavail = StringField('Thursday Availability', validators=[DataRequired()])
+    friavail = StringField('Friday Availability', validators=[DataRequired()])
+    satavail = StringField('Saturday Availability', validators=[DataRequired()])
+    sunavail = StringField('Sunday Availability', validators=[DataRequired()])
 
 
 class EmployeeForm(FlaskForm):
@@ -280,13 +280,16 @@ class SiteIncident(FlaskForm):
     security = BooleanField()
     fire = BooleanField()
 
-    location = StringField('Location', validators=[DataRequired(), Length(min=1, max= 100)])
+    location =QuerySelectField('Store',
+        query_factory=lambda: Store.query.order_by(Store.number),
+        allow_blank=False
+    )
 
-    eventdetails = TextAreaField('Details', validators=[DataRequired()])
-    eventdate = DateField('EvenDate', validators=[DataRequired()])
-    eventtime = TimeField('EvenTime', validators=[DataRequired()])
-    reportedby = StringField('Reported by', validators=[DataRequired()])
-    reportedbynumber = StringField('Phone NUmber', validators=[DataRequired()])
+    eventdetails = TextAreaField('Details', validators=[Optional()])#
+    eventdate = DateField('EvenDate', validators=[DataRequired()])#
+    eventtime = TimeField('EvenTime', validators=[DataRequired()])#
+    reportedby = StringField('Reported by', validators=[DataRequired()])#
+    reportedbynumber = StringField('Phone NUmber', validators=[DataRequired()])#
 
     suncoremployee = BooleanField()
     contractor = BooleanField()
@@ -296,7 +299,7 @@ class SiteIncident(FlaskForm):
     othertext = StringField('Other')
 
     actionstaken = TextAreaField('Actions Taken')
-    correctiveactions = TextAreaField('Corrective Actions', validators=[DataRequired()])
+    correctiveactions = TextAreaField('Corrective Actions', validators=[Optional()])#
 
     sno = BooleanField()
     syes = BooleanField()

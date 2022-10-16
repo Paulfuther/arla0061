@@ -44,6 +44,11 @@ body {
   font-size: 16px;
 }
 
+.card.active {
+  display:block;
+}
+
+
 /* progress bar */
 
 .progress_container {

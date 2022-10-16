@@ -31,128 +31,136 @@
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@500&display=swap" rel="stylesheet">
    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-   
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+
+
    <!-- <link rel = "stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}"> -->
   
   </head>
 
   <body>
 
-    <div class="menu-btn">
-        <i class="fas fa-bars fa-1x"></i>
-    </div>   
-
-   
-
-      
-      
-
-
-    <div class = "menu-container" >
+    
 
       <!--  Nave bar -->
              
-               <nav class="main-nav" >
-                
+               <nav class="navbar navbar-expand-lg bg-light" >
+                <div class="container-fluid">
                  <!--<img src="/static/images/PaulFuther.jpg" >--> 
                   
-                  <ul class = "main-menu">
+                <a class="navbar-brand">Petro Canada</a>
 
-                    {% if current_user.is_anonymous %}
-                    <a href="{{ url_for('login') }}">Login</a>
-                    
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
 
-                   
-                    {% elif current_user.has_roles('GSA') %}
-
-                      <li> <a href="{{ url_for('home')}}">ARL A0061</a></li>
-                      <li> <a href="{{ url_for('home22')}}">Home</a></li>
-                      <li> <a href="{{ url_for('logout')}}">Logout</a></li>
-                      <li> <a href="{{ url_for('clock_in_out')}}">Clock</a></li>
-
-                      {% else %}
-                   
-                      <li>{{ current_user }} </li>
-                      <li> <a href="{{ url_for('home')}}">ARL A0061</a></li>
-                      <li> <a href="{{ url_for('home')}}">Home</a></li>
-                      <li> <a href="{{ url_for('logout')}}">Logout</a></li>
-                      <li> <a href="{{ url_for('Applications')}}">Apps</a></li>
-                      <li> <a href="{{ url_for('clock_in_out')}}">Clock</a></li>
-                      <li> <a href="{{ url_for('hrhome')}}">HR</a></li>
-                      <li> <a href="{{ url_for('schedule')}}">Schedule</a></li>
-                      <li> <a href="{{ url_for('admin.index')}}">Admin</a></li>
-                      <li> <a href="{{url_for('eventreport')}}">Event From</a></li>
-                      <li> <a href="{{ url_for('comms_menu')}}">Comms</a></li>
-                  
-                     {% endif %}
-                    
-                      
-                  </ul>
-
-                  <!-- Navbar Right Side -->
-
-              </nav>
-
-    </div>
-
-      <div class = "container" > 
-      
-              <nav class = "mobile-nav">
-
-              <ul class = "mobile-menu">
+                    <div class="collapse navbar-collapse" id="navbarNav">
 
                       {% if current_user.is_anonymous %}
-                      <a href="{{ url_for('login') }}">login</a>
+                      <ul class="navbar-nav">
+                        <li class="nav-item">
+                        <a href="{{ url_for('login') }}">Login</a>
+                      </li>
+                       <ul>
+                   
+                    {% elif current_user.has_roles('GSA') %}
+                        <ul class="navbar-nav mx-auto">
+                          <li class="nav-item">
+                          
 
-                      {% elif current_user.has_roles('GSA') %}
+                      <li class="nav-item"> <a href="{{ url_for('home22')}}">Home</a></li>
+                      <li class="nav-item"> <a href="{{ url_for('logout')}}">Logout</a></li>
+                      <li class="nav-item"> <a href="{{ url_for('clock_in_out')}}">Clock</a></li>
+                        </ul>
 
-                        <li> <a href="{{ url_for('home')}}">ARL A0061</a></li>
-                        <li> <a href="{{ url_for('home22')}}">Home</a></li>
-                        <li> <a href="{{ url_for('clock_in_out')}}">Clock</a></li>
-                        <li> <a href="{{ url_for('logout')}}">Logout</a></li>
-                    
+                       {% elif current_user.has_roles('Manager') %}
+                        <ul class="navbar-nav mx-auto">
+                          <li class="nav-item">
+                          
+                          
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('login')}}">Home</a></li>
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('logout')}}">Logout</a></li>
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('clock_in_out')}}">Clock</a></li>
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('hrhome')}}">HR</a></li>
+                      <li class="nav-item"> <a class="nav-link" href="{{url_for('eventreport')}}">Event From</a></li>
+                        </ul> 
+                        <span class="navbar-text px-4" >{{ current_user }}</span>
                       {% else %}
-                    
-                      
-                        <li>{{ current_user }} </li>
-                        <li> <a href="{{ url_for('home')}}">Home</a></li>
-                        <li> <a href="{{ url_for('logout')}}">Logout</a></li>
-                        <li> <a href="{{ url_for('schedule')}}">Schedule</a></li>
-                        <li><a href="{{ url_for('admin.index')}}">Admin</a></li>
-                        <li> <a href="{{ url_for('eventreport')}}">Event Form</a></li>
-                        <li> <a href="{{ url_for('comms_menu')}}">Comms</a></li>
-                        <li> <a href="{{ url_for('clock_in_out')}}">Clock</a></li>
-                        <li class = "dropdown-btn">HR Main</li>
-                        <div class= "dropdown-container">
-                         
-                         <a href = "{{ url_for('hrlist')}}" >Search Employess</a>
+
+                      <ul class="navbar-nav mx-auto">
                         
-                         <a href="addemployee">Add Employee</a>
-                         <a href="nofile">Employees Without a File</a>
-                      </div>
-
-                      <li class="dropdown-btn">Apps</li>
-                        <div class = "dropdown-container">
-                          <a href="kpiconvert">Growth KPI Converter</a>
-                          <a href="carwashkpiconvert">Carwash KPI Converter </a>
-                          <a  href="tpfileconvert">Team Performance Converter </a>
-                          <a href="securityfileconvert">Security Log Converter</a>
-                          <a href="securityfilenegconvert">Security Log Negative Sales Converter</a>
-                       </div>
-
-                        {% endif %}
-                       
-              </ul>
+                      
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('login')}}">Home</a></li>
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('logout')}}">Logout</a></li>
+                    
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Apps
+                        </a>
+                        <ul class="dropdown-menu " aria-labelledby="navbarDarkDropdownMenuLink">
+                          <li><a class="dropdown-item" href="kpiconvert">Growth KPI</a></li>
+                          <li><a class="dropdown-item" href="carwashkpiconvert">Carwash KPI</a></li>
+                          <li><a class="dropdown-item" href="tpfileconvert">TP Convert</a></li>
+                          <li><a class="dropdown-item" href="securityfileconvert">Security Log Convert</a></li>
+                          <li><a class="dropdown-item" href="securityfilenegconvert">Neg Sales Convert</a></li>
+                          <li><a class="dropdown-item" href="securityfilevoidconvert">Voids Convert</a></li>
+                        </ul>
+                      </li>
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('clock_in_out')}}">Clock</a></li>
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          HR
+                        </a>
+                        <ul class="dropdown-menu " aria-labelledby="navbarDarkDropdownMenuLink">
+                          <li><a class="dropdown-item" href="hrlist">Search Employess</a></li>
+                          <li><a class="dropdown-item" href="addemployee">Add Employess</a></li>
+                          <li><a class="dropdown-item" href="nofile">Employees Without A File</a></li>
+                          <li><a class="dropdown-item" href="activebystore">Employess Active By Store</a></li>
+                          
+                        </ul>
+                      </li>
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('schedule')}}">Schedule</a></li>
+                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('admin.index')}}">Admin</a></li>
+                      <li class="nav-item"> <a class="nav-link" href="{{url_for('eventreport')}}">Event From</a></li>
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Comms
+                        </a>
+                        <ul class="dropdown-menu " aria-labelledby="navbarDarkDropdownMenuLink">
+                          <li><a class="dropdown-item" href="{{ url_for('bulk_sms')}}">Bulk SMS</a></li>
+                          <li><a class="dropdown-item" href="{{ url_for('bulk_email')}}">Bulk Email</a></li>
+                          <li><a class="dropdown-item" href="{{ url_for('twilio_call')}}">Bulk Phone Call</a></li>
+                        </ul>
+                      </li>
+                        </ul>
+                        <span class="navbar-text px-4" >{{ current_user }}</span>
+                     {% endif %}
+                    
+                </div>
+                </div>
               </nav>
 
-      </div>  
-
-            <main role="main" class="container">
+ 
+                <main role="main" class="container">
                 
-                    {% block content %}{% endblock %}
+                    {% block content %}
+                    {% with messages = get_flashed_messages()%}
+                                    {%if messages%}
+                                        {% for message in messages %}
+                                        <div class = "alerts">
+                                        {{ message }} 
+                                        </div>
+                                        {% endfor %}
+                                        
+                                        
+                                    {% endif %}
+                                    {% endwith %}
+                
+                    {% endblock %}
  
                 
-              </main> 
+                </main> 
 
 
 
@@ -160,21 +168,7 @@
               
               <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
              
-              <script>
               
-              const btn = document.querySelector('.menu-btn');
-
-              function menus(){
-                document.querySelector('.mobile-menu').classList.toggle('show');
-              
-               
-              }
-              
-              btn.addEventListener('click',menus);
-              
-              
-              
-              </script>  
 
              <script>
               /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */

@@ -638,10 +638,12 @@ class Store(db.Model):
     carwash =  db.Column(db.Boolean, default = False)
     phone = db.Column(db.String(), nullable=False)
     check_in_out = db.relationship('checkinout', backref='store', lazy=True)
-
+    address = db.Column(db.String())
+    city = db.Column(db.String())
+    province = db.Column(db.String())
     
     def __repr__(self):
-        return str(self.number)
+        return f"{self.number}:  {self.address}  {self.city}  {self.province}"
    
 class StoreSchema(ma.Schema):
     class Meta:
