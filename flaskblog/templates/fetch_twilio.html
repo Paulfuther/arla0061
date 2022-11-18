@@ -21,10 +21,11 @@
                         
                         
                         <th>Date Sent</th>
-                        <th>Error Code</th>
                         
                         
+                        <th>From</th>
                         <th>To</th>
+                       
                         <th>Status</th>
                         
                         <th>Body</th>
@@ -37,11 +38,11 @@
                         <td>{{ loop.index }}</td>
                         
                        
-                        <td>{{ x.date_sent }}</td>
-                        <td>{{ x.error_code }}</td>
-                        
-                        
+                        <td>{{ x.date_sent.strftime('%Y-%m-%d') }}</td>
+                       
+                        <td>{{ x.from_ }}</td>
                         <td>{{ x.to }}</td>
+                        
                         <td>{{ x.status }}</td>
                         
                         <td>{{ x.body }}</td>

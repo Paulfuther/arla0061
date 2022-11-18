@@ -16,7 +16,7 @@ from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
                  employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
                      DEFAULT_SENDER, Store,Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID, \
                          login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient,\
-                             basedir,INCIDENT_UPLOAD_PATH, incident_files, checkinout, user_schema
+                             basedir,INCIDENT_UPLOAD_PATH, BULK_EMAIL_PATH, incident_files, checkinout, user_schema, sg
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
@@ -50,6 +50,7 @@ from flaskblog.utils.sms import send_bulk_sms
 from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, \
                     check_verification_token, request_verification_token_whatsapp
 from flask_login import current_user, login_user, logout_user, fresh_login_required
+from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
 moment = Moment(app)
 CORS(app)
 
@@ -126,55 +127,59 @@ def login():
     form=LoginForm()
     if current_user.is_authenticated:
         return render_template("layout.html")
-    if form.validate_on_submit():
+    if request.method == 'GET':
+        return render_template("login.html", form=form)
+    if request.method == 'POST':
+        #if form.validate_on_submit():
         user=User.query.filter_by(email=form.email.data).first()
-        if user is None:
-            flash('That email does not exits')
-        elif user.active == False:
-            flash('You are not an active user')
-            return render_template("login.html", form=form)
-        elif user is None or  not bcrypt.check_password_hash(user.password, form.password.data):
-            flash('invalid username or password')
-            return redirect(url_for('login', form=form)  )
-        elif user.email_confirmed == 0:      
-            send_email_confirmation(user)
-            flash('please confirm email')
-            return redirect(url_for('login'))
-        elif user and bcrypt.check_password_hash(user.password, form.password.data):
-            user_phone =db.session.query(Employee.mobilephone, User)\
-            .filter(Employee.user_id == user.id).first()
-            print(user.phone)
-            print(user.active)
-            print(form.two_fa.data)
-            # testing
-            login_user(user, remember=form.remember_me.data)
-            return render_template("layout.html", title="home")
+        if not user:
+            flash('Email address is not recognised')
+            return render_template('login.html' ,form=form)
+        #if user.active == False:
+        #    flash('You are not an active user')
+        #    return redirect(url_for('login')  )
+        if not bcrypt.check_password_hash(user.password, form.password.data):
+            flash('Invalid Password')
+            return render_template('login.html' ,form=form)
+        #if user.email_confirmed == 0:      
+        #    send_email_confirmation(user)
+        #    flash('please confirm email')
+        #    return redirect(url_for('login'))
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+                #user_phone =db.session.query(Employee.mobilephone, User)\
+                #.filter(Employee.user_id == user.id).first()
+                #print(user.phone)
+                #print(user.active)
+                #print(form.two_fa.data)
+                # testing
+                login_user(user, remember=form.remember_me.data)
+                return render_template("layout.html", title="home")
 
-            # end here
-            if form.two_fa.data=="sms":
-                request_verification_token(user.phone)
-                session['phone']=user.phone
-                return redirect(url_for('verify_2fa'))
-            elif form.two_fa.data=="whatsapp":
-                request_verification_token_whatsapp(user.phone)
-                session['phone']=user.phone
-                return redirect(url_for('verify_2fa'))
-            else:
-                flash('you need to select a 2fa channel')
-                #return redirect(url_for('lodin'))
-            #session['phone']=user_phone
-            return redirect(url_for('login', form=form))
-            login_user(user, remember=form.remember_me.data)
-            next_page = request.args.get('next')
-            if current_user.has_roles('GSA'):
-                gsaid = int(current_user.id)
-                staff = Employee.query.filter_by(user_id=gsaid).first()
-                exists = Empfile.query.filter_by(employee2_id=staff.id).first()
-                return render_template("gsadashboard.html", staff=staff, exists=exists)
-            print(current_user)
-            return render_template("layout.html", title="home")
-    #print("nope")    
-    return render_template("login.html", form=form)
+                # end here
+                if form.two_fa.data=="sms":
+                    request_verification_token(user.phone)
+                    session['phone']=user.phone
+                    return redirect(url_for('verify_2fa'))
+                elif form.two_fa.data=="whatsapp":
+                    request_verification_token_whatsapp(user.phone)
+                    session['phone']=user.phone
+                    return redirect(url_for('verify_2fa'))
+                else:
+                    flash('you need to select a 2fa channel')
+                    #return redirect(url_for('lodin'))
+                #session['phone']=user_phone
+                return redirect(url_for('login', form=form))
+                login_user(user, remember=form.remember_me.data)
+                next_page = request.args.get('next')
+                if current_user.has_roles('GSA'):
+                    gsaid = int(current_user.id)
+                    staff = Employee.query.filter_by(user_id=gsaid).first()
+                    exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+                    return render_template("gsadashboard.html", staff=staff, exists=exists)
+                    print(current_user)
+                return render_template("layout.html", title="home")
+    
+    
 
 @app.route("/home22", methods = ['GET', 'POST'])
 @login_required
@@ -311,7 +316,7 @@ def confirm_email(token):
     return redirect(url_for("login"))
     
 def fetch_sms():
-    return client.messages.stream()
+    return client.messages.list(limit=100)
 
 @app.route('/fetch_twilio')
 def fetch_twilio():
@@ -441,7 +446,50 @@ def bulk_email():
         
         role_id = request.form['role']
         templatename = request.form['templatename']
-        send_bulk_email.apply_async(args=[role_id,templatename], countdown=10) 
+        uploaded_file = request.files['file']
+        #print(uploaded_file.filename)
+        filename = secure_filename(uploaded_file.filename)
+        #print(filename)
+        uploaded_file.save(os.path.join(BULK_EMAIL_PATH, filename))
+        
+        '''bulkmessage = BulkEmailSendgrid.query.get(templatename)
+        bm = bulkmessage.templateid
+        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+        .all()
+
+        for user in gsa:
+            message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= user.email)
+            message.dynamic_template_data = {
+                'subject':templatename,
+                'name': user.firstname,
+
+            }
+            #emailpath = 'flaskblog/static/emailfiles/'+filename
+            with open('flaskblog/static/emailfiles/'+filename, 'rb') as f:
+                data = f.read()
+                f.close()
+            encoded_file = base64.b64encode(data).decode()
+            attachedFile = Attachment(
+                    FileContent(encoded_file),
+                    FileName(uploaded_file.filename),
+                    FileType(uploaded_file.content_type),
+                    Disposition('attachment')) 
+            print(user.email)
+            message.template_id = bm
+            message.attachment=attachedFile
+            response = sg.send(message)'''
+
+            
+
+
+
+        send_bulk_email.apply_async(args=[role_id,templatename, filename], countdown=10) 
         
         return render_template("layout.html")
 
@@ -514,7 +562,7 @@ def sms_reply():
 @login_required
 def print_incident():
     form=SiteIncident()
-    x=int(53)
+    x=int(85)
     gsa = Incident.query.get(x)
     ident = gsa.id
     print(ident)
@@ -542,6 +590,35 @@ def email(email):
         resp = make_response('None', 404)
     return resp
 
+
+@app.route("/process_images", methods = ['GET', 'POST'])
+@login_required
+def process_images():
+    form = SiteIncident()
+    pics= request.files.getlist('photos[]')
+    print (pics)
+            #filename = secure_filename(pics.filename)
+            #print(INCIDENT_UPLOAD_PATH)
+            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
+           
+    for pic in pics:
+        if not pic:
+            pass
+        else:
+            filename = pic.filename
+            file_ext = os.path.splitext(filename)[1]
+            print(file_ext)
+            if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+                abort(400)
+            i=Image.open(pic)
+            i.thumbnail((300,300), Image.LANCZOS)  
+            print(i.size)    
+            i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
+    return render_template('eventreport.html', form=form)
+
+
+
+
 @app.route("/event", methods = ['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -551,24 +628,25 @@ def eventreport():
     # get all of the information from the form
 
     if form.validate_on_submit():
-            pics= request.files.getlist('incimage')
+            pics= request.files.getlist('photos[]')
             print (pics)
+            print(form.location.data)
             #filename = secure_filename(pics.filename)
             #print(INCIDENT_UPLOAD_PATH)
             #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
            
-            for pic in pics:
-                if not pic:
-                    pass
-                else:
-                    i=Image.open(pic)
+            #for pic in pics:
+            #    if not pic:
+            #        pass
+            #    else:
+            #        i=Image.open(pic)#
 
                     #= Image.open(pic)
-                    i.thumbnail((300,300), Image.LANCZOS)
+            #        i.thumbnail((300,300), Image.LANCZOS)
                     #i.save(picture_paththumb)
-                    print(i.size)
+            #        print(i.size)
                     #new_pic = image.resize(300,300)
-                    i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
+             #       i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
         
             #return render_template('layout.html')
             newtime=str(form.eventtime.data)
@@ -580,7 +658,7 @@ def eventreport():
                             reputation = form.reputation.data,
                             security = form.security.data,
                             fire = form.fire.data,
-                            location = form.location.data,
+                            location = str(form.location.data),
                             eventdetails = form.eventdetails.data,
                             eventdate = form.eventdate.data,
                             eventtime = time2,
@@ -676,7 +754,7 @@ def eventreport():
             # we call a task mamanger to do this. That is the apply_async 
            # make_incident_pdf.apply_async(args=[file_id], countdown=10)
 
-
+            return("good")
             return render_template('layout.html')
            
     return render_template('eventreport.html', form=form)
@@ -1008,7 +1086,7 @@ def sendfile(staff_id):
 @login_required
 def hrfile(staff_id):
     gsa = Employee.query.get(staff_id)
-    hrpage = hrfiles.query.limit(3).all()
+    hrpage = hrfiles.query.all()
     
     #print(gsa.firstname)
     for x in hrpage:

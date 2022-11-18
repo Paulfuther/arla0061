@@ -3,183 +3,640 @@
 
 {% block content%}
 
-        <form method = "POST" id="form" action  = "" enctype="multipart/form-data" class = "report-container">
+                        {% with messages = get_flashed_messages()%}
+                        {% if messages%}
+                        {% for message in messages %}
+                        <div class = "alerts">
+                        {{ message }} 
+                        </div>
+                        {% endfor %}
+                        
+                        
+                        {% endif %}
+                        {% endwith %}
+
+
+        <div class="container mt-4">
+        <form method = "POST" id="form" action  = "" enctype="multipart/form-data" class="was-validated"  data-multi-step>
         
         {{ form.hidden_tag() }}
 
-        <div class="inctitle inc1">  Primary Incident Type </div>
-        <div class="inctitle inc2" >Injury {{form.injuryorillness}} </div>
-        <div  class="inctitle inc3" >{{"Environmental"}} {{form.environmental}} </div>
-        <div  class="inctitle inc4" >{{"Regulatory"}} {{form.regulatory}} </div>
-        <div  class="inctitle inc5">{{"Economic/Damage"}} {{form.economicdamage}} </div>
-        <div  class="inctitle inc6">{{"Reputation"}} {{form.reputation}} </div>    
-        <div  class="inctitle inc7">{{"Security"}} {{form.security}} </div>
-        <div  class="inctitle inc8">{{"Fire"}} {{form.fire}} </div>
+    <!--    <div class="newhire_card mx-auto" style="width: 80%" data-step>
 
-       
-        <div class="row-border1"></div>
+                        <h4 class="text-center">Step 1 of 8</h4>
 
-        <div  class="inctitle inc9">Location</div>
-        <div  class="inctitle  inc10 formstyle2" >{{form.location(style ='width:100%')}} </div>
-        <div  class="inctitle inc11 formstyle">{{"Event Details"}} </div>
-        <div  class = "inctitle  inc12">{{form.eventdetails( style='width:100%; height:100%; autofocus=autofocus')}} </div>
+                <h3 class="mx-auto mt-2 mb-2">Primary Incident Type</h3>
+                <div class="form-group row">
+                        <label class="col-6 col-form-label p-4">Injury or Illness</label>
+                        <div class="col p-4" >{{form.injuryorillness}}  </div>
+                </div>     
+                <div class="form-group row">
+                        <label class="col-6 col-form-label p-4">Environmental</label>
+                        <div  class="col p-4" >{{form.environmental}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 col-form-label p-4">Regulatory</label>
+                        <div  class="col p-4" >{{form.regulatory}} </div>
+                </div>        
+                <div class="form-group row">
+                        <label class="col-6 col-form-label p-4">Econmic/Damage</label>
+                        <div  class="col p-4" >{{form.economicdamage}} </div>          
+                </div> 
+                <div class="form-group row">
+                        <label class="col-6 col-form-label p-4">Reputation</label>
+                        <div  class="col p-4" >{{form.reputation}} </div>
+                </div> 
+                <div class="form-group row">
+                        <label class="col-6 col-form-label p-4">Security</label>
+                        <div  class="col p-4" > {{form.security}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 col-form-label p-4">Fire</label>
+                        <div  class="col p-4" >{{form.fire}} </div>
+                </div> 
+                        <div class="row">
+                             <div class="btn-group btn-block">
+                                
+                                <button type="button"  class="btn btn-primary  m-2 rounded"data-next>Next    </button>
+                              </div>
+                        </div>
+        </div>       
+                
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
 
+                <h4 class="text-center">Step 2 of 8</h4>
 
+                <h5  class="mx-auto mt-2 mb-2" >SECTION 1 - INCIDENT INFORMATION -(always complete this section)</h5>
+        
+                <h3 class="mx-auto mt-4 mb-2">Primary Incident Type</h3>
 
-        <div  class="inctitle inc13" >Event Date </div> 
-        <div  class="inctitle  inc14" >{{form.eventdate}} </div>
-        <div  class="inctitle inc15" > Event Time </div>
-        <div  class=" inctitle inc16"> {{form.eventtime}} </div>
-        <div  class="inctitle inc17" >Reported By: </div>
-        <div  class ="inctitle  inc18" >{{form.reportedby}} </div>
-        <div  class="inctitle inc19" >Phone Number</div>
-        <div  class="inctitle  inc20">{{form.reportedbynumber}} </div>
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label">Location</label>   
+                        <div  class="col-10 p-4" >{{form.location (class_="form-control")}} </div>
+                </div>
 
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label">Event Details</label> 
+
+                        <div class="col-10 p-4"  >{{form.eventdetails (class_="form-control" , id="textAreaExample" ,rows="6") }} </div>
+                        <div class="valid-feedback">Valid.</div>
+                        <div class="invalid-feedback">Please fill out this field.</div>
+                </div>
+
+                <div class="form-group row">
+
+                        <label class="col-2 p-4 col-form-label">Even Date</label>   
+                        <div  class="col-10 p-4" >{{form.eventdate (class_="form-control")}} </div>
+                 </div>
+                <div class="form-group row">
+                                <label class="col-2 p-4 col-form-label" > Event Time </label>
+                                <div  class="col-10 p-4"> {{form.eventtime (class_="form-control")}} </div>
+                </div>
+                <div class="form-group row">
+
+                        <label class="col-2 p-4 col-form-label" >Reported By: </label>
+                        <div  class ="col-10 p-4" >{{form.reportedby (class_="form-control") }} </div>
+                </div>
+
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label"  >Phone Number</label>
+                        <div  class="col-10 p-4">{{form.reportedbynumber (class_="form-control")}} </div>
+                </div>
       
 
-        <div  class = "inctitle inc23" >Is The Person A:</div>
+                <h3 class="mx-auto mt-2 mb-2" >Is The Person A:</h3>
 
-        <div  class="incheader inc100" >SECTION 1 - INCIDENT INFORMATION -(always complete this section)</div>
-
-        <div  class="inctitle inc24" > {{form.suncoremployee}} Suncor Emp </div>
-        <div  class="inctitle inc25" > {{form.contractor}} Contractor</div>
-        <div  class="inctitle inc26" >{{form.associate}} Associate </div>
-        <div  class="inctitle inc27" > {{form.generalpublic}} General Public</div>
-        <div  class="inctitle inc28" >{{form.other}} Other: {{form.othertext}}</div>
-        
-
-        <div  class="inctitle inc30" >Immediate   Actions Taken</div>
-        <div  class = "inctitle  inc31 formstyle" >{{form.actionstaken( style='width:100%; height:100%')}} </div>
-        <div  class="inctitle inc32" >Corrective   Actions Taken</div>
-        <div  class="inctitle  inc33 formstyle" >{{form.correctiveactions( style = 'width:100%;height:100%')}} </div>
-
-        <div class="row-border2"></div>
-
-        <div  class="incheader inc59" >SECTION 2 - SPILLS - (complete only if spill occured)</div>
-        <div  class="inctitle  inc34"> Off Property Impact</div>
-        <div  class="inctitle inc35" >no {{form.sno}} </div>
-        <div  class="inctitle inc36" >yes {{form.syes}} </div>
-        <div  class="inctitle inc37" >comment {{form.scomment}} </div>
-
-        <div  class="inctitle inc38"> Regulatory Authorities Notified?</div>
-
-        <div  class="inctitle inc39" >N/A {{form.rna}} </div>
-        <div  class="inctitle inc40" >no {{form.rno}} </div>
-        <div  class="inctitle inc41" >yes {{form.ryes}} </div>
-        <div  class="inctitle inc42" >comment {{form.rcomment}} </div>
-
-        <div  class="inctitle inc43"> Product Spilled?</div>
-
-        <div  class="inctitle inc44" >Gas {{form.gas}} </div>
-        <div  class="inctitle inc45" >Diesel {{form.diesel}} </div>
-        <div  class="inctitle inc46" >Sewage {{form.sewage}} </div>
-        <div  class="inctitle inc47" >Chemical {{form.chemical}} </div>
-        <div  class="inctitle inc48" >(Please Specify Chemical) {{form.chemcomment}} </div>
-        <div  class="inctitle inc49" >Diesel Exhaust Fluid {{form.deiselexhaustfluid}} </div>
-        <div  class="inctitle inc50" >Other {{form.sother}} </div>
-        <div  class="inctitle inc51" >(Please Specify) {{form.s2comment}} </div>
-
-        <div  class="inctitle inc52"> Source Impacted</div>
-
-        <div  class="inctitle inc53" >Air {{form.air}} </div>
-        <div  class="inctitle inc54" >water {{form.water}} </div>
-        <div  class="inctitle inc55" >wildlife {{form.wildlife}} </div>
-        <div  class="inctitle inc56" >land {{form.land}} </div>
-        <div  class="inctitle inc57" >Volume Release Estimate {{form.volumerelease}} </div>
-        <div class="row-border3"></div>
-        <div  class="incheader inc58">SECTION 3 SECURITY -(complete only for security such as a theft, robbery, break & enter or drive off)</div>
-
-        <div  class="inctitle inc60"> Police Notified?</div>
-
-        <div  class="inctitle inc61" >Yes {{form.pyes}} No {{form.pno}} N/A {{form.pna}} </div>
-        <div  class="inctitle inc62" >{{"Case #"}} {{form.pcase}} </div>
-
-        <div  class="inctitle inc63"> What Was Stolen</div>
-
-        <div  class="inctitle inc64" > {{form.stolentransactions}} # of Transactions {{form.stoltransactions}} </div>
-        <div  class="inctitle inc65" >{{form.stolencards}} # of Cards {{form.stolcards}} </div>
-        <div  class="inctitle inc66" >{{form.stolentobacco}} Tobacco Value {{form.stoltobacco}} </div>
-        <div  class="inctitle inc67" >{{form.stolenlottery}} Lottery Value {{form.stollottery}} </div>
-        <div  class="inctitle inc68" >{{form.stolenfuel}} Fuel Value {{form.stolfuel}} </div>
-        <div  class="inctitle inc69" >{{form.stolenother}} Other {{form.stolother}} </div>
-        <div  class="inctitle inc70"> value of other: {{form.stolenothervalue}}  </div>
-        <div  class="inctitle inc71" >{{form.stolenna}} N/A: nothihng taken  </div>
-
-        <div  class="inc110"><img src="/static/images/SECURITYPERSON.jpg" ></div>
-        
-
-
-        <div  class="inctitle inc72" >{{"Gener/Estimated Age"}} {{form.gender}} </div>
-        <div  class="inctitle inc73" >{{"Height"}} {{form.height}} </div>
-        <div  class="inctitle inc74" >{{"Weight"}} {{form.weight}} </div>
-        <div  class="inctitle inc75" >{{"Hair Color/Cut"}} {{form.haircolor}} </div>
-        <div  class="inctitle inc76" >{{"Complexion"}} {{form.complexion}} </div>
-        <div  class="inctitle inc77" >{{"Bear/Moustache"}} {{form.beardmoustache}} </div>
-        <div  class="inctitle inc78" >{{"Eye/Eyeglasses"}} {{form.eyeeyeglasses}} </div>
-        <div  class="inctitle inc79" >{{"Licence #"}} {{form.licencenumber}} </div>
-        <div  class="inctitle inc80" >{{"Make/Model"}} {{form.makemodel}} </div>
-        <div  class="inctitle inc81" >{{"Color"}} {{form.color}} </div>
-        <div  class="inctitle inc82 placement" >{{form.scars}} {{"Visible Scars"}}  </div>
-        <div  class="inctitle inc83" >{{form.tatoos}} {{"Tatoos"}}  </div>
-        <div  class="inctitle inc84" >{{form.hat}} {{"Type of Hat"}}  </div>
-        <div  class="inctitle inc85" >{{form.shirt}} {{"Shirt/Coat"}}  </div>
-        <div  class="inctitle inc86" >{{form.trousers}} {{"Trousers"}}  </div>
-        <div  class="inctitle inc87" >{{form.shoes}} {{"Shoes"}}  </div>
-        <div  class="inctitle inc88" >{{form.voice}} {{"Voice"}}  </div>
-        <div  class="inctitle inc89" >{{form.bumpersticker}} {{"Bumper Sticker"}}  </div>
-        <div  class="inctitle inc90" >{{form.direction}} {{"Direction of Travel"}}  </div>
-        <div  class="inctitle inc91" >{{form.damage}} {{"Damage/Rust"}}  </div>
-
-        <div class = "inc92">
-        <input type="file" id="files" name ="incimage" accept="image/*" multiple="multiple" class="formcheckbtn">
-        
-        <output id="result"></output>
-        </div>
-                <div class="inctitle inc120">
-                <input type="submit"class="formcheckbtn"  >
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Suncor Emp</label>
+                        <div  class="col p-4" > {{form.suncoremployee}}  </div>
                 </div>
-        
-        </form>
-        <div class="progress_container">
-        <div class="progress" style="height:60px" >
-                <div id="progressbar" class="progress-bar" role="progressbar" style="width: 0%; height:60px" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">0%</div>
-              </div>
-        </div>
-        <script>
-               $(document).ready(function() {
-                       $('form').on('submit', function(event){
-                               event.preventDefault();
-                               var formData = new FormData($('form')[0]);
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Contractor</label>
+                        <div  class="col p-4" > {{form.contractor}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Associate</label>
+                        <div  class="col p-4" > {{form.associate}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >General Public</label>
+                        <div  class="col p-4" > {{form.generalpublic}}  </div>
+                </div>
+                
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label "  >Other</label>
+                        <div class="col p-4" >{{form.othertext (class_="form-control") }} </div>
+                </div>
 
-                                $.ajax({
+                <div class="row">
+                        <div class="btn-group btn-block">
+                            <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
+                           <button type="button"  class="btn btn-primary  m-2 rounded"data-next>Next    </button>
+                         </div>
+                   
+                </div>
+        </div>       
+
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+
+                <h4 class="text-center">Step 3 of 8</h4>
+                <div class="form-group row">
+                        <hs class="mx-auto mt-2 mb-2">Immediate Action Taken </hs>
+
+                        <div >{{form.actionstaken (class_="form-control" ,id="textAreaExample" ,rows="6") }} </div>
+                </div>
+
+
+                <div class="form-group row">
+                
+                        <hs class="mx-auto mt-2 mb-2" >Corrective Actions Taken</hs>
+                        <div>{{form.correctiveactions (class_="form-control" ,id="textAreaExample" ,rows="6")}} </div>
+                </div>
+
+                <div class="row">
+                        <div class="btn-group btn-block">
+                            <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
+                           <button type="button"  class="btn btn-primary  m-2 rounded"data-next>Next    </button>
+                         </div>
+                   
+                </div>
+
+        </div>
+
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 4 of 8</h4>
+                <h5  class="mx-auto mt-2 mb-2" >SECTION 2 - SPILLS - (complete only if spill occured)</h5>
+                <h3 class="mx-auto mt-4 mb-2"> Off Property Impact</h3>
+
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label"  >No</label>
+                        <div  class="col-1 p-4" > {{form.sno}}  </div>
+                        <label class="col-2 p-4 col-form-label"  >Yes</label>
+                        <div  class="col-1 p-4" > {{form.syes}}  </div>
+                </div>
+
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label "  >Comment</label>
+                        <div class="col-10 p-4" >{{form.scomment (class_="form-control" ,rows="6") }} </div>
+                </div>
+
+                <h3 class="mx-auto mt-4 mb-2"> Regulatory Authorities Notified?</h3>
+
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label"  >No</label>
+                        <div  class="col-2 p-4" >{{form.rno}}  </div>
+                        <label class="col-2 p-4 col-form-label"  >Yes</label>
+                        <div  class="col-2 p-4" >{{form.ryes}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label"  >NA</label>
+                        <div  class="col p-4" > {{form.rna}}  </div>
+                </div>
+
+                <div class="form-group row">
+                        <label class="col-2 p-4 col-form-label "  >Comment</label>
+                        <div class="col-10 p-4" >{{form.rcomment (class_="form-control" ,rows="6") }} </div>
+                </div>
+
+                <h3 class="mx-auto mt-4 mb-2"> Product Spilled?</h3>
+
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Gas</label>
+                        <div  class="col p-4" > {{form.gas}}  </div>
+                </div>
+
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Deisel</label>
+                        <div  class="col p-4" > {{form.diesel}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Sewage</label>
+                        <div  class="col p-4" > {{form.sewage}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Chemical</label>
+                        <div  class="col p-4" > {{form.chemical}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Please Specify Chemical</label>
+                        <div  class="col p-4" > {{form.chemcomment}}  </div>
+                </div>
+               
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Deisel Exhaust Fluid</label>
+                        <div  class="col p-4" > {{form.deiselexhaustfluid}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Other</label>
+                        <div  class="col p-4" > {{form.sother}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Please Specify</label>
+                        <div  class="col p-4" > {{form.s2comment}}  </div>
+                </div>
+                
+       
+                <h3 class="mx-auto mt-4 mb-2"> Source Impacted</h3>
+
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Air</label>
+                        <div  class="col p-4" > {{form.air}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Water</label>
+                        <div  class="col p-4" > {{form.water}}  </div>
+                </div>
+                
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Wildlife</label>
+                        <div  class="col p-4" >  {{form.wildlife}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Land</label>
+                        <div  class="col p-4" >  {{form.land}}  </div>
+                </div>
+               
+                <div class="form-group row">
+                        <label class="col-6 p-4 col-form-label"  >Volume Relase Estimate</label>
+                        <div  class="col p-4" >  {{form.volumerelease}}  </div>
+                </div>
+
+                
+                <div class="row">
+                        <div class="btn-group btn-block">
+                            <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
+                           <button type="button"  class="btn btn-primary  m-2 rounded"data-next>Next    </button>
+                         </div>
+                   
+                </div>
+        </div>
+
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 5 of 8</h4>
+                <h5  class="mx-auto mt-2 mb-2" >SECTION 3 SECURITY -(complete only for security such as a theft, robbery, break & enter or drive off)</h5>
+                <h3 class="mx-auto mt-4 mb-2">  Police Notified?</h3>
+
+                <div class="form-group row">
+                        <label class="col-2 pl-5 col-form-label"  >No</label>
+                        <div  class="col-2 pt-1" >{{form.pno}}  </div>
+                        <label class="col-2 pl-5 col-form-label"  >Yes</label>
+                        <div  class="col-2 pt-1" >{{form.pyes}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-2 pl-5 col-form-label"  >NA</label>
+                        <div  class="col pt-1" > {{form.pna}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-6 pl-5 col-form-label"  >Case #</label>
+                        <div  class="col pt-1" > {{form.pcase}}  </div>
+                </div>
+
+                
+             
+
+                <h3 class="mx-auto mt-4 mb-2"> What Was Stolen</h3>
+
+                <div class="form-group row">
+                        <div  class="col-1 pt-2" > {{form.stolentransactions}}  </div>
+                        <label class="col pl-5 col-form-label"  ># of Transactions</label>
+                        <div  class="col-12 pt-1" > {{form.stoltransactions}}  </div>
+                </div>
+                <div class="form-group row">
+                        <div  class="col-1 pt-2" > {{form.stolencards}}  </div>
+                        <label class="col pl-5 col-form-label"  ># of Cards</label>
+                        <div  class="col-12 pt-1" > {{form.stolcards}}  </div>
+                </div>
+                <div class="form-group row">
+                        <div  class="col-1 pt-2" > {{form.stolentobacco}}  </div>
+                        <label class="col pl-5 col-form-label"  >Tobacco Value </label>
+                        <div  class="col-12 pt-1" > {{form.stoltobacco}}  </div>
+                </div>
+                <div class="form-group row">
+                        <div  class="col-1 pt-2" > {{form.stolenlottery}}  </div>
+                        <label class="col pl-5 col-form-label"  >Lottery Value</label>
+                        <div  class="col-12 pt-1" > {{form.stollottery}}  </div>
+                </div>
+                <div class="form-group row">
+                        <div  class="col-1 pt-2" > {{form.stolenfuel}}  </div>
+                        <label class="col pl-5 col-form-label"  >Fuel Value</label>
+                        <div  class="col-12 pt-1" > {{form.stolfuel}} </div>
+                </div>
+                <div class="form-group row">
+                        <div  class="col-1 pt-2" > {{form.stolenother}}  </div>
+                        <label class="col pl-5 col-form-label"  >Other</label>
+                        <div  class="col-12 pt-1" >  {{form.stolother}}  </div>
+                </div>
+                <div class="form-group row">
+                    
+                        <label class="col pl-5 col-form-label"  >value of other:</label>
+                        <div  class="col-12 pt-1" >  {{form.stolenothervalue}}  </div>
+                </div>
+                <div class="form-group row">
+                        <div  class="col-1 pt-2" > {{form.stolenna}}  </div>
+                        <label class="col pl-5 col-form-label"  >N/A: nothihng taken</label>
+                      
+                </div>
+               
+        
+                <div class="row">
+                        <div class="btn-group btn-block">
+                            <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
+                           <button type="button"  class="btn btn-primary  m-2 rounded"data-next>Next    </button>
+                         </div>
+                   
+                </div>
+        </div>
+
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 6 of 8</h4>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Gender/Estimated Age</label>
+                        <div  class="col-12 pt-1" >  {{form.gender}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Height</label>
+                        <div  class="col-12 pt-1" >  {{form.height}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Weight</label>
+                        <div  class="col-12 pt-1" >  {{form.weight}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Hair Color/Cut</label>
+                        <div  class="col-12 pt-1" >  {{form.haircolor}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Complexion</label>
+                        <div  class="col-12 pt-1" >  {{form.complexion}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Beard/Moustache</label>
+                        <div  class="col-12 pt-1" >  {{form.beardmoustache}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Eyes/Sunglasses</label>
+                        <div  class="col-12 pt-1" >  {{form.eyeeyeglasses}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Licence #</label>
+                        <div  class="col-12 pt-1" >  {{form.licencenumber}}  </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Make/Model</label>
+                        <div  class="col-12 pt-1" >  {{form.makemodel}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Color</label>
+                        <div  class="col-12 pt-1" > {{form.color}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Scars</label>
+                        <div  class="col-12 pt-1" > {{form.scars}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Tatoos</label>
+                        <div  class="col-12 pt-1" >  {{form.tatoos}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Type of Hat</label>
+                        <div  class="col-12 pt-1" >  {{form.hat}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Shirt/Coat</label>
+                        <div  class="col-12 pt-1" >  {{form.shirt}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Pants</label>
+                        <div  class="col-12 pt-1" >  {{form.trousers}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Shoes</label>
+                        <div  class="col-12 pt-1" >  {{form.shoes}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Voice</label>
+                        <div  class="col-12 pt-1" >  {{form.voice}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Bumper Sticker</label>
+                        <div  class="col-12 pt-1" >  {{form.bumpersticker}} </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Direction of Travel</label>
+                        <div  class="col-12 pt-1" >  {{form.direction}}</div>
+                </div>
+                <div class="form-group row">
+                        <label class="col pl-5 col-form-label"  >Damage/Rust</label>
+                        <div  class="col-12 pt-1" > {{form.damage}}</div>
+                </div>
+               
+                <div class="row">
+                        <div class="btn-group btn-block">
+                            <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
+                           <button type="button"  class="btn btn-primary  m-2 rounded"data-next>Next    </button>
+                         </div>
+                   
+                </div>
+
+        </div>
+-->
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 7 of 8</h4>
+
+                <div class="alert alert-danger alert-error"style="display:none" role="alert">
+                        Invalid File Type
+                    </div>
+
+
+                <div class = "inc92">
+                <input type="file" id="file-select" name="photos[]"  multiple="multiple"  onchange="mychangefunction()" class="formcheckbtn">
+                </div>
+                <div class="inctitle inc120">
+                        <button type="submit" id="upload-button" style="display:none" class="btn btn-primary">Upload Images</button>
+                        </div>
+
+
+                <div class="progress_container">
+                        <div class="progress" style="height:30px; display:none" id="progress-bar-div" >
+                                <div id="progressbar" class="progress-bar" role="progressbar" style="width: 0%; height:30px" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                        </div>
+
+                <div class="row">
+                        <div class="btn-group btn-block">
+                            <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
+                           <button type="button" id="picture-next" class="btn btn-primary  m-2 rounded"   data-next>Next    </button>
+                         </div>
+                   
+                </div>
+        </div>
+
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 8 of 8</h4>
+                        <div class="row">
+                        <h3 class="col pl-5 col-form-label">Thank you for creating this form. Please click "submit" to create the new form.</h3>
+                        <div class="btn-group btn-block">
+                        <button type="button" class="btn btn-primary mb-2 rounded"  id="form-submit" >Submit</button>
+                        </div>
+                        </div>
+                        <div class="row">
+                        <div class="btn-group btn-block">
+                                <button type="button"  class="btn btn-primary mb-2 rounded"data-previous>Previous</button>
+                        </div>
+                        </div>
+                                <div class="modal fade bd-example-modal-lg" data-backdrop="static" data-keyboard="false" tabindex="-1">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content" style="width: 48px">
+                                        <span class="fa fa-spinner fa-spin fa-3x"></span>
+                                    </div>
+                                </div>
+                                </div>
+        </div>
+
+        </form>
+
+
+        <div class="form-group" id="process" style="display:none;">
+                <div class="progress">
+               <div class="progress-bar progress-bar-striped active bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" style=""></div>
+              </div>
+               </div>
+        </div>
+
+
+        <script>
+                const upload_button =  document.getElementById("upload-button");
+                //const progress_bar =   document.getElementByid("progressbar");
+                function mychangefunction(){
+                        upload_button.style.display="" ;
+                        uploadButton.innerHTML="Upload Files";
+                        file_upload_error.style.display="none";
+                    //    progress_bar.attr('aria-valuenow=0')
+                        
+                }
+
+
+        </script>
+
+        <script>
+                    var form = document.getElementById('form');
+                    var fileSelect = document.getElementById('file-select');
+                    var uploadButton = document.getElementById('upload-button');
+                    const picture_upload_button = document.getElementById('picture-next')
+                    const bar_div = document.getElementById('progress-bar-div')
+                    const file_upload_error = document.querySelector(".alert-error");
+                    form.onsubmit = function(event) {
+
+                        event.preventDefault();
+                        bar_div.style.display="";
+                        var files = fileSelect.files;
+                        var formData=new FormData();
+                        uploadButton.innerHTML="Uploading";
+                        for (var i = 0; i<files.length; i++){
+                                var file = files[i];
+                                formData.append('photos[]', file, file.name);
+                               
+                        }
+                        $.ajax({
                                         xhr : function(){
                                                 var xhr = new window.XMLHttpRequest();
                                                 xhr.upload.addEventListener('progress', function(e) {
                                                         if (e.lengthComputable){
-                                                                console.log('Bytes Loaded: ' + e.loaded)
-                                                                console.log('Total Size: ' + e.total)
-                                                                console.log('Percentage Uploaded: ' + e.loaded / e.total)
+                                                              //  console.log('Bytes Loaded: ' + e.loaded)
+                                                              //  console.log('Total Size: ' + e.total)
+                                                              //  console.log('Percentage Uploaded: ' + e.loaded / e.total)
 
                                                                 var percent = Math.round(e.loaded / e.total * 100);
                                                                 $('#progressbar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
-
+                                                                if (e.loaded / e.total  == 1){
+                                                                     //   console.log('done');
+                                                                        picture_upload_button.style.display="";
+                                                                        uploadButton.innerHTML="Upload Files";
+                                                                };
                                                         }
                                                 });
                                                 return xhr;
                                         },
                                         type: 'POST',
-                                        url : '/event',
+                                        url : '/process_images',
                                         data: formData,
                                         processData:false,
                                         contentType:false,
-                                        success : function(){
-                                                alert('File uploaded');
-                                        }
-                                })
+                                        error: function(error){
+                                                file_upload_error.style.display="";
+                                                uploadButton.innerHTML="Upload Images";
+                                                document.getElementById("upload-button").style.display="none" ;
+                                                bar_div.style.display="none";
+                                         }
+                                       
+                                }) 
+                    }
 
-                       });
-               });
-                </script>
+        </script>
+
+
+        <script>
+                        var form = document.getElementById("form");
+
+                        document.getElementById("form-submit").addEventListener("click", function () {
+                                // disable button
+                                $(this).prop("disabled", true);
+                                // add spinner to button
+                                //$(this).html(
+                               // `<i class="fas fa-spinner fa-spin"></i> Creating File`
+                               //  );
+                               $('.modal').modal('show');
+                        form.submit();
+                                
+
+
+                        });
+                         
+        </script>
+
+
+        <script>
+
+        const multiStepForm = document.querySelector("[data-multi-step]")
+        const formSteps = [...multiStepForm.querySelectorAll("[data-step]")]
+        let currentStep = formSteps.findIndex(step => {
+            return step.classList.contains("active")
+        })
+        if (currentStep <0 ){
+            currentStep=0
+            showCurrentStep()
+            
+        }
+
+        multiStepForm.addEventListener("click", e => {
+            let incrementor
+            if (e.target.matches("[data-next]")){
+
+                incrementor = 1
+            } else if (e.target.matches("[data-previous]")){
+                incrementor = -1
+            } 
+            
+            if (incrementor == null) return
+            const inputs = [...formSteps[currentStep].querySelectorAll("input")]
+            const allValid = inputs.every(input => input.reportValidity())
+            if (allValid) {
+                currentStep += incrementor
+                showCurrentStep()
+            }
+          
+           
+            console.log(currentStep)
+        })
+        
+        function showCurrentStep(){
+            formSteps.forEach((step, index) => {
+                step.classList.toggle("active", index === currentStep)
+            })
+        }
+
+        </script>
+
 
 {% endblock %}
 

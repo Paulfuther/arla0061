@@ -58,24 +58,26 @@
                
                    
                       
-                        <form method="POST" action = "/staff_register" enctype="multipart/form-data" class = "form-hrinfo-add-emp needs-validation" data-multi-step >
+                        <form method="POST" action = "/staff_register" enctype="multipart/form-data" class = "form-hrinfo-add-emp was-validated" data-multi-step >
                            
                             <div class="newhire_card" data-step>
 
                                     <div class="text-center mb-3">Step 1 of 4</div>
-                                    <div> {{form.firstname(class = "form-control form-control-lg mb-3", placeholder="First Name - Required")}} </div>
-                                    <div> {{form.lastname(class = "form-control form-control-lg mb-3", placeholder="Last Name - Required")}} </div>
-                                    <div> {{form.password(class = "form-control form-control-lg mb-3", placeholder="Password - Required", id="password")}} </div>
+                           
+                                    <div> {{form.firstname(class_= "form-control form-control-lg mb-3", placeholder="First Name - Required")}} </div>
+                               
+                                    <div> {{form.lastname(class_ = "form-control form-control-lg mb-3", placeholder="Last Name - Required")}} </div>
+                                    <div> {{form.password(class_ = "form-control form-control-lg mb-3", placeholder="Password - Required", id="password")}} </div>
                                     
                                     <div> {{form.passwordconfirm(class = "form-control form-control-lg mb-3", placeholder="Confirm Password - Required", id="password2")}} </div>
                                     <div class="alert alert-danger alert4-error"style="display:none" role="alert">
                                         Passwords Do Not Match
                                     </div>
-                                
+                                    
                                     <div> {{form.email(class = "form-control form-control-lg mb-3", placeholder="Email Address - Required", id="live_search_first")}} </div>
                                     <input type="hidden" id="hiddenemail" name="hiddenemail">
                                     <div class="alert alert-danger alert-error"style="display:none" role="alert">
-                                        Email Already Used
+                                        Email Already Used. Please Try Another One.
                                     </div>
                                     <div class="alert alert-success alert-info"style="display:none" role="alert">
                                         Email Is Good
@@ -117,7 +119,7 @@
 
                             <div class="newhire_card" data-step>
                                 <div class="text-center mb-3">Step 2 of 4</div>  
-                            <div> {{form.monavail(class = "form", placeholder="Monday Availability - Required")}} 
+                            <div> {{form.monavail(class = "form-control form-control-lg mb-3", placeholder="Monday Availability - Required")}} 
                         
                                         {% if form.monavail.errors %}
                                             {% for error in form.monavail.errors %}
@@ -127,7 +129,7 @@
                             </div>
                 
                         
-                            <div> {{form.tueavail(class = "form", placeholder="Tuesday Availability - Required")}} 
+                            <div> {{form.tueavail(class = "form-control form-control-lg mb-3", placeholder="Tuesday Availability - Required")}} 
                                         
                                         {% if form.tueavail.errors %}
                                             {% for error in form.tueavail.errors %}
@@ -137,7 +139,7 @@
                             </div>
                 
                         
-                            <div> {{form.wedavail(class = "form", placeholder="Wednesday Availabilit  - Required")}} 
+                            <div> {{form.wedavail(class = "form-control form-control-lg mb-3", placeholder="Wednesday Availabilit  - Required")}} 
                                         
                                         {% if form.wedavail.errors %}
                                             {% for error in form.wedavail.errors %}
@@ -147,7 +149,7 @@
                             </div>
                 
                             
-                            <div> {{form.thuavail(class = "form", placeholder="Thursday Availability - Required ")}} 
+                            <div> {{form.thuavail(class = "form-control form-control-lg mb-3", placeholder="Thursday Availability - Required ")}} 
                                         
                                         {% if form.thuavail.errors %}
                                             {% for error in form.thuavail.errors %}
@@ -157,7 +159,7 @@
                             </div>
                 
                             
-                            <div> {{form.friavail(class = "form", placeholder="Friday Availability - Required")}} 
+                            <div> {{form.friavail(class = "form-control form-control-lg mb-3", placeholder="Friday Availability - Required")}} 
                                         
                                         {% if form.friavail.errors %}
                                             {% for error in form.friavail.errors %}
@@ -167,7 +169,7 @@
                             </div>
                 
                         
-                            <div> {{form.satavail(class = "form", placeholder="Saturday Availability - Required")}} 
+                            <div> {{form.satavail(class = "form-control form-control-lg mb-3", placeholder="Saturday Availability - Required")}} 
                                         
                                         {% if form.satavail.errors %}
                                             {% for error in form.satavail.errors %}
@@ -177,7 +179,7 @@
                             </div>
                 
                             
-                            <div> {{form.sunavail(class = "form", placeholder="Sunday Availability - Required")}} 
+                            <div> {{form.sunavail(class = "form-control form-control-lg mb-3", placeholder="Sunday Availability - Required")}} 
                                         
                                         {% if form.sunavail.errors %}
                                             {% for error in form.sunavail.errors %}
