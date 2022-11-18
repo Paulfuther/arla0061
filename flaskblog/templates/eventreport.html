@@ -3,12 +3,28 @@
 
 {% block content%}
 
+                        {% with messages = get_flashed_messages()%}
+                        {% if messages%}
+                        {% for message in messages %}
+                        <div class = "alerts">
+                        {{ message }} 
+                        </div>
+                        {% endfor %}
+                        
+                        
+                        {% endif %}
+                        {% endwith %}
+
+
         <div class="container mt-4">
-        <form method = "POST" id="form" action  = "" enctype="multipart/form-data" data-multi-step>
+        <form method = "POST" id="form" action  = "" enctype="multipart/form-data" class="was-validated"  data-multi-step>
         
         {{ form.hidden_tag() }}
 
-                <div class="newhire_card mx-auto" style="width: 80%" data-step>
+    <!--    <div class="newhire_card mx-auto" style="width: 80%" data-step>
+
+                        <h4 class="text-center">Step 1 of 8</h4>
+
                 <h3 class="mx-auto mt-2 mb-2">Primary Incident Type</h3>
                 <div class="form-group row">
                         <label class="col-6 col-form-label p-4">Injury or Illness</label>
@@ -47,6 +63,9 @@
         </div>       
                 
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
+
+                <h4 class="text-center">Step 2 of 8</h4>
+
                 <h5  class="mx-auto mt-2 mb-2" >SECTION 1 - INCIDENT INFORMATION -(always complete this section)</h5>
         
                 <h3 class="mx-auto mt-4 mb-2">Primary Incident Type</h3>
@@ -57,9 +76,11 @@
                 </div>
 
                 <div class="form-group row">
-                        <label class="col-2 p-4 col-form-label">Even Details</label> 
+                        <label class="col-2 p-4 col-form-label">Event Details</label> 
 
-                        <div class="col-10 p-4" >{{form.eventdetails (class_="form-control" ,id="textAreaExample" ,rows="6") }} </div>
+                        <div class="col-10 p-4"  >{{form.eventdetails (class_="form-control" , id="textAreaExample" ,rows="6") }} </div>
+                        <div class="valid-feedback">Valid.</div>
+                        <div class="invalid-feedback">Please fill out this field.</div>
                 </div>
 
                 <div class="form-group row">
@@ -114,11 +135,11 @@
                          </div>
                    
                 </div>
-        </div>              
+        </div>       
 
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
 
-
+                <h4 class="text-center">Step 3 of 8</h4>
                 <div class="form-group row">
                         <hs class="mx-auto mt-2 mb-2">Immediate Action Taken </hs>
 
@@ -143,7 +164,7 @@
         </div>
 
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
-
+                <h4 class="text-center">Step 4 of 8</h4>
                 <h5  class="mx-auto mt-2 mb-2" >SECTION 2 - SPILLS - (complete only if spill occured)</h5>
                 <h3 class="mx-auto mt-4 mb-2"> Off Property Impact</h3>
 
@@ -251,6 +272,7 @@
         </div>
 
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 5 of 8</h4>
                 <h5  class="mx-auto mt-2 mb-2" >SECTION 3 SECURITY -(complete only for security such as a theft, robbery, break & enter or drive off)</h5>
                 <h3 class="mx-auto mt-4 mb-2">  Police Notified?</h3>
 
@@ -326,7 +348,7 @@
         </div>
 
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
-
+                <h4 class="text-center">Step 6 of 8</h4>
                 <div class="form-group row">
                         <label class="col pl-5 col-form-label"  >Gender/Estimated Age</label>
                         <div  class="col-12 pt-1" >  {{form.gender}}  </div>
@@ -417,14 +439,20 @@
                 </div>
 
         </div>
-
+-->
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 7 of 8</h4>
+
+                <div class="alert alert-danger alert-error"style="display:none" role="alert">
+                        Invalid File Type
+                    </div>
+
 
                 <div class = "inc92">
-                <input type="file" id="file-select" name="photos[]" accept="image/*" multiple="multiple" class="formcheckbtn">
+                <input type="file" id="file-select" name="photos[]"  multiple="multiple"  onchange="mychangefunction()" class="formcheckbtn">
                 </div>
                 <div class="inctitle inc120">
-                        <button type="submit" id="upload-button" class="btn btn-primary">Upload Images</button>
+                        <button type="submit" id="upload-button" style="display:none" class="btn btn-primary">Upload Images</button>
                         </div>
 
 
@@ -444,6 +472,7 @@
         </div>
 
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                <h4 class="text-center">Step 8 of 8</h4>
                         <div class="row">
                         <h3 class="col pl-5 col-form-label">Thank you for creating this form. Please click "submit" to create the new form.</h3>
                         <div class="btn-group btn-block">
@@ -455,10 +484,39 @@
                                 <button type="button"  class="btn btn-primary mb-2 rounded"data-previous>Previous</button>
                         </div>
                         </div>
+                                <div class="modal fade bd-example-modal-lg" data-backdrop="static" data-keyboard="false" tabindex="-1">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content" style="width: 48px">
+                                        <span class="fa fa-spinner fa-spin fa-3x"></span>
+                                    </div>
+                                </div>
+                                </div>
         </div>
 
         </form>
 
+
+        <div class="form-group" id="process" style="display:none;">
+                <div class="progress">
+               <div class="progress-bar progress-bar-striped active bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" style=""></div>
+              </div>
+               </div>
+        </div>
+
+
+        <script>
+                const upload_button =  document.getElementById("upload-button");
+                //const progress_bar =   document.getElementByid("progressbar");
+                function mychangefunction(){
+                        upload_button.style.display="" ;
+                        uploadButton.innerHTML="Upload Files";
+                        file_upload_error.style.display="none";
+                    //    progress_bar.attr('aria-valuenow=0')
+                        
+                }
+
+
+        </script>
 
         <script>
                     var form = document.getElementById('form');
@@ -466,6 +524,7 @@
                     var uploadButton = document.getElementById('upload-button');
                     const picture_upload_button = document.getElementById('picture-next')
                     const bar_div = document.getElementById('progress-bar-div')
+                    const file_upload_error = document.querySelector(".alert-error");
                     form.onsubmit = function(event) {
 
                         event.preventDefault();
@@ -483,15 +542,16 @@
                                                 var xhr = new window.XMLHttpRequest();
                                                 xhr.upload.addEventListener('progress', function(e) {
                                                         if (e.lengthComputable){
-                                                                console.log('Bytes Loaded: ' + e.loaded)
-                                                                console.log('Total Size: ' + e.total)
-                                                                console.log('Percentage Uploaded: ' + e.loaded / e.total)
+                                                              //  console.log('Bytes Loaded: ' + e.loaded)
+                                                              //  console.log('Total Size: ' + e.total)
+                                                              //  console.log('Percentage Uploaded: ' + e.loaded / e.total)
 
                                                                 var percent = Math.round(e.loaded / e.total * 100);
                                                                 $('#progressbar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
                                                                 if (e.loaded / e.total  == 1){
-                                                                        console.log('done');
+                                                                     //   console.log('done');
                                                                         picture_upload_button.style.display="";
+                                                                        uploadButton.innerHTML="Upload Files";
                                                                 };
                                                         }
                                                 });
@@ -502,21 +562,37 @@
                                         data: formData,
                                         processData:false,
                                         contentType:false,
+                                        error: function(error){
+                                                file_upload_error.style.display="";
+                                                uploadButton.innerHTML="Upload Images";
+                                                document.getElementById("upload-button").style.display="none" ;
+                                                bar_div.style.display="none";
+                                         }
                                        
-                                })
+                                }) 
                     }
 
         </script>
 
 
-                <script>
+        <script>
                         var form = document.getElementById("form");
 
                         document.getElementById("form-submit").addEventListener("click", function () {
+                                // disable button
+                                $(this).prop("disabled", true);
+                                // add spinner to button
+                                //$(this).html(
+                               // `<i class="fas fa-spinner fa-spin"></i> Creating File`
+                               //  );
+                               $('.modal').modal('show');
                         form.submit();
+                                
+
+
                         });
                          
-                </script>
+        </script>
 
 
         <script>
@@ -559,7 +635,7 @@
             })
         }
 
-            </script>
+        </script>
 
 
 {% endblock %}

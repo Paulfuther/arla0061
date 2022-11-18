@@ -4,27 +4,27 @@
 {% block content%}
 
 <div   class="comms-container">
-<form method = "post">
+    <form method = "post" action="" enctype="multipart/form-data">
 
-    <div  class="formtitle searchbyrole" >{{"Role:"}}</div>
-    <div> {{form.role(class = "form3", placeholder="Role", id="userrole")}} 
-                {% if form.role.errors %}
-                    {% for error in form.role.errors %}
-                    <div class = "formerror">{{ error }}</div>
-                    {% endfor %}       
-                {% endif %}
-    </div>
+            <label class="form-label" >Select Role:</label>
+            <div> {{form.role(class = "form-select mb-2 mt-2", placeholder="Role", id="userrole")}} 
+                        {% if form.role.errors %}
+                            {% for error in form.role.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}       
+                        {% endif %}
+            </div>
 
-    <div  class="formtitle" >{{"Template to Use:"}}</div>
-    <div> {{form.templatename(class = "form", placeholder="Template")}} 
-              
-    </div>
-
-
-   
-    <input type = "submit" name="send" class="comms-button" >
+            <label class="form-label mt-2">Template to Use:</label>
+            <div> {{form.templatename(class = "form-select mb-2 mt-2", placeholder="Template")}} 
+                    
+            </div>
+            <label class="form-label mt-2">Attach File if Needed:</label>
+            <p><input class="form-control mb-2 mt-2" type="file" name="file"></p>
+        
+            <input type = "submit" class="btn btn-primary" name="send"  >
     
-</form>
+    </form>
 
         
 

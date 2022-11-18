@@ -5,7 +5,7 @@ from flask_wtf.file import FileField, FileAllowed
 from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy.sql.sqltypes import Date, String
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, \
-        RadioField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField
+        RadioField, FormField,HiddenField, DateField, SelectField, IntegerField, DecimalField, SelectMultipleField, TextField
 from wtforms.fields.html5 import DateField, TelField, TimeField, EmailField, DateTimeLocalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, \
             InputRequired, NumberRange
@@ -285,7 +285,7 @@ class SiteIncident(FlaskForm):
         allow_blank=False
     )
 
-    eventdetails = TextAreaField('Details', validators=[Optional()])#
+    eventdetails = TextAreaField('Details')#
     eventdate = DateField('EvenDate', validators=[DataRequired()])#
     eventtime = TimeField('EvenTime', validators=[DataRequired()])#
     reportedby = StringField('Reported by', validators=[DataRequired()])#

@@ -68,7 +68,10 @@ app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
 INCIDENT_UPLOAD_PATH=os.path.join(basedir, 'static/incidentpictures')
+BULK_EMAIL_PATH=os.path.join(basedir, 'static/emailfiles')
+app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg',  '.png', '.gif']
 app.config['INCIDENT_UPLOAD_PATH'] = INCIDENT_UPLOAD_PATH
+app.config['BULK_EMAIL_PATH']= BULK_EMAIL_PATH
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=5)
 #CELERY_ENABLE_UTC = False
 #USE_TZ=True
@@ -179,7 +182,7 @@ def call_stores_monthly():
       
 
 @celery.task
-def send_bulk_email(role_id, templatename):
+def send_bulk_email(role_id, templatename, filename):
     with app.test_request_context():    
 
         
@@ -202,17 +205,17 @@ def send_bulk_email(role_id, templatename):
         # have issues generating the proper format for twilio rest api.
         # so we do it old school.
     
-        '''with open('flaskblog/static/attachments/siteevaluation.pdf', 'rb') as f:
+        ''' with open('flaskblog/static/attachments/siteevaluation.pdf', 'rb') as f:
             data = f.read()
             f.close()
         encoded_file = base64.b64encode(data).decode()
         attachedFile = Attachment(
                     FileContent(encoded_file),
-                    FileName('siteevaluation.pdf'),
-                    FileType('application/pdf'),
+                    FileName(uploaded_file.name),
+                    FileType(uploaded_file.content_type),
                     Disposition('attachment')) 
-
-       '''
+            '''
+       
         for user in gsa:
             message = Mail(
             from_email=DEFAULT_SENDER,
@@ -222,9 +225,18 @@ def send_bulk_email(role_id, templatename):
                 'name': user.firstname,
 
             }
+            with open('flaskblog/static/emailfiles/'+filename, 'rb') as f:
+                data = f.read()
+                f.close()
+            encoded_file = base64.b64encode(data).decode()
+            attachedFile = Attachment(
+                    FileContent(encoded_file),
+                    FileName(filename),
+                    FileType(filename.content_type),
+                    Disposition('attachment')) 
             print(user.email)
             message.template_id = bm
-            
+            message.attachment=attachedFile
             response = sg.send(message)
 
             #print(user.email) 
@@ -520,13 +532,16 @@ class Twimlmessages(db.Model):
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
-    description = db.Column(db.String(255))
+    
 
     def __repr__(self):
-        return '%r' % (self.name)
+        return (self.name)
 
     def __hash__(self):
         return hash(self.name)
+
+    def __str__(self):
+        return (self.name)
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -643,7 +658,7 @@ class Store(db.Model):
     province = db.Column(db.String())
     
     def __repr__(self):
-        return f"{self.number}:  {self.address}  {self.city}  {self.province}"
+        return f"{self.number}  {self.address}  {self.city}  {self.province}"
    
 class StoreSchema(ma.Schema):
     class Meta:
@@ -845,9 +860,9 @@ class MyModelView(ModelView):
     can_export = True
     can_delete = False
     #column_sortable_list = ['lastname']
-    column_hide_backrefs = False
-    column_list = ( 'firstname','lastname','store','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
-    column_searchable_list = ['lastname']
+    #column_hide_backrefs = False
+    #column_list = ( 'firstname','lastname','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
+    #column_searchable_list = ['lastname']
     
     def is_accessible(self):
         return current_user.has_roles('Admin' )
@@ -863,14 +878,14 @@ class MyModelView(ModelView):
     #            model.password = bcrypt.generate_password_hash(form.password.data)
 
 class MyModelView2(ModelView):
-    create_modal = True
-    edit_modal = True
+    #create_modal = True
+    #edit_modal = True
     can_export = True
     can_delete = False
     column_hide_backrefs = True
     #column_list = ('firstname', 'course', 'value')
     #column_list = ('employee_id', 'course_id')
-    column_editable_list = ['firstname', 'lastname']
+    #column_editable_list = ['firstname', 'lastname']
     column_searchable_list = ['firstname', 'lastname']
     #list_columns = ['firstname','store']
     def is_accessible(self):
@@ -1147,7 +1162,7 @@ class MyModelView15(ModelView):
 # these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
-admin.add_view(MyModelView6(Role, db.session))
+admin.add_view(MyModelView(Role, db.session))
 admin.add_view(MyModelView2(Employee, db.session))
 admin.add_view(MyModelView5(Todo, db.session))
 admin.add_view(AdminViewStore(Store, db.session))
