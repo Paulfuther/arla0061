@@ -1,4 +1,4 @@
-# arla0061 This is my first attempt at a full stack website. 
+# arla0061 Full Stack Human Resources Platform. 
 
 it started as an attempt to delivery python applications to people via the web. That part worked. But then things grew. This project has now morphed into a full HR platform with new hire documentation repositories, communications via sms, whats app, email and phone as we are fully integrated with Twilio. As well as an assortment of other things. Bulk phone calls, training and compliance reviews, incident forms converted to pdf and pushed todrop box and general data management.
 
