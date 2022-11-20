@@ -555,14 +555,12 @@
                 </table>
              <table>
                
-                <img src='flaskblog/static/incidentpictures/IMG_5672.jpg'>
+                
           
                 {% for x in picture %}
                 <td>
-                <img src= "{{ url_for( 'static' ,filename='incidentpictures/'+ x.image)}} " class="inc_pic_display">
+                <img src= "{{ url_for( 'static' ,filename='incidentpictures/'+ x.image)}} " >
 
-                
-                
                 </td>
                 <tr></tr>
 
