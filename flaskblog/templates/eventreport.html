@@ -21,7 +21,7 @@
         
         {{ form.hidden_tag() }}
 
-    <!--    <div class="newhire_card mx-auto" style="width: 80%" data-step>
+        <div class="newhire_card mx-auto" style="width: 80%" data-step>
 
                         <h4 class="text-center">Step 1 of 8</h4>
 
@@ -439,8 +439,44 @@
                 </div>
 
         </div>
--->
-        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+
+                
+                        <!-- hi res picture upload-->
+                        <div class="newhire_card mx-auto" style="width: 80%" data-step>
+                        <h3 class="text-center">Step 7 of 8</h3>
+                        <label class="text-center">Upload Hi Resolution Images here. They must be pictures</label>
+                        <label class="text-center">Like Documents that you need to read</label>
+                        <label class="text-center">An example would be the salt log or insurance documents</label>
+                        <div class="alert alert-danger alert-error-hires"style="display:none" role="alert">
+                                Invalid File Type
+                        </div>
+
+
+                        <div class = "inc92">
+                        <input type="file" id="file-select-hires" name="photoshires[]"  multiple="multiple"  onchange="mychangefunctionhires()" class="formcheckbtn">
+                        </div>
+                        <div class="inctitle inc120">
+                                <button type="submit" id="upload-button-hires" style="display:none" class="btn btn-primary">Upload Images</button>
+                                </div>
+
+
+                        <div class="progress_container">
+                                <div class="progress" style="height:30px; display:none" id="hires-progress-bar-div" >
+                                        <div id="hires-progressbar" class="progress-bar" role="progressbar" style="width: 0%; height:30px" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                                </div>
+                                </div>
+
+                        <div class="row">
+                                <div class="btn-group btn-block">
+                                <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
+                                <button type="button" id="picture-hires-next" class="btn btn-primary  m-2 rounded"   data-next>Next    </button>
+                                </div>
+                        
+                        </div>
+                        </div>
+
+                        <!-- regular images -->
+                <div class="newhire_card mx-auto" style="width: 80%" data-step>
                 <h4 class="text-center">Step 7 of 8</h4>
 
                 <div class="alert alert-danger alert-error"style="display:none" role="alert">
@@ -449,16 +485,16 @@
 
 
                 <div class = "inc92">
-                <input type="file" id="file-select" name="photos[]"  multiple="multiple"  onchange="mychangefunction()" class="formcheckbtn">
+                <input type="file" id="file-select" name="photos[]"  multiple="multiple" onchange="mychangefunction()" class="formcheckbtn">
                 </div>
                 <div class="inctitle inc120">
-                        <button type="submit" id="upload-button" style="display:none" class="btn btn-primary">Upload Images</button>
+                        <button  id="upload-button" style="display:none"  class="btn btn-primary">Upload Images</button>
                         </div>
 
 
                 <div class="progress_container">
-                        <div class="progress" style="height:30px; display:none" id="progress-bar-div" >
-                                <div id="progressbar" class="progress-bar" role="progressbar" style="width: 0%; height:30px" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        <div class="progress" style="height:30px; display:none" id="reg-progress-bar-div" >
+                                <div id="reg-progressbar" class="progress-bar" role="progressbar" style="width: 0%; height:30px" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                         </div>
                         </div>
 
@@ -469,7 +505,7 @@
                          </div>
                    
                 </div>
-        </div>
+                </div>
 
         <div class="newhire_card mx-auto" style="width: 80%" data-step>
                 <h4 class="text-center">Step 8 of 8</h4>
@@ -504,34 +540,49 @@
         </div>
 
 
-        <script>
-                const upload_button =  document.getElementById("upload-button");
-                //const progress_bar =   document.getElementByid("progressbar");
-                function mychangefunction(){
-                        upload_button.style.display="" ;
-                        uploadButton.innerHTML="Upload Files";
-                        file_upload_error.style.display="none";
-                    //    progress_bar.attr('aria-valuenow=0')
-                        
-                }
+                        <script>
+                        const upload_button_hires =  document.getElementById("upload-button-hires");
+                        //const progress_bar =   document.getElementByid("progressbar");
+                        function mychangefunctionhires(){
+                                upload_button_hires.style.display="" ;
+                                upload_button_hires.innerHTML="Upload Hi Res Files";
+                                file_upload_error_hires.style.display="none";
+                        //    progress_bar.attr('aria-valuenow=0')
+                                
+                        }
+                        </script>
 
+                        <script>
+                        // regular image select button
+                        const upload_button =  document.getElementById("upload-button");
+                        //const progress_bar =   document.getElementByid("progressbar");
+                        function mychangefunction(){
+                                upload_button.style.display="" ;
+                                upload_button.innerHTML="Upload Files";
+                                file_upload_error.style.display="none";
+                        //    progress_bar.attr('aria-valuenow=0')
+                                
+                        }
+                        </script>
+                        <script>
 
-        </script>
+                //regular image upload
 
-        <script>
-                    var form = document.getElementById('form');
+                    //var form = document.getElementById('form');
                     var fileSelect = document.getElementById('file-select');
-                    var uploadButton = document.getElementById('upload-button');
+                    //var uploadButton = document.getElementById('upload-button');
                     const picture_upload_button = document.getElementById('picture-next')
-                    const bar_div = document.getElementById('progress-bar-div')
+                    const bar_div = document.getElementById('reg-progress-bar-div')
                     const file_upload_error = document.querySelector(".alert-error");
-                    form.onsubmit = function(event) {
-
+                    
+                        
+                        document.getElementById("upload-button").addEventListener("click", click_upload_button);
+                        function click_upload_button(event) {
                         event.preventDefault();
                         bar_div.style.display="";
                         var files = fileSelect.files;
                         var formData=new FormData();
-                        uploadButton.innerHTML="Uploading";
+                        upload_button.innerHTML="Uploading";
                         for (var i = 0; i<files.length; i++){
                                 var file = files[i];
                                 formData.append('photos[]', file, file.name);
@@ -547,11 +598,11 @@
                                                               //  console.log('Percentage Uploaded: ' + e.loaded / e.total)
 
                                                                 var percent = Math.round(e.loaded / e.total * 100);
-                                                                $('#progressbar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
+                                                                $('#reg-progressbar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
                                                                 if (e.loaded / e.total  == 1){
                                                                      //   console.log('done');
                                                                         picture_upload_button.style.display="";
-                                                                        uploadButton.innerHTML="Upload Files";
+                                                                        upload_button.innerHTML="Upload Files";
                                                                 };
                                                         }
                                                 });
@@ -564,7 +615,7 @@
                                         contentType:false,
                                         error: function(error){
                                                 file_upload_error.style.display="";
-                                                uploadButton.innerHTML="Upload Images";
+                                                upload_button.innerHTML="Upload Images";
                                                 document.getElementById("upload-button").style.display="none" ;
                                                 bar_div.style.display="none";
                                          }
@@ -572,10 +623,66 @@
                                 }) 
                     }
 
-        </script>
+                        </script>
+                        <script>
+                // this is the hi res upload function 
+                //var form = document.getElementById('form');
+                var fileSelecthires = document.getElementById('file-select-hires');
+                //var upload_button_hires = document.getElementById('upload-button-hires');
+                const picture_upload_button_hires = document.getElementById('picture-hires-next')
+                const bar_div_hires = document.getElementById('hires-progress-bar-div')
+                const file_upload_error_hires = document.querySelector(".alert-error-hires");
+                
+                        document.getElementById("upload-button-hires").addEventListener("click", click_upload_button_hires);
+                        function click_upload_button_hires(event) {
+                        event.preventDefault();
+                        bar_div_hires.style.display="";
+                        var files = fileSelecthires.files;
+                        var formData=new FormData();
+                        upload_button_hires.innerHTML="Uploading";
+                        for (var i = 0; i<files.length; i++){
+                                var file = files[i];
+                                formData.append('photos[]', file, file.name);
+                                
+                        }
+                        $.ajax({
+                                    xhr : function(){
+                                            var xhr = new window.XMLHttpRequest();
+                                            xhr.upload.addEventListener('progress', function(e) {
+                                                    if (e.lengthComputable){
+                                                          //  console.log('Bytes Loaded: ' + e.loaded)
+                                                          //  console.log('Total Size: ' + e.total)
+                                                          //  console.log('Percentage Uploaded: ' + e.loaded / e.total)
 
+                                                            var percent = Math.round(e.loaded / e.total * 100);
+                                                            $('#hires-progressbar').attr('aria-valuenow', percent).css('width', percent + '%').text(percent + '%');
+                                                            if (e.loaded / e.total  == 1){
+                                                                 //   console.log('done');
+                                                                    picture_upload_button.style.display="";
+                                                                    upload_button_hires.innerHTML="Upload Files";
+                                                            };
+                                                    }
+                                            });
+                                            return xhr;
+                                    },
+                                    type: 'POST',
+                                    url : '/process_hires_images',
+                                    data: formData,
+                                    processData:false,
+                                    contentType:false,
+                                    error: function(error){
+                                            file_upload_error.style.display="";
+                                            upload_button.innerHTML="Upload Images";
+                                            document.getElementById("upload-button").style.display="none" ;
+                                            bar_div.style.display="none";
+                                     }
+                                   
+                            }) 
+                }
 
-        <script>
+                        </script>
+
+                        <script>
                         var form = document.getElementById("form");
 
                         document.getElementById("form-submit").addEventListener("click", function () {
@@ -592,10 +699,10 @@
 
                         });
                          
-        </script>
+                        </script>
 
 
-        <script>
+                        <script>
 
         const multiStepForm = document.querySelector("[data-multi-step]")
         const formSteps = [...multiStepForm.querySelectorAll("[data-step]")]
@@ -635,7 +742,7 @@
             })
         }
 
-        </script>
+                        </script>
 
 
 {% endblock %}

@@ -562,7 +562,7 @@ def sms_reply():
 @login_required
 def print_incident():
     form=SiteIncident()
-    x=int(85)
+    x=int(108)
     gsa = Incident.query.get(x)
     ident = gsa.id
     print(ident)
@@ -616,7 +616,30 @@ def process_images():
             i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
     return render_template('eventreport.html', form=form)
 
-
+@app.route("/process_hires_images", methods = ['GET', 'POST'])
+@login_required
+def process_hires_images():
+    form = SiteIncident()
+    pics= request.files.getlist('photos[]')
+    print (pics)
+            #filename = secure_filename(pics.filename)
+            #print(INCIDENT_UPLOAD_PATH)
+            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
+           
+    for pic in pics:
+        if not pic:
+            pass
+        else:
+            filename = pic.filename
+            file_ext = os.path.splitext(filename)[1]
+            print(file_ext)
+            if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+                abort(400)
+            i=Image.open(pic)
+            i.thumbnail((1000,1000), Image.LANCZOS)  
+            print(i.size)    
+            i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)),optimize=True)
+    return render_template('eventreport.html', form=form)
 
 
 @app.route("/event", methods = ['GET', 'POST'])
@@ -629,7 +652,9 @@ def eventreport():
 
     if form.validate_on_submit():
             pics= request.files.getlist('photos[]')
-            print (pics)
+            hires_pics = request.files.getlist('photoshires[]')
+        
+            
             print(form.location.data)
             #filename = secure_filename(pics.filename)
             #print(INCIDENT_UPLOAD_PATH)
@@ -744,6 +769,16 @@ def eventreport():
                     incimage = incident_files(image=secure_filename(pic.filename),
                                     incident_id = inc.id)
                     db.session.add(incimage)
+            for hrpic in  hires_pics:
+                if not hrpic:
+                    pass
+                else:
+
+                    incimage = incident_files(image=secure_filename(hrpic.filename),
+                                    incident_id = inc.id)
+                    db.session.add(incimage)
+
+
             db.session.commit()
 
             print(inc.id)
@@ -752,9 +787,9 @@ def eventreport():
             
             # once the data has been written to the database, we create a pdf.
             # we call a task mamanger to do this. That is the apply_async 
-           # make_incident_pdf.apply_async(args=[file_id], countdown=10)
+            #make_incident_pdf.apply_async(args=[file_id], countdown=10)
 
-            return("good")
+            #return("good")
             return render_template('layout.html')
            
     return render_template('eventreport.html', form=form)
