@@ -3,281 +3,359 @@
   
 
 
-<div class= "container">
+<div class= "container mt-4">
 
-            <!-- Applications Nav Bar -->       
-
-          
-
-
-<div   class="form-container">
-    <form id = "gsa_data" method = "POST" enctype="multipart/form-data" class = "form-hrinfo">
     
-        
-        
 
-        
-           {{form.hidden_tag()}}
-           
 
-        <div> <img class="gsaupdateimage" src="{{ image_file }}">
+
+    <form id = "gsa_data" method = "POST" enctype="multipart/form-data" >
+    
+        {{form.hidden_tag()}}
+       <div class="row row-cols-1 row-cols-sm-1 row-cols-md-3 text-center">
+            <div class="col">
+            <button class="btn btn-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEmployeeInfo" aria-expanded="false" aria-controls="collapseExample"> Employee Information</button>
+            </div>
+            <div class="col">
+            <button class="btn btn-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"> Employee Documents</button>
+           </div>
+           <div class="col">
+            <button class="btn btn-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAvailability" aria-expanded="false" aria-controls="collapseExample"> Employee Availability</button>
+           </div>
         </div>
-        <div></div>
-
         
-       
+        <div class="collapse" id="collapseExample">
 
-
-        <label class="formtitle">First Name :  </label>
-        <input type="text"  id="gsa_name" class="form" name = "firstname"  value = {{gsa.firstname}} data-gsa="{{gsa.id}}" readonly>
+            <div class="card card-body mx-auto" >
+                <table class="table"></table>
+                <thead>
+                    <tr>
+                        <th>{{ gsa }}'s  Documents</th>   
+                    </tr>
+                </thead>
                 
-        <div  class="formtitle" >Last Name :</div>
-        <input type="text"  id="gsa_last_name" class="form" name = "lastname"  value = {{gsa.lastname}}  readonly>
-        <div></div>
-        <div>
-                                    
-            <button type = "submit" id="update_contact_info" class = "formcheckbtn">Submit </button>
-                        
+                <tbody>
+                    {% if emp_docs %}
+                    {% for emp in emp_docs %}
+                    <tr>
+                    <td> <a href= "{{url_for('static', filename='employee_docs/' + emp.file_document) }}">{{ emp.file_document }}</a></td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                    <tr>
+                    <td><label class="form-label mt-2">Upload Document(s):</label></td>
+                    </tr>
+                    <td><input class="form-control mb-2 mt-2" id="emp_docs_upload" type="file" name="empdocs[]"  multiple="multiple" ></td>
+                    <tr>
+                    <td><input type = "submit"  id="update_employee_docs" class="btn btn-primary" name="send"  ></td>
+                    </tr>
+                </tbody>
+                </table>
+   
             </div>
-
-
-        <div  class="formtitle" >{{"Date of Birth:"}}</div>
-        <div> {{form.dob(class = "form")}}   
-                        {% if form.dob.errors %}
-                        {% for error in form.dob.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}  
-                        {% endif %}
-        </div> 
-
+        </div>
         
-         
+        <div class="collapse" id="collapseEmployeeInfo">
 
-       
-        <div  class="formtitle" >{{"Phone Number:"}}</div>
-        <div> {{form.mobilephone(class = "form" ,placeholder="Phone Number", readonly=true)}} 
-                    {% if form.mobilephone.errors %}
-                        {% for error in form.mobilephone.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}        
-                    {% endif %}
-        </div>
-        <div  class="formtitle" >{{"Start Date:"}}</div>
-        <div> {{form.startdate(class = "form" ,placeholder="Start Date")}} </div>
-        <div  class="formtitle" >{{"End Date:"}}</div>
-        <div> {{form.enddate(class = "form" ,placeholder="End Date")}} </div>
-        <div  class="formtitle" >{{"Address Line 1:"}}</div>
-        <div> {{form.addressone(class = "form" ,placeholder="Address Line 1")}} 
-                        {% if form.addressone.errors %}   
-                        {% for error in form.addressone.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}       
-                    {% endif %}
-        </div>           
-        <div  class="formtitle" >{{"Address Line 2:"}}</div>
-        <div> {{form.addresstwo(class = "form" ,placeholder="Address Line 2")}} 
-                        {% if form.addresstwo.errors %}
-                        {% for error in form.addresstwo.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}       
-                    {% endif %}
-        </div>           
-        <div  class="formtitle" >{{"Unit/Apt:"}}</div>
-        <div> {{form.apt(class = "form" ,placeholder="Unit/Apt")}} </div>
-        <div  class="formtitle" >{{"City:"}}</div>
-        <div> {{form.city(class = "form" ,placeholder="City")}} 
-                        {% if form.city.errors %}
-                        {% for error in form.city.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}           
-                    {% endif %}
-        </div>           
-        <div  class="formtitle" >{{"Province:"}}</div>
-        <div> {{form.province(class = "form" ,placeholder="Province")}} 
-                        {% if form.province.errors %}
-                        {% for error in form.province.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}         
-                    {% endif %}
-        </div>     
-        <div  class="formtitle" >{{"Postal Code:"}}</div>
-        <div> {{form.postal(class = "form", placeholder="Postal Code")}} 
-                    {% if form.postal.errors %}
-                        {% for error in form.postal.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
+            <div class="card mx-auto border-0" >
+                <div> <img class="gsaupdateimage" src="{{ image_file }}">
+                </div>
+                <div></div>
+                <input type="text"  id="gsa_name" class="form-control mb-2" name = "firstname"  value = {{gsa.firstname}} data-gsa="{{gsa.id}}" readonly>
+                <input type="text"  id="gsa_last_name" class="form-control mb-2" name = "lastname"  value = {{gsa.lastname}}  readonly>
+                <label  class="form-label" >Home Store:</label>
+                <div> {{form.store(class = "form-control mb-2")}} 
+                            {% if form.store.errors %}
+                                {% for error in form.store.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}       
+                            {% endif %}
+                </div>
 
-        <div  class="formtitle" >{{"Country:"}}</div>
-        <div> {{form.country(class = "form" ,placeholder="Country")}} 
-                        {% if form.country.errors %}
-                        {% for error in form.country.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}           
-                    {% endif %}
-        </div>           
+
+                    <label  class="form-label ">Date of Birth</label>
+                    <div> {{form.dob(class = "form-control mb-2", placeholder="Date of Birth")}}   
+                                {% if form.dob.errors %}
+                                {% for error in form.dob.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}  
+                                {% endif %}
+                    </div>
+            
+                    <label  class="form-label" >Phone Number:</label>
+                    <div> {{form.mobilephone(class = "form-control mb-2" ,placeholder="Phone Number", readonly=true)}} 
+                                {% if form.mobilephone.errors %}
+                                    {% for error in form.mobilephone.errors %}
+                                    <div class = "formerror">{{ error }}</div>
+                                    {% endfor %}        
+                                {% endif %}
+                    </div>
+                    <label  class="form-label" >Start Date:</label>
+                    <div> {{form.startdate(class = "form-control mb-2" ,placeholder="Start Date")}} </div>
+                    <div  class="form-label" >{{"End Date:"}}</div>
+                    <div> {{form.enddate(class = "form-control mb-2" ,placeholder="End Date")}} </div>
+                    <div  class="form-label" >{{"Address Line 1:"}}</div>
+                    <div> {{form.addressone(class = "form-control mb-2" ,placeholder="Address Line 1")}} 
+                                {% if form.addressone.errors %}   
+                                {% for error in form.addressone.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}       
+                            {% endif %}
+                </div>           
+                <div  class="form-label" >{{"Address Line 2:"}}</div>
+                <div> {{form.addresstwo(class = "form-control mb-2" ,placeholder="Address Line 2")}} 
+                                {% if form.addresstwo.errors %}
+                                {% for error in form.addresstwo.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}       
+                            {% endif %}
+                </div>           
+                <div  class="form-label" >{{"Unit/Apt:"}}</div>
+                <div> {{form.apt(class = "form-control mb-2" ,placeholder="Unit/Apt")}} </div>
+                <div  class="form-label" >{{"City:"}}</div>
+                <div> {{form.city(class = "form-control mb-2" ,placeholder="City")}} 
+                                {% if form.city.errors %}
+                                {% for error in form.city.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}           
+                            {% endif %}
+                </div>           
+                <div  class="form-label" >{{"Province:"}}</div>
+                <div> {{form.province(class = "form-control mb-2" ,placeholder="Province")}} 
+                                {% if form.province.errors %}
+                                {% for error in form.province.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}         
+                            {% endif %}
+                </div>     
+                <div  class="form-label" >{{"Postal Code:"}}</div>
+                <div> {{form.postal(class = "form-control mb-2", placeholder="Postal Code")}} 
+                            {% if form.postal.errors %}
+                                {% for error in form.postal.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+
+                <div  class="form-label" >{{"Country:"}}</div>
+                <div> {{form.country(class = "form-control mb-2" ,placeholder="Country")}} 
+                                {% if form.country.errors %}
+                                {% for error in form.country.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}           
+                            {% endif %}
+                </div>           
+            
+                <div  class="form-label" >{{"Email:"}}</div>
+                <div> {{form.email(class = "form-control mb-2", placeholder="E-Mail", readonly=true)}} 
+                            {% if form.email.errors %}
+                                {% for error in form.email.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+                
+                
+                
+
+                <div  class="form-label" >{{"Online Training User ID:"}}</div>
+                
+                
+                <div>{{form.trainingid(class = "form-control mb-2", placeholder="Training User ID")}} 
+                            {% if form.trainingid.errors %}
+                                {% for error in form.trainingid.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                
+                </div>
+                <div  class="form-label" >{{"Online Training Password:"}}</div>
+                
+                <div>{{form.trainingpassword(class = "form-control mb-2", placeholder="Training Pasword")}} 
+                            {% if form.trainingpassword.errors %}
+                                {% for error in form.trainingpassword.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                
+                </div>
+
+
+                <div  class="form-label" >{{"Iprism Code:"}}</div>
+                
+                <div>{{form.iprismcode(class = "form-control mb-2", placeholder="iprismcode")}} 
+                            {% if form.iprismcode.errors %}
+                                {% for error in form.iprismcode.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                
+                </div>
+
+                
+                <div  class="form-label" >{{"Profile Picture:"}}</div>
+                <div>  {{ form.hrpicture(class = "form-control mb-2")}}
+                </div>
+                </div>
+
+                <div>
+                                            
+                    <button type = "submit" id="update_contact_info" class = "btn btn-primary mb-2">Submit Changes </button>
+                                
+                    </div>
+
+        </div>
+        
+        <div class="collapse" id="collapseAvailability">
+            <div class="card mx-auto border-0">
+
+                <div  class="form-label" >{{"Monday Availability:"}}</div>
+                <div> {{form.mon_avail(class = "form-control mb-2", value = gsa.mon_avail)}}
+            
+                            
+                            {% if form.mon_avail.errors %}
+                                {% for error in form.mon_avail.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+                
+
+                <div  class="form-label" >{{"Tuesday Availability:"}}</div>
+                <div> {{form.tue_avail(class = "form-control mb-2", value=gsa.tue_avail)}} 
+                            
+                            {% if form.tue_avail.errors %}
+                                {% for error in form.tue_avail.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+
+                <div  class="form-label" >{{"Wednesday Availability"}}</div>
+                <div> {{form.wed_avail(class = "form-control mb-2", value=gsa.wed_avail)}} 
+                            
+                            {% if form.wed_avail.errors %}
+                                {% for error in form.wed_avail.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+
+                <div  class="form-label" >{{"Thursday Availability"}}</div>
+                <div> {{form.thu_avail(class = "form-control mb-2", value=gsa.thu_avail)}} 
+                            
+                            {% if form.thu_avail.errors %}
+                                {% for error in form.thu_avail.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+
+                <div  class="form-label" >{{"Friday Availability"}}</div>
+                <div> {{form.fri_avail(class = "form-control mb-2", value=gsa.fri_avail)}} 
+                            
+                            {% if form.fri_avail.errors %}
+                                {% for error in form.fri_avail.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+
+                <div  class="form-label" >{{"Saturday Availability"}}</div>
+                <div> {{form.sat_avail(class = "form-control mb-2", value=gsa.sat_avail)}} 
+                            
+                            {% if form.sat_avail.errors %}
+                                {% for error in form.sat_avail.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+
+                <div  class="form-label" >{{"Sunday Availability"}}</div>
+                <div> {{form.sun_avail(class = "form-control mb-2", value=gsa.sun_avail)}} 
+                            
+                            {% if form.sun_avail.errors %}
+                                {% for error in form.sun_avail.errors %}
+                                <div class = "formerror">{{ error }}</div>
+                                {% endfor %}            
+                            {% endif %}
+                </div>
+                <div>
+                                            
+                    <button type = "submit" id="update_contact_info" class = "btn btn-primary mb-2">Submit Changes </button>
+                                
+                    </div>
+            </div>
      
-        <div  class="formtitle" >{{"Email:"}}</div>
-        <div> {{form.email(class = "form", placeholder="E-Mail", readonly=true)}} 
-                    {% if form.email.errors %}
-                        {% for error in form.email.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        
-        
-        
-
-        <div  class="formtitle" >{{"Online Training User ID:"}}</div>
-        
-        
-        <div>{{form.trainingid(class = "form", placeholder="Training User ID")}} 
-                    {% if form.trainingid.errors %}
-                        {% for error in form.trainingid.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-        <div  class="formtitle" >{{"Online Training Password:"}}</div>
-        
-        <div>{{form.trainingpassword(class = "form", placeholder="Training Pasword")}} 
-                    {% if form.trainingpassword.errors %}
-                        {% for error in form.trainingpassword.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-
-
-        <div  class="formtitle" >{{"Iprism Code:"}}</div>
-        
-        <div>{{form.iprismcode(class = "form", placeholder="iprismcode")}} 
-                    {% if form.iprismcode.errors %}
-                        {% for error in form.iprismcode.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        
-        </div>
-
-        
-         <div  class="formtitle" >{{"Profile Picture:"}}</div>
-         <div>  {{ form.hrpicture(class = "form")}}
-        </div>
-
-        <div  class="formtitle" >{{"Monday Availability:"}}</div>
-        <div> {{form.mon_avail(class = "form", value = gsa.mon_avail)}}
-       
-                    
-                    {% if form.mon_avail.errors %}
-                        {% for error in form.mon_avail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-        
-
-        <div  class="formtitle" >{{"Tuesday Availability:"}}</div>
-        <div> {{form.tue_avail(class = "form", value=gsa.tue_avail)}} 
-                    
-                    {% if form.tue_avail.errors %}
-                        {% for error in form.tue_avail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Wednesday Availability"}}</div>
-        <div> {{form.wed_avail(class = "form", value=gsa.wed_avail)}} 
-                    
-                    {% if form.wed_avail.errors %}
-                        {% for error in form.wed_avail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Thursday Availability"}}</div>
-        <div> {{form.thu_avail(class = "form", value=gsa.thu_avail)}} 
-                    
-                    {% if form.thu_avail.errors %}
-                        {% for error in form.thu_avail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Friday Availability"}}</div>
-        <div> {{form.fri_avail(class = "form", value=gsa.fri_avail)}} 
-                    
-                    {% if form.fri_avail.errors %}
-                        {% for error in form.fri_avail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Saturday Availability"}}</div>
-        <div> {{form.sat_avail(class = "form", value=gsa.sat_avail)}} 
-                    
-                    {% if form.sat_avail.errors %}
-                        {% for error in form.sat_avail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-        <div  class="formtitle" >{{"Sunday Availability"}}</div>
-        <div> {{form.sun_avail(class = "form", value=gsa.sun_avail)}} 
-                    
-                    {% if form.sun_avail.errors %}
-                        {% for error in form.sun_avail.errors %}
-                        <div class = "formerror">{{ error }}</div>
-                        {% endfor %}            
-                    {% endif %}
-        </div>
-
-            <div>
-            <!-- <a class = "hrbutton" <a href="{{ url_for('home')}}">Edit an Employee</a> -->
-            </div>
-
     </form>
+ 
 </div>
 
 
 
                 <script>
-                    const info_update = document.querySelector(".alert2-info");
-                    const btn_push = document.querySelector("#update_contact_info");
-                    btn_push.addEventListener('click', function(e){
-                        
-                        var form = $('#gsa_data');
                     
+                        const btn_push_docs = document.getElementById("update_employee_docs");
+
+                        btn_push_docs.addEventListener('click', function(e){
+                        var emp_docs_upload = document.getElementById('emp_docs_upload');
                         var gsa_identifier = document.querySelector('#gsa_name');
                         var id = gsa_identifier.dataset.gsa;
                         e.preventDefault()
                         console.log(id);
-                        console.log(form);
+                        var files = emp_docs_upload.files;
+                        var formData=new FormData();
+                            
+                                for (var i = 0; i<files.length; i++){
+                                    var file = files[i];
+                                    console.log(file.name);
+                                    formData.append('empdocs[]', file, file.name);
+                                    console.log(formData);
+                                    }   
+                                
                         $.ajax({
-                                url:'/update_gsa_contact'+id,
-                                data: form.serialize(),
+                                url:'/add_docs'+id,
+                                data: formData,
                                 type:'POST',
+                                processData: false,
+                                contentType:false,
                                 success: function(response){
                                 console.log("yes you posted it"),
-                                alert('Successfully Updated')
+                                alert('Successfully sent files')
                                 }
-                            
-                                
-
+                            })
                         })
-                    })
                 </script>
 
+                    <script>
+                        const info_update = document.querySelector(".alert2-info");
+                        const btn_push = document.querySelector("#update_contact_info");
+                        btn_push.addEventListener('click', function(e){
+                            
+                            var form = $('#gsa_data');
+                        
+                            var gsa_identifier = document.querySelector('#gsa_name');
+                            var id = gsa_identifier.dataset.gsa;
+                            e.preventDefault()
+                            console.log(id);
+                            console.log(form);
+                        
+                            
 
+                            $.ajax({
+                                    url:'/update_gsa_contact'+id,
+                                    data: form.serialize(),
+                                    type:'POST',
+                                    success: function(response){
+                                    console.log("yes you posted it"),
+                                    alert('Successfully Updated')
+                                    }
+                                
+                                    
+
+                            })
+                        })
+                    </script>
 
 
 

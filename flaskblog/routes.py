@@ -16,7 +16,8 @@ from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
                  employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
                      DEFAULT_SENDER, Store,Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID, \
                          login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient,\
-                             basedir,INCIDENT_UPLOAD_PATH, BULK_EMAIL_PATH, incident_files, checkinout, user_schema, sg
+                             basedir,INCIDENT_UPLOAD_PATH, BULK_EMAIL_PATH, incident_files, checkinout, user_schema, sg,\
+                                Empdocs, EMPLOYEE_FILE_UPLOAD_PATH, INCIDENT_HIRES_UPLOAD_PATH, make_incident_file
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
@@ -146,14 +147,14 @@ def login():
         #    flash('please confirm email')
         #    return redirect(url_for('login'))
         if user and bcrypt.check_password_hash(user.password, form.password.data):
-                #user_phone =db.session.query(Employee.mobilephone, User)\
-                #.filter(Employee.user_id == user.id).first()
-                #print(user.phone)
-                #print(user.active)
-                #print(form.two_fa.data)
+                user_phone =db.session.query(Employee.mobilephone, User)\
+                .filter(Employee.user_id == user.id).first()
+                print(user.phone)
+                print(user.active)
+                print(form.two_fa.data)
                 # testing
-                login_user(user, remember=form.remember_me.data)
-                return render_template("layout.html", title="home")
+                #login_user(user, remember=form.remember_me.data)
+                #return render_template("layout.html", title="home")
 
                 # end here
                 if form.two_fa.data=="sms":
@@ -166,7 +167,7 @@ def login():
                     return redirect(url_for('verify_2fa'))
                 else:
                     flash('you need to select a 2fa channel')
-                    #return redirect(url_for('lodin'))
+                    return render_template('login.html' ,form=form)
                 #session['phone']=user_phone
                 return redirect(url_for('login', form=form))
                 login_user(user, remember=form.remember_me.data)
@@ -558,19 +559,20 @@ def sms_reply():
 
     return str(resp)
 
-@app.route('/testincident', methods = ['GET', 'POST'])
+@app.route('/testincident<int:staff_id>', methods = ['GET', 'POST'])
 @login_required
-def print_incident():
+def print_incident(staff_id):
     form=SiteIncident()
-    x=int(108)
+    x=int(staff_id)
     gsa = Incident.query.get(x)
     ident = gsa.id
     print(ident)
-    picture = incident_files.query.filter_by(incident_id=ident)
+    picture = incident_files.query.filter_by(incident_id=staff_id)
     for x in picture:
         print( x.image)
     print (basedir)
     return render_template('eventreportpdf.html' , form=form, gsa=gsa, picture=picture)
+    #return render_template('server_eventreportpdf.html' , form=form, gsa=gsa, picture=picture)
 
 @app.route('/email/<email>')
 @login_required
@@ -594,18 +596,23 @@ def email(email):
 @app.route("/process_images", methods = ['GET', 'POST'])
 @login_required
 def process_images():
+
+    # here we get the form data as well as the  pictures.
+    # the  pictures are sent with an ajax call.
+    # they are rescaled and resized then saved to the server
+    # the pics need to have an extension that is acceptable.
+    # that extension is set in the upload extensions variable.
+
     form = SiteIncident()
     pics= request.files.getlist('photos[]')
-    print (pics)
-            #filename = secure_filename(pics.filename)
-            #print(INCIDENT_UPLOAD_PATH)
-            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
-           
+    reg_file_names = []
     for pic in pics:
         if not pic:
             pass
         else:
             filename = pic.filename
+            securefilename = secure_filename(filename)
+            reg_file_names.append(securefilename)
             file_ext = os.path.splitext(filename)[1]
             print(file_ext)
             if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
@@ -613,24 +620,35 @@ def process_images():
             i=Image.open(pic)
             i.thumbnail((300,300), Image.LANCZOS)  
             print(i.size)    
-            i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
-    return render_template('eventreport.html', form=form)
+            i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)),optimize=True)
+    session['reg_file_names']=reg_file_names
+    return jsonify(reg_file_names)
 
 @app.route("/process_hires_images", methods = ['GET', 'POST'])
 @login_required
 def process_hires_images():
+
+    # here we get the form data as well as the hires pictures.
+    # the hi res pictures are sent with an ajax call.
+    # they are rescaled and resized then saved to the server
+    # the pics need to have an extension that is acceptable.
+    # that extension is set in the upload extensions variable.
+
     form = SiteIncident()
-    pics= request.files.getlist('photos[]')
-    print (pics)
-            #filename = secure_filename(pics.filename)
-            #print(INCIDENT_UPLOAD_PATH)
-            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
-           
+    pics= request.files.getlist('hiresphotos[]')
+    file_names = []
+    #for pic in pics:
+     #   file_ext = os.path.splitext(filename)[1]
+      #  if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+       #         abort(400)
+
     for pic in pics:
         if not pic:
             pass
         else:
             filename = pic.filename
+            securefilename = secure_filename(filename)
+            file_names.append(securefilename)
             file_ext = os.path.splitext(filename)[1]
             print(file_ext)
             if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
@@ -639,7 +657,21 @@ def process_hires_images():
             i.thumbnail((1000,1000), Image.LANCZOS)  
             print(i.size)    
             i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)),optimize=True)
-    return render_template('eventreport.html', form=form)
+    session['file_names']=file_names
+    return jsonify(file_names)
+    
+
+@app.route("/display_hires_images/<filename>", methods = ['GET', 'POST'])
+@login_required
+def display_hires_images(filename):
+    print(filename)
+    return redirect(url_for ('static', filename='/incidentpictures_hires/'+ filename), code=30)
+
+@app.route("/display_images/<filename>", methods = ['GET', 'POST'])
+@login_required
+def display_images(filename):
+    print(filename)
+    return redirect(url_for ('static', filename='/incidentpictures/'+ filename), code=30)
 
 
 @app.route("/event", methods = ['GET', 'POST'])
@@ -647,152 +679,16 @@ def process_hires_images():
 @roles_accepted('Admin', 'Manager')
 def eventreport():
     form = SiteIncident()
+    reg_file_names=session['reg_file_names']
+    file_names=session['file_names']
+    file_list={
+        "form": form,
+        "reg_file_names": reg_file_names,
+        "file_names": file_names}
+
+    make_incident_file.apply_async(args=[file_list] ,countdown=10)
+
     
-    # get all of the information from the form
-
-    if form.validate_on_submit():
-            pics= request.files.getlist('photos[]')
-            hires_pics = request.files.getlist('photoshires[]')
-        
-            
-            print(form.location.data)
-            #filename = secure_filename(pics.filename)
-            #print(INCIDENT_UPLOAD_PATH)
-            #target = os.path.join(app.config['INCIDENT_UPLOAD_PATH'], 'static/incidentpictures')
-           
-            #for pic in pics:
-            #    if not pic:
-            #        pass
-            #    else:
-            #        i=Image.open(pic)#
-
-                    #= Image.open(pic)
-            #        i.thumbnail((300,300), Image.LANCZOS)
-                    #i.save(picture_paththumb)
-            #        print(i.size)
-                    #new_pic = image.resize(300,300)
-             #       i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)))
-        
-            #return render_template('layout.html')
-            newtime=str(form.eventtime.data)
-            time2 =datetime.strptime(newtime, '%H:%M:%S').time()
-            inc=Incident(injuryorillness=form.injuryorillness.data,
-                            environmental =form.environmental.data,
-                            regulatory =form.regulatory.data,
-                            economicdamage = form.economicdamage.data,
-                            reputation = form.reputation.data,
-                            security = form.security.data,
-                            fire = form.fire.data,
-                            location = str(form.location.data),
-                            eventdetails = form.eventdetails.data,
-                            eventdate = form.eventdate.data,
-                            eventtime = time2,
-                            reportedby = form.reportedby.data,
-                            reportedbynumber = form.reportedbynumber.data,
-                            suncoremployee = form.suncoremployee.data,
-                            contractor = form.contractor.data,
-                            associate = form.associate.data,
-                            generalpublic = form.generalpublic.data,
-                            other = form.other.data,
-                            othertext = form.othertext.data,
-                            actionstaken = form.actionstaken.data,
-                            correctiveactions = form.correctiveactions.data,
-                            sno = form.sno.data,
-                            syes = form.syes.data,
-                            scomment = form.scomment.data,
-                            rna = form.rna.data,
-                            rno = form.rno.data,
-                            ryes = form.ryes.data,
-                            rcomment = form.rcomment.data,
-                            gas = form.gas.data,
-                            diesel = form.diesel.data,
-                            sewage = form.sewage.data,
-                            chemical = form.chemical.data,
-                            chemcomment = form.chemcomment.data,
-                            deiselexhaustfluid = form.deiselexhaustfluid.data,
-                            sother = form.sother.data,
-                            s2comment = form.scomment.data,
-                            air = form.air.data,
-                            water = form.water.data,
-                            wildlife = form.wildlife.data,
-                            land = form.land.data,
-                            volumerelease = form.volumerelease.data,
-                            pyes = form.pyes.data,
-                            pno = form.pno.data,
-                            pna = form.pna.data,
-                            pcase = form.pcase.data,
-                            stolentransactions = form.stolentransactions.data,
-                            stoltransactions = form.stoltransactions.data,
-                            stolencards = form.stolencards.data,
-                            stolcards = form.stolcards.data,
-                            stolentobacco = form.stolentobacco.data,
-                            stoltobacco = form.stoltobacco.data,
-                            stolenlottery = form.stolenlottery.data,
-                            stollottery = form.stollottery.data,
-                            stolenfuel = form.stolenfuel.data,
-                            stolfuel = form.stolfuel.data,
-                            stolenother = form.stolenother.data,
-                            stolother = form.stolother.data,
-                            stolenothervalue = form.stolenothervalue.data,
-                            stolenna = form.stolenna.data,
-                            gender = form.gender.data,
-                            height = form.height.data,
-                            weight = form.weight.data,
-                            haircolor = form.haircolor.data,
-                            haircut= form.haircut.data,
-                            complexion = form.complexion.data,
-                            beardmoustache = form.beardmoustache.data,
-                            eyeeyeglasses = form.eyeeyeglasses.data,
-                            licencenumber = form.licencenumber.data,
-                            makemodel = form.makemodel.data,
-                            color = form.color.data,
-                            scars = form.scars.data,
-                            tatoos = form.tatoos.data,
-                            hat = form.hat.data,
-                            shirt = form.shirt.data,
-                            trousers = form.trousers.data,
-                            shoes = form.shoes.data,
-                            voice = form.voice.data,
-                            bumpersticker = form.bumpersticker.data,
-                            direction = form.direction.data,
-                            damage = form.damage.data)
-                            
-            db.session.add(inc)
-            db.session.flush()
-            #db.session.commit()
-
-            for pic in  pics:
-                if not pic:
-                    pass
-                else:
-
-                    incimage = incident_files(image=secure_filename(pic.filename),
-                                    incident_id = inc.id)
-                    db.session.add(incimage)
-            for hrpic in  hires_pics:
-                if not hrpic:
-                    pass
-                else:
-
-                    incimage = incident_files(image=secure_filename(hrpic.filename),
-                                    incident_id = inc.id)
-                    db.session.add(incimage)
-
-
-            db.session.commit()
-
-            print(inc.id)
-            file_id = int(inc.id)
-            flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
-            
-            # once the data has been written to the database, we create a pdf.
-            # we call a task mamanger to do this. That is the apply_async 
-            #make_incident_pdf.apply_async(args=[file_id], countdown=10)
-
-            #return("good")
-            return render_template('layout.html')
-           
-    return render_template('eventreport.html', form=form)
 
 @app.route("/nofile")
 @login_required
@@ -1668,6 +1564,52 @@ def save_hrpicture(form_hrpicture):
     
     return hrpicture_fn
 
+
+@app.route("/add_docs<int:staff_id>", methods = ['GET','POST'])
+@login_required
+def add_docs(staff_id):
+    print(staff_id)
+    docs = request.files.getlist('empdocs[]')
+    print(docs)
+
+    for doc in docs:
+        if not doc:
+            pass
+       
+
+        else:
+            filename = doc.filename
+            file_ext = os.path.splitext(filename)[1]
+            print(file_ext)
+            #if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+            #    abort(400)
+            #i=Image.open(pic)
+            #i.thumbnail((300,300), Image.LANCZOS)  
+            #print(i.size)    
+            doc.save(os.path.join(EMPLOYEE_FILE_UPLOAD_PATH,secure_filename(doc.filename)))
+            
+    for doc in docs:
+        if not doc:
+            pass
+        else:
+            emp_docs = Empdocs(file_document =secure_filename(doc.filename),
+                                file_employee = int(staff_id))
+            db.session.add(emp_docs)
+        db.session.commit() 
+
+
+    return "done"
+
+
+        #    filename=doc.filename
+        #    filename2 = secure_filename(filename)
+        #    doc.save(os.path.join(EMPLOYEE_FILE_UPLOAD_PATH, filename2))
+
+
+         #   
+       # 
+    
+
 @app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
 @login_required
 def updategsa(staff_id):
@@ -1679,7 +1621,10 @@ def updategsa(staff_id):
     #you can then compare the new form data using .data with old data use gsa.data
     #note below that some data is int and some is text. they need to be the same for the compares
     
-    
+    emp_docs = Empdocs.query.filter_by(file_employee = int(staff_id))
+        
+
+    #print(emp_docs.file_document)
     gsa = Employee.query.get(staff_id)
     print(gsa.dob)
     
@@ -1689,6 +1634,8 @@ def updategsa(staff_id):
         .join(Course, Course.id == Grade.course_id)\
         .add_columns(Course.name, Grade.completed)
   
+    #document = url_for(
+   #     'static', filename='employee_docs/'+ emp_docs.file_document)
     
     image_file = url_for(
         'static', filename='empfiles/mobile/' + gsa.image_file)
@@ -1697,8 +1644,10 @@ def updategsa(staff_id):
     form = EmployeeUpdateForm(obj=gsa)
     
     if request.method == "GET":
-        print(form.dob.data)
-        return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa)
+        #print(form.dob.data)
+        return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa, emp_docs=emp_docs)
+        
+        #, emp_docs=emp_docs)
  
 @app.route("/update_gsa_contact<int:staff_id>", methods=['GET','POST'])
 @login_required

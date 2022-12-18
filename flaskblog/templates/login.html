@@ -87,7 +87,18 @@
                             {{ form.password (class ='form-control form-control-lg mb-1', placeholder="password") }}
                         </div>  
                         
-                        
+                     
+                          <h6 class="text-center font-weight-normal m-2 ">You Must Select Either SMS (text) or Whatsapp for 2 Factor Authorisation</h6>
+                          
+
+                          <div>
+                              {{ form.two_fa (class='form-control form-control-sm mb-1')}}
+                          </div>
+
+                          {% for error in form.two_fa.errors %}
+                          <div class="two_fa_alerts">[{{ error }}]</div>
+                          {% endfor %}
+
                           <div class="text-center">
                             <!-- Simple link -->
                             <a href="/forgot_password">Forgot Password?</a>
@@ -108,19 +119,9 @@
 
                
                         
-                   <!--
-                                <div class="loginheader">
-                                <h1>You Must Select Either SMS (text) or Whatsapp for 2 Factor Authorisation</h1>
-                                </div>
-
-                                <div>
-                                    {{ form.two_fa (class='form-control form-control-lg mb-1')}}
-                                </div>
-
-                                {% for error in form.two_fa.errors %}
-                                <div class="two_fa_alerts">[{{ error }}]</div>
-                                {% endfor %}
-                              -->
+                   
+                                
+                              
                                 
                         
                         
