@@ -13,7 +13,7 @@ import json
 from functools import wraps
 from datetime import datetime, timedelta
 from flask import render_template_string, make_response, url_for, redirect, send_from_directory, \
-     request, render_template, send_file, abort, g
+     request, render_template, send_file, abort, g, message_flashed, flash
 from flask_admin import Admin, expose, BaseView
 from flask_admin.actions import action
 from flask_sqlalchemy import SQLAlchemy
@@ -67,11 +67,15 @@ app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 app.config['CKEDITOR_FILE_UPLOADER'] = 'upload'
 #app.config['CKEDITOR_ENABLE_CSRF'] = True  # if you want to enable CSRF protect, uncomment this line
 app.config['UPLOADED_PATH'] = os.path.join(basedir, 'images')
+EMPLOYEE_FILE_UPLOAD_PATH = os.path.join(basedir, 'static/employee_docs')
 INCIDENT_UPLOAD_PATH=os.path.join(basedir, 'static/incidentpictures')
+INCIDENT_HIRES_UPLOAD_PATH=os.path.join(basedir, 'static/incidentpictures_hires')
 BULK_EMAIL_PATH=os.path.join(basedir, 'static/emailfiles')
 app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.jpeg',  '.png', '.gif']
 app.config['INCIDENT_UPLOAD_PATH'] = INCIDENT_UPLOAD_PATH
+app.config['INCIDENT_HIRES_UPLOAD_PATH'] = INCIDENT_HIRES_UPLOAD_PATH
 app.config['BULK_EMAIL_PATH']= BULK_EMAIL_PATH
+app.config['EMPLOYEE_FILE_UPLOAD_PATH']= EMPLOYEE_FILE_UPLOAD_PATH
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=5)
 #CELERY_ENABLE_UTC = False
 #USE_TZ=True
@@ -319,7 +323,134 @@ def make_pdf(staff_id, sigs):
         with file as f:    
             dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
     
+@celery.task
+def make_incident_file(file_list):
 
+    form=file_list.get('form')
+    file_names=file_list.get('file_names')
+    reg_file_names = file_list.get('reg_file_names')
+
+    print(Incident.id)
+    # get all of the information from the form
+
+    if form.validate_on_submit():
+            pics= request.files.getlist('photos[]')
+            hires_pics = request.files.getlist('photoshires[]')
+            newtime=str(form.eventtime.data)
+            time2 =datetime.strptime(newtime, '%H:%M:%S').time()
+            inc=Incident(injuryorillness=form.injuryorillness.data,
+                            environmental =form.environmental.data,
+                            regulatory =form.regulatory.data,
+                            economicdamage = form.economicdamage.data,
+                            reputation = form.reputation.data,
+                            security = form.security.data,
+                            fire = form.fire.data,
+                            location = str(form.location.data),
+                            eventdetails = form.eventdetails.data,
+                            eventdate = form.eventdate.data,
+                            eventtime = time2,
+                            reportedby = form.reportedby.data,
+                            reportedbynumber = form.reportedbynumber.data,
+                            suncoremployee = form.suncoremployee.data,
+                            contractor = form.contractor.data,
+                            associate = form.associate.data,
+                            generalpublic = form.generalpublic.data,
+                            other = form.other.data,
+                            othertext = form.othertext.data,
+                            actionstaken = form.actionstaken.data,
+                            correctiveactions = form.correctiveactions.data,
+                            sno = form.sno.data,
+                            syes = form.syes.data,
+                            scomment = form.scomment.data,
+                            rna = form.rna.data,
+                            rno = form.rno.data,
+                            ryes = form.ryes.data,
+                            rcomment = form.rcomment.data,
+                            gas = form.gas.data,
+                            diesel = form.diesel.data,
+                            sewage = form.sewage.data,
+                            chemical = form.chemical.data,
+                            chemcomment = form.chemcomment.data,
+                            deiselexhaustfluid = form.deiselexhaustfluid.data,
+                            sother = form.sother.data,
+                            s2comment = form.scomment.data,
+                            air = form.air.data,
+                            water = form.water.data,
+                            wildlife = form.wildlife.data,
+                            land = form.land.data,
+                            volumerelease = form.volumerelease.data,
+                            pyes = form.pyes.data,
+                            pno = form.pno.data,
+                            pna = form.pna.data,
+                            pcase = form.pcase.data,
+                            stolentransactions = form.stolentransactions.data,
+                            stoltransactions = form.stoltransactions.data,
+                            stolencards = form.stolencards.data,
+                            stolcards = form.stolcards.data,
+                            stolentobacco = form.stolentobacco.data,
+                            stoltobacco = form.stoltobacco.data,
+                            stolenlottery = form.stolenlottery.data,
+                            stollottery = form.stollottery.data,
+                            stolenfuel = form.stolenfuel.data,
+                            stolfuel = form.stolfuel.data,
+                            stolenother = form.stolenother.data,
+                            stolother = form.stolother.data,
+                            stolenothervalue = form.stolenothervalue.data,
+                            stolenna = form.stolenna.data,
+                            gender = form.gender.data,
+                            height = form.height.data,
+                            weight = form.weight.data,
+                            haircolor = form.haircolor.data,
+                            haircut= form.haircut.data,
+                            complexion = form.complexion.data,
+                            beardmoustache = form.beardmoustache.data,
+                            eyeeyeglasses = form.eyeeyeglasses.data,
+                            licencenumber = form.licencenumber.data,
+                            makemodel = form.makemodel.data,
+                            color = form.color.data,
+                            scars = form.scars.data,
+                            tatoos = form.tatoos.data,
+                            hat = form.hat.data,
+                            shirt = form.shirt.data,
+                            trousers = form.trousers.data,
+                            shoes = form.shoes.data,
+                            voice = form.voice.data,
+                            bumpersticker = form.bumpersticker.data,
+                            direction = form.direction.data,
+                            damage = form.damage.data)
+                            
+            db.session.add(inc)
+            db.session.flush()
+            for pic in  reg_file_names:
+                if not pic:
+                    pass
+                else:
+                    incimage = incident_files(image=pic,
+                                    incident_id = inc.id)
+                    db.session.add(incimage)
+
+            for hrpic in  file_names:
+                if not hrpic:
+                    pass
+                else:
+                    incimage = incident_files(image=hrpic,
+                                    incident_id = inc.id)
+                    db.session.add(incimage)
+            db.session.commit()
+
+            print(inc.id)
+            file_id = int(inc.id)
+            
+            flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
+            
+            # once the data has been written to the database, we create a pdf.
+            # we call a task mamanger to do this. That is the apply_async 
+            make_incident_pdf.apply_async(args=[file_id], countdown=10)
+
+            #return("good")
+            return render_template('layout.html')
+           
+    return render_template('eventreport.html', form=form)
 
 @celery.task
 def make_incident_pdf(file_id):
@@ -459,7 +590,7 @@ class User(UserMixin, db.Model):
                             backref=db.backref('users', lazy='dynamic'))
 
     check_in_out = db.relationship('checkinout', backref='user', lazy=True)
-
+    
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -582,7 +713,7 @@ class Employee(db.Model):
     fri_avail = db.Column(db.String(100), nullable=False)
     sat_avail = db.Column(db.String(100), nullable=False)
     sun_avail = db.Column(db.String(100), nullable=False)
-    
+    employee_doc = db.relationship('Empdocs', backref='employee', lazy=True)
    
     
     def __str__(self):
@@ -825,6 +956,10 @@ class incident_files(db.Model):
     image = db.Column(db.String(100), nullable=False)
     incident_id = db.Column(db.Integer, db.ForeignKey('incident.id'))
 
+class Empdocs(db.Model):
+    id=db.Column(db.Integer, primary_key = True)
+    file_document = db.Column(db.String(100), nullable=False)
+    file_employee = db.Column(db.Integer, db.ForeignKey('employee.id'))
 
 class checkinout(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -834,6 +969,9 @@ class checkinout(db.Model):
     endtime = db.Column(db.Time())
     check_store = db.Column(db.Integer, db.ForeignKey('store.id'))
     check_user = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+
 
 # here we initiate the datastore which is used in the Admin model
 

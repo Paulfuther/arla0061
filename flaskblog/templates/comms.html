@@ -7,7 +7,7 @@
 <form method = "post">
 
     <div  class="formtitle searchbyrole" >{{"Role:"}}</div>
-    <div> {{form.role(class = "form3", placeholder="Role", id="userrole")}} 
+    <div> {{form.role(class = "form-control", placeholder="Role", id="userrole")}} 
                 {% if form.role.errors %}
                     {% for error in form.role.errors %}
                     <div class = "formerror">{{ error }}</div>
@@ -16,7 +16,7 @@
     </div>
 
     <div  class="formtitle" >{{"Message to be Sent:"}}</div>
-    <div> {{form.message_body(class = "form", placeholder="Message")}} 
+    <div> {{form.message_body( class = "form-control mb-2" ,rows="5", placeholder="Message")}} 
               
     </div>
 

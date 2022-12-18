@@ -16,16 +16,14 @@
                         {% if current_user.has_roles('GSA') %}
                         {% else %}
 
-                        <ul>
-                              <li class = "mhrlist">Search By Name or Store</li>
-                        </ul>
+                       
                        
                        
                   
                         <ul>
                         <form method="POST" class = "hrsearch">
                            
-                                <div><input type ="text"  id = "live_search_first" name = "text" placeholder = " Search " class = "inputform"> 
+                                <div><input type ="text"  id = "live_search_first" name = "text" placeholder = " Search " class = "inputform mt-3"> 
                                 </div>
                                 
                         </form>
@@ -37,18 +35,11 @@
                
 
 
-                    
-                           <!--url_for('static', filename='profile_pics/mobile/' +-->
+                            <div id="tablecontainer">
 
-                  
-
-                        <div class = "border-top" ></div>
-                      
-                        <div class = "tablecontainer" id ="tablecontainer">
-
-
-                        
-                      <script>
+                            </div>
+                     
+                        <script>
 
                     $(document).ready(function(){
                         $("#live_search_first").on("input",function(e){
@@ -64,38 +55,32 @@
                                 
                                     let html = res.reduce(( acc, {number, firstname, lastname, email, store, store_id, image_file, id}) =>
                                         acc += `
-                                        <div class = 'tablecard'>
-                                        <div class = 'tablecard-image'>
-
-                                   
+                                        <div class="row mb-2">
+                                        <span class="border-bottom mb-2"></span>
+                                        <div class="col-2 col-md-2 tablecard-image">
                                         <img src =' /static/empfiles/thumb/${image_file}' class = 'hrlistimage' > 
                                         </div>
-                                        <div class = 'tablecard-inner'>
-                                        
-                                        <div class = 'hritem1'>
+                                
+                                        <div class="col-3 col-md-2">
                                         ${number}
                                         </div>
-                                        <div class = 'hritem2'>
+                                       <div class = "col-5 col-md-2 text-end">
                                         ${firstname +" "+ lastname}
                                         </div>
-                                        <div class = 'hritem3'>
+                                        <div class= "col-10 col-md-5 text-end">
                                         ${email}
                                         </div> 
-                                        <div class = "tablecard-links">
-
-                                        <a   href="/updategsa${id}">Contact Info</a>
-                                        <a   href="/updategsatraining${id}">Training Info</a>
-                                        <a   href="/hrfile${id}">Create File</a>
-                                        <a   href="/existingemployeefile${id}">View File</a>
-                                        </div> 
+                                        <div class = "col-2 col-md-1">
+                                        <a href="/updategsa${id}" class='fas fa-edit' style='font-size:12px'></a>
                                         </div>
-                                     
-                                        </div>`
+                                        </div class="row mb-2">
+                                        <div class="row mt-2"></div>
+                                        `
                                      
 
                                     , '');
                                     console.log(res.id)
-                                    $('.tablecontainer').append(html);
+                                    $('#tablecontainer').append(html);
                                     console.log(res);
                                  
                                 }
@@ -104,9 +89,9 @@
                         });
                     })
 
-                </script>
-                      
-                
+                        </script>
+                        
+                        
 
 {% endblock content %}
 

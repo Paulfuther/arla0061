@@ -48,6 +48,12 @@ body {
   display:block;
 }
 
+img {
+  display: block;
+  max-width: 40%;
+  
+  margin:auto;
+}
 
 /* progress bar */
 
@@ -1588,7 +1594,7 @@ input[type=password] {
  .tablecard-image {
    display: flex;
    align-items: flex-start;
-   padding: 0px 0px 0px 10px;
+   
 
 
  }
@@ -2360,6 +2366,7 @@ a.hrbutton {
   margin-top: 20px;
   
 }
+//*
 .card {
   display: grid;
   width: 50%;
@@ -2392,7 +2399,7 @@ a.hrbutton {
 .cardheader img {
   border-radius:50%;
 }
-
+*/
 .media-body {
   margin-bottom: 20px;
   margin-left: 35px;
@@ -2541,11 +2548,7 @@ a.hrbutton {
   padding-bottom: 5px;
  
 }
-.app-nav ul li:hover {
-  
-  border-bottom: 2px solid #262626;
-  
-}
+
 .app.nav ul.app-menu {
   flex: 1;
   margin-left: 20px;
@@ -3241,7 +3244,7 @@ p.error {
   img {
     display: block;
     max-width: 90%;
-    height: 90%;
+   
   }
 
   .requiredgrid img {
