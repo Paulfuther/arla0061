@@ -19,7 +19,7 @@ from flaskblog import app, conn, Employee, User, Role, roles_users, bcrypt, \
                              basedir,INCIDENT_UPLOAD_PATH, BULK_EMAIL_PATH, incident_files, checkinout, user_schema, sg,\
                                 Empdocs, EMPLOYEE_FILE_UPLOAD_PATH, INCIDENT_HIRES_UPLOAD_PATH, make_incident_file, send_created_email, save_images,\
                                     make_incident_file, completedfile, UserActivity, LINODE_ACCESS_KEY, LINODE_SECRET_KEY, LINODE_BUCKET_URL, LINODE_REGION,\
-                                    DROP_BOX_KEY, DROP_BOX_SECRET, DROP_BOX_SHORT_TOKEN
+                                    DROP_BOX_KEY, DROP_BOX_SECRET, DROP_BOX_SHORT_TOKEN, LINODE_BUCKET_NAME
                                         
 
 from flask_email_verifier import EmailVerifier
@@ -126,7 +126,7 @@ def upload_to_bucket():
         file = request.files['file']
         filename = file.filename
         print(filename)
-        bucket_name = 'paulfuther'
+        bucket_name = LINODE_BUCKET_NAME
         #file_path = file
         folder_name = 'SITEINCIDENTS3'
         #object_key = '{}/{}'.format(folder_name, filename)
@@ -155,7 +155,7 @@ def list_buckets():
                 created = bucket.creation_date,
         ))
 
-    bucket_name = 'paulfuther'
+    bucket_name = LINODE_BUCKET_NAME
     file_path = '/Users/paulfuther/arla0061/flaskblog/static/emailfiles/Simple_Rewash_Log.xlsx'
     folder_name = 'SITEINCIDENTS'
     object_key = '{}/{}'.format(folder_name, '402_Payroll_2022.xlsx')
@@ -1953,7 +1953,7 @@ def updategsa(staff_id):
     print(gsa.dob)
     print(gsa_docs.id)
 
-    bucket = conn.get_bucket('paulfuther')
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
 
     # Get a reference to the desired folder (prefix)
 
@@ -2024,7 +2024,7 @@ def add_docs(staff_id):
             filename = secure_filename(doc.filename)
 
             file = doc
-            bucket_name = 'paulfuther'
+            bucket_name = LINODE_BUCKET_NAME
             #file_path = file
             folder_name = f"EMPLOYEES/{gsa.id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
             object_key = '{}/{}'.format(folder_name, filename)
@@ -2032,7 +2032,7 @@ def add_docs(staff_id):
             key = bucket.new_key('{}/{}'.format(folder_name, filename))
             key.set_contents_from_file(file)
 
-    bucket = conn.get_bucket('paulfuther')
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
 
     # Get a reference to the desired folder (prefix)
             
@@ -2090,7 +2090,7 @@ def gsa_add_docs(staff_id):
             filename = secure_filename(doc.filename)
 
             file = doc
-            bucket_name = 'paulfuther'
+            bucket_name = LINODE_BUCKET_NAME
             #file_path = file
             folder_name = f"EMPLOYEES/{gsa.id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
             object_key = '{}/{}'.format(folder_name, filename)
@@ -2098,7 +2098,7 @@ def gsa_add_docs(staff_id):
             key = bucket.new_key('{}/{}'.format(folder_name, filename))
             key.set_contents_from_file(file)
 
-    bucket = conn.get_bucket('paulfuther')
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
 
     # Get a reference to the desired folder (prefix)
             
@@ -2155,7 +2155,7 @@ def gsa_updategsa(staff_id):
     
     form = EmployeeUpdateForm(obj=gsa)
     
-    bucket = conn.get_bucket('paulfuther')
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
     # Get a reference to the desired folder (prefix)
        
     folder_prefix= f"EMPLOYEES/{current_user.id}_{current_user.lastname}_{current_user.firstname}/"
@@ -2199,7 +2199,7 @@ def download_file(filename):
     # We're also using the quote function to manually encode the file name before replacing it in the pre-signed URL.
 
 
-    bucket = conn.get_bucket('paulfuther')
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
     key = bucket.get_key(filename)
     download_url =key.generate_url(expires_in=3600)  # Link expires after 1 hour
     # Return a redirect to the download link
@@ -2224,7 +2224,7 @@ def update_gsa_image(staff_id):
     img.save(output, format='JPEG', quality=70)
     output.seek(0)
 
-    bucket_name = 'paulfuther'
+    bucket_name = LINODE_BUCKET_NAME
     folder_name = f"EMPLOYEES/{gsa.id}_{gsa.lastname}_{gsa.firstname}/IMAGES"
     print(folder_name)
 
