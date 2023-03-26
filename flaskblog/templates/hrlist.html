@@ -35,10 +35,12 @@
                
 
 
-                            <div id="tablecontainer">
+                            <div id="table-container" class="card mx-auto w-90 p-2 border-0" >
 
                             </div>
                      
+                           
+
                         <script>
 
                     $(document).ready(function(){
@@ -51,27 +53,25 @@
                                 data:{text:textinlivebox},
                                 success:function(res){
                                     console.log(res)
-                                    $('#tablecontainer').empty();
+                                    $('#table-container').empty();
                                 
                                     let html = res.reduce(( acc, {number, firstname, lastname, email, store, store_id, image_file, id}) =>
                                         acc += `
-                                        <div class="row mb-2">
-                                        <span class="border-bottom mb-2"></span>
-                                        <div class="col-2 col-md-2 tablecard-image">
-                                        <img src =' /static/empfiles/thumb/${image_file}' class = 'hrlistimage' > 
-                                        </div>
+                                        <div class="row justify-content-md-center mb-2">
+                                        <span class="border-bottom mb-2 mx-auto w-90"></span>
+                                       
                                 
-                                        <div class="col-3 col-md-2">
+                                        <div class="col-6 col-sm-3 col-md-2">
                                         ${number}
                                         </div>
-                                       <div class = "col-5 col-md-2 text-end">
+                                       <div class = "col-6 col-sm- 5 col-md-2 text-end">
                                         ${firstname +" "+ lastname}
                                         </div>
-                                        <div class= "col-10 col-md-5 text-end">
+                                        <div class= "col-10 col-sm-10 col-md-5 text-beginning">
                                         ${email}
                                         </div> 
-                                        <div class = "col-2 col-md-1">
-                                        <a href="/updategsa${id}" class='fas fa-edit' style='font-size:12px'></a>
+                                        <div class = "col-2 p-1 col-sm-2 col-md-1">
+                                        <a href="/updategsa${id}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">Edit</a>
                                         </div>
                                         </div class="row mb-2">
                                         <div class="row mt-2"></div>
@@ -80,7 +80,7 @@
 
                                     , '');
                                     console.log(res.id)
-                                    $('#tablecontainer').append(html);
+                                    $('#table-container').append(html);
                                     console.log(res);
                                  
                                 }
@@ -92,7 +92,6 @@
                         </script>
                         
                         
-
 {% endblock content %}
 
 

@@ -17,25 +17,7 @@
 </head>
  {% block content %}   
 
-      <div class= "container">
-
-            <!-- Applications Nav Bar -->       
-
-            <nav class="app-nav">
-
-                  <ul class = "app-menu">
-                        <ul>
-                              {% if current_user.has_roles('GSA') %}
-                                {% else %}
-                                
-                                {% endif %}
-                        </ul>
-                        
-                  </ul>
-            </nav>
-
-      </div>  
-
+    
 
 
 <body>           
@@ -82,7 +64,7 @@
                            </div>
 
                           <div class = "sigdate">
-                              {{gsa.startdate}}
+                              {{date_today}}
                           </div> 
                        
                         </div>

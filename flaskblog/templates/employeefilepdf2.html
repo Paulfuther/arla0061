@@ -9,13 +9,15 @@
   <style>
     body { font: normal 100.01%/1.375 "Helvetica Neue",Helvetica,Arial,sans-serif; }
   </style>
-  <link href="../static/jquery.signaturepad.css" rel="stylesheet">
+  <!--<link href="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.css" rel="stylesheet">-->
+  <link href="{{ url_for('static', filename='jquery.signaturepad.css') }}">
   
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
   
 </head>
  {% block content %}  
-   
+ 
+
     <div class= "container">
 
             <!-- Applications Nav Bar -->       
@@ -26,8 +28,8 @@
 
 
 <body>           
-    {% for x in hrpage [:3] %}
-    
+    {% for x in hrpage %}
+    {% set signature = signatures[loop.index0].signature%} if loop.index0 < signatures|length else "No signature" %}
             <a name="top"></a>
                
                   </br>
@@ -48,7 +50,7 @@
 
                     </br>
 
-                   <div  class="sigPad" id = "sigs">
+                   <div  class="sigPad{{loop.index}}" id = "sigs">
                                       <div class="sigWrapper">
                                         
                                           <canvas  class="sig"  width="200" height="55"></canvas>
@@ -61,7 +63,8 @@
                            </div>
 
                           <div class = "sigdate">
-                              {{gsa.startdate}}
+                            {{date_today}}
+                            
                           </div> 
                   </div>
                 
@@ -69,35 +72,24 @@
                  
                   </br>
 
-                  <script src="../static/jquery.signaturepad.js"></script>
-                              
+                 <script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>
+                 <!--<script type="text/javascript" src="{{ url_for('static', filename='jquery.signaturepad.js') }}"></script>-->
                   <script>
                     
                       $(document).ready(function() {
-                         x = document.querySelector('#hr-page-data');
-                         y = x.dataset.hrpage
-                        console.log(y);
-                      var sigdata = {{signatures[0].sig_data | tojson}};
-                      $('.sigPad').signaturePad({displayOnly:true}).regenerate(sigdata);
-                        x+=1
-                
+                      var sigdata = {{signatures[loop.index0].data | tojson }};
+                      $('.sigPad{{loop.index}}').signaturePad({displayOnly:true}).regenerate(sigdata);
+                       
                       });
                   </script>
-                  <script src="../static/json2.min.js" ></script>
+                  <script type="text/javascript" src="/Users/paulfuther/arla0061/flaskblog/static/json2.min.js" ></script>
 
 
          {% endfor %}         
-                   <!-- end of page  -->
                   
-                   
                 
                    <!-- end of page  -->
     
-
-
-                  <div  style="text-align:center; padding-bottom:50px">
-                  <button class= "hrbutton" onclick="printFunction()"> Print   File</button>
-                  </div>
 
                   <div style="text-align:center; padding-bottom:50px">
                  <button onclick="topFunction()" id="myBtn" class ="hrbutton" >Top Of Page</button>
@@ -111,12 +103,6 @@
                   </script>
                   </div>
                  
-                  </br>
-                  </br>
-                   <script>
-                    function printFunction(){
-                    window.print();
-                  }
-                  </script>
+                   
 </body> 
 {% endblock content %}

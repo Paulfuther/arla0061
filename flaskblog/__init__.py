@@ -1,12 +1,12 @@
 
 from pyexpat.errors import messages
-from flask import Flask
+from flask import Flask, session
 
 app = Flask(__name__)
 
 from dotenv import load_dotenv
 from time import time
-import jwt
+import jwt, uuid, traceback, pytz
 from flask_ckeditor import CKEditor, CKEditorField, upload_fail, upload_success
 import os, base64
 import json
@@ -15,8 +15,12 @@ from datetime import datetime, timedelta
 from flask import render_template_string, make_response, url_for, redirect, send_from_directory, \
      request, render_template, send_file, abort, g, message_flashed, flash
 from flask_admin import Admin, expose, BaseView
+from flask_admin.form import rules
 from flask_admin.actions import action
+from flask_admin.contrib.fileadmin import FileAdmin
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import MultipleResultsFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_admin.contrib.sqla import ModelView
 from flask_marshmallow import Marshmallow
@@ -32,16 +36,19 @@ from flask_login import  user_logged_out, user_logged_in, login_required,\
 from flask_user import roles_required, roles_accepted, UserMixin
 from celery import Celery
 from celery.schedules import crontab
-from flaskblog.tasks import celery
+from flaskblog.tasks import *
 import dropbox
+from dropbox import DropboxOAuth2Flow
 from dropbox.files import WriteMode
-import pdfkit
+import pdfkit,boto
+import boto.s3.connection
 from io import BytesIO
 from twilio.rest import Client
 from functools import wraps
 from twilio.request_validator import RequestValidator
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
+from PIL import Image
 
 bcrypt = Bcrypt(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -77,6 +84,21 @@ app.config['INCIDENT_HIRES_UPLOAD_PATH'] = INCIDENT_HIRES_UPLOAD_PATH
 app.config['BULK_EMAIL_PATH']= BULK_EMAIL_PATH
 app.config['EMPLOYEE_FILE_UPLOAD_PATH']= EMPLOYEE_FILE_UPLOAD_PATH
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=5)
+LINODE_ACCESS_KEY = os.environ.get('LINODE_BUCKET_ACCESS_KEY')
+LINODE_SECRET_KEY = os.environ.get('LINODE_BUCKET_SECRET_KEY')
+LINODE_BUCKET_URL = os.environ.get('LINODE_BUCKET_URL') 
+LINODE_BUCKET_NAME = os.environ.get('LINODE_BUCKET_NAME')
+LINODE_REGION = os.environ.get('LINODE_REGION')
+
+conn = boto.connect_s3(
+        aws_access_key_id = LINODE_ACCESS_KEY,
+        aws_secret_access_key = LINODE_SECRET_KEY,
+        host = LINODE_REGION,
+        #is_secure=False,               # uncomment if you are not using ssl
+        calling_format = boto.s3.connection.OrdinaryCallingFormat(),
+        )
+
+#app.config['MAX_CONTENT_LENGTH'] = 4 * 1024 * 1024
 #CELERY_ENABLE_UTC = False
 #USE_TZ=True
 #CELERY_TIMEZONE = 'Canada/Eastern'
@@ -136,10 +158,13 @@ def validate_twilio_request(f):
 
 
 DROP_BOX_KEY = os.environ.get('DROP_BOX_KEY')
+DROP_BOX_SECRET = os.environ.get('DROP_BOX_SECRET')
+DROP_BOX_SHORT_TOKEN=os.environ.get('DROP_BOX_SHORT_TOKEN')
 
 verifier = EmailVerifier(app)
 db = SQLAlchemy(app)
-dbx = dropbox.Dropbox(DROP_BOX_KEY)
+#dbx = dropbox.Dropbox(DROP_BOX_KEY)
+
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
 login_manager = LoginManager()
@@ -154,306 +179,40 @@ login_manager.needs_refresh_message_category = 'info'
 def load_user(user_id):
     return User.query.get(user_id)
 
-@celery.task(name="print_hello")
-def print_hello():
-    return print("hello")
+#@app.context_processor
+#def context_processor():
+#    return dict(session=session)
 
 
-@celery.task(name="send_sms_testing")
-def send_sms_testing():
-    message=client.messages\
-        .create(
-            body="Hello from Paul",
-            from_=twilio_from,
-            to='+15196707469'
-        )
-    
-@celery.task(name="call_stores_monthly")
-def call_stores_monthly():
-    twimlname = 'Monthly Mystershop and Site Evaluation'
-    bulk_call = Twimlmessages.query.get(twimlname)
-    twil_id = bulk_call.twimlid
-        #print(twil_id)
-        # this is using twilml machine learning text to speach.
-        # this only goes out to stores.
-    site = db.session.query(Store.number,Store.phone).all()
-    for x in site:
-            call = client.calls.create(
-                            url=twil_id,
-                            to=x.phone,
-                            from_=twilio_from
-        )              
-      
+#@celery.task(context=True)
+
+
+
 
 @celery.task
-def send_bulk_email(role_id, templatename, filename):
-    with app.test_request_context():    
+def save_images(upload_directory):
+    print(upload_directory)
+    for f in os.listdir(upload_directory):
 
-        
-        # this is bulk sms using the notify api from twilio.
-        # first we grab all employees who are active users.
-        # we need to search specifically for mobile phone
-        
-        bulkmessage = BulkEmailSendgrid.query.get(templatename)
-        bm = bulkmessage.templateid
-        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
-        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
-            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
-        .filter(User.active == 1)\
-            .filter(Role.id==role_id)\
-        .all()
+        print(f)
 
-        #print(bm)
-        
-        # gsa returns an object. Although we can serialise the object, we still
-        # have issues generating the proper format for twilio rest api.
-        # so we do it old school.
     
-        ''' with open('flaskblog/static/attachments/siteevaluation.pdf', 'rb') as f:
-            data = f.read()
-            f.close()
-        encoded_file = base64.b64encode(data).decode()
-        attachedFile = Attachment(
-                    FileContent(encoded_file),
-                    FileName(uploaded_file.name),
-                    FileType(uploaded_file.content_type),
-                    Disposition('attachment')) 
-            '''
-       
-        for user in gsa:
-            message = Mail(
-            from_email=DEFAULT_SENDER,
-            to_emails= user.email)
-            message.dynamic_template_data = {
-                'subject':templatename,
-                'name': user.firstname,
+            #file = request.files.get(f)
+        i=Image.open(os.path.join(upload_directory,f))
+        i.thumbnail((2000,2000), Image.LANCZOS)  
+        print(i.size)  
+            #securefilename = secure_filename(file.filename)
+            #upload_directory = os.path.join(INCIDENT_UPLOAD_PATH,unique_num)
+            #os.mkdir(upload_directory)
+        i.save(os.path.join(upload_directory,f),optimize=True)
+        print (f)
+            #print(upload_directory)
+        return "uploading..."
 
-            }
-            with open('flaskblog/static/emailfiles/'+filename, 'rb') as f:
-                data = f.read()
-                f.close()
-            encoded_file = base64.b64encode(data).decode()
-            attachedFile = Attachment(
-                    FileContent(encoded_file),
-                    FileName(filename),
-                    FileType(filename.content_type),
-                    Disposition('attachment')) 
-            print(user.email)
-            message.template_id = bm
-            message.attachment=attachedFile
-            response = sg.send(message)
 
-            #print(user.email) 
-      
 
 @celery.task
-def make_pdf(staff_id, sigs):
-    with app.test_request_context():
-        signatures = sigs#Empfile.query.filter_by(employee2_id = staff_id)
-        ## this is incorrect. Employeeid is not user id. correct before pbulishing.
-        #rol =  User.query.filter(or_(User.roles.any(Role.id == 3), User.id==staff_id)).all()
-        img = '/files/image-20201205212708-1.png'
-
-        print(sigs)
-        #for x in rol:
-        #    print(x.email)
-
-        #return "done"
-        
-        image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
-        image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
-        image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
-        image4 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213057-2.png'
-        image5 = '/Users/paulfuther/arla0061/flaskblog/images/uniformfour.png'
-        image6 = '/Users/paulfuther/arla0061/flaskblog/images/uniformthree.png' 
-
-
-        x=signatures
-        hrpage = hrfiles.query.all()
-        gsa = Employee.query.get(staff_id)
-        fname = gsa.firstname
-        lname = gsa.lastname
-        id = gsa.id
-        print(fname)
-    
-        rendered = render_template('employeefilepdf2.html',image1=image1, image2=image2, image3 = image3, image4 = image4, image5=image5, image6=image6,hrpage = hrpage, sigs=sigs, gsa=gsa)
-    
-        options = {'enable-local-file-access': None,
-            '--keep-relative-links': '',
-            '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
-            'encoding' : "UTF-8"
-        }
-        css = "flaskblog/static/jquery.signaturepad.css"
-        css2 = ".."
-        pdf = pdfkit.from_string(rendered, False, options=options, css=css)
-
-        file = BytesIO(pdf)
-        created_on = datetime.now().strftime('%Y-%m-%d')
-        filename = f" {lname} {fname}  ID  {id} {created_on}.pdf"
-
-        encoded_file = base64.b64encode(pdf).decode()
-        attachedFile = Attachment(
-                FileContent(encoded_file),
-                FileName(filename),
-                FileType('application/pdf'),
-                Disposition('attachment')) 
-
-        #for x in rol:
-        #    email = x.email
-        #    message = Mail(
-        #    from_email=DEFAULT_SENDER,
-        #    to_emails= email,
-        #    subject = 'A New Hire File has been created',
-        #    html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
-        #    )
-            
-         #   message.dynamic_template_data = {
-         #       
-         #       'name':gsa.firstname,
-         #       'userid':gsa.trainingid,
-         #       'password':gsa.trainingpassword
-
-          #  }
-        
-            #message.template_id = SENDGRID_NEW_HIRE_FILE_ID
-            #message.attachment=attachedFile
-            #response = sg.send(message)
-
-            
-        with file as f:    
-            dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
-    
-@celery.task
-def make_incident_file(file_list):
-
-    form=file_list.get('form')
-    file_names=file_list.get('file_names')
-    reg_file_names = file_list.get('reg_file_names')
-
-    print(Incident.id)
-    # get all of the information from the form
-
-    if form.validate_on_submit():
-            pics= request.files.getlist('photos[]')
-            hires_pics = request.files.getlist('photoshires[]')
-            newtime=str(form.eventtime.data)
-            time2 =datetime.strptime(newtime, '%H:%M:%S').time()
-            inc=Incident(injuryorillness=form.injuryorillness.data,
-                            environmental =form.environmental.data,
-                            regulatory =form.regulatory.data,
-                            economicdamage = form.economicdamage.data,
-                            reputation = form.reputation.data,
-                            security = form.security.data,
-                            fire = form.fire.data,
-                            location = str(form.location.data),
-                            eventdetails = form.eventdetails.data,
-                            eventdate = form.eventdate.data,
-                            eventtime = time2,
-                            reportedby = form.reportedby.data,
-                            reportedbynumber = form.reportedbynumber.data,
-                            suncoremployee = form.suncoremployee.data,
-                            contractor = form.contractor.data,
-                            associate = form.associate.data,
-                            generalpublic = form.generalpublic.data,
-                            other = form.other.data,
-                            othertext = form.othertext.data,
-                            actionstaken = form.actionstaken.data,
-                            correctiveactions = form.correctiveactions.data,
-                            sno = form.sno.data,
-                            syes = form.syes.data,
-                            scomment = form.scomment.data,
-                            rna = form.rna.data,
-                            rno = form.rno.data,
-                            ryes = form.ryes.data,
-                            rcomment = form.rcomment.data,
-                            gas = form.gas.data,
-                            diesel = form.diesel.data,
-                            sewage = form.sewage.data,
-                            chemical = form.chemical.data,
-                            chemcomment = form.chemcomment.data,
-                            deiselexhaustfluid = form.deiselexhaustfluid.data,
-                            sother = form.sother.data,
-                            s2comment = form.scomment.data,
-                            air = form.air.data,
-                            water = form.water.data,
-                            wildlife = form.wildlife.data,
-                            land = form.land.data,
-                            volumerelease = form.volumerelease.data,
-                            pyes = form.pyes.data,
-                            pno = form.pno.data,
-                            pna = form.pna.data,
-                            pcase = form.pcase.data,
-                            stolentransactions = form.stolentransactions.data,
-                            stoltransactions = form.stoltransactions.data,
-                            stolencards = form.stolencards.data,
-                            stolcards = form.stolcards.data,
-                            stolentobacco = form.stolentobacco.data,
-                            stoltobacco = form.stoltobacco.data,
-                            stolenlottery = form.stolenlottery.data,
-                            stollottery = form.stollottery.data,
-                            stolenfuel = form.stolenfuel.data,
-                            stolfuel = form.stolfuel.data,
-                            stolenother = form.stolenother.data,
-                            stolother = form.stolother.data,
-                            stolenothervalue = form.stolenothervalue.data,
-                            stolenna = form.stolenna.data,
-                            gender = form.gender.data,
-                            height = form.height.data,
-                            weight = form.weight.data,
-                            haircolor = form.haircolor.data,
-                            haircut= form.haircut.data,
-                            complexion = form.complexion.data,
-                            beardmoustache = form.beardmoustache.data,
-                            eyeeyeglasses = form.eyeeyeglasses.data,
-                            licencenumber = form.licencenumber.data,
-                            makemodel = form.makemodel.data,
-                            color = form.color.data,
-                            scars = form.scars.data,
-                            tatoos = form.tatoos.data,
-                            hat = form.hat.data,
-                            shirt = form.shirt.data,
-                            trousers = form.trousers.data,
-                            shoes = form.shoes.data,
-                            voice = form.voice.data,
-                            bumpersticker = form.bumpersticker.data,
-                            direction = form.direction.data,
-                            damage = form.damage.data)
-                            
-            db.session.add(inc)
-            db.session.flush()
-            for pic in  reg_file_names:
-                if not pic:
-                    pass
-                else:
-                    incimage = incident_files(image=pic,
-                                    incident_id = inc.id)
-                    db.session.add(incimage)
-
-            for hrpic in  file_names:
-                if not hrpic:
-                    pass
-                else:
-                    incimage = incident_files(image=hrpic,
-                                    incident_id = inc.id)
-                    db.session.add(incimage)
-            db.session.commit()
-
-            print(inc.id)
-            file_id = int(inc.id)
-            
-            flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
-            
-            # once the data has been written to the database, we create a pdf.
-            # we call a task mamanger to do this. That is the apply_async 
-            make_incident_pdf.apply_async(args=[file_id], countdown=10)
-
-            #return("good")
-            return render_template('layout.html')
-           
-    return render_template('eventreport.html', form=form)
-
-@celery.task
-def make_incident_pdf(file_id):
+def make_incident_pdf(file_id, random_number):
     with app.test_request_context():
         rol =  User.query.filter(User.roles.any(Role.id == 9)).all()
         print(file_id)
@@ -470,8 +229,10 @@ def make_incident_pdf(file_id):
         gsa = Incident.query.get(file_id)
         ident = gsa.id
         print(ident)
+
         picture = incident_files.query.filter_by(incident_id=file_id)
-        rendered = render_template('eventreportpdf.html',gsa=gsa, css=css, picture=picture)
+       
+        rendered = render_template('eventreportpdf.html',gsa=gsa, css=css, picture=picture, random_number=random_number)
         options = {'enable-local-file-access': None,
             '--keep-relative-links': '',
             '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
@@ -510,9 +271,110 @@ def make_incident_pdf(file_id):
             # upload to drop box
 
         with file as f:    
-            dbx.files_upload(f.read(), path=f"/SITEINCDIENTS/{filename}", mode=WriteMode('overwrite'))
+            dbx.files_upload(f.read(), path=f"/SITEINCIDENTS/{filename}", mode=WriteMode('overwrite'))
     
+
+@celery.task
+def make_pdf(staff_id, signatures):
+    with app.test_request_context():
+        #signatures = sigs#Empfile.query.filter_by(employee2_id = staff_id)
+        ## this is incorrect. Employeeid is not user id. correct before pbulishing.
+        rol =  User.query.filter(or_(User.roles.any(Role.id == 9), User.id==staff_id)).all()
+        img = '/files/image-20201205212708-1.png'
+
+       
+        print(len(signatures))
+
+        #print(signatures)
+        for x in rol:
+            print(x.email)
+        print(staff_id)
+        #return "done"
+        
+        image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
+        image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
+        image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
+        image4 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213057-2.png'
+        image5 = '/Users/paulfuther/arla0061/flaskblog/images/uniformfour.png'
+        image6 = '/Users/paulfuther/arla0061/flaskblog/images/uniformthree.png' 
+
+        x=signatures
+        hrpage = hrfiles.query.all()
+        for y in hrpage:
+            print(y.id)
+        gsa = Employee.query.filter_by(user_id = staff_id).first()
+        print(gsa)
+        fname = gsa.firstname
+        lname = gsa.lastname
+        id = gsa.id
+        print(fname)
+        date_today = datetime.now()
+        rendered = render_template('employeefilepdf2.html',
+                                   image1=image1, image2=image2, image3 = image3, image4 = image4, 
+                                   image5=image5, image6=image6,hrpage = hrpage, signatures=signatures,
+                                    date_today=date_today, gsa=gsa)
     
+        options = {'enable-local-file-access': None,
+            '--keep-relative-links': '',
+            '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
+            'encoding' : "UTF-8"
+        }
+        css = "flaskblog/static/jquery.signaturepad.css"
+        css2 = ".."
+        pdf = pdfkit.from_string(rendered, False, options=options, css=css)
+
+        file = BytesIO(pdf)
+        created_on = datetime.now().strftime('%Y-%m-%d')
+        filename = f" {lname} {fname}  NEWHIREFILE ID  {id} {created_on}.pdf"
+
+        encoded_file = base64.b64encode(pdf).decode()
+        attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName(filename),
+                FileType('application/pdf'),
+                Disposition('attachment')) 
+#            for x in rol:
+            #email = x.email
+            #message = Mail(
+            #from_email=DEFAULT_SENDER,
+            #to_emails= email,
+            #subject = 'A New Hire File has been created',
+            #html_content='<strong>A new hire file has been created and uploaded to dropbox. {}<strong>'.format(filename)
+            #)
+            
+            #message.dynamic_template_data = {
+                
+            #    'name':gsa.firstname,
+            #    'userid':gsa.trainingid,
+            #    'password':gsa.trainingpassword
+
+            #}
+        
+            #message.template_id = SENDGRID_NEW_HIRE_FILE_ID
+            #message.attachment=attachedFile
+            #response = sg.send(message)
+         ##///
+
+        # upload newhire file to linode.
+        # new hire files are in the folder EMPLOYEES then their user id and lastname then first name.
+
+        bucket_name = 'paulfuther'
+        #file_path = file
+        folder_name = f"EMPLOYEES/{staff_id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
+        object_key = '{}/{}'.format(folder_name, filename)
+        bucket = conn.lookup(bucket_name)
+        key = bucket.new_key('{}/{}'.format(folder_name, filename))
+        key.set_contents_from_file(file)
+
+
+
+        #with file as f:    
+        #    dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
+    
+
+
+
+
 admin = Admin(app, name='Dashboard')
     
 bcrypt = Bcrypt(app)
@@ -570,27 +432,32 @@ class Customer(db.Model):
     firstname = db.Column(db.String(100), unique=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+    #def __str__(self):
+    #    return (self.firstname)
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean, default = True)
-    firstname = db.Column(db.String(100), nullable=False)
-    lastname = db.Column(db.String(100), nullable=False)
+    firstname = db.Column(db.String(100))
+    lastname = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime)
-    user_name = db.Column(db.String(100), nullable=False)
-    phone = db.Column(db.String(100))
+    user_name = db.Column(db.String(100))
+    phone = db.Column(db.String(100), unique=True)
     # new additions 
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     updated_on = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow) 
-    email_confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    email_confirmed = db.Column(db.Boolean, default=False)
     email_confirmed_date = db.Column(db.DateTime)
     #employee = db.relationship('Customer', backref= 'user', uselist = False)
     roles = db.relationship('Role',  secondary=roles_users,
-                            backref=db.backref('users', lazy='dynamic'))
+                           backref=db.backref('users', lazy='dynamic'))
 
     check_in_out = db.relationship('checkinout', backref='user', lazy=True)
     
+ 
+
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -604,7 +471,7 @@ class User(UserMixin, db.Model):
         return self.active
 
     def __str__(self):
-        return (self.user_name) 
+        return str(self.firstname) 
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
@@ -638,7 +505,7 @@ class User(UserMixin, db.Model):
 class UserSchema(ma.Schema):
     class Meta:
         model = User
-        fields = ('id', 'email')
+        fields = ('id', 'email', 'roles')
 user_schema = UserSchema(many=True)
 
 
@@ -649,6 +516,9 @@ class BulkEmailSendgrid(db.Model):
     
     def __repr__(self):
         return '%r' % (self.templatename)
+
+    #def __str__(self):
+    #    return (self.templatename)
         
  
 class Twimlmessages(db.Model):
@@ -659,20 +529,24 @@ class Twimlmessages(db.Model):
     def __repr__(self):
         return '%r' % (self.twimlname)
 
+    #def __str__(self):
+    #    return (self.twimlname)
 
 class Role(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
     
 
-    def __repr__(self):
-        return (self.name)
-
-    def __hash__(self):
-        return hash(self.name)
-
     def __str__(self):
         return (self.name)
+
+    #def __repr__(self):
+    #    return (self.name)
+
+    #def __hash__(self):
+    #    return hash(self.name)
+
+   
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -681,14 +555,14 @@ class Employee(db.Model):
     lastname = db.Column(db.String(), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'))
     store = db.relationship('Store', backref = 'store')
-    addressone = db.Column(db.String(20), nullable=False)
+    addressone = db.Column(db.String(20), nullable=True)
     addresstwo = db.Column(db.String(20), nullable=True)
     apt = db.Column(db.String(20), nullable=True)
-    city = db.Column(db.String(), nullable=False)
-    province = db.Column(db.String(), nullable=False)
-    country = db.Column(db.String(), nullable=False)
-    mobilephone = db.Column(db.String(), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
+    city = db.Column(db.String(), nullable=True)
+    province = db.Column(db.String(), nullable=True)
+    country = db.Column(db.String(), nullable=True)
+    mobilephone = db.Column(db.String(), nullable=True)
+    email = db.Column(db.String(120), nullable=True)
     dob = db.Column(db.DateTime(),nullable=True)
     startdate = db.Column(db.DateTime(),nullable=True)
     sinexpire = db.Column(db.DateTime(), nullable=True)
@@ -697,11 +571,11 @@ class Employee(db.Model):
         db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
     
    
-    postal = db.Column(db.String(6), nullable=False)
-    trainingid = db.Column(db.String(),unique=True, nullable=False)
-    trainingpassword = db.Column(db.String(), nullable=False)
+    postal = db.Column(db.String(6), nullable=True)
+    trainingid = db.Column(db.String(),unique=True, nullable=True)
+    trainingpassword = db.Column(db.String(), nullable=True)
     manager = db.Column(db.Integer)
-    image_file = db.Column(db.String(50), nullable=False,
+    image_file = db.Column(db.String(50), nullable=True,
                            default='default.jpg')
     
     iprismcode = db.Column(db.String(9), nullable=False)
@@ -716,8 +590,8 @@ class Employee(db.Model):
     employee_doc = db.relationship('Empdocs', backref='employee', lazy=True)
    
     
-    def __str__(self):
-        return (self.firstname) 
+    #def __str__(self):
+    #    return (self.firstname) 
 
 class EmployeeSchema(ma.Schema):
     class Meta:
@@ -739,8 +613,8 @@ class Course(db.Model):
     name = db.Column(db.String(100), nullable=False)  
     
     
-    def __str__(self):
-        return '%r' % (self.name)
+    #def __str__(self):
+    #    return '%r' % (self.name)
    
 class Grade(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -752,6 +626,9 @@ class Grade(db.Model):
     completed = db.Column(db.Boolean, default = False)
     completeddate = db.Column(db.String(), nullable=True)
       
+    #def __str__(self):
+    #    return (self.course_id)
+
 class staffschedule(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     employee_id = db.Column(Integer(), ForeignKey('employee.id'))
@@ -761,6 +638,9 @@ class staffschedule(db.Model):
     shift_hours = db.Column(db.Integer())
     shift_date = db.Column(db.Date)
  
+    #def __str__(self):
+    #    return (self.id)
+
 class staffscheduleschema(ma.Schema):
     class Meta:
         model = staffschedule
@@ -778,6 +658,9 @@ class Empfile(db.Model):
     file = db.relationship('hrfiles', backref = 'filess') 
     sig_data = db.Column(db.Integer())
     
+    #def __str__(self):
+    #    return (self.id)
+
 class Store(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.Integer)
@@ -790,6 +673,9 @@ class Store(db.Model):
     
     def __repr__(self):
         return f"{self.number}  {self.address}  {self.city}  {self.province}"
+
+   # def __str__(self):
+   #     return (self.number)
    
 class StoreSchema(ma.Schema):
     class Meta:
@@ -818,6 +704,8 @@ class cwmaintenance(db.Model):
     workdone = db.Column(db.String(500))
     partsused = db.Column(db.String(500))
 
+    
+
 # To do list 
 class Todo(db.Model):
     id=db.Column(db.Integer, primary_key=True)
@@ -826,7 +714,9 @@ class Todo(db.Model):
                             backref=db.backref('users', lazy='dynamic'))
     
     def __repr__(self):
-           return '%r' % (self.task)
+        return '%r' % (self.task)
+
+   
 
  # ticket numbers
  
@@ -840,6 +730,7 @@ class Incidentnumbers(db.Model):
      def __repr__(self):
          return '%r' % (self.details)
 
+    
 
 # salt log
        
@@ -855,6 +746,8 @@ class Saltlog(db.Model):
      def __repr__(self):
          return '%r' % (self.area)      
 
+
+     
 
 class Incident(db.Model):
      id = db.Column(db.Integer, primary_key=True)
@@ -950,16 +843,24 @@ class Incident(db.Model):
      direction = db.Column(db.String())
      damage = db.Column(db.String())
      incident_images = db.relationship('incident_files', backref='incident_images', lazy=True)
+     image_folder = db.Column(db.String())
+
+     
+    
 
 class incident_files(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     image = db.Column(db.String(100), nullable=False)
     incident_id = db.Column(db.Integer, db.ForeignKey('incident.id'))
 
+    
+
 class Empdocs(db.Model):
     id=db.Column(db.Integer, primary_key = True)
     file_document = db.Column(db.String(100), nullable=False)
     file_employee = db.Column(db.Integer, db.ForeignKey('employee.id'))
+
+    
 
 class checkinout(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -970,50 +871,109 @@ class checkinout(db.Model):
     check_store = db.Column(db.Integer, db.ForeignKey('store.id'))
     check_user = db.Column(db.Integer, db.ForeignKey('user.id'))
 
+class completedfile(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    userid = db.Column(db.Integer())
+    completed =db.Column(db.Boolean, default=False)
+    date_completed = db.Column(db.DateTime(timezone=True), default=pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone("America/New_York")))
 
+class Error(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(255), nullable=False)
+    traceback = db.Column(db.String())
+    time = db.Column(db.DateTime(timezone=True), default=pytz.utc.localize(datetime.utcnow()).astimezone(pytz.timezone("America/New_York")))
+
+
+class UserActivity(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    activity_type = db.Column(db.String(), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    firstname = db.Column(db.String())
+    lastname = db.Column(db.String())
+    endpoint = db.Column(db.String(200), nullable=False)
+    method = db.Column(db.String(50), nullable=False)
+
+#@app.before_request
+#def track_activity():
+#    activity = UserActivity(user_id=current_user.id, endpoint=request.endpoint, method=request.method)
+#    db.session.add(activity)
+#    db.session.commit()
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    trace = traceback.format_exc()
+    error = Error(message=str(error), time=datetime.utcnow(),traceback=trace )
+    db.session.add(error)
+    db.session.commit()
+
+    message = client.messages \
+    .create(
+         body='An Internal Server Error Has Occured',
+         from_=twilio_from,
+         to='+15196707469'
+     )
+
+    flash("An internal error has occurred. The administrator has been notified.")
+    return redirect(url_for('login'))
+    
+@app.errorhandler(AttributeError)
+def handle_attribute_error(error):
+    trace = traceback.format_exc()
+    db.session.add(Error(message=str(error), traceback=trace, time=datetime.utcnow()))
+    db.session.commit()
+
+    #message = client.messages \
+    #.create(
+    #     body='An Attribute Error Has Occured',
+    #     from_=twilio_from,
+    #     to='+15196707469'
+     #)
+
+    flash("An Attribute Error has occurred. The administrator has been notified.")
+    return redirect(url_for('login'))
+
+
+@app.errorhandler(ValueError)
+def handle_value_error(error):
+    db.session.add(Error(message=str(error), time=datetime.utcnow()))
+    db.session.commit()
+    #message = client.messages \
+    #.create(
+    #     body='A Value Error Has Occured',
+    #     from_=twilio_from,
+    #     to='+15196707469'
+    # )
+
+    flash("A Value Error has occurred. The administrator has been notified.")
+    return redirect(url_for('login'))
+    
 
 
 # here we initiate the datastore which is used in the Admin model
 
 
 # feb 27 2021
-#user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-#security = Security(app, user_datastore)
-
-#create a user to test with
-
-
-
-
-
-#@user_registered.connect_via(app)
-#def user_registered_sighandler(app, user, confirm_token):
-#    default_role = user_datastore.find_role('GSA')
-#    user_datastore.add_role_to_user(user, default_role)
-#    db.session.commit()
 
 
 
 class MyModelView(ModelView):
     can_export = True
     can_delete = False
-    #column_sortable_list = ['lastname']
-    #column_hide_backrefs = False
-    #column_list = ( 'firstname','lastname','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
-    #column_searchable_list = ['lastname']
+    form_excluded_columns = ('password',)
+    form_edit_rules = ('firstname','lastname', 'phone' ,'email', 'roles', 'active')
+    column_sortable_list = ['lastname']
+    column_list = ( 'firstname','lastname','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
+    column_searchable_list = ['lastname', 'firstname']
     
     def is_accessible(self):
-        return current_user.has_roles('Admin' )
+        return current_user.has_roles('Admin')
     
 
-    #def on_model_change(self, form, model, is_created):
-    #    if is_created:
-    #        model.password = bcrypt.generate_password_hash(form.password.data)
-    #    else:
-    #        old_password = form.password.object_data
-    #        # If password has been changed, hash password
-    #        if not old_password == model.password:
-    #            model.password = bcrypt.generate_password_hash(form.password.data)
+class MyModelView3(ModelView):
+    can_export = True
+    can_delete = False
+    
 
 class MyModelView2(ModelView):
     #create_modal = True
@@ -1297,10 +1257,57 @@ class MyModelView15(ModelView):
     def is_accessible(self):
         return current_user.has_roles('Admin' )
 
+class MyModelView16(ModelView):
+    can_export = True
+    can_delete = True
+
+class RoleModelView(ModelView):
+        pass
+    
+#class S3BucketView(BaseView):
+#    @expose('/')
+#    def index(self):
+#        column_list = ('name', 'size', 'last_modified')
+#        # Connect to Linode Object Storage
+#        conn = boto.connect_s3(
+#        aws_access_key_id = LINODE_ACCESS_KEY,
+#        aws_secret_access_key = LINODE_SECRET_KEY,
+#      host = LINODE_REGION,
+        #is_secure=False,               # uncomment if you are not using ssl
+#        calling_format = boto.s3.connection.OrdinaryCallingFormat(),
+#        )
+
+        # Retrieve a reference to your bucket
+ #       bucket_name = 'paulfuther'
+ #       bucket = conn.get_bucket(bucket_name)
+
+ #       for key in bucket.list():
+ #           print("{name}\t{size}\t{modified}".format(
+ #               name = key.name,
+ #               size = key.size,
+  #              modified = key.last_modified,
+  #          ))
+
+        # Get the contents of the bucket
+   #     contents = []
+   #     for key in bucket.list():
+   #         contents.append({
+   #             'name': key.name,
+   #             'size': key.size,
+   #             'last_modified': key.last_modified,
+   #         })
+   #     print(contents)
+#
+     #   return self.render('s3_bucket_view.html', contents=contents)
+
+     
+
+
 # these are the views needed to display tables in the Admin section
 
 admin.add_view(MyModelView(User, db.session))
-admin.add_view(MyModelView(Role, db.session))
+admin.add_view(RoleModelView(Role, db.session))
+admin.add_view(RoleModelView(Error, db.session))
 admin.add_view(MyModelView2(Employee, db.session))
 admin.add_view(MyModelView5(Todo, db.session))
 admin.add_view(AdminViewStore(Store, db.session))
@@ -1315,9 +1322,11 @@ admin.add_view(MyModelView12(BulkEmailSendgrid, db.session, category="Paul"))
 admin.add_view(MyModelView14(Twimlmessages, db.session, category="Paul"))
 admin.add_view(MyModelView10(cwmaintenance, db.session, category = "Paul"))
 admin.add_view(MyModelView15(checkinout, db.session, category = "Paul"))
-#admin.add_view(MyModelView11(Employee, db.session))
 admin.add_view(EmailView(name = 'Email', endpoint='email'))
-#admin.add_sub_category(name = "Links", parent_name="Team")
+#admin.add_view(MyModelView11(Employee, db.session))
+#admin.add_view(EmailView(name = 'Email', endpoint='email'))
+#admin.add_view(S3BucketView(name='Linode Object Storage'))
+admin.add_view(MyModelView16(completedfile, db.session))
 
 from flaskblog import routes
 

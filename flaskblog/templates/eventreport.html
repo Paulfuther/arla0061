@@ -448,80 +448,23 @@
                                 Invalid File Type
                         </div>
 
-                       
+                        <p class="text-center">Upload All Images here. Maximum 4 and they must be pictures. </p>
+                        <p class="text-center">Images are saved in a resolution that will make text readable</p>
+                                <div class="alert alert-danger alert-error-hires"style="display:none" role="alert">Invalid File Type</div>
+                        <div class = "dropzone" id="my-dropzone"> </div>
 
 
-                        <p class="text-center">Upload Hi Resolution Images here. They must be pictures,
-                        Like Documents that you need to read. 
-                        An example would be the salt log or insurance documents. Upload regular pictures in the next section.</p>
-                        <div class="alert alert-danger alert-error-hires"style="display:none" role="alert">
-                                Invalid File Type</div>
-                                
-                        <div class = "inc92">
-                        <label for="file-select-hires" class="form-label">must be jpeg jpg png gif</label>
-                        <input type="file" id="file-select-hires"  name="photoshires[]"  multiple="multiple"  onchange="mychangefunctionhires()" class="formcheckbtn">
-                        </div>
-                        <div class="inctitle inc120">
-                                <button type="submit" id="upload-button-hires" style="display:none" class="btn btn-primary">Upload Images</button>
-                                </div>
-                        <div class="progress_container">
-                                <div class="progress" style="height:30px; display:none" id="hires-progress-bar-div" >
-                                        <div id="hires-progressbar" class="progress-bar" role="progressbar" style="width: 0%; height:30px" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                                </div>
-                                </div>
-                        
-                        <div class="row">
+                                <div class="row">
                                
                                 <div class="btn-group btn-block">
                                 <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
                                 <button type="button" id="picture-hires-next" class="btn btn-primary  m-2 rounded"   data-next>Next    </button>
                                 </div>
                                 
-                                <div style="width: 80%" class="card mx-auto mt-2">
-                                        <label class="text-center">A Thumbnail Of The Hi Res Images Will Display Here</label>
-                                        <div id="header" ></div> 
-                                </div>
                                 
-                        </div>
+                                </div>
                         </div>
                        
-                        <!-- regular images -->
-                        <div class="newhire_card mx-auto" style="width: 80%" data-step>
-                        <h4 class="text-center">Step 8 of 8</h4>
-
-                        <div class="alert alert-danger alert-error"style="display:none" role="alert">
-                                Invalid File Type
-                        </div>
-
-
-                        <div class = "inc92">
-                                <label for="file-select" class="form-label">must be jpeg jpg png gif</label>
-                        <input type="file" id="file-select" name="photos[]"  multiple="multiple" onchange="mychangefunction()" class="formcheckbtn">
-                        </div>
-                        <div class="inctitle inc120">
-                                <button  id="upload-button" style="display:none"  class="btn btn-primary">Upload Images</button>
-                                </div>
-
-
-                        <div class="progress_container">
-                                <div class="progress" style="height:30px; display:none" id="reg-progress-bar-div" >
-                                        <div id="reg-progressbar" class="progress-bar" role="progressbar" style="width: 0%; height:30px" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-                                </div>
-                                </div>
-
-                        <div class="row">
-                                <div class="btn-group btn-block">
-                                <button type="button"  class="btn btn-primary  m-2 rounded"data-previous>Previous</button>
-                                <button type="button" id="picture-next" class="btn btn-primary  m-2 rounded"   data-next>Next    </button>
-                                </div>
-                                <div style="width: 80%" class="card mx-auto mt-2">
-                                        <label class="text-center">A Thumbnail Of The Hi Res Images Will Display Here</label>
-                                        <div id="pictureheader" ></div> 
-                                </div>
-                                
-                        </div>
-                        </div>
-
                         <div class="newhire_card mx-auto" style="width: 80%" data-step>
                                 <h4 class="text-center">Final Step</h4>
                                         <div class="row">
@@ -583,6 +526,7 @@
                                 
                         }
                         </script>
+
                         <script>
 
                         //regular image upload
@@ -733,6 +677,7 @@
                                // `<i class="fas fa-spinner fa-spin"></i> Creating File`
                                //  );
                                $('.modal').modal('show');
+                               //myDropzone.removeFile(file);
                         form.submit();
                                 
 
@@ -784,7 +729,23 @@
 
                         </script>
 
-
+                        <script>
+                        // initialise dropzone
+                        let myDropzone = new Dropzone("#my-dropzone", { 
+                        url: "/process_hires_images",
+                        maxFilesize: 5, // MB
+                        maxFiles: 4,
+                       
+                        acceptedFiles: "image/*",
+                        });
+                        var randomNumber = Math.random().toString(36).substring(2);
+                        myDropzone.on("sending", function(file, xhr, formData) {
+                        formData.append("random_number", randomNumber);
+                        })
+                        myDropzone.on("complete", function(file) {
+                        //myDropzone.removeFile(file);
+                        });
+                        </script>
 {% endblock %}
 
 

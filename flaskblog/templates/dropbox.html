@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+<html>
+<head>
+    <title>Dropbox Files</title>
+</head>
+<body>
+    <h1>Dropbox Files</h1>
+    <ul>
+        {% for file in contents %}
+            <li>{{ file }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+{% endblock %}

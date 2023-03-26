@@ -24,8 +24,24 @@
                 </div>
                            <!--url_for('static', filename='profile_pics/mobile/' +-->
 
-                   
+                       
+                           {% with messages = get_flashed_messages()%}
+                                           {%if messages%}
+                                               {% for message in messages %}
+                                               <div class = "flashes">
+                                               {{ message }} 
+                                               </div>
+                                               {% endfor %}
+                                               
+                                               
+                                           {% endif %}
+                                           {% endwith %}
+                       
+                       
 
+                        <div class = "border-top" ></div>
+                      
+                    
                         <div class = "border-top" ></div>
                       
                     
@@ -34,7 +50,7 @@
 
                                 <div class = "tablecard-image">
 
-                                     <img class="hrlistimage" src= {{url_for('static', filename='empfiles/thumb/') + staff.image_file}}>
+                                     <img class="hrlistimage" src= "{{url_for('static', filename='empfiles/thumb/+ staff.image_file')}}">
                                
                                 </div>
 
@@ -61,8 +77,7 @@
                             </div> 
                      
                         </div>
-                 
-
+                       
 
 
 {% endblock content %}

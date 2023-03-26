@@ -8,23 +8,27 @@ from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
     grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, \
         forgot_password_Form, BulkCallForm, reset_password_form, Confirm2faForm, checkinoutForm,\
-            NewRegisterForm
-from flaskblog import app, Employee, User, Role, roles_users, bcrypt, \
-    db, dbx, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
+            NewRegisterForm, BulkCreatedEmailSendgridForm
+from flaskblog import app, conn, Employee, User, Role, roles_users, bcrypt, \
+    db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
             make_incident_pdf,send_bulk_email, celery, client, Client, twilio_from, validate_twilio_request, Mail, \
                  employeeSMS_schema, NOTIFY_SERVICE_SID, BulkEmailSendgrid,\
                      DEFAULT_SENDER, Store,Twimlmessages, store_schema, SENDGRID_NEWHIRE_ID, \
                          login_required, roles_required, roles_accepted, check_password_hash, sg, SendGridAPIClient,\
                              basedir,INCIDENT_UPLOAD_PATH, BULK_EMAIL_PATH, incident_files, checkinout, user_schema, sg,\
-                                Empdocs, EMPLOYEE_FILE_UPLOAD_PATH, INCIDENT_HIRES_UPLOAD_PATH, make_incident_file
+                                Empdocs, EMPLOYEE_FILE_UPLOAD_PATH, INCIDENT_HIRES_UPLOAD_PATH, make_incident_file, send_created_email, save_images,\
+                                    make_incident_file, completedfile, UserActivity, LINODE_ACCESS_KEY, LINODE_SECRET_KEY, LINODE_BUCKET_URL, LINODE_REGION,\
+                                    DROP_BOX_KEY, DROP_BOX_SECRET, DROP_BOX_SHORT_TOKEN
+                                        
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
-import os, string, secrets
-import json
-import pdfkit
+import os, string, secrets, pytz, io
+import json, uuid, requests, dropbox
+import pdfkit,  pickle
 from werkzeug.utils import secure_filename
+from urllib.parse import quote
 import pandas as pd
 import numpy
 import openpyxl
@@ -43,7 +47,7 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from flask_mail import Message
 from json import dumps, loads
 from twilio.twiml.messaging_response import MessagingResponse
-import time
+import time , dropbox
 from flask_cors import CORS
 from flaskblog.utils.request import validate_body
 from flaskblog.utils.response import response, error_response
@@ -51,9 +55,147 @@ from flaskblog.utils.sms import send_bulk_sms
 from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, \
                     check_verification_token, request_verification_token_whatsapp
 from flask_login import current_user, login_user, logout_user, fresh_login_required
-from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
+from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition, Email, To, Content
+from dropbox import DropboxOAuth2FlowNoRedirect
+
 moment = Moment(app)
 CORS(app)
+
+
+    
+
+@app.route('/dropbox')
+def dropbox_files():
+    auth_flow2 = DropboxOAuth2FlowNoRedirect(DROP_BOX_KEY,
+                                         consumer_secret=DROP_BOX_SECRET,
+                                         token_access_type='offline',
+                                         scope=['files.metadata.write'])
+
+    authorize_url = auth_flow2.start()
+    print("1. Go to: " + authorize_url)
+    print("2. Click \"Allow\" (you might have to log in first).")
+    print("3. Copy the authorization code.")
+    auth_code = input("Enter the authorization code here: ").strip()
+
+    try:
+        oauth_result = auth_flow2.finish(auth_code)
+        #Oauth token has files.metadata.write scope only
+        assert oauth_result.scope == 'files.metadata.write'
+    except Exception as e:
+        print('Error: %s' % (e,))
+        #exit(1)
+
+    with dropbox.Dropbox(oauth2_access_token=oauth_result.access_token,
+                     oauth2_access_token_expiration=oauth_result.expires_at,
+                     oauth2_refresh_token=oauth_result.refresh_token,
+                     app_key=DROP_BOX_KEY,
+                     app_secret=DROP_BOX_SECRET):
+        print("Successfully set up client!")
+
+
+
+
+    dbx = dropbox.Dropbox(auth_code)
+    print(auth_code)
+    # Use the long-lived token to make API calls
+    #client = dropbox.Dropbox(long_lived_token)
+
+    #file_path = '/path/to/file.txt'
+    #file_name = 'file.txt'
+    #with open(file_path, 'rb') as f:
+    #    response = client.files_upload(f.read(), '/{}'.format(file_name))
+
+    #print(response)
+
+
+
+    
+    results = dbx.files_list_folder(path='/siteincidents')
+    contents = [entry.name for entry in results.entries]
+
+    return render_template('dropbox.html', contents=contents)
+    
+   
+
+@app.route('/upload_to_bucket', methods=['GET','POST'])
+@login_required
+def upload_to_bucket():
+    if request.method == 'GET':
+        return render_template('bucket_upload.html')
+    if request.method == 'POST':
+        file = request.files['file']
+        filename = file.filename
+        print(filename)
+        bucket_name = 'paulfuther'
+        #file_path = file
+        folder_name = 'SITEINCIDENTS3'
+        #object_key = '{}/{}'.format(folder_name, filename)
+        bucket = conn.lookup(bucket_name)
+        key = bucket.new_key('{}/{}'.format(folder_name, filename))
+        key.set_contents_from_file(file)
+
+
+    for key in bucket.list():
+        print("{name}\t{size}\t{modified}".format(
+                name = key.name,
+                size = key.size,
+                modified = key.last_modified,
+        ))
+    
+    return "done"
+
+
+
+
+@app.route('/list_buckets',methods=['GET', 'POST'])
+def list_buckets():
+    for bucket in conn.get_all_buckets():
+        print("{name}\t{created}".format(
+                name = bucket.name,
+                created = bucket.creation_date,
+        ))
+
+    bucket_name = 'paulfuther'
+    file_path = '/Users/paulfuther/arla0061/flaskblog/static/emailfiles/Simple_Rewash_Log.xlsx'
+    folder_name = 'SITEINCIDENTS'
+    object_key = '{}/{}'.format(folder_name, '402_Payroll_2022.xlsx')
+
+    bucket = conn.lookup(bucket_name)
+    key = bucket.new_key(object_key)
+
+    key.set_contents_from_filename(file_path)
+
+    
+    #key = bucket.new_key('402_Payroll_2022.xlsx')
+
+    #key.set_contents_from_filename('/Users/paulfuther/arla0061/flaskblog/static/emailfiles/402_Payroll_2022.xlsx')
+
+
+    for key in bucket.list():
+        print("{name}\t{size}\t{modified}".format(
+                name = key.name,
+                size = key.size,
+                modified = key.last_modified,
+        ))
+    
+    
+
+    #name=bucket.name
+    #for key in bucket.list():
+    #    key.delete()
+        
+    return "done"
+
+
+#@app.route('/delete-folder-files', methods=['DELETE'])
+#def delete_folder_files():
+#    folder_path = request.args.get('folder_path')
+#    client = linode_object_storage.ObjectStorageClient(ACCESS_KEY, SECRET_KEY, BUCKET_NAME)
+#    for file_name in client.list_files(folder_path):
+#        client.delete_file(os.path.join(folder_path, file_name))
+#    return jsonify({'message': 'All files in folder have been deleted.'})
+
+
 
 
 @app.route('/clock_in_out', methods=['GET','POST'])
@@ -120,6 +262,7 @@ def update_phone():
 
 @app.route("/")
 def home(): 
+    print("home")
     return render_template("home.html")
 
 
@@ -127,7 +270,12 @@ def home():
 def login():
     form=LoginForm()
     if current_user.is_authenticated:
-        return render_template("layout.html")
+        result = db.session.query(Employee.mobilephone, Employee.firstname,Employee.lastname,User)\
+                    .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+                    .filter(User.active == 1)\
+                    .first()
+        
+        return render_template("layout.html", result=result)
     if request.method == 'GET':
         return render_template("login.html", form=form)
     if request.method == 'POST':
@@ -152,45 +300,81 @@ def login():
                 print(user.phone)
                 print(user.active)
                 print(form.two_fa.data)
+                if user.has_roles('GSA'):
+                    print('yes')
+
                 # testing
-                #login_user(user, remember=form.remember_me.data)
-                #return render_template("layout.html", title="home")
+                login_user(user, remember=form.remember_me.data)
+                activity = UserActivity(user_id=current_user.id, activity_type='login', firstname=user.firstname, lastname=user.lastname)
+                db.session.add(activity)
+                db.session.commit()
+                result = db.session.query(Employee.mobilephone, Employee.firstname,Employee.lastname,User)\
+                    .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+                    .filter(User.active == 1)\
+                    .first()
+
+                    
+                    #results = employee_schema.dump(gsa)
+                    #staff = jsonify(results)
+                    #return render_template("gsadashboard.html", title="home", result=result)
+                
+                
+                return render_template("layout.html", title="home", result=result)
 
                 # end here
-                if form.two_fa.data=="sms":
-                    request_verification_token(user.phone)
-                    session['phone']=user.phone
-                    return redirect(url_for('verify_2fa'))
-                elif form.two_fa.data=="whatsapp":
-                    request_verification_token_whatsapp(user.phone)
-                    session['phone']=user.phone
-                    return redirect(url_for('verify_2fa'))
-                else:
-                    flash('you need to select a 2fa channel')
-                    return render_template('login.html' ,form=form)
-                #session['phone']=user_phone
-                return redirect(url_for('login', form=form))
+                #if form.two_fa.data=="sms":
+                #    request_verification_token(user.phone)
+                #    session['phone']=user.phone
+                #    return redirect(url_for('verify_2fa'))
+                #elif form.two_fa.data=="whatsapp":
+                #    request_verification_token_whatsapp(user.phone)
+                #    session['phone']=user.phone
+                #    return redirect(url_for('verify_2fa'))
+                #else:
+                #    flash('you need to select a 2fa channel')
+                #    return render_template('login.html' ,form=form)
+                session['phone']=user_phone
+                #return redirect(url_for('login', form=form))
                 login_user(user, remember=form.remember_me.data)
                 next_page = request.args.get('next')
-                if current_user.has_roles('GSA'):
+                print(current_user.roles)
+                if current_user.has_roles('INC'):
                     gsaid = int(current_user.id)
+                    print(gsaid)
                     staff = Employee.query.filter_by(user_id=gsaid).first()
+                    print(staff)
                     exists = Empfile.query.filter_by(employee2_id=staff.id).first()
-                    return render_template("gsadashboard.html", staff=staff, exists=exists)
+                    print(exists)
                     print(current_user)
-                return render_template("layout.html", title="home")
-    
-    
 
+                    # testing this for gsa info
+                    gsa = db.session.query(Employee.mobilephone, Employee.firstname,Employee.lastname,User)\
+                    .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+                    .filter(User.active == 1)\
+                    .first()
+
+                  
+                    #results = employee_schema.dump(gsa)
+                    #result = jsonify(results)
+
+
+                    #print(result)
+                else:
+                    return ('done')
+                    #return render_template("gsadashboard.html", result=result, exists=exists)
+                    #print(current_user)
+    return render_template("layout.html", title="home")
+    
 @app.route("/home22", methods = ['GET', 'POST'])
 @login_required
 def home22():
     print(current_user.id)
     gsaid = int(current_user.id)
     staff = Employee.query.filter_by(user_id=gsaid).first()
+
     if current_user.has_roles('GSA'):
         print(staff.id)
-        exists = Empfile.query.filter_by(employee2_id=staff.id).first()
+        exists = completedfile.query.filter(completedfile.userid ==gsaid, completedfile.completed== True ).first()
         if exists:    
             return render_template('gsadashboard.html', staff=staff, exists=exists)
         else:
@@ -199,17 +383,8 @@ def home22():
             #print('user is gsa')
             return render_template('gsadashboard.html', staff=staff, exists=exists)
     
-    #return render_template('testsig.html')
-    
     return render_template('layout.html')
-    #return render_template('home.html')
-
-#@app.route('/new_hire_hr_list', methods = ['GET','POST'])
-#def new_hire_hr_list():
-    #emp = Employee.query.get(3)
-    #print(emp.firstname)
-    #return render_template('newhirehomehr.html', emp=emp)
-
+  
 def send_email_confirmation(user):
     token = user.get_mail_confirm_token()
     email = user.email
@@ -435,6 +610,69 @@ def twilio_call():
         
         return render_template("layout.html")
    
+@app.route('/send_created_email', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def send_created_email():
+    form=BulkCreatedEmailSendgridForm()
+    
+    if request.method == "GET":
+        return render_template("comms_email_usercreated.html", form=form)
+    
+    if request.method == "POST":
+        #print(form.body)
+        role_id = request.form['role']
+        subject=request.form['subject']
+        uploaded_file = request.files['file']
+        body=request.form['body']
+        if not body:
+            flash("You Cannot Send a Blank Email")
+            return render_template("comms_email_usercreated.html", form=form)
+        print(body)
+        
+        if uploaded_file:
+            print(uploaded_file.filename)
+            filename = secure_filename(uploaded_file.filename)
+            uploaded_file.save(os.path.join(BULK_EMAIL_PATH, filename))
+        
+        # get the email addresses of the roles that were selected.
+       
+        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+        .all()
+
+        # cycle through all emails and send the email with attachment if one exists.
+
+        for user in gsa:
+      
+            message = Mail(
+                from_email=DEFAULT_SENDER,
+                to_emails=user.email,
+                subject=subject,
+                html_content=body
+            )
+        # add attachment if one exists.
+
+            if uploaded_file:
+                    with open('flaskblog/static/emailfiles/'+filename, 'rb') as f:
+                        data = f.read()
+                        f.close()
+                    encoded_file = base64.b64encode(data).decode()
+                    attachedFile = Attachment(
+                            FileContent(encoded_file),
+                            FileName(uploaded_file.filename),
+                            FileType(uploaded_file.content_type),
+                            Disposition('attachment')) 
+                    message.attachment = attachedFile
+            response=sg.send(message)
+       
+        #send_created_email.apply_async(args=[role_id, filename, uploaded_file], countdown=10) 
+        
+        return render_template("layout.html")
+
 @app.route('/bulkemail', methods = ['GET', 'POST'])
 @login_required
 @roles_required('Admin')
@@ -448,10 +686,11 @@ def bulk_email():
         role_id = request.form['role']
         templatename = request.form['templatename']
         uploaded_file = request.files['file']
+        if uploaded_file:
         #print(uploaded_file.filename)
-        filename = secure_filename(uploaded_file.filename)
+            filename = secure_filename(uploaded_file.filename)
         #print(filename)
-        uploaded_file.save(os.path.join(BULK_EMAIL_PATH, filename))
+            uploaded_file.save(os.path.join(BULK_EMAIL_PATH, filename))
         
         '''bulkmessage = BulkEmailSendgrid.query.get(templatename)
         bm = bulkmessage.templateid
@@ -592,7 +831,6 @@ def email(email):
         resp = make_response('None', 404)
     return resp
 
-
 @app.route("/process_images", methods = ['GET', 'POST'])
 @login_required
 def process_images():
@@ -634,33 +872,31 @@ def process_hires_images():
     # the pics need to have an extension that is acceptable.
     # that extension is set in the upload extensions variable.
 
-    form = SiteIncident()
-    pics= request.files.getlist('hiresphotos[]')
-    file_names = []
-    #for pic in pics:
-     #   file_ext = os.path.splitext(filename)[1]
-      #  if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
-       #         abort(400)
+    #images = request.files.getlist('images')
+    file_obj = request.files
+    random_number = request.form.get("random_number")
+    print(random_number)
+    session['random_number'] = random_number
+    upload_directory = os.path.join(INCIDENT_UPLOAD_PATH,random_number)
 
-    for pic in pics:
-        if not pic:
-            pass
-        else:
-            filename = pic.filename
-            securefilename = secure_filename(filename)
-            file_names.append(securefilename)
-            file_ext = os.path.splitext(filename)[1]
-            print(file_ext)
-            if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
-                abort(400)
-            i=Image.open(pic)
-            i.thumbnail((1000,1000), Image.LANCZOS)  
-            print(i.size)    
-            i.save(os.path.join(INCIDENT_UPLOAD_PATH,secure_filename(pic.filename)),optimize=True)
-    session['file_names']=file_names
-    return jsonify(file_names)
+    if not os.path.exists(upload_directory):
+        os.makedirs(upload_directory)
+        print(f'{upload_directory} created')
+    else:
+        print(f'{upload_directory} already exists')
+
+    for f in file_obj:
+            file = request.files.get(f)
+            i=Image.open(file) 
+            #print(i.size) 
+            securefilename = secure_filename(file.filename)
+            i.save(os.path.join(upload_directory,securefilename))
+            print (securefilename)
+            
+    #save_images.apply_async(args=[upload_directory], countdown=10)
     
-
+    return "image processing sent to worker"
+    
 @app.route("/display_hires_images/<filename>", methods = ['GET', 'POST'])
 @login_required
 def display_hires_images(filename):
@@ -673,22 +909,157 @@ def display_images(filename):
     print(filename)
     return redirect(url_for ('static', filename='/incidentpictures/'+ filename), code=30)
 
-
 @app.route("/event", methods = ['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
 def eventreport():
     form = SiteIncident()
-    reg_file_names=session['reg_file_names']
-    file_names=session['file_names']
-    file_list={
-        "form": form,
-        "reg_file_names": reg_file_names,
-        "file_names": file_names}
 
-    make_incident_file.apply_async(args=[file_list] ,countdown=10)
+    # the site incident form may have pictures.
+    # they are uploaded automatically by dropzone.
+    # there is a unique folder number for each site incident.
+    # assuming that pictures were sent.
+    # if not then no unique folder.    
+    # the unique folder number is stored in a session variable.
 
-    
+    if form.validate_on_submit():
+
+            # if there is no folder then set the random_number variable to none.
+            # this variable is written to the database and is used
+            # to grab the images for the final form.
+            # we do not want to send images to the celery task.
+            # so we save them first then access them in celery.
+
+            if 'random_number' in session:
+                random_number=session['random_number']
+                print(random_number)
+            else:
+                random_number=None
+            newtime=str(form.eventtime.data)
+            time2 =datetime.strptime(newtime, '%H:%M:%S').time()
+            inc=Incident(injuryorillness=form.injuryorillness.data,
+                            environmental =form.environmental.data,
+                            regulatory =form.regulatory.data,
+                            economicdamage = form.economicdamage.data,
+                            reputation = form.reputation.data,
+                            security = form.security.data,
+                            fire = form.fire.data,
+                            location = str(form.location.data),
+                            eventdetails = form.eventdetails.data,
+                            eventdate = form.eventdate.data,
+                            eventtime = form.eventtime.data,
+                            reportedby = form.reportedby.data,
+                            reportedbynumber = form.reportedbynumber.data,
+                            suncoremployee = form.suncoremployee.data,
+                            contractor = form.contractor.data,
+                            associate = form.associate.data,
+                            generalpublic = form.generalpublic.data,
+                            other = form.other.data,
+                            othertext = form.othertext.data,
+                            actionstaken = form.actionstaken.data,
+                            correctiveactions = form.correctiveactions.data,
+                            sno = form.sno.data,
+                            syes = form.syes.data,
+                            scomment = form.scomment.data,
+                            rna = form.rna.data,
+                            rno = form.rno.data,
+                            ryes = form.ryes.data,
+                            rcomment = form.rcomment.data,
+                            gas = form.gas.data,
+                            diesel = form.diesel.data,
+                            sewage = form.sewage.data,
+                            chemical = form.chemical.data,
+                            chemcomment = form.chemcomment.data,
+                            deiselexhaustfluid = form.deiselexhaustfluid.data,
+                            sother = form.sother.data,
+                            s2comment = form.scomment.data,
+                            air = form.air.data,
+                            water = form.water.data,
+                            wildlife = form.wildlife.data,
+                            land = form.land.data,
+                            volumerelease = form.volumerelease.data,
+                            pyes = form.pyes.data,
+                            pno = form.pno.data,
+                            pna = form.pna.data,
+                            pcase = form.pcase.data,
+                            stolentransactions = form.stolentransactions.data,
+                            stoltransactions = form.stoltransactions.data,
+                            stolencards = form.stolencards.data,
+                            stolcards = form.stolcards.data,
+                            stolentobacco = form.stolentobacco.data,
+                            stoltobacco = form.stoltobacco.data,
+                            stolenlottery = form.stolenlottery.data,
+                            stollottery = form.stollottery.data,
+                            stolenfuel = form.stolenfuel.data,
+                            stolfuel = form.stolfuel.data,
+                            stolenother = form.stolenother.data,
+                            stolother = form.stolother.data,
+                            stolenothervalue = form.stolenothervalue.data,
+                            stolenna = form.stolenna.data,
+                            gender = form.gender.data,
+                            height = form.height.data,
+                            weight = form.weight.data,
+                            haircolor = form.haircolor.data,
+                            haircut= form.haircut.data,
+                            complexion = form.complexion.data,
+                            beardmoustache = form.beardmoustache.data,
+                            eyeeyeglasses = form.eyeeyeglasses.data,
+                            licencenumber = form.licencenumber.data,
+                            makemodel = form.makemodel.data,
+                            color = form.color.data,
+                            scars = form.scars.data,
+                            tatoos = form.tatoos.data,
+                            hat = form.hat.data,
+                            shirt = form.shirt.data,
+                            trousers = form.trousers.data,
+                            shoes = form.shoes.data,
+                            voice = form.voice.data,
+                            bumpersticker = form.bumpersticker.data,
+                            direction = form.direction.data,
+                            damage = form.damage.data,
+                            image_folder = random_number)
+                            
+            db.session.add(inc)
+            db.session.flush()
+
+            if random_number:
+           
+                upload_directory = os.path.join(INCIDENT_UPLOAD_PATH,random_number)
+                print(upload_directory)
+                for file in os.listdir(upload_directory):
+                    i=Image.open(os.path.join(upload_directory,file))
+                    print(i.size) 
+                    i.thumbnail((1500,1500), Image.LANCZOS) 
+                    i.save(os.path.join(upload_directory,file)) 
+                    print(file)
+                    incimage = incident_files(image=file,
+                                    incident_id = inc.id)
+                    db.session.add(incimage)
+
+            db.session.commit()
+            
+            print(inc.id, inc.eventtime, inc.eventdate)
+
+            print(inc)
+            file_id = int(inc.id)
+            # the form data needs to be converted to a dictionary
+            # to send to celery
+
+            #form_data = request.form.to_dict()
+            #print(form_data)
+            make_incident_pdf.apply_async(args=[file_id, random_number])
+
+
+
+            flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
+
+            # empty the random_number value in the session.
+            print("done")
+            session.pop('random_number', default=None)
+            
+            return render_template('layout.html')
+           
+    return render_template('eventreport.html', form=form)
 
 @app.route("/nofile")
 @login_required
@@ -749,7 +1120,6 @@ def activebystoreexcel():
     
 
     return send_file(out, attachment_filename="activebystore.xlsx", as_attachment=True)
-
 
 @app.route("/nofileexcel")
 @login_required
@@ -994,11 +1364,6 @@ def addtoschedule():
         
     return render_template('schedule.html', form=form)
         
-#@app.route("/employeedashboard", methods = ['GET', 'POST'])
-#@login_required
-#@roles_required('GSA')
-#def employeedashboard():
-
 def storelist():
     return db.session.query(Store).all.order_by('number')
 
@@ -1016,55 +1381,55 @@ def sendfile(staff_id):
 @app.route("/hrfile<int:staff_id>", methods=['GET', 'POST'])
 @login_required
 def hrfile(staff_id):
-    gsa = Employee.query.get(staff_id)
-    hrpage = hrfiles.query.all()
-    
-    #print(gsa.firstname)
-    for x in hrpage:
-        print(x.id)
-    exists = Empfile.query.filter_by(employee2_id = staff_id).first()
-    if exists:
-        print("yes")
-        flash("This employee has a file. Thank you.")
-        return redirect(url_for("hrlist"))
 
+    # here we can loop over the number of pages in the HR file.
+    # it is dynamic. We can add and remove pages. No problem.
+    
+
+    gsa = User.query.get(staff_id)
+    hrpage = hrfiles.query.all()
+    enumerated_hrpage = list(enumerate(hrpage))
+    print(staff_id)
+    print(current_user.id)
     if request.method == "POST":
-        #sigs = request.form.getlist('output')
-        signature = request.form.getlist('output')
-        #signatures = json.dumps(signature)
-        hrpage = hrfiles.query.limit(3).all()
-        #sigs2 = json.dumps(sigs)
-        #print(sigs)
+        # get the list of signatures from the hidden filed called output.
+        signature_data = request.form.getlist('output')
+        # create a dictionary called signatures and append a key value pair to be passed
+        # to the template.
+        signaturess = []
+        for sig in signature_data:
+            signature = {
+            "data": sig
+            }
+            signaturess.append(signature)
+        print(type(signaturess))
+
+        signature_list = json.dumps(signaturess)
+        signatures = json.loads(signature_list)
+
+        print(type(signatures))
+        # update the database to indicate that the HR file has been completed.
+        ##file_completion = completedfile(userid= current_user.id,
+         ##               completed = True)
+       
+        ##db.session.add(file_completion)
+        ##db.session.commit()
+
+        # here we will generate the employee file in pdf.  
+        make_pdf.apply_async(args=[staff_id, signatures], countdown=10)
+
+        #return redirect(url_for("updategsa", staff_id=current_user.id))
+        date_today = datetime.now()
         
-        #for x in sigs:
-        #   print(x)
-        f = (staff_id)
-        y = 1
-        z = 0
-        for x in hrpage:
-                empfile = Empfile(employee2_id= f,
-                                file_id= y,
-                                sig_data = signature[z])
-          
-                data = request.form['output']
-                #print(data)
-                #print("hello")               
-                db.session.add(empfile)
-                y += 1
-                z += 1
-                
-        db.session.commit()
-        signatures = Empfile.query.filter_by(employee2_id = staff_id)
-        for x in signatures:
-            print (x)
-        flash("file completed. Thank you")
-        #make_pdf.apply_async(args=[staff_id, sigs], countdown=10)
-        return render_template('employeefilepdf2.html', hrpage=hrpage ,signatures=signatures, staff_id = staff_id, gsa=gsa)
-        return ('success')
+        flash('Thank you. Your New Hire File is compelte. You can view your file in the Documents Section')
+        return redirect(url_for('login'))
+       
   
-    #print("success")
-  
-    return render_template('ckfile.html', hrpage=hrpage, gsa=gsa)
+    # ckfile is the html page to create the HR file.
+    # there is no date on this file. The date is used in the above code
+    # when data is sent to this route the pdf file is created with todays date.
+    date_today = datetime.now()
+    return render_template('ckfile.html', hrpage=hrpage, gsa=gsa, date_today=date_today)
 
 @app.route("/hrhome")
 @login_required
@@ -1073,7 +1438,6 @@ def hrhome():
     print(emp.firstname)
     return render_template('hrhome.html', emp=emp)
     
-
 @app.route("/createpdfnewhire<int:staff_id>", methods = ['GET', 'POST'])
 @login_required
 def pdf_file(staff_id):
@@ -1146,7 +1510,6 @@ def updategsatraining(staff_id):
     # gsa, store, course and gradelist, done up top.
     
     return render_template("updategsatraining.html", gsa=gsa, store=store, course=course, gradelist=gradelist)
-
 
 @app.route("/updategsatraining2<int:staff_id>", methods=['GET', 'POST'])
 @login_required
@@ -1224,7 +1587,6 @@ def updategsatraining2(staff_id):
     # gsa, store, course and gradelist, done up top.
     
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
-
 
 @app.route("/rolesearch", methods = ['POST', "GET"])
 @login_required
@@ -1304,7 +1666,20 @@ def livesearch():
     
     # search by first name, last name or store number
     # you need to serialise the result to pass it on as json.
+    #searchbox = request.form.get("text")
+    #results=[]
+    #users = User.query.filter(or_(User.firstname.like('%' + searchbox + '%')\
+    #    ,User.lastname.like('%' + searchbox + '%')))\
+    #        .filter(User.active==1).all()
+    #print(users)
+    #for user in users:
+    #        employee = Employee.query.filter_by(user_id=user.id).first()  # get the employee associated with the user
+    #        if employee:
+    #            print(employee.id)
+    #            results.append({'firstname': user.firstname, 'lastname':user.lastname, 'store': employee.store.number}) 
 
+
+    #print(results)
     searchbox = request.form.get("text")
     gsa = Employee.query.filter(or_(Employee.firstname.like('%' + searchbox + '%')\
         ,Employee.lastname.like('%' + searchbox + '%')\
@@ -1313,15 +1688,17 @@ def livesearch():
         .join(User, Employee.user_id == User.id)\
         .filter(User.active == 1).order_by(Store.number)\
         .add_columns(Store.number, Employee.firstname, Employee.lastname, \
-        Employee.email, Employee.store_id, Employee.image_file, Employee.id)\
+        Employee.email, Employee.store_id, Employee.id)\
         .all()
     
     for s in gsa:
-        print(s.firstname)
+        print( s.firstname, s.lastname)
 
     results = employee_schema.dump(gsa)
+    #results=[{'firstname':s.firstname, 'lastname':s.lastname, 'Store':s.store} for s in search_text]
     result = jsonify(results)
-    print(result)
+    #result = json.dumps(results)
+    #print(result)
     return result
 
 @app.route("/live_email", methods =['GET', 'POST'])
@@ -1356,7 +1733,7 @@ def email_livesearch():
 def staff_register():
     form = NewRegisterForm()
     coursecount = Course.query.all()
-    #print(coursecount)
+
     # the get is for the first load of the page
     if request.method == "GET":
         return render_template('emailsearch.html', form=form)
@@ -1392,8 +1769,6 @@ def staff_register():
                     phone=form.mobilephone.data)
 
                 db.session.add(adduser)
-                print(form.sunavail.data)
-                print(form.monavail.data)
                 # flush will create an entry in the database that cannot be over written.
                 # flush then gives us the user id. 
                 # we need the user id to go along with the employee id.
@@ -1404,7 +1779,7 @@ def staff_register():
                 newid = adduser.id
                 
                 print(newid)
-                picture_file = '3d611379cfdf5a89.jpg'
+                #picture_file = '3d611379cfdf5a89.jpg'
 
                 # Here we create the new employee in the database.
 
@@ -1412,19 +1787,8 @@ def staff_register():
                                 firstname=form.firstname.data,
                                 lastname=form.lastname.data,
                                 store_id=1,
-                                addressone="tbd",
-                                addresstwo="tbd",
-                                apt="tbd",
-                                city="tbd",
-                                province="tbd",
-                                country="tbd",
-                                postal="tbdtbd",
                                 email=form.email.data,
                                 mobilephone=form.mobilephone.data,
-                                trainingid="tbd",
-                                trainingpassword="tbd",
-                                image_file=picture_file,
-                                iprismcode="tbd",
                                 mon_avail=form.monavail.data,
                                 tue_avail=form.tueavail.data,
                                 wed_avail=form.wedavail.data,
@@ -1443,25 +1807,22 @@ def staff_register():
                 # the data has to be in the format that the database can read.
 
                 # need all of this  
-            
-                #r = request.form.getlist("completeddate")
-                #g = request.form.getlist("myCheck2")
                 f = emp.id
                 
-                print(emp.id)
-                yy = 0
-                y=1
+                #print(emp.id)
+                #yy = 0
+                #y=1
                 
-                for x in coursecount:
-                    empgrade = Grade(
-                                employee_id=f,
-                                course_id=y,
-                                completed = 0
-                                )  
-                    print(f, y)
-                    db.session.add(empgrade)
-                    y += 1
-                    yy += 1
+                #for x in coursecount:
+                #    empgrade = Grade(
+                #                employee_id=f,
+                #                course_id=y,
+                #                completed = 0
+                #                )  
+                #    print(f, y)
+                #    db.session.add(empgrade)
+                #    y += 1
+                #    yy += 1
            
                 #print(emp)
                     
@@ -1474,7 +1835,7 @@ def staff_register():
 
                 db.session.commit()
        
-            ''' email = emp.email
+                email = emp.email
                 message = Mail(
                 from_email=DEFAULT_SENDER,
                 to_emails= email,
@@ -1494,11 +1855,11 @@ def staff_register():
                 message.template_id = SENDGRID_NEWHIRE_ID
             
                 response = sg.send(message)
-            '''
+            
 
             message=client.messages\
             .create(
-            body="Hello. This is Terry from Petro Canada. Thank you for registering your account. Please go to www.paulfuther.com to log in. We need you to complete your empoloyee file. Please talk to your manager if you have any questions.",
+            body="Hello. This is Terry from Petro Canada. Thank you for registering your account. Please go to www.paulfuther.com to log in. We need you to complete your empoloyee file. We also need you to update your contact information. Please talk to your manager if you have any questions.",
             from_=twilio_from,
             to=target
             )
@@ -1564,51 +1925,8 @@ def save_hrpicture(form_hrpicture):
     
     return hrpicture_fn
 
+# this section includes the routes for managers to update employee data.
 
-@app.route("/add_docs<int:staff_id>", methods = ['GET','POST'])
-@login_required
-def add_docs(staff_id):
-    print(staff_id)
-    docs = request.files.getlist('empdocs[]')
-    print(docs)
-
-    for doc in docs:
-        if not doc:
-            pass
-       
-
-        else:
-            filename = doc.filename
-            file_ext = os.path.splitext(filename)[1]
-            print(file_ext)
-            #if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
-            #    abort(400)
-            #i=Image.open(pic)
-            #i.thumbnail((300,300), Image.LANCZOS)  
-            #print(i.size)    
-            doc.save(os.path.join(EMPLOYEE_FILE_UPLOAD_PATH,secure_filename(doc.filename)))
-            
-    for doc in docs:
-        if not doc:
-            pass
-        else:
-            emp_docs = Empdocs(file_document =secure_filename(doc.filename),
-                                file_employee = int(staff_id))
-            db.session.add(emp_docs)
-        db.session.commit() 
-
-
-    return "done"
-
-
-        #    filename=doc.filename
-        #    filename2 = secure_filename(filename)
-        #    doc.save(os.path.join(EMPLOYEE_FILE_UPLOAD_PATH, filename2))
-
-
-         #   
-       # 
-    
 
 @app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
 @login_required
@@ -1620,14 +1938,208 @@ def updategsa(staff_id):
     #when changes are made the form.data attribut is changed also
     #you can then compare the new form data using .data with old data use gsa.data
     #note below that some data is int and some is text. they need to be the same for the compares
+    print(staff_id)
+    #emp_docs = Empdocs.query.filter_by(file_employee = int(staff_id))
+    #print(current_user.id)
+    #gsaid = int(current_user.id)
+    staff = Employee.query.filter_by(id=staff_id).first()
+    print(staff.id)
+    exists = completedfile.query.filter(completedfile.userid == Employee.user_id, completedfile.completed== True ).first()
+   
     
-    emp_docs = Empdocs.query.filter_by(file_employee = int(staff_id))
-        
-
-    #print(emp_docs.file_document)
     gsa = Employee.query.get(staff_id)
+    gsa_docs = User.query.filter(User.id == gsa.user_id).first()
+    print(gsa.id)
     print(gsa.dob)
+    print(gsa_docs.id)
+
+    bucket = conn.get_bucket('paulfuther')
+
+    # Get a reference to the desired folder (prefix)
+
+    #gradelist = Grade.query\
+    #    .filter_by(employee_id = staff_id)\
+    #    .join(Employee, Employee.id == Grade.employee_id)\
+    #    .join(Course, Course.id == Grade.course_id)\
+    #    .add_columns(Course.name, Grade.completed)
+  
+    #document = url_for(
+    #    'static', filename='employee_docs/'+ emp_docs.file_document)
+    folder_prefix= f"EMPLOYEES/{gsa_docs.id}_{gsa_docs.lastname}_{gsa_docs.firstname}/DOCUMENTS/"
+    folder_prefix_image= f"EMPLOYEES/{gsa_docs.id}_{gsa_docs.lastname}_{gsa_docs.firstname}/IMAGES"
+        # Retrieve the objects in the folder
+    #print(folder_prefix_image)
+    #response = bucket.list(prefix=folder_prefix_image)
+    response_documents = bucket.list(prefix=folder_prefix)
     
+
+    try:
+        k = bucket.get_all_keys(prefix=folder_prefix_image)[0]
+    except:
+        image_file = url_for('static', filename='empfiles/mobile/' + gsa.image_file)
+    else:
+        url = k.generate_url(expires_in=600)
+        image_file=url
+    
+    emp_docs = []
+    for obj in response_documents:
+        if obj.key != folder_prefix:  # Skip the folder itself
+            emp_docs.append({
+                  'name': obj.key[len(folder_prefix):],  # Remove the folder prefix from the file name
+                 'link': url_for('download_file', filename=obj.key)  # Generate the download link for the file
+             })
+
+    form = EmployeeUpdateForm(obj=gsa)
+    
+    return render_template('employeeupdate.html',emp_docs=emp_docs,image_file=image_file, gsa_docs=gsa_docs, form=form, gsa=gsa, exists=exists)
+        
+@app.route("/add_docs<int:staff_id>", methods = ['GET','POST'])
+@login_required
+def add_docs(staff_id):
+    print(staff_id)
+    docs = request.files.getlist('empdocs[]')
+    print(docs)
+    gsa=User.query.filter_by(id=staff_id).first()
+    print(gsa.firstname)
+    #gsaid = int(current_user.id)
+    #gsa2 = Employee.query.filter_by(user_id=gsaid).first()
+    #print(gsa2.id)
+
+    # docs are uploaded to linode s3
+
+    for doc in docs:
+        if not doc:
+            pass
+        else:
+            filename = doc.filename
+            file_ext = os.path.splitext(filename)[1]
+            print(file_ext)
+            #if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+            #    abort(400)
+            #i=Image.open(pic)
+            #i.thumbnail((300,300), Image.LANCZOS)  
+            #print(i.size)    
+            #doc.save(os.path.join(EMPLOYEE_FILE_UPLOAD_PATH,secure_filename(doc.filename)))
+            
+            filename = secure_filename(doc.filename)
+
+            file = doc
+            bucket_name = 'paulfuther'
+            #file_path = file
+            folder_name = f"EMPLOYEES/{gsa.id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
+            object_key = '{}/{}'.format(folder_name, filename)
+            bucket = conn.lookup(bucket_name)
+            key = bucket.new_key('{}/{}'.format(folder_name, filename))
+            key.set_contents_from_file(file)
+
+    bucket = conn.get_bucket('paulfuther')
+
+    # Get a reference to the desired folder (prefix)
+            
+    folder_prefix= f"EMPLOYEES/{gsa.id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS/"
+    # Retrieve the objects in the folder
+    objects = bucket.list(prefix=folder_prefix)
+    for obj in objects:
+        print(obj)
+
+    # Generate links for the files in the folder
+    emp_docs = []
+    for obj in objects:
+            if obj.key != folder_prefix:  # Skip the folder itself
+                emp_docs.append({
+                        'name': obj.key[len(folder_prefix):],  # Remove the folder prefix from the file name
+                        'link': url_for('download_file', filename=obj.key)  # Generate the download link for the file
+                    })
+    
+    print (emp_docs)
+
+    return jsonify(emp_docs)
+    
+
+# this section has the routes for employees to update docs.
+
+
+@app.route("/gsa_add_docs<int:staff_id>", methods = ['GET','POST'])
+@login_required
+def gsa_add_docs(staff_id):
+    print(staff_id)
+    docs = request.files.getlist('empdocs[]')
+    print(docs)
+    gsa=User.query.filter_by(id=staff_id).first()
+    print(gsa.firstname)
+    gsaid = int(current_user.id)
+    gsa2 = Employee.query.filter_by(user_id=gsaid).first()
+    print(gsa2.id)
+
+    # docs are uploaded to linode s3
+
+    for doc in docs:
+        if not doc:
+            pass
+        else:
+            filename = doc.filename
+            file_ext = os.path.splitext(filename)[1]
+            print(file_ext)
+            #if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+            #    abort(400)
+            #i=Image.open(pic)
+            #i.thumbnail((300,300), Image.LANCZOS)  
+            #print(i.size)    
+            #doc.save(os.path.join(EMPLOYEE_FILE_UPLOAD_PATH,secure_filename(doc.filename)))
+            
+            filename = secure_filename(doc.filename)
+
+            file = doc
+            bucket_name = 'paulfuther'
+            #file_path = file
+            folder_name = f"EMPLOYEES/{gsa.id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
+            object_key = '{}/{}'.format(folder_name, filename)
+            bucket = conn.lookup(bucket_name)
+            key = bucket.new_key('{}/{}'.format(folder_name, filename))
+            key.set_contents_from_file(file)
+
+    bucket = conn.get_bucket('paulfuther')
+
+    # Get a reference to the desired folder (prefix)
+            
+    folder_prefix= f"EMPLOYEES/{current_user.id}_{current_user.lastname}_{current_user.firstname}/DOCUMENTS/"
+    # Retrieve the objects in the folder
+    objects = bucket.list(prefix=folder_prefix)
+
+    # Generate links for the files in the folder
+    emp_docs = []
+    for obj in objects:
+            if obj.key != folder_prefix:  # Skip the folder itself
+                emp_docs.append({
+                        'name': obj.key[len(folder_prefix):],  # Remove the folder prefix from the file name
+                        'link': url_for('download_file', filename=obj.key)  # Generate the download link for the file
+                    })
+
+    return jsonify(emp_docs)
+    
+@app.route("/gsa_updategsa<int:staff_id>", methods=['GET', 'POST'])
+@login_required
+def gsa_updategsa(staff_id):
+
+    # this route is just for GSA's
+
+    # Here we are getting the row of data based on the index, which is staff_id and
+    #generatating a query under gsa
+    #form is then populated with that data and published
+
+    #when changes are made the form.data attribut is changed also
+    #you can then compare the new form data using .data with old data use gsa.data
+    #note below that some data is int and some is text. they need to be the same for the compares
+
+    print(staff_id)
+    #emp_docs = Empdocs.query.filter_by(file_employee = int(staff_id))
+    
+    print(current_user.id)
+    gsaid = int(current_user.id)
+    gsa = Employee.query.filter_by(user_id=gsaid).first()
+    print(gsa.id)
+    exists = completedfile.query.filter(completedfile.userid ==gsaid, completedfile.completed== True ).first()
+    print(gsa.dob)
     gradelist = Grade.query\
         .filter_by(employee_id = staff_id)\
         .join(Employee, Employee.id == Grade.employee_id)\
@@ -1643,20 +2155,106 @@ def updategsa(staff_id):
     
     form = EmployeeUpdateForm(obj=gsa)
     
-    if request.method == "GET":
-        #print(form.dob.data)
-        return render_template('employeeupdate.html', image_file=image_file, form=form, gsa=gsa, emp_docs=emp_docs)
-        
-        #, emp_docs=emp_docs)
- 
+    bucket = conn.get_bucket('paulfuther')
+    # Get a reference to the desired folder (prefix)
+       
+    folder_prefix= f"EMPLOYEES/{current_user.id}_{current_user.lastname}_{current_user.firstname}/"
+    folder_prefix_image= f"EMPLOYEES/{current_user.id}_{current_user.lastname}_{current_user.firstname}/IMAGES"
+        # Retrieve the objects in the folder
+    #print(folder_prefix_image)
+    #response = bucket.list(prefix=folder_prefix_image)
+    response_documents = bucket.list(prefix=folder_prefix)
+    #print(response_documents)
+    try:
+        k = bucket.get_all_keys(prefix=folder_prefix_image)[0]
+    except:
+        image_file = url_for('static', filename='empfiles/mobile/' + gsa.image_file)
+    else:
+        url = k.generate_url(expires_in=600)
+        image_file=url
+        # Retrieve the objects in the folder
+    
+
+        # Generate links for the files in the folder
+    emp_docs = []
+    for obj in response_documents:
+        if obj.key != folder_prefix:  # Skip the folder itself
+            emp_docs.append({
+                  'name': obj.key[len(folder_prefix):],  # Remove the folder prefix from the file name
+                 'link': url_for('download_file', filename=obj.key)  # Generate the download link for the file
+             })
+
+    return render_template('gsa_employeeupdate.html', image_file=image_file, form=form, gsa=gsa, emp_docs=emp_docs, exists=exists, current_user=current_user)
+
+@app.route('/download/<path:filename>')
+@login_required
+def download_file(filename):
+    # Generate the download link for the file
+
+    #In this version of the download_file route, 
+    # we're using the boto.connect_s3 method to connect to S3
+    # and getting the bucket and key objects using the get_bucket and get_key methods, 
+    # respectively. 
+    # We're then using the generate_url method of the key object to generate the pre-signed URL for the specified file. 
+    # We're also using the quote function to manually encode the file name before replacing it in the pre-signed URL.
+
+
+    bucket = conn.get_bucket('paulfuther')
+    key = bucket.get_key(filename)
+    download_url =key.generate_url(expires_in=3600)  # Link expires after 1 hour
+    # Return a redirect to the download link
+    filename_encoded = quote(filename, safe='')
+    return redirect(download_url.replace(filename, filename_encoded))
+
+@app.route('/update_gsa_image<int:staff_id>', methods=['POST'])
+@login_required
+def update_gsa_image(staff_id):
+    file = request.files['image']
+    filename = secure_filename(file.filename)
+    gsa=User.query.filter_by(id=staff_id).first()
+    # call function to scale down image and upload to S3
+    #image_url = upload_scaled_image_to_s3(file, filename, gsa)
+    img = Image.open(file)
+
+    # scale down image to a maximum of 800x800 while preserving aspect ratio
+    max_size = (800, 800)
+    img.thumbnail(max_size)
+    # save scaled image to memory
+    output = io.BytesIO()
+    img.save(output, format='JPEG', quality=70)
+    output.seek(0)
+
+    bucket_name = 'paulfuther'
+    folder_name = f"EMPLOYEES/{gsa.id}_{gsa.lastname}_{gsa.firstname}/IMAGES"
+    print(folder_name)
+
+    # Get list of objects in the bucket
+    bucket = conn.lookup(bucket_name)
+    objects = bucket.list(prefix=folder_name)
+    
+    # Loop through objects and delete them
+    for obj in objects:
+        bucket.delete_key(obj.key)
+
+    object_key = '{}/{}'.format(folder_name, filename)
+    
+    key = bucket.new_key('{}/{}'.format(folder_name, filename))
+    key.set_contents_from_file(output)
+    # Generate a public URL for the uploaded image
+    #key.set_acl('public-read')
+    url = key.generate_url(expires_in=60)
+    print('URL:', url)
+    return jsonify({'image_url':url})
+
 @app.route("/update_gsa_contact<int:staff_id>", methods=['GET','POST'])
 @login_required
 def update_gsa_contact(staff_id):
     if request.method == "POST":
-        r=request.form.to_dict()
+
+        #r=request.form.to_dict()
+        #print(r)
         
         gsa = Employee.query.get(staff_id)
-    
         form = EmployeeUpdateForm(obj=gsa)
         image_file = url_for('static', filename='empfiles/mobile/' + gsa.image_file)
         if form.hrpicture.data:
@@ -1664,61 +2262,23 @@ def update_gsa_contact(staff_id):
            print(form.hrpicture.data)
         else:
             picture_file = '3d611379cfdf5a89.jpg'
-        gsaphone = gsa.mobilephone
-        print(form.addressone.data)
-        gsaemail = gsa.email
-        gsapostal = gsa.postal
         gsatrainingid = gsa.trainingid
-        gsatrainingpassword = gsa.trainingpassword
-        gsaiprism = gsa.iprismcode
+        store = form.store.data
+        storeid = store.id
+        print(type(storeid))
 
-        phone = form.mobilephone.data        
-        postal = form.postal.data
-        trainingid = form.trainingid.data
-        trainingpassword = form.trainingpassword.data
-        iprismcodecheck = form.iprismcode.data
+        # check if training id is unique
 
-        emp = Employee.query.filter_by(mobilephone=text(phone)).first()
-        emailcheck = Employee.query.filter_by(email=form.email.data).first()
-        
-        postalcheck = Employee.query.filter_by(postal=postal).first()
-        trainingidcheck = Employee.query.filter_by(trainingid=trainingid).first()
-        trainingpasswordcheck = Employee.query.filter_by(
-                trainingpassword=trainingpassword).first()
-        iprismcheck = Employee.query.filter_by(iprismcode=iprismcodecheck).first()
+        #trainingid_check = form.trainingid.data
+        #trainingidcheck = Employee.query.filter_by(trainingid=trainingid_check).first()
+        #if trainingidcheck is not None:
+        #    return jsonify({'isUnique': False})
 
-        if gsaphone == phone:
-            print("same mobile")
-        else:
-            if emp:
-                    flash("mobile already used")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
+      
+        # update database with changes.
 
-        if gsa.email == form.email.data:
-                print("same email")
-        else:
-            if emailcheck:
-                    flash("email already used")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-        if gsa.trainingid == form.trainingid.data:
-                print("same user id ")
-        else:
-            if trainingidcheck:
-                    flash("user id already exists")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-
-        if gsa.trainingpassword == form.trainingpassword.data:
-                print("same training password")
-        else:
-            if trainingpasswordcheck:
-                    flash("training password already exists")
-            return render_template('employeeupdate.html', form=form, gsa=gsa)
-        
-        #print(request.form)
-        #for x,y in r.items():
-        #    print (x,y)
         gsa.dob=form.dob.data
+        gsa.store_id=int(storeid)
         gsa.startdate=form.startdate.data
         gsa.addressone=form.addressone.data
         gsa.addresstwo=form.addresstwo.data
@@ -1727,24 +2287,26 @@ def update_gsa_contact(staff_id):
         gsa.province=form.province.data
         gsa.postal=form.postal.data
         gsa.country=form.country.data
-        gsa.trainingid=form.trainingid.data
-        gsa.trainingpassword=form.trainingpassword.data
-        gsa.iprismcode=form.iprismcode.data
-        gsa.mon_avail=form.mon_avail.data
-        gsa.tue_avail=form.tue_avail.data
-        gsa.wed_avail=form.wed_avail.data
-        gsa.thu_avail=form.thu_avail.data
-        gsa.fri_avail=form.fri_avail.data
-        gsa.sat_avail=form.sat_avail.data
-        gsa.sun_avail=form.sun_avail.data
-        gsa.image_file=picture_file
+        #gsa.trainingid=form.trainingid.data
+        #gsa.trainingpassword=form.trainingpassword.data
+        #gsa.iprismcode=form.iprismcode.data
+        #gsa.mon_avail=form.mon_avail.data
+        #gsa.tue_avail=form.tue_avail.data
+        #gsa.wed_avail=form.wed_avail.data
+        #gsa.thu_avail=form.thu_avail.data
+        #gsa.fri_avail=form.fri_avail.data
+        #gsa.sat_avail=form.sat_avail.data
+        #gsa.sun_avail=form.sun_avail.data
+        #gsa.image_file=picture_file
                                      
         db.session.commit()
 
 
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
     return "none"
-    
+
+# this is the end of the routes for employees to update everything.
+   
 @app.route("/addemployee", methods=['GET', 'POST'])
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -1765,7 +2327,8 @@ def addemployee():
     
     if form.validate_on_submit():
         print("success")
-       
+        store = form.store.data
+        storeid = store.id
         target=request.form.get('hiddenphone')
         form.mobilephone.data = target
         #print(target)
@@ -1824,7 +2387,7 @@ def addemployee():
         emp = Employee(user_id=newid,
                        firstname=form.firstname.data,
                        lastname=form.lastname.data,
-                       store=form.store.data,
+                       store_id=int(storeid),
                        addressone=form.addressone.data,
                        addresstwo=form.addresstwo.data,
                        apt=form.apt.data,
@@ -2011,8 +2574,6 @@ def tpfileupload():
 @login_required
 def SecurityFileconvert():
     return render_template('securityfileconvert.html', title='Security File Converter')
-
-
 
 @app.route("/securityfileupload", methods=['POST'])
 @login_required
@@ -2424,7 +2985,6 @@ def uploaded_files(filename):
     return send_from_directory(path, filename)
 
 @app.route('/upload', methods=['POST'])
-
 def upload():
     f = request.files.get('upload')
     extension = f.filename.split('.')[-1].lower()

@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+
+
+{% block content%}
+
+<div   class="container mx-auto" style=width:80%>
+    <form method = "post" action="" class="was-validated" enctype="multipart/form-data">
+
+           
+            <div> {{form.role(class = "form-select required mb-4 mt-4", placeholder="Role", id="userrole")}} 
+                <div class="invalid-feedback">
+                    Please select a valid state.
+                  </div>       
+                  <div class="invalid-feedback">Example invalid select feedback</div>
+                
+                
+                {% if form.role.errors %}
+                            {% for error in form.role.errors %}
+                            <div class = "formerror">{{ error }}</div>
+                            {% endfor %}       
+                        {% endif %}
+            </div>
+
+                
+                <div> {{form.subject(class = "form-control mb-4 mt-2", placeholder="Subject")}}  
+
+               
+                <div> {{form.body(class = "form-control mb-4 mt-2",  rows="10", placeholder="Body of Email")}}  
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                      <ul class=flashes>
+                      {% for message in messages %}
+                        <li>{{ message }}</li>
+                      {% endfor %}
+                      </ul>
+                    {% endif %}
+                  {% endwith %}
+
+
+            <label class="form-label mt-2">Attach A Single File if Needed:</label>
+            <p><input class="form-control mb-2 mt-2" type="file" name="file" id="fileInput" accept=".xlsx,.xls,image/*,.doc, .docx,.ppt, .pptx,.txt, .pdf"></p>
+            <span id="file_error"></span></div>
+        
+            <input type = "submit" class="btn btn-primary" name="send"  >
+    
+    </form>
+            {{ ckeditor.load() }}
+            {{ ckeditor.config(name='body',
+            custom_config="
+            height:420,
+            toolbar: [
+                        { name: 'tools', items: [  'ShowBlocks' ] },
+                        { name: 'document', items: [ 'Save', 'NewPage', 'Templates' ,'-','Preview'] },
+                        { name: 'clipboard', items: [ 'Undo', 'Redo','-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord'] },
+                        { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', '-', 'Scayt' ] },
+                        { name: 'basicstyles', items: [ 'CopyFormatting', 'RemoveFormat' ,'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'] },
+                        { name: 'paragraph', items: [ 'HorizontalRule','PageBreak', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'BidiLtr', 'BidiRtl'] },
+                        '/',
+                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                        { name: 'insert', items: [ 'Table', 'Image', 'Flash', 'Smiley', 'SpecialChar' ] },
+                        { name: 'element', items: ['Blockquote', 'CreateDiv', 'Iframe', '-'] },
+                        { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+                        { name: 'styles', items: [  'Styles', 'Format', 'Font', 'FontSize' ] },
+                        { name: 'colors', items: [ 'TextColor', 'BGColor' ] },		
+                        { name: 'about', items: [ 'Language' , 'About'] }
+            ] 
+   ") }}
+            
+            
+        
+
+        <div class = "tablecontainer" id ="tablecontainer"> </div>
+
+
+</div>
+          <script>
+            $('#fileInput').on('change', function() {
+                var file = this.files[0];
+                if (file.size > 4 * 1024 * 1024) {
+                    alert('File cannot be larget than 4 MB');
+                    document.getElementById("fileInput").value = "";
+                } else {
+                    // send file to server
+                }
+            });
+          </script>
+
+
+          <script>
+                      
+              $("#userrole").change(function (){
+                  role=$(this).val();
+                  $.ajax({
+                          method:"POST",
+                          url:"/rolesearch",
+                          data:{text:role},
+                          success:function(res){
+                              $('#tablecontainer').empty();
+                                          
+                                  let html = res.reduce(( acc, {firstname,lastname, mobilephone}) =>
+                                      acc += `
+                                                  <div class = 'comms-list'>
+                                                  ${firstname +" "+lastname +"  "+ mobilephone}
+                                                  </div>`
+                                              , '');
+
+                              console.log(res)
+                              $('.tablecontainer').append(html);
+                          }})
+                  });
+
+          </script>
+
+
+{% endblock content %}
