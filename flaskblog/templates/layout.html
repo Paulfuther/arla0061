@@ -51,6 +51,7 @@
                  <!--<img src="/static/images/PaulFuther.jpg" >--> 
                   
                 <a class="navbar-brand">Petro Canada</a>
+                
 
                   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -70,9 +71,22 @@
                           <li class="nav-item">
                           
 
-                      <li class="nav-item"> <a href="{{ url_for('home22')}}">Home</a></li>
-                      <li class="nav-item"> <a href="{{ url_for('logout')}}">Logout</a></li>
-                      <li class="nav-item"> <a href="{{ url_for('clock_in_out')}}">Clock</a></li>
+                      <li class="nav-item"><a class="nav-link" href="{{ url_for('gsa_updategsa', staff_id=current_user.id)}}">Dashboard</a></li>
+                      <li class="nav-item"><a class="nav-link" href="{{ url_for('logout')}}">Logout</a></li>
+                      <li class="nav-item"><a class="nav-link" href="{{ url_for('clock_in_out')}}">Clock</a></li>
+                      
+                      
+                        </ul>
+                        <a class="navbar-brand px-4 mr-auto" >{{ current_user }}</a>
+                        {% elif current_user.has_roles('GSATEST') %}
+                        <ul class="navbar-nav mx-auto">
+                          <li class="nav-item">
+                          
+
+                      <li class="nav-item"><a class="nav-link" href="{{ url_for('gsa_updategsa', staff_id=current_user.id)}}">Dashboard</a></li>
+                      <li class="nav-item"><a class="nav-link" href="{{ url_for('logout')}}">Logout</a></li>
+                      <li class="nav-item"><a class="nav-link" href="{{ url_for('clock_in_out')}}">Clock</a></li>
+                      
                         </ul>
 
                        {% elif current_user.has_roles('Manager') %}
@@ -83,15 +97,24 @@
                       <li class="nav-item"> <a class="nav-link" href="{{ url_for('login')}}">Home</a></li>
                       <li class="nav-item"> <a class="nav-link" href="{{ url_for('logout')}}">Logout</a></li>
                       <li class="nav-item"> <a class="nav-link" href="{{ url_for('clock_in_out')}}">Clock</a></li>
-                      <li class="nav-item"> <a class="nav-link" href="{{ url_for('hrhome')}}">HR</a></li>
-                      <li class="nav-item"> <a class="nav-link" href="{{url_for('eventreport')}}">Event From</a></li>
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          HR
+                        </a>
+                        <ul class="dropdown-menu " aria-labelledby="navbarDarkDropdownMenuLink">
+                          <li><a class="dropdown-item" href="hrlist">Search Employess</a></li>
+                          <li><a class="dropdown-item" href="nofile">Employees Without A File</a></li>
+                          <li><a class="dropdown-item" href="activebystore">Employess Active By Store</a></li>
+                          
+                        </ul>
+                      </li>
+                     
+                      <li class="nav-item"> <a class="nav-link" href="{{url_for('eventreport')}}">Event Form</a></li>
                         </ul> 
                         <span class="navbar-text px-4" >{{ current_user }}</span>
                       {% else %}
 
                       <ul class="navbar-nav mx-auto">
-                        
-                      
                       <li class="nav-item"> <a class="nav-link" href="{{ url_for('login')}}">Home</a></li>
                       <li class="nav-item"> <a class="nav-link" href="{{ url_for('logout')}}">Logout</a></li>
                     
@@ -132,6 +155,7 @@
                           <li><a class="dropdown-item" href="{{ url_for('bulk_sms')}}">Bulk SMS</a></li>
                           <li><a class="dropdown-item" href="{{ url_for('bulk_email')}}">Bulk Email</a></li>
                           <li><a class="dropdown-item" href="{{ url_for('twilio_call')}}">Bulk Phone Call</a></li>
+                          <li><a class="dropdown-item" href="{{ url_for('send_created_email')}}">Create Bulk Email</a></li>
                         </ul>
                       </li>
                         </ul>
@@ -149,7 +173,7 @@
                     {% with messages = get_flashed_messages()%}
                                     {%if messages%}
                                         {% for message in messages %}
-                                        <div class = "alerts">
+                                        <div class = "flashes">
                                         {{ message }} 
                                         </div>
                                         {% endfor %}

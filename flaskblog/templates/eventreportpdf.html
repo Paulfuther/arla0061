@@ -215,7 +215,7 @@
                                 <td><i class="far fa-square"></i> Associate </td>
                                 {% endif %}
 
-                                {% if gsa.generalpuclic %}
+                                {% if gsa.generalpublic %}
                                 <td> <i class="far fa-check-square"></i> General Public</td>
                                 {% else %}
                                 <td><i class="far fa-square"></i> General Public </td>
@@ -559,7 +559,9 @@
           
                 {% for x in picture %}
                 <td>
-                <img src= "{{ url_for( 'static' ,filename='incidentpictures/'+ x.image)}} " >
+                      
+
+                <img src= "/Users/paulfuther/arla0061/flaskblog/static/incidentpictures/{{ random_number }}/{{ x.image }}" class="inc_pic_display" >
 
                 </td>
                 <tr></tr>

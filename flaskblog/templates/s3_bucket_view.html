@@ -1,0 +1,24 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+{% block body %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Last Modified</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in contents %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.size }}</td>
+                    <td>{{ item.last_modified }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endblock %}
+{% endblock %}
