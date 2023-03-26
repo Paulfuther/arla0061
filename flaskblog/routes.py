@@ -8,7 +8,7 @@ from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
     grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, \
         forgot_password_Form, BulkCallForm, reset_password_form, Confirm2faForm, checkinoutForm,\
-            NewRegisterForm, BulkCreatedEmailSendgridForm
+            NewRegisterForm, BulkCreatedEmailSendgridForm, SiteIncidentUpdate
 from flaskblog import app, conn, Employee, User, Role, roles_users, bcrypt, \
     db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
@@ -944,7 +944,7 @@ def eventreport():
                             reputation = form.reputation.data,
                             security = form.security.data,
                             fire = form.fire.data,
-                            location = str(form.location.data),
+                            store_id = str(form.store.data),
                             eventdetails = form.eventdetails.data,
                             eventdate = form.eventdate.data,
                             eventtime = form.eventtime.data,
@@ -1060,6 +1060,46 @@ def eventreport():
             return render_template('layout.html')
            
     return render_template('eventreport.html', form=form)
+
+@app.route("/eventreport_selection", methods = ['GET', 'POST'])
+@login_required
+@roles_accepted('Admin', 'Manager')
+def eventreport_selection():
+    report = Incident.query.all()
+    
+    return render_template('event_selection.html', report=report)
+
+@app.route("/update_eventreport<int:row_id>", methods = ['GET', 'POST'])
+@login_required
+@roles_accepted('Admin', 'Manager')
+def update_eventreport(row_id):
+    report_data = Incident.query.get(row_id)
+    form = SiteIncidentUpdate(obj=report_data)
+    
+    #if request.method == 'POST':
+    #print(report_id)
+    # the site incident form may have pictures.
+    # they are uploaded automatically by dropzone.
+    # there is a unique folder number for each site incident.
+    # assuming that pictures were sent.
+    # if not then no unique folder.    
+    # the unique folder number is stored in a session variable.
+
+    if form.validate_on_submit():
+           form.populate_obj(report_data) 
+           db.session.commit()
+           flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
+           file_id=report_data.id
+           random_number=None
+           #make_incident_pdf.apply_async(args=[file_id, random_number])
+           return render_template('layout.html')
+         
+    print(row_id)
+    return render_template('eventreport_update.html', form=form)        
+           
+    #return render_template('eventreport.html', form=form)
+
+
 
 @app.route("/nofile")
 @login_required

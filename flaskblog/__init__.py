@@ -256,22 +256,31 @@ def make_incident_pdf(file_id, random_number):
                 FileType('application/pdf'),
                 Disposition('attachment')) 
 
-        for x in rol:
+
+        bucket_name = 'paulfuther'
+        #file_path = file
+        folder_name = f"EMPLOYEES/{staff_id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
+        object_key = '{}/{}'.format(folder_name, filename)
+        bucket = conn.lookup(bucket_name)
+        key = bucket.new_key('{}/{}'.format(folder_name, filename))
+        key.set_contents_from_file(file)
+
+        #for x in rol:
                 
-            email = x.email
-            message = Mail(
-            from_email = DEFAULT_SENDER,
-            to_emails=email,
-            subject ='A new incident report has been filed',
-            html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
-            message.attachment = attachedFile
-            response = sg.send(message)
-            print(response.status_code, response.body, response.headers)
+         #   email = x.email
+         #   message = Mail(
+         #   from_email = DEFAULT_SENDER,
+         #   to_emails=email,
+         #   subject ='A new incident report has been filed',
+         #   html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
+         #   message.attachment = attachedFile
+         #   response = sg.send(message)
+         #   print(response.status_code, response.body, response.headers)
 
             # upload to drop box
 
-        with file as f:    
-            dbx.files_upload(f.read(), path=f"/SITEINCIDENTS/{filename}", mode=WriteMode('overwrite'))
+        #with file as f:    
+        #    dbx.files_upload(f.read(), path=f"/SITEINCIDENTS/{filename}", mode=WriteMode('overwrite'))
     
 
 @celery.task
@@ -395,8 +404,7 @@ incident_store = db.Table(
     'incident_store',
     db.Column('incidentnumbers_id', db.Integer(),
               db.ForeignKey('incidentnumbers.id')),
-    db.Column('store_id', db.Integer(), db.ForeignKey('store.id'))
-)
+    db.Column('store_id', db.Integer(), db.ForeignKey('store.id')))
 
 salt_store = db.Table(
     'salt_store',
@@ -759,8 +767,8 @@ class Incident(db.Model):
      security = db.Column(db.Boolean, default = False)
      fire = db.Column(db.Boolean, default = False)
 
-     location = db.Column(db.String())
-
+     store_id =db.Column(db.Integer, db.ForeignKey('store.id'))
+     store = db.relationship('Store', backref = 'stores')
      eventdetails = db.Column(db.String())
      eventdate = db.Column(db.DateTime(), nullable = True)
      eventtime = db.Column(db.Time())
@@ -1315,7 +1323,7 @@ admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass4(Grade, db.session))
 admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
 admin.add_view(hreditor(hrfiles, db.session))
-admin.add_view(MyModelView8(Incidentnumbers, db.session, category = "Paul"))
+#admin.add_view(MyModelView8(Incidentnumbers, db.session, category = "Paul"))
 admin.add_view(MyModelView9(Saltlog, db.session))
 admin.add_view(MyModelViewReclaim(reclaimtank, db.session, category = "Paul"))
 admin.add_view(MyModelView12(BulkEmailSendgrid, db.session, category="Paul"))

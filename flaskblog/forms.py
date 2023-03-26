@@ -285,7 +285,7 @@ class SiteIncident(FlaskForm):
     security = BooleanField()
     fire = BooleanField()
 
-    location =QuerySelectField('Store',
+    store =QuerySelectField('Store',
         query_factory=lambda: Store.query.order_by(Store.number),
         allow_blank=False
     )
@@ -385,4 +385,114 @@ class SiteIncident(FlaskForm):
     submit = SubmitField('Submit Event Form')
 
 
-    
+class SiteIncidentUpdate(FlaskForm):
+    injuryorillness = BooleanField()
+    environmental = BooleanField()
+    regulatory = BooleanField()
+    economicdamage = BooleanField()
+    reputation = BooleanField()
+    security = BooleanField()
+    fire = BooleanField()
+
+    store =QuerySelectField(
+        query_factory=lambda: Store.query.order_by(Store.number),
+        allow_blank=False
+    )
+
+    eventdetails = TextAreaField('Details')#
+    eventdate = DateField('EvenDate', validators=[DataRequired()])#
+    eventtime = TimeField('EvenTime', validators=[DataRequired()])#
+    reportedby = StringField('Reported by', validators=[DataRequired()])#
+    reportedbynumber = StringField('Phone NUmber', validators=[DataRequired()])#
+
+    suncoremployee = BooleanField()
+    contractor = BooleanField()
+    associate = BooleanField()
+    generalpublic = BooleanField()
+    other = BooleanField()
+    othertext = StringField('Other')
+
+    actionstaken = TextAreaField('Actions Taken')
+    correctiveactions = TextAreaField('Corrective Actions', validators=[Optional()])#
+
+    sno = BooleanField()
+    syes = BooleanField()
+    scomment = StringField()
+
+    rna = BooleanField()
+    rno = BooleanField()
+    ryes = BooleanField()
+    rcomment = StringField()
+
+    gas = BooleanField()
+    diesel = BooleanField()
+    sewage = BooleanField()
+    chemical = BooleanField()
+    chemcomment = StringField()
+    deiselexhaustfluid = BooleanField()
+    sother = BooleanField()
+    s2comment = StringField()
+
+    air = BooleanField()
+    water = BooleanField()
+    wildlife = BooleanField()
+    land = BooleanField()
+    volumerelease = StringField()
+
+    pyes = BooleanField()
+    pno = BooleanField()
+    pna = BooleanField()
+    pcase = StringField()
+
+    stolentransactions = BooleanField()
+    stoltransactions = StringField()
+    stolencards = BooleanField()
+    stolcards = StringField()
+    stolentobacco = BooleanField()
+    stoltobacco = StringField()
+    stolenlottery = BooleanField()
+    stollottery = StringField()
+    stolenfuel = BooleanField()
+    stolfuel = StringField()
+    stolenother = BooleanField()
+    stolother = StringField()
+    stolenothervalue = StringField()
+    stolenna = BooleanField()
+
+    gender = StringField()
+    height = StringField()
+    weight = StringField()
+    haircolor = StringField()
+    haircut= StringField()
+    complexion = StringField()
+    beardmoustache = StringField()
+    eyeeyeglasses = StringField()
+    licencenumber = StringField()
+    makemodel = StringField()
+    color = StringField()
+    scars = StringField()
+    tatoos = StringField()
+    hat = StringField()
+    shirt = StringField()
+    trousers = StringField()
+    shoes = StringField()
+    voice = StringField()
+    bumpersticker = StringField()
+    direction = StringField()
+    damage = StringField()
+
+    wgsa = BooleanField()
+    wcontractor = BooleanField()
+    wassociate = BooleanField()
+    wpublic = BooleanField()
+    wother = BooleanField()
+    wothertext = StringField()
+    wname = StringField()
+    wnumber = StringField()
+    waddress = StringField()
+    wdate = DateField()
+    submit = SubmitField('Submit Event Form')
+
+   
+
+  
