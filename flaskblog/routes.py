@@ -8,7 +8,7 @@ from sqlalchemy.sql.functions import current_time
 from flaskblog.forms import LoginForm, EmployeeForm, EmployeeUpdateForm, SiteIncident, \
     grade_form, schedule_start, Schedule, GradeForm, CommsForm, BulkEmailSendgridForm, \
         forgot_password_Form, BulkCallForm, reset_password_form, Confirm2faForm, checkinoutForm,\
-            NewRegisterForm, BulkCreatedEmailSendgridForm, SiteIncidentUpdate
+            NewRegisterForm, BulkCreatedEmailSendgridForm, SiteIncidentUpdate, UserForm
 from flaskblog import app, conn, Employee, User, Role, roles_users, bcrypt, \
     db, Course, Grade, Store, hrfiles, upload_fail, upload_success, Empfile, \
         staffschedule, Incident, User, Customer, employee_schema, staffschedule_schema, make_pdf,\
@@ -62,6 +62,9 @@ moment = Moment(app)
 CORS(app)
 
 
+@app.route('/cleaning_maintenance')
+def cleaning_maintenance():
+    return render_template('cleaning_maintenance.html')
     
 
 @app.route('/dropbox')
@@ -115,7 +118,9 @@ def dropbox_files():
 
     return render_template('dropbox.html', contents=contents)
     
-   
+@app.route('/thank_you')
+def thank_you():
+    return render_template('thank_you.html')
 
 @app.route('/upload_to_bucket', methods=['GET','POST'])
 @login_required
@@ -937,6 +942,7 @@ def eventreport():
                 random_number=None
             newtime=str(form.eventtime.data)
             time2 =datetime.strptime(newtime, '%H:%M:%S').time()
+            print(form.store.data.id)
             inc=Incident(injuryorillness=form.injuryorillness.data,
                             environmental =form.environmental.data,
                             regulatory =form.regulatory.data,
@@ -944,7 +950,7 @@ def eventreport():
                             reputation = form.reputation.data,
                             security = form.security.data,
                             fire = form.fire.data,
-                            store_id = str(form.store.data),
+                            store_id = str(form.store.data.id),
                             eventdetails = form.eventdetails.data,
                             eventdate = form.eventdate.data,
                             eventtime = form.eventtime.data,
@@ -1091,13 +1097,113 @@ def update_eventreport(row_id):
            flash('Your form has been submitted, uploaded to dropbox and sent to the ARL. Thank you', 'success')
            file_id=report_data.id
            random_number=None
-           #make_incident_pdf.apply_async(args=[file_id, random_number])
+           make_incident_pdf.apply_async(args=[file_id, random_number])
            return render_template('layout.html')
          
     print(row_id)
     return render_template('eventreport_update.html', form=form)        
            
     #return render_template('eventreport.html', form=form)
+
+
+@app.route("/download_event_report<int:row_id>", methods = ['GET'])
+@login_required
+@roles_accepted('Admin','Manager')
+def download_event_report(row_id):
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
+    file = Incident.query.get(row_id)
+    random_number = file.image_folder
+    if not random_number:
+        random_number = None
+    fdate1 = file.eventdate
+    print(fdate1)
+    fdate= datetime.strftime(fdate1,'%Y-%m-%d')
+    print(fdate)
+    fstore = file.store
+    id = row_id
+    # Get a reference to the desired folder (prefix)
+    #filename = f" {fstore} {fdate}  ID  {id} {fdate}.pdf"
+    #folder_prefix= f"SITEINCIDENTS/{current_user.id}_{current_user.lastname}_{current_user.firstname}/DOCUMENTS/"
+    # Retrieve the objects in the folder
+    #objects = bucket.list(prefix=folder_prefix)
+
+   
+    #return "awesome"
+
+    rol =  User.query.filter(User.roles.any(Role.id == 9)).all()
+    print(row_id)
+    img = '/Users/paulfuther/arla0061/flaskblog/static/images/SECURITYPERSON.jpg'
+    css = "flaskblog/static/main.css"
+    file = Incident.query.get(row_id)
+    fdate1 = file.eventdate
+        #print(fdate1)
+    fdate= datetime.strftime(fdate1,'%Y-%m-%d')
+        #print(fdate)
+    fstore = file.store
+    id = row_id
+        #print(fdate)
+    gsa = Incident.query.get(row_id)
+    ident = gsa.id
+    print(ident)
+
+    picture = incident_files.query.filter_by(incident_id=row_id)
+       
+    rendered = render_template('eventreportpdf.html',gsa=gsa, css=css, picture=picture, random_number=random_number)
+    options = {'enable-local-file-access': None,
+            '--keep-relative-links': '',
+            '--cache-dir':'/Users/paulfuther/arla0061/flaskblog',
+            'encoding' : "UTF-8"
+        }
+    css = "flaskblog/static/main.css"
+        
+    pdf = pdfkit.from_string(rendered, False, options=options, css=css)
+
+    file = BytesIO(pdf)
+            #print(type(file))
+    created_on = datetime.now().strftime('%Y-%m-%d')
+    filename = f" {fstore} {fdate}  ID  {id} {created_on}.pdf"
+
+        # need to create a bytes file to use as an attachment for sendgrid
+
+    encoded_file = base64.b64encode(pdf).decode()
+    attachedFile = Attachment(
+                FileContent(encoded_file),
+                FileName(filename),
+                FileType('application/pdf'),
+                Disposition('attachment')) 
+
+    response = make_response(pdf)
+    response.headers['Content-Type']= 'application/pdf'
+    response.headers['Content-Disposition']= 'attachment; filename=filename'
+
+    return response
+
+    #bucket_name = 'paulfuther'
+        #file_path = file
+    #folder_name = f"SITEINCIDENTS/"
+    #object_key = '{}/{}'.format(folder_name, filename)
+    #bucket = conn.lookup(bucket_name)
+    #key = bucket.new_key('{}/{}'.format(folder_name, filename))
+    #key.set_contents_from_file(file)
+
+        #for x in rol:
+                
+         #   email = x.email
+         #   message = Mail(
+         #   from_email = DEFAULT_SENDER,
+         #   to_emails=email,
+         #   subject ='A new incident report has been filed',
+         #   html_content='<strong>An incident report has been filed. {}<strong>'.format(filename))
+         #   message.attachment = attachedFile
+         #   response = sg.send(message)
+         #   print(response.status_code, response.body, response.headers)
+
+            # upload to drop box
+
+        #with file as f:    
+        #    dbx.files_upload(f.read(), path=f"/SITEINCIDENTS/{filename}", mode=WriteMode('overwrite'))
+    
+
 
 
 

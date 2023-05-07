@@ -19,6 +19,7 @@ from flask_admin.form import rules
 from flask_admin.actions import action
 from flask_admin.contrib.fileadmin import FileAdmin
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import MultipleResultsFound
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -84,6 +85,7 @@ app.config['INCIDENT_HIRES_UPLOAD_PATH'] = INCIDENT_HIRES_UPLOAD_PATH
 app.config['BULK_EMAIL_PATH']= BULK_EMAIL_PATH
 app.config['EMPLOYEE_FILE_UPLOAD_PATH']= EMPLOYEE_FILE_UPLOAD_PATH
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=5)
+
 LINODE_ACCESS_KEY = os.environ.get('LINODE_BUCKET_ACCESS_KEY')
 LINODE_SECRET_KEY = os.environ.get('LINODE_BUCKET_SECRET_KEY')
 LINODE_BUCKET_URL = os.environ.get('LINODE_BUCKET_URL') 
@@ -164,6 +166,7 @@ DROP_BOX_SHORT_TOKEN=os.environ.get('DROP_BOX_SHORT_TOKEN')
 verifier = EmailVerifier(app)
 db = SQLAlchemy(app)
 #dbx = dropbox.Dropbox(DROP_BOX_KEY)
+migrate = Migrate(app, db)
 
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
@@ -223,7 +226,7 @@ def make_incident_pdf(file_id, random_number):
         #print(fdate1)
         fdate= datetime.strftime(fdate1,'%Y-%m-%d')
         #print(fdate)
-        fstore = file.location
+        fstore = file.store
         id = file_id
         #print(fdate)
         gsa = Incident.query.get(file_id)
@@ -259,7 +262,7 @@ def make_incident_pdf(file_id, random_number):
 
         bucket_name = 'paulfuther'
         #file_path = file
-        folder_name = f"EMPLOYEES/{staff_id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
+        folder_name = f"SITEINCIDENTS/"
         object_key = '{}/{}'.format(folder_name, filename)
         bucket = conn.lookup(bucket_name)
         key = bucket.new_key('{}/{}'.format(folder_name, filename))
@@ -443,6 +446,22 @@ class Customer(db.Model):
     #def __str__(self):
     #    return (self.firstname)
 
+class Company(db.Model):
+    id =db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+    address = db.Column(db.String(200))
+    address_two = db.Column(db.String(200))
+    city = db.Column(db.String(200))
+    state_province = db.Column(db.String(200))
+    country = db.Column(db.String(200))
+    phone_number = db.Column(db.String(100))
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow) 
+   # users = db.relationship('User', backref='company', lazy=True)
+
+    def _str__(self):
+        return (self.name)
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200), unique=True)
@@ -463,8 +482,8 @@ class User(UserMixin, db.Model):
                            backref=db.backref('users', lazy='dynamic'))
 
     check_in_out = db.relationship('checkinout', backref='user', lazy=True)
-    
- 
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+    company = db.relationship('Company', backref = 'company')
 
     
     def __init__(self, **kwargs):
@@ -682,8 +701,8 @@ class Store(db.Model):
     def __repr__(self):
         return f"{self.number}  {self.address}  {self.city}  {self.province}"
 
-   # def __str__(self):
-   #     return (self.number)
+    #def __str__(self):
+    #    return (self.number)
    
 class StoreSchema(ma.Schema):
     class Meta:
@@ -966,12 +985,13 @@ def handle_value_error(error):
 
 
 class MyModelView(ModelView):
+    column_hide_backrefs = True
     can_export = True
     can_delete = False
     form_excluded_columns = ('password',)
-    form_edit_rules = ('firstname','lastname', 'phone' ,'email', 'roles', 'active')
+    form_edit_rules = ('firstname','lastname', 'phone' ,'email', 'roles', 'active', 'company')
     column_sortable_list = ['lastname']
-    column_list = ( 'firstname','lastname','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone')
+    column_list = ( 'firstname','lastname','user_name', 'active','created_on', 'updated_on', 'email','email_confirmed', 'email_confirmed_date','roles', 'phone', 'company_id')
     column_searchable_list = ['lastname', 'firstname']
     
     def is_accessible(self):
@@ -1272,6 +1292,9 @@ class MyModelView16(ModelView):
 class RoleModelView(ModelView):
         pass
     
+class MyModelView17(ModelView):
+    can_export = True
+    can_delete = False
 #class S3BucketView(BaseView):
 #    @expose('/')
 #    def index(self):
@@ -1335,6 +1358,8 @@ admin.add_view(EmailView(name = 'Email', endpoint='email'))
 #admin.add_view(EmailView(name = 'Email', endpoint='email'))
 #admin.add_view(S3BucketView(name='Linode Object Storage'))
 admin.add_view(MyModelView16(completedfile, db.session))
+admin.add_view(MyModelView17(Company, db.session))
+
 
 from flaskblog import routes
 

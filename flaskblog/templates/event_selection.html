@@ -6,7 +6,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.6.0/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/b-print-2.2.3/r-2.3.0/datatables.min.css"/>
- 
+   <link  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jq-3.6.0/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/b-print-2.2.3/r-2.3.0/datatables.min.js"></script>
@@ -36,6 +36,7 @@
                                             <th >Store</th>
                                             <th >Date</th>
                                             <th>Select</th>
+                                            <th>Download</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -43,9 +44,10 @@
                                         {% for row in report %}
                                         <tr >
                                             <td>{{ row.id }}</td>
-                                            <td>{{ row.store }}</td>
+                                            <td>{{ row.store.number }}</td>
                                             <td>{{ row.eventdate }}</td>
                                             <td><a href="{{ url_for('update_eventreport', row_id=row.id) }}"class="btn btn-primary btn-sm active" role="button" aria-pressed="true" value="{{ row.id }}">Edit</a></td>
+                                            <td><a href="{{ url_for('download_event_report', row_id=row.id) }}"class="btn btn-primary btn-sm active" role="button" aria-pressed="true" value="{{ row.id }}">PDF</a></td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
@@ -62,9 +64,7 @@
                                 
                                 dom: 'Bfrtip',
                                 responsive: true,
-                                buttons: [
-                                'copy', 'csv', 'excel', 'pdf', 'print'
-                            ]
+                                
                             });
                             });
                         </script>

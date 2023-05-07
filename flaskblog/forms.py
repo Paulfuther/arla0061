@@ -9,7 +9,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.fields.html5 import DateField, TelField, TimeField, EmailField, DateTimeLocalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Optional, \
             InputRequired, NumberRange
-from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid, Twimlmessages
+from flaskblog import  Employee, db, Store, User, Role, BulkEmailSendgrid, Twimlmessages, Company
 from flask_login import current_user
 import wtforms
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
@@ -84,6 +84,14 @@ class checkinoutForm(FlaskForm):
         query_factory=lambda: Store.query.order_by(Store.number),
         allow_blank=False
     )
+
+class UserForm(FlaskForm):
+    company_id = QuerySelectField(
+        query_factory = lambda: Company.query.order_by(Company.name),
+        allow_blank=False
+    )
+
+                                  
 
 class NewRegisterForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
