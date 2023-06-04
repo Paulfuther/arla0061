@@ -97,6 +97,16 @@ class NewRegisterForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     firstname = StringField('Firstname', validators= [DataRequired()])
     lastname = StringField('Lastname', validators=[DataRequired()])
+    dob = DateField('DOB',validators=[DataRequired()], format='%Y-%m-%d')
+    addressone = StringField('Address Line 1', validators=[DataRequired()])
+    addresstwo = StringField('Address Line 2', validators=[
+                             Optional(), Length(min=2, max=100)])
+    apt = StringField('Unit/Apt', validators=[Optional()])
+    city = StringField('City', validators=[DataRequired()])
+    province = StringField('Province', validators=[DataRequired()])
+    country = StringField('Country', validators=[Optional()])
+    postal = StringField('Postal Code', validators=[DataRequired()])
+    sin_number = StringField('Postal Code', validators=[DataRequired(), Length(min=9,max=9)])
     mobilephone = StringField('mobile', validators=[
                               DataRequired()])
     submit2 = SubmitField('Create Account')
@@ -110,6 +120,9 @@ class NewRegisterForm(FlaskForm):
     satavail = StringField('Saturday Availability', validators=[DataRequired()])
     sunavail = StringField('Sunday Availability', validators=[DataRequired()])
 
+    def validate_sin(self, sin):
+        if not sin.data.isdigit():
+            raise ValidationError('SIN must contain only digits.')
 
 class EmployeeForm(FlaskForm):
     
@@ -138,6 +151,7 @@ class EmployeeForm(FlaskForm):
                         DataRequired(), Length(min=10, max=100), Email()])
     mobilephone = StringField('mobile', validators=[
                               DataRequired()])
+    sin_number = StringField('Postal Code', validators=[DataRequired(), Length(min=9, max=9)])
     token = StringField()
     sinexpire = DateField('Sin Expire', format='%Y-%m-%d', validators=[Optional()])
     
@@ -162,8 +176,7 @@ class EmployeeForm(FlaskForm):
     sunavail = StringField('Sunday Availability', validators=[Optional()])
     submit2 = SubmitField('Add Employee')
 
-   
-  
+
 class EmployeeUpdateForm(FlaskForm):
    
     #username = StringField('Username', validators=[

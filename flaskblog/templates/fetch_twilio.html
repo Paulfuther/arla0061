@@ -50,20 +50,21 @@
                 {% endfor %}
                 </tbody>
         </table>
-        <script>
-            $(document).ready( function () {
-            $('#tabletwil').DataTable();
-                            } );
-        </script>
-        <script>
-            $('#tabletwil').DataTable( {
-            buttons: [
-            'copy', 'excel', 'pdf'
-                ]
-            } );
-        </script>
        
+        <script>
+           
 
+       $(document).ready( function () {
+        $('#tabletwil').DataTable({
+            
+            dom: 'Bfrtip',
+            responsive: true,
+            buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ]
+        });
+        });
 
+        </script>
 
 </html>

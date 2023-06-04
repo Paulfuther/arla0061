@@ -331,11 +331,12 @@ img {
     
 }
 
-table {
+/*table {
   border: 1px solid black;
   table-layout: fixed;
   width: 100%
 }
+*/
 
 .blankrow {
   height: 50px !important;
@@ -2022,12 +2023,7 @@ ul.a {
 /* Hr Form */
 
 .newhire_card {
-  background-color: white;
-  border: 1px solid #333;
-  border-radius: .5rem;
-  padding: .5rem;
-  width: 400px;
-  margin: 0 auto;
+  
   display: none;
 }
 

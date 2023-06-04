@@ -50,6 +50,8 @@ from twilio.request_validator import RequestValidator
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
 from PIL import Image
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 bcrypt = Bcrypt(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -126,6 +128,7 @@ SENDGRID_NEW_HIRE_FILE_ID=os.environ.get('SENDGRID_NEW_HIRE_FILE_ID')
 NOTIFY_SERVICE_SID = os.environ.get('TWILIO_NOTIFY_SERVICE_SID')
 DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
 TWILIO_VERIFY_SID = os.environ.get('TWILIO_VERIFY_SID')
+TWILIO_FROM = os.environ.get('TWILIO_FROM')
 sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
 client = Client(account_sid, auth_token)
 verify = client.verify.services(TWILIO_VERIFY_SID)
@@ -167,9 +170,18 @@ verifier = EmailVerifier(app)
 db = SQLAlchemy(app)
 #dbx = dropbox.Dropbox(DROP_BOX_KEY)
 migrate = Migrate(app, db)
-
 ma = Marshmallow(app)
 ckeditor = CKEditor(app)
+
+# docusign oauth setup
+
+
+CLIENT_ID = '3e3c4c0f-5918-49a2-9061-d41cfe16d62e'
+PRIVATE_KEY_PATH = ['SECRET_KEY']
+ISSUER = 'your_issuer'
+AUDIENCE = 'account-d.docusign.com'
+EXPIRATION_MINUTES = 5
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view='login'
@@ -182,12 +194,79 @@ login_manager.needs_refresh_message_category = 'info'
 def load_user(user_id):
     return User.query.get(user_id)
 
+
+
+
+def send_weekly_tobacco_email():
+    with app.app_context():
+        templatename = "Required Actions for Tobacco and Vape"
+        bm = 'd-488749fd81d4414ca7bbb2eea2b830db'
+        roles = [3,5,9]
+        gsa = db.session.query(User.email, User.firstname, Role.id)\
+        .join(roles_users, User.id == roles_users.c.user_id)\
+        .join(Role, roles_users.c.role_id == Role.id)\
+        .filter(User.active == 1)\
+        .filter(Role.id.in_(roles))\
+        .order_by(Role.id)\
+        .all()
+
+        for user in gsa:
+            message = Mail(
+            from_email=DEFAULT_SENDER,
+            to_emails= user.email)
+            message.dynamic_template_data = {
+                'subject':templatename,
+                'name': user.firstname,
+
+            }
+            
+            #print(user.email)
+            message.template_id = bm
+            response = sg.send(message)
+            #print('Weekly report email sent at:', datetime.now())
+
+
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(send_weekly_tobacco_email, 'cron', day_of_week='sun', hour=12, minute=15)
+scheduler.start()
+        
+
+
+
 #@app.context_processor
 #def context_processor():
 #    return dict(session=session)
 
 
 #@celery.task(context=True)
+
+@celery.task
+def send_sms_with_attachment(role_id, message_to_send):
+    with app.test_request_context():
+        gsa = db.session.query(Employee.mobilephone, Employee.firstname,User,Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
+        .filter(User.active == 1)\
+            .filter(Role.id==role_id)\
+        .all()
+        # gsa returns an object. Although we can serialise the object, we still
+        # have issues generating the proper format for twilio rest api.
+        # so we do it old school.
+
+        gsat = []
+        for id in gsa:
+            gsatt = id.mobilephone
+            print(gsatt, id.firstname)
+            gsat.append(gsatt)
+
+        message = client.messages.create(
+                              body='hello. Attached is a pdf file of our Tobacco Requirements. Please read the file. Respond with "I understand" if you understand the tobacco policy or "I need help" if you do not understand the tobacco policy. Someone will get back to you to offer any help or aaddiional training that you may need. ',
+                              from_=TWILIO_FROM,
+                              media_url=['https://paulfuther.eu-central-1.linodeobjects.com/SMSATTACHMENTS/TOBACCOPOLICIES.pdf'],
+                              to=gsat
+                          )
+
 
 
 
@@ -286,6 +365,23 @@ def make_incident_pdf(file_id, random_number):
         #    dbx.files_upload(f.read(), path=f"/SITEINCIDENTS/{filename}", mode=WriteMode('overwrite'))
     
 
+def upload_to_linode_object_storage(file_obj, object_key):
+    # Connect to Linode Object Storage
+    
+
+    # Get the bucket
+    bucket = conn.get_bucket('paulfuther')
+
+    # Create the S3 key
+    key = bucket.new_key(object_key)
+
+    # Set the key's contents from the file object
+    key.set_contents_from_file(file_obj)
+
+    # Close the connection
+    conn.close()
+
+
 @celery.task
 def make_pdf(staff_id, signatures):
     with app.test_request_context():
@@ -303,18 +399,12 @@ def make_pdf(staff_id, signatures):
         print(staff_id)
         #return "done"
         
-        image1 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205212708-1.png'
-        image2 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213750-1.png'
-        image3 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213046-1.png '
-        image4 = '/Users/paulfuther/arla0061/flaskblog/images/image-20201205213057-2.png'
-        image5 = '/Users/paulfuther/arla0061/flaskblog/images/uniformfour.png'
-        image6 = '/Users/paulfuther/arla0061/flaskblog/images/uniformthree.png' 
 
         x=signatures
         hrpage = hrfiles.query.all()
         for y in hrpage:
             print(y.id)
-        gsa = Employee.query.filter_by(user_id = staff_id).first()
+        gsa = User.query.get(staff_id)
         print(gsa)
         fname = gsa.firstname
         lname = gsa.lastname
@@ -322,8 +412,7 @@ def make_pdf(staff_id, signatures):
         print(fname)
         date_today = datetime.now()
         rendered = render_template('employeefilepdf2.html',
-                                   image1=image1, image2=image2, image3 = image3, image4 = image4, 
-                                   image5=image5, image6=image6,hrpage = hrpage, signatures=signatures,
+                                   hrpage = hrpage, signatures=signatures,
                                     date_today=date_today, gsa=gsa)
     
         options = {'enable-local-file-access': None,
@@ -370,15 +459,23 @@ def make_pdf(staff_id, signatures):
         # upload newhire file to linode.
         # new hire files are in the folder EMPLOYEES then their user id and lastname then first name.
 
-        bucket_name = 'paulfuther'
-        #file_path = file
+        #bucket_name = 'paulfuther'
+        
         folder_name = f"EMPLOYEES/{staff_id}_{gsa.lastname}_{gsa.firstname}/DOCUMENTS"
-        object_key = '{}/{}'.format(folder_name, filename)
-        bucket = conn.lookup(bucket_name)
-        key = bucket.new_key('{}/{}'.format(folder_name, filename))
-        key.set_contents_from_file(file)
+        employee_key = '{}/{}'.format(folder_name, filename)
+        upload_to_linode_object_storage(file, employee_key)
+        #bucket = conn.lookup(bucket_name)
+        #key = bucket.new_key('{}/{}'.format(folder_name, filename))
+        #key.set_contents_from_file(file)
 
-
+        file.seek(0)
+          
+        folder_name = "NEWHIREFILES/"
+        employee_key = '{}/{}'.format(folder_name, filename)
+        upload_to_linode_object_storage(file, employee_key)
+        #bucket = conn.lookup(bucket_name)
+        #key = bucket.new_key('{}/{}'.format(folder_name, filename))
+        #key.set_contents_from_file(file)
 
         #with file as f:    
         #    dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
@@ -532,7 +629,7 @@ class User(UserMixin, db.Model):
 class UserSchema(ma.Schema):
     class Meta:
         model = User
-        fields = ('id', 'email', 'roles')
+        fields = ('id', 'firstname', 'lastname', 'email')
 user_schema = UserSchema(many=True)
 
 
@@ -592,6 +689,7 @@ class Employee(db.Model):
     email = db.Column(db.String(120), nullable=True)
     dob = db.Column(db.DateTime(),nullable=True)
     startdate = db.Column(db.DateTime(),nullable=True)
+    sin_number = db.Column(db.String())
     sinexpire = db.Column(db.DateTime(), nullable=True)
     created_on = db.Column(db.DateTime(), default=datetime.utcnow)
     updated_on = db.Column(
@@ -1344,7 +1442,7 @@ admin.add_view(MyModelView5(Todo, db.session))
 admin.add_view(AdminViewStore(Store, db.session))
 admin.add_view(AdminViewClass(Course, db.session))
 admin.add_view(AdminViewClass4(Grade, db.session))
-admin.add_menu_item(MenuLink(name='Main Site', url='/', category = "Links"))
+admin.add_menu_item(MenuLink(name='Main Site', url='/login', category = "Links"))
 admin.add_view(hreditor(hrfiles, db.session))
 #admin.add_view(MyModelView8(Incidentnumbers, db.session, category = "Paul"))
 admin.add_view(MyModelView9(Saltlog, db.session))

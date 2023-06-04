@@ -105,6 +105,7 @@
                           <li><a class="dropdown-item" href="hrlist">Search Employess</a></li>
                           <li><a class="dropdown-item" href="nofile">Employees Without A File</a></li>
                           <li><a class="dropdown-item" href="activebystore">Employess Active By Store</a></li>
+                          <li><a  class="dropdown-item" href="list_hr_files">Employee Files</a>
                           
                         </ul>
                       </li>
@@ -148,9 +149,11 @@
                         </a>
                         <ul class="dropdown-menu " aria-labelledby="navbarDarkDropdownMenuLink">
                           <li><a class="dropdown-item" href="hrlist">Search Employess</a></li>
-                          <li><a class="dropdown-item" href="addemployee">Add Employess</a></li>
+                          <li><a class="dropdown-item" href="staff_register">Add Employess</a></li>
                           <li><a class="dropdown-item" href="nofile">Employees Without A File</a></li>
                           <li><a class="dropdown-item" href="activebystore">Employess Active By Store</a></li>
+                          <li><a  class="dropdown-item" href="list_hr_files">Employee Files</a>
+                          </li>
                           
                         </ul>
                       </li>
@@ -178,6 +181,7 @@
                         </a>
                         <ul class="dropdown-menu " aria-labelledby="navbarDarkDropdownMenuLink">
                           <li><a class="dropdown-item" href="{{ url_for('bulk_sms')}}">Bulk SMS</a></li>
+                          <li><a class="dropdown-item" href="{{ url_for('bulk_sms_with_attachment')}}">Bulk SMS with Attachment</a></li>
                           <li><a class="dropdown-item" href="{{ url_for('bulk_email')}}">Bulk Email</a></li>
                           <li><a class="dropdown-item" href="{{ url_for('twilio_call')}}">Bulk Phone Call</a></li>
                           <li><a class="dropdown-item" href="{{ url_for('send_created_email')}}">Create Bulk Email</a></li>

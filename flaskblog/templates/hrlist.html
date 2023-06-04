@@ -35,7 +35,7 @@
                
 
 
-                            <div id="table-container" class="card mx-auto w-90 p-2 border-0" >
+                            <div id="table-container"  >
 
                             </div>
                      
@@ -43,51 +43,55 @@
 
                         <script>
 
-                    $(document).ready(function(){
-                        $("#live_search_first").on("input",function(e){
-                            textinlivebox= $("#live_search_first").val();
-                            
-                            $.ajax({
-                                method:"POST",
-                                url:"/livesearch",
-                                data:{text:textinlivebox},
-                                success:function(res){
-                                    console.log(res)
-                                    $('#table-container').empty();
-                                
-                                    let html = res.reduce(( acc, {number, firstname, lastname, email, store, store_id, image_file, id}) =>
-                                        acc += `
-                                        <div class="row justify-content-md-center mb-2">
-                                        <span class="border-bottom mb-2 mx-auto w-90"></span>
-                                       
-                                
-                                        <div class="col-6 col-sm-3 col-md-2">
-                                        ${number}
-                                        </div>
-                                       <div class = "col-6 col-sm- 5 col-md-2 text-end">
-                                        ${firstname +" "+ lastname}
-                                        </div>
-                                        <div class= "col-10 col-sm-10 col-md-5 text-beginning">
-                                        ${email}
-                                        </div> 
-                                        <div class = "col-2 p-1 col-sm-2 col-md-1">
-                                        <a href="/updategsa${id}" class="btn btn-primary btn-sm active" role="button" aria-pressed="true">Edit</a>
-                                        </div>
-                                        </div class="row mb-2">
-                                        <div class="row mt-2"></div>
-                                        `
-                                     
 
-                                    , '');
-                                    console.log(res.id)
-                                    $('#table-container').append(html);
-                                    console.log(res);
-                                 
-                                }
-                            })
+                                    $(document).ready(function() {
+                                    $('#live_search_first').on('input', function() {
+                                        var query = $(this).val();
+                                        if (query.length >= 1) {
+                                        // Send an AJAX request to the search route with the query parameter
+                                        $.ajax({
+                                            url: '/livesearch',
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            data: {
+                                            text: query
+                                            },
+                                                    success: function(response) {
+                                                        var user=response
+                                                        console.log(user)
+                                                    // Generate the dynamic table using the search results
+                                                    var tableRows = '';
+                                                        user.forEach(function(user) {
+                                                            console.log(user.firstname)
+                                                          
+                                                            tableRows += '<tr class="row">';
+                                                            tableRows += '<td class="col  >' + user.id + '</td>';
+                                                            tableRows += '<td class="col >' + user.firstname + ' ' +user.lastname+ '</td>';
+                                                            tableRows += '<td class="col text-beginning">' + user.email + '</td>';
+                                                            tableRows += '<td class="col "><button class="btn btn-primary btn-sm  edit-button" data-id="' + user.id + '">Edit</button></td>';
+                                                        
+                                                          
 
-                        });
-                    })
+                                                        });
+
+                                                        // Add the generated table rows to the table body
+                                                        $('#table-container').html('<table>' + tableRows + '</table>');
+
+                                                        $('.edit-button').click(function() {
+                                                        var userId = $(this).data('id');
+                                                        // Perform the desired action with the user ID
+                                                        console.log('Edit button clicked for user ID:', userId);
+                                                        window.location.href = "/updategsa" + userId;
+                                                    });
+                                                    
+                                                                                                            },
+                                                                                                        })
+                                                                                                    }
+                                                                                                }
+                                                                                        )
+                                                                                            }
+                                                                                        )
+                                                                                                    
 
                         </script>
                         

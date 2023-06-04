@@ -1,0 +1,151 @@
+
+
+  
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <style>
+    body { font: normal 100.01%/1.375 "Helvetica Neue",Helvetica,Arial,sans-serif; }
+  </style>
+  <!--<link href="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.css" rel="stylesheet">-->
+  <link href="{{ url_for('static', filename='jquery.signaturepad.css') }}">
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+  
+</head>
+ {% block content %}  
+ 
+
+    <div class= "container">
+
+            <!-- Applications Nav Bar -->       
+
+           
+
+      </div>
+
+
+<body>           
+    {% for x in hrpage %}
+   
+            <a name="top"></a>
+               
+              
+                   <!--  document 1 -->
+                   <div class = "bg-light p-4 m-4" id="hr-page-data" data-hrpage="{{ x.id }}">
+                       
+                          <div class = "hrheaderdata">
+                          <p>Effective Date:    {{hrpage[x.id-1].effective_date|safe}}
+                          <p>Last Reviewed by Owner:    {{hrpage[x.id-1].date_of_review|safe}}
+                          </div>
+                      
+
+                          {{hrpage[x.id-1].text | safe}}
+
+                            <div  class="sigPad{{loop.index}}" id = "sigs">
+                                      <div class="sigWrapper">
+                                        
+                                          <canvas  class="sig"  width="200" height="55"></canvas>
+                                      </div>
+                                      <div class = "sigcontainer">
+                                      <div class = "signame">
+                                      
+                                      {{gsa.firstname }} {{""}} {{gsa.lastname}}    
+                                      </div>
+                                      </div>
+
+                                      <div class = "sigdate">
+                                        {{date_today}}
+                                        
+                                      </div> 
+                              </div>
+                
+                  </div>
+                 
+                  
+
+                 <!--<script src="/Users/paulfuther/arla0061/flaskblog/static/jquery.signaturepad.js"></script>-->
+                
+
+                  <div style="break-after:page"></div>
+
+         {% endfor %}         
+                  
+                
+                   <!-- end of page  -->
+
+
+
+                   <div class = "bg-light p-4 m-4">
+                  
+                   
+                    <h2> Hours of Availability </h2>
+                   
+                    
+                    <table>
+                    <tr>
+                    <td>Monday Availability  </td><td>  {{gsa.mon_avail}} </td>
+                    </tr>
+                    <tr>
+                    <td>Monday Availability  </td><td>  {{gsa.tue_avail}} </td>
+                    </tr>
+                    <tr>
+                    <td>Monday Availability  </td><td>  {{gsa.wed_avail}} </td>
+                    </tr>
+                    <tr>
+                    <td>Monday Availability  </td><td>  {{gsa.thu_avail}} </td>
+                    </tr>
+                    <tr>
+                    <td>Monday Availability  </td><td>  {{gsa.fri_avail}} </td>
+                    </tr>
+                    <tr>
+                    <td>Monday Availability  </td><td>  {{gsa.sat_avail}} </td>
+                    </tr>
+                    <tr>
+                    <td>Monday Availability  </td><td>  {{gsa.sun_avail}} </td>
+                    </tr>
+                    </table>
+                    
+                </div>
+
+                 
+
+
+                
+                  <div style="break-after:page"></div>
+
+                
+                    
+
+                  <div style="text-align:center; padding-bottom:50px">
+                    <p>
+                      Click submit. 
+                      </p>
+                      <p></p>
+                      If you are still here then you have not provided all of the required signatures. 
+                    </p>
+                    <p>
+                      Please scroll up and provide the missing signatures. Thank you.
+                    </p>
+
+
+
+                  <div style="text-align:center; padding-bottom:50px">
+                 
+                 <button onclick="topFunction()" id="myBtn" class ="hrbutton" >Top Of Page</button>
+                 
+                 <script>
+                  mybutton = document.getElementById("myBtn")
+                  function topFunction() {
+                  document.body.scrollTop = 0; // For Safari
+                  document.documentElement.scrollTop = 0;
+                  } // For Chrome, Firefox, IE and Opera
+
+                  </script>
+                  </div>
+                 
+                   
+</body> 
+{% endblock content %}

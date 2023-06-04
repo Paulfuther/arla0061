@@ -46,9 +46,6 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="{{url_for('home')}}">Home</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{url_for('login')}}">Log In</a>
-          </li>
          
         </ul>
       </div>
@@ -56,7 +53,7 @@
   </nav>
                 <form id="loginform"   method="POST" action="" role="form">
 
-                    <div class = "login_container"  >
+                    <div class = "container mt-5"  >
                     
                           
                   
@@ -78,21 +75,21 @@
 
                          <h2 class="text-center"> Login </h2>
 
-                        <div class = "box-1" >
-                            {{ form.email(class='form-control form-control-lg mb-1', placeholder="email") }}
+                        <div  >
+                            {{ form.email(class='form-control form-control-lg mb-3', placeholder="email") }}
                         </div>
 
                         
-                        <div class = "box-2" >
-                            {{ form.password (class ='form-control form-control-lg mb-1', placeholder="password") }}
+                        <div  >
+                            {{ form.password (class ='form-control form-control-lg mb-3', placeholder="password") }}
                         </div>  
                         
                      
-                          <h6 class="text-center font-weight-normal m-2 ">You Must Select Either SMS (text) or Whatsapp for 2 Factor Authorisation</h6>
-                          
-
+                         
                           <div>
-                              {{ form.two_fa (class='form-control form-control-sm mb-1')}}
+                          <label for="two_fa" class="form-label h5">Select 2FA</label>
+                          
+                              {{ form.two_fa (class='form-control form-control-lg')}}
                           </div>
 
                           {% for error in form.two_fa.errors %}
@@ -101,18 +98,22 @@
 
                           <div class="text-center">
                             <!-- Simple link -->
-                            <a href="/forgot_password">Forgot Password?</a>
-                          </div>
-                          <div class="d-grid gap-2">
+                            
+                          <div >
                             <button type="button submit"  value="Submit" class="btn btn-primary" >Submit</button>
                         </div>
                         
 
 
 
-                          <div class="text-center">
+                          <div class="text-start">
                             <!-- Simple link -->
-                            <a>Not registered as an employee?   </a><a href="/staff_register"> Register </a>
+                            <div class="mt-2">
+                            <a href="/staff_register" class="fs-5"> Register </a>
+                            </div>
+                            <div class="mt-2">
+                            <a href="/forgot_password" class="fs-5" >Forgot Password?</a>
+                            </div>
                            
                           </div>
                       </div>

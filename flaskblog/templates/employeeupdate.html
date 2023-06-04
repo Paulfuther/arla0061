@@ -37,7 +37,7 @@
                 <table class="table" id="file-list">
                 <thead>
                     <tr>
-                        <th>{{ gsa_docs.firstname }}'s  Documents</th>   
+                        <th>{{ user.firstname }}'s  Documents</th>   
                     </tr>
                 </thead>
                 
@@ -337,8 +337,10 @@
                         const btn_push_hrfile = document.getElementById("hr_file")
                         btn_push_hrfile.addEventListener('click', function(e){
                             e.preventDefault();
-                            var current_user_id = {{ current_user.id }};
-                            window.location.href = "/hrfile" + current_user_id;
+                            var current_user_id = {{ user.id|tojson }};
+                            var url = "/hrfile" + current_user_id;  // Replace "/hrfile" with your actual route URL
+                            window.location.href = url;
+                          
                         })
 
                 </script>
@@ -351,7 +353,7 @@
                         btn_push_docs.addEventListener('click', function(e){
                         var emp_docs_upload = document.getElementById('emp_docs_upload');
                         var gsa_identifier = document.querySelector('#gsa_name');
-                        var gsaid = "{{gsa_docs.id}}";
+                        var gsaid = "{{user.id}}";
                       
                         e.preventDefault()
                         console.log(gsaid);
@@ -426,7 +428,7 @@
 
                         <script>
                             var gsa_identifier = document.querySelector('#gsa_name');
-                            var gsaid = "{{gsa_docs.id}}";
+                            var gsaid = "{{user.id}}";
                             var avatar_update_push = document.querySelector("#image_update_button");
                             var avatar_upload = document.querySelector('#avatar_input')
                             avatar_update_push.addEventListener('click', function(e){

@@ -19,8 +19,8 @@ from flaskblog import app, conn, Employee, User, Role, roles_users, bcrypt, \
                              basedir,INCIDENT_UPLOAD_PATH, BULK_EMAIL_PATH, incident_files, checkinout, user_schema, sg,\
                                 Empdocs, EMPLOYEE_FILE_UPLOAD_PATH, INCIDENT_HIRES_UPLOAD_PATH, make_incident_file, send_created_email, save_images,\
                                     make_incident_file, completedfile, UserActivity, LINODE_ACCESS_KEY, LINODE_SECRET_KEY, LINODE_BUCKET_URL, LINODE_REGION,\
-                                    DROP_BOX_KEY, DROP_BOX_SECRET, DROP_BOX_SHORT_TOKEN, LINODE_BUCKET_NAME
-                                        
+                                    DROP_BOX_KEY, DROP_BOX_SECRET, DROP_BOX_SHORT_TOKEN, LINODE_BUCKET_NAME, CLIENT_ID,  \
+                                         EXPIRATION_MINUTES, AUDIENCE, TWILIO_FROM, send_sms_with_attachment
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
@@ -51,12 +51,14 @@ import time , dropbox
 from flask_cors import CORS
 from flaskblog.utils.request import validate_body
 from flaskblog.utils.response import response, error_response
-from flaskblog.utils.sms import send_bulk_sms
+from flaskblog.utils.sms import send_bulk_sms, send_bulk_sms_with_attachment
 from flaskblog.utils.twofa import _get_twilio_verify_client, request_verification_token, \
                     check_verification_token, request_verification_token_whatsapp
 from flask_login import current_user, login_user, logout_user, fresh_login_required
 from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition, Email, To, Content
 from dropbox import DropboxOAuth2FlowNoRedirect
+from datetime import timedelta, datetime
+import jwt
 
 moment = Moment(app)
 CORS(app)
@@ -149,8 +151,47 @@ def upload_to_bucket():
     
     return "done"
 
+@app.route('/list_hr_files',methods=['GET'])
+@login_required
+def list_hr_files():
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
 
+    # Get a reference to the desired folder (prefix)
+            
+    folder_prefix= "NEWHIREFILES/"
+    # Retrieve the objects in the folder
 
+    objects = bucket.list(prefix=folder_prefix)
+    #for obj in objects:
+    #    print(obj)
+
+    # Generate links for the files in the folder
+    filtered_keys = []
+    for obj in objects:
+            if obj.key != folder_prefix:  # Skip the folder itself
+                filtered_keys.append({
+                        'name': obj.key[len(folder_prefix):],  # Remove the folder prefix from the file name
+                        'link': url_for('download_newhire_file', key=obj.key)  # Generate the download link for the file
+                    })
+    return render_template("list_hr_files.html", filtered_keys = filtered_keys )
+    
+
+@app.route('/download_newhire_file/<path:key>', methods=['GET', 'POST'])
+@login_required
+def download_newhire_file(key):
+    # the key is the file that we want to download.
+    # buckets create keys
+
+    #print(key)
+    bucket = conn.get_bucket(LINODE_BUCKET_NAME)
+    newkey = bucket.get_key(key)
+    #print(newkey)
+    url =newkey.generate_url(expires_in=3600)  # Link expires after 1 hour
+    #print(url)
+    # Return a redirect to the download link
+    filename_encoded = quote(key, safe='')
+    # create the link for the table.
+    return redirect(url.replace(key, filename_encoded))
 
 @app.route('/list_buckets',methods=['GET', 'POST'])
 def list_buckets():
@@ -497,7 +538,7 @@ def confirm_email(token):
     return redirect(url_for("login"))
     
 def fetch_sms():
-    return client.messages.list(limit=100)
+    return client.messages.list(limit=400)
 
 @app.route('/fetch_twilio')
 def fetch_twilio():
@@ -696,14 +737,20 @@ def bulk_email():
             filename = secure_filename(uploaded_file.filename)
         #print(filename)
             uploaded_file.save(os.path.join(BULK_EMAIL_PATH, filename))
-        
+
+        gsa = db.session.query(User.email, User.firstname, User, Role)\
+        .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
+        .order_by(User.firstname).filter(User.active == 1).filter(Role.id.in_(roles))\
+        .all()
+
+        for email, firstname, role_id in gsa:
+            print(f"Email: {email}, Name: {firstname}, Role ID: {role_id}")
+
         '''bulkmessage = BulkEmailSendgrid.query.get(templatename)
         bm = bulkmessage.templateid
-        gsa = db.session.query(Employee.email, Employee.firstname, User,Role)\
+        gsa = db.session.query(User.email, User.firstname, User, Role)\
         .filter((roles_users.c.user_id == User.id) & (roles_users.c.role_id == Role.id))\
-            .join(User, Employee.user_id == User.id).order_by(Employee.firstname)\
-        .filter(User.active == 1)\
-            .filter(Role.id==role_id)\
+        .order_by(User.firstname).filter(User.active == 1).filter(Role.id == role_id)\
         .all()
 
         for user in gsa:
@@ -790,6 +837,30 @@ def bulk_sms():
     # once completed. Do something.
 
         return render_template("layout.html")
+
+@app.route('/bulk_sms_with_attachment', methods = ['GET', 'POST'])
+@login_required
+@roles_required('Admin')
+def bulk_sms_with_attachment():
+    form=CommsForm()
+    if request.method == "GET":
+        return render_template("comms.html", form=form)
+    else:
+        
+        role_id = request.form['role']
+        message_to_send = request.form['message_body']
+        print(message_to_send)
+        print(role_id)
+        
+    # this is bulk sms using the notify api from twilio.
+    # first we grab all employees who are active users.
+    # we need to search specifically for mobile phone
+
+        send_sms_with_attachment.apply_async(args=[role_id, message_to_send])
+    # once completed. Do something.
+
+        return render_template("layout.html")
+
 
 @app.route("/sms", methods=['GET', 'POST'])
 @validate_twilio_request
@@ -1204,9 +1275,6 @@ def download_event_report(row_id):
         #    dbx.files_upload(f.read(), path=f"/SITEINCIDENTS/{filename}", mode=WriteMode('overwrite'))
     
 
-
-
-
 @app.route("/nofile")
 @login_required
 @roles_accepted('Admin', 'Manager')
@@ -1552,8 +1620,12 @@ def hrfile(staff_id):
 
         signature_list = json.dumps(signaturess)
         signatures = json.loads(signature_list)
-
+        date_today = datetime.now()
         print(type(signatures))
+        gsa = Employee.query.filter_by(user_id = staff_id).first()
+        hrpage = hrfiles.query.all()
+        for y in hrpage:
+            print(y.id)
         # update the database to indicate that the HR file has been completed.
         ##file_completion = completedfile(userid= current_user.id,
          ##               completed = True)
@@ -1563,9 +1635,9 @@ def hrfile(staff_id):
 
         # here we will generate the employee file in pdf.  
         make_pdf.apply_async(args=[staff_id, signatures], countdown=10)
-
+        #return render_template('employeefilepdf2.html', signatures=signatures, date_today=date_today, gsa=gsa, hrpage=hrpage)
         #return redirect(url_for("updategsa", staff_id=current_user.id))
-        date_today = datetime.now()
+        #date_today = datetime.now()
         
         flash('Thank you. Your New Hire File is compelte. You can view your file in the Documents Section')
         return redirect(url_for('login'))
@@ -1809,43 +1881,22 @@ def storesearch():
 @app.route("/livesearch", methods = ["POST", "GET"])
 @login_required
 def livesearch():
-    
-    # search by first name, last name or store number
-    # you need to serialise the result to pass it on as json.
-    #searchbox = request.form.get("text")
-    #results=[]
-    #users = User.query.filter(or_(User.firstname.like('%' + searchbox + '%')\
-    #    ,User.lastname.like('%' + searchbox + '%')))\
-    #        .filter(User.active==1).all()
-    #print(users)
-    #for user in users:
-    #        employee = Employee.query.filter_by(user_id=user.id).first()  # get the employee associated with the user
-    #        if employee:
-    #            print(employee.id)
-    #            results.append({'firstname': user.firstname, 'lastname':user.lastname, 'store': employee.store.number}) 
 
+    searchbox = request.args.get('text', '')  # Retrieve the query parameter from the request
+    if searchbox is None:
+        return jsonify([]), 200  # Return an empty list if query is None
 
-    #print(results)
-    searchbox = request.form.get("text")
-    gsa = Employee.query.filter(or_(Employee.firstname.like('%' + searchbox + '%')\
-        ,Employee.lastname.like('%' + searchbox + '%')\
-        ,Store.number.like('%' + searchbox + '%')))\
-        .join(Store, Store.id == Employee.store_id)\
-        .join(User, Employee.user_id == User.id)\
-        .filter(User.active == 1).order_by(Store.number)\
-        .add_columns(Store.number, Employee.firstname, Employee.lastname, \
-        Employee.email, Employee.store_id, Employee.id)\
-        .all()
-    
+    print(searchbox)
+   
+    gsa = User.query.filter(or_(User.firstname.like('%' + searchbox + '%')\
+        ,User.lastname.like('%' + searchbox + '%'))).filter(User.active == 1).all()
+
     for s in gsa:
         print( s.firstname, s.lastname)
-
-    results = employee_schema.dump(gsa)
-    #results=[{'firstname':s.firstname, 'lastname':s.lastname, 'Store':s.store} for s in search_text]
-    result = jsonify(results)
-    #result = json.dumps(results)
-    #print(result)
-    return result
+    
+    user = user_schema.dump(gsa)
+   
+    return jsonify(user)
 
 @app.route("/live_email", methods =['GET', 'POST'])
 @login_required
@@ -1875,16 +1926,195 @@ def email_livesearch():
     return result
 
 
+    form = NewRegisterForm()
+    form_data = request.form
+    date_obj = form.dob.data
+    serialized_date = date_obj.isoformat()
+    for field_name, field_value in form_data.items():
+        print(f'{field_name}: {field_value}')
+    if form.validate_on_submit():
+        emp = Employee(firstname=form.firstname.data,
+                            lastname=form.lastname.data,
+                            dob=form.dob.data,
+                            email=form.email.data.lower(),
+                            mobilephone=form.mobilephone.data,
+                            addressone=form.addressone.data,
+                            addresstwo=form.addresstwo.data,
+                            city=form.city.data,
+                            province=form.province.data,
+                            postal=form.postal.data,
+                            country=form.country.data,
+                            sin_number=form.sin_number.data,
+                            mon_avail=form.monavail.data,
+                            tue_avail=form.tueavail.data,
+                            wed_avail=form.wedavail.data,
+                            thu_avail=form.thuavail.data,
+                            fri_avail=form.friavail.data,
+                            sat_avail=form.satavail.data,
+                            sun_avail=form.sunavail.data)
+
+        email = emp.email
+        message = Mail(
+        from_email=DEFAULT_SENDER,
+        to_emails= 'paul.futher@gmail.com',#'stephfuther@rogers.com','terryfuther@rogers.com'],
+        subject = 'We have a New Employee',
+                
+                )
+                
+        message.dynamic_template_data = {
+                    
+                    'firstname':emp.firstname,
+                    'lastname':emp.lastname,
+                    'email':emp.email,
+                    'mobilephone':emp.mobilephone,
+                    'addressone':emp.addressone,
+                    'addresstwo':emp.addresstwo,
+                    'city':emp.city,
+                    'province':emp.province,
+                    'postal':emp.postal,
+                    'country':emp.country,
+                    'sin_number':emp.sin_number,
+                    'dob': serialized_date,
+                    'email': emp.email
+
+                }
+            
+        message.template_id = 'd-d0806dff1e62449d9ba8cfcb481accaa'
+            
+        response = sg.send(message)
+
+        return "done"
+    
+    for field, errors in form.errors.items():
+        for error in errors:
+            field_name = getattr(form, field).label.text
+            flash(f'{field_name}: {error}', 'error')
+
+    
+
+    return render_template('emailsearch.html', form=form)
+
+@app.route('/docusign-login')
+def docusign_login():
+    if 'docusign_token' in session:
+        # User is already authenticated with DocuSign
+        return redirect(url_for('sign_employee_file'))
+    else:
+        # Redirect to DocuSign authorization
+        params = {
+            'response_type': 'code',
+            'scope': ' '.join(SCOPES),
+            'client_id': CLIENT_ID,
+            'redirect_uri': REDIRECT_URI
+        }
+        auth_url = f'{AUTHORIZATION_URL}?{"&".join(f"{key}={value}" for key, value in params.items())}'
+        return redirect(auth_url)
+
+@app.route('/docusign-callback')
+def docusign_callback():
+    code = request.args.get('code')
+
+    # Exchange authorization code for access token
+    data = {
+        'code': code,
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'redirect_uri': REDIRECT_URI,
+        'grant_type': 'authorization_code'
+    }
+    response = requests.post(TOKEN_URL, data=data)
+
+    if response.status_code == 200:
+        # Store the access token in session for future API calls
+        session['docusign_token'] = response.json()['access_token']
+        return redirect(url_for('sign_employee_file'))
+    else:
+        return 'Failed to obtain access token'
+
+@app.route('/sign-employee-file')
+def sign_employee_file():
+    # Generate the signing link using DocuSign API
+    signing_link = generate_signing_link('paul.futher@gmail.com')
+
+    # Send the signing link to the new hire via email or display it in your app
+
+    return 'Signing link: ' + signing_link
+
+def generate_signing_link(email):
+    email='paul.futher@gmail.com'
+    access_token = get_access_token()
+    if access_token is None:
+        return 'Failed to obtain access token'
+
+    # Generate a one-time signing URL using DocuSign API
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Content-Type': 'application/json'
+    }
+    payload = {
+        'email': email,
+        'authenticationMethod': 'email',
+        'clientUserId': '1',
+        'returnUrl': 'https://www.paulfuther.com',
+        'userName': 'New Hire'
+    }
+
+    response = requests.post(
+        'https://demo.docusign.net/restapi/v2.1/accounts/{CLIENT_ID}/envelopes',
+        headers=headers,
+        json=payload
+    )
+
+    if response.status_code == 201:
+        signing_link = response.json()['url']
+        return signing_link
+    else:
+        return 'Failed to generate signing link'
+    
+def get_access_token():
+    private_key = SECRET_KEY.strip()
+    now = datetime.utcnow()
+
+    payload = {
+        'iss': ISSUER,
+        'sub': CLIENT_ID,
+        'aud': AUDIENCE,
+        'iat': now,
+        'exp': now + timedelta(minutes=EXPIRATION_MINUTES)
+    }
+
+    token = jwt.encode(payload, private_key, algorithm='RS256')
+
+    data = {
+        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion': token
+    }
+
+    response = requests.post(
+        'https://account-d.docusign.com/oauth/token',
+        data=data
+    )
+
+    if response.status_code == 200:
+        access_token = response.json()['access_token']
+        return access_token
+    else:
+        return None
+
+    
 @app.route("/staff_register", methods=["GET", "POST"])
 def staff_register():
     form = NewRegisterForm()
-    coursecount = Course.query.all()
-
-    # the get is for the first load of the page
     if request.method == "GET":
         return render_template('emailsearch.html', form=form)
     if request.method == "POST":
+        form_data = request.form
+        date_obj = form.dob.data
+        serialized_date = date_obj.isoformat()
+        for field_name, field_value in form_data.items():
+            print(f'{field_name}: {field_value}')
         gsa_register = request.form['hiddenphone']
+
         if form.validate_on_submit:
             # here we submit a form...which should be valid
 
@@ -1898,7 +2128,7 @@ def staff_register():
                 target=request.form.get('hiddenphone')
                 form.mobilephone.data = target
                 newuser = request.form.get('hiddenemail')
-
+                
                 print("good stuff")
                 print(gsa_register)
                 
@@ -1907,7 +2137,7 @@ def staff_register():
                 
                 # now add the user to the database
                 
-                adduser = User(email=form.email.data,
+                adduser = User(email=form.email.data.lower(),
                     password=newpassword,
                     active=1,
                     firstname=form.firstname.data,
@@ -1925,53 +2155,36 @@ def staff_register():
                 newid = adduser.id
                 
                 print(newid)
-                #picture_file = '3d611379cfdf5a89.jpg'
+               
 
                 # Here we create the new employee in the database.
 
+                
                 emp = Employee(user_id=newid,
-                                firstname=form.firstname.data,
-                                lastname=form.lastname.data,
-                                store_id=1,
-                                email=form.email.data,
-                                mobilephone=form.mobilephone.data,
-                                mon_avail=form.monavail.data,
-                                tue_avail=form.tueavail.data,
-                                wed_avail=form.wedavail.data,
-                                thu_avail=form.thuavail.data,
-                                fri_avail=form.friavail.data,
-                                sat_avail=form.satavail.data,
-                                sun_avail=form.sunavail.data)
-                                     
+                            firstname=form.firstname.data,
+                            lastname=form.lastname.data,
+                            dob=form.dob.data,
+                            email=form.email.data.lower(),
+                            mobilephone=form.mobilephone.data,
+                            addressone=form.addressone.data,
+                            addresstwo=form.addresstwo.data,
+                            city=form.city.data,
+                            province=form.province.data,
+                            postal=form.postal.data,
+                            country=form.country.data,
+                            sin_number=form.sin_number.data,
+                            mon_avail=form.monavail.data,
+                            tue_avail=form.tueavail.data,
+                            wed_avail=form.wedavail.data,
+                            thu_avail=form.thuavail.data,
+                            fri_avail=form.friavail.data,
+                            sat_avail=form.satavail.data,
+                            sun_avail=form.sunavail.data)
                 db.session.add(emp)  
                         # flush will get the id of the pending user so that
                         # we can add the raining information     
                 db.session.flush()
-
-                # here we are adding the training courses and the compelted dates.
-                # adding the dates requires some work.
-                # the data has to be in the format that the database can read.
-
-                # need all of this  
-                f = emp.id
                 
-                #print(emp.id)
-                #yy = 0
-                #y=1
-                
-                #for x in coursecount:
-                #    empgrade = Grade(
-                #                employee_id=f,
-                #                course_id=y,
-                #                completed = 0
-                #                )  
-                #    print(f, y)
-                #    db.session.add(empgrade)
-                #    y += 1
-                #    yy += 1
-           
-                #print(emp)
-                    
                 # here we add the defuault role of GSA to new hire
                 # you cannot add to the association table 
                 # instead you insert
@@ -1982,6 +2195,7 @@ def staff_register():
                 db.session.commit()
        
                 email = emp.email
+
                 message = Mail(
                 from_email=DEFAULT_SENDER,
                 to_emails= email,
@@ -2002,16 +2216,48 @@ def staff_register():
             
                 response = sg.send(message)
             
+                email = emp.email
 
-            message=client.messages\
-            .create(
-            body="Hello. This is Terry from Petro Canada. Thank you for registering your account. Please go to www.paulfuther.com to log in. We need you to complete your empoloyee file. We also need you to update your contact information. Please talk to your manager if you have any questions.",
-            from_=twilio_from,
-            to=target
-            )
-        flash("Account Created")
-        return redirect(url_for('login'))
-              
+                message = Mail(
+                from_email=DEFAULT_SENDER,
+                to_emails= 'paul.futher@gmail.com',#'stephfuther@rogers.com','terryfuther@rogers.com'],
+                subject = 'We have a New Employee',
+                )
+                        
+                message.dynamic_template_data = {
+                            
+                            'firstname':emp.firstname,
+                            'lastname':emp.lastname,
+                            'email':emp.email,
+                            'mobilephone':emp.mobilephone,
+                            'addressone':emp.addressone,
+                            'addresstwo':emp.addresstwo,
+                            'city':emp.city,
+                            'province':emp.province,
+                            'postal':emp.postal,
+                            'country':emp.country,
+                            'sin_number':emp.sin_number,
+                            'dob': serialized_date,
+                            'email': emp.email
+
+                        } 
+                message.template_id = 'd-d0806dff1e62449d9ba8cfcb481accaa'
+                response = sg.send(message)
+                message=client.messages\
+                .create(
+                body="Hello. This is Terry from Petro Canada. Thank you for registering your account. Please go to www.paulfuther.com to log in. We need you to complete your empoloyee file. We also need you to update your contact information. Please talk to your manager if you have any questions.",
+                from_=twilio_from,
+                to=target
+                )
+
+            flash("Account Created")
+            return redirect(url_for('login'))
+
+    
+        for field, errors in form.errors.items():
+                for error in errors:
+                    field_name = getattr(form, field).label.text
+                    flash(f'{field_name}: {error}', 'error')
     return redirect('emailsearch.html', form=form)
     
     
@@ -2074,70 +2320,44 @@ def save_hrpicture(form_hrpicture):
 # this section includes the routes for managers to update employee data.
 
 
-@app.route("/updategsa<int:staff_id>", methods=['GET', 'POST'])
+@app.route("/updategsa<int:user_id>", methods=['GET', 'POST'])
 @login_required
-def updategsa(staff_id):
+def updategsa(user_id):
     # Here we are getting the row of data based on the index, which is staff_id and
     #generatating a query under gsa
     #form is then populated with that data and published
-
+    # the staff_id being passed is the user id. We need to convert that to the employee id.
+    user =  User.query.get(user_id)
+    print(user.id, user.firstname, user.lastname)
+    gsa = Employee.query.filter_by(user_id = user.id).first()
+   
     #when changes are made the form.data attribut is changed also
     #you can then compare the new form data using .data with old data use gsa.data
     #note below that some data is int and some is text. they need to be the same for the compares
-    print(staff_id)
-    #emp_docs = Empdocs.query.filter_by(file_employee = int(staff_id))
-    #print(current_user.id)
-    #gsaid = int(current_user.id)
-    staff = Employee.query.filter_by(id=staff_id).first()
-    print(staff.id)
-    exists = completedfile.query.filter(completedfile.userid == Employee.user_id, completedfile.completed== True ).first()
-   
-    
-    gsa = Employee.query.get(staff_id)
-    gsa_docs = User.query.filter(User.id == gsa.user_id).first()
-    print(gsa.id)
-    print(gsa.dob)
-    print(gsa_docs.id)
 
+    exists = completedfile.query.filter(completedfile.userid == user.id, completedfile.completed== True ).first()
     bucket = conn.get_bucket(LINODE_BUCKET_NAME)
 
     # Get a reference to the desired folder (prefix)
 
-    #gradelist = Grade.query\
-    #    .filter_by(employee_id = staff_id)\
-    #    .join(Employee, Employee.id == Grade.employee_id)\
-    #    .join(Course, Course.id == Grade.course_id)\
-    #    .add_columns(Course.name, Grade.completed)
-  
-    #document = url_for(
-    #    'static', filename='employee_docs/'+ emp_docs.file_document)
-    folder_prefix= f"EMPLOYEES/{gsa_docs.id}_{gsa_docs.lastname}_{gsa_docs.firstname}/DOCUMENTS/"
-    folder_prefix_image= f"EMPLOYEES/{gsa_docs.id}_{gsa_docs.lastname}_{gsa_docs.firstname}/IMAGES"
-        # Retrieve the objects in the folder
+    folder_prefix= f"EMPLOYEES/{user.id}_{user.lastname}_{user.firstname}/DOCUMENTS/"
+    
+    # Retrieve the objects in the folder
     #print(folder_prefix_image)
     #response = bucket.list(prefix=folder_prefix_image)
     response_documents = bucket.list(prefix=folder_prefix)
-    
-
-    try:
-        k = bucket.get_all_keys(prefix=folder_prefix_image)[0]
-    except:
-        image_file = url_for('static', filename='empfiles/mobile/' + gsa.image_file)
-    else:
-        url = k.generate_url(expires_in=600)
-        image_file=url
-    
+        
     emp_docs = []
     for obj in response_documents:
         if obj.key != folder_prefix:  # Skip the folder itself
             emp_docs.append({
-                  'name': obj.key[len(folder_prefix):],  # Remove the folder prefix from the file name
-                 'link': url_for('download_file', filename=obj.key)  # Generate the download link for the file
-             })
+                'name': obj.key[len(folder_prefix):],  # Remove the folder prefix from the file name
+                'link': url_for('download_file', filename=obj.key)  # Generate the download link for the file
+            })
 
-    form = EmployeeUpdateForm(obj=gsa)
+    form = EmployeeUpdateForm(obj=user)
     
-    return render_template('employeeupdate.html',emp_docs=emp_docs,image_file=image_file, gsa_docs=gsa_docs, form=form, gsa=gsa, exists=exists)
+    return render_template('employeeupdate.html',emp_docs=emp_docs, form=form, gsa=gsa, exists=exists, user=user)
         
 @app.route("/add_docs<int:staff_id>", methods = ['GET','POST'])
 @login_required
@@ -2349,6 +2569,8 @@ def download_file(filename):
     key = bucket.get_key(filename)
     download_url =key.generate_url(expires_in=3600)  # Link expires after 1 hour
     # Return a redirect to the download link
+    print(key)
+    print(download_url)
     filename_encoded = quote(filename, safe='')
     return redirect(download_url.replace(filename, filename_encoded))
 

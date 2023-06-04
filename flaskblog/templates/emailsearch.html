@@ -54,19 +54,35 @@
     </div>
   </nav>
   
-    <div class="container"></div>
-               
+  
+        
+       
                    
                       
-                        <form method="POST" action = "/staff_register" enctype="multipart/form-data" class = "form-hrinfo-add-emp was-validated" data-multi-step >
-                           
-                            <div class="newhire_card" data-step>
+                        <form method="POST" action = "/staff_register" enctype="multipart/form-data" class = "container-sm mx-auto  was-validated" data-multi-step >
+                            {{ form.hidden_tag() }}
+                        
+                            <div class="newhire_card col-lg-6 col-md-8 col-sm-10 mx-auto" data-step>
 
                                     <div class="text-center mb-3">Step 1 of 4</div>
                            
                                     <div> {{form.firstname(class_= "form-control form-control-lg mb-3", placeholder="First Name - Required")}} </div>
-                               
                                     <div> {{form.lastname(class_ = "form-control form-control-lg mb-3", placeholder="Last Name - Required")}} </div>
+                                    <label for="dob" class="form-label">Date of Birth</label>
+                                    <div> {{form.dob(class_ = "form-control form-control-lg mb-3", id="dob", placeholder="Date of Birth - Required")}} </div>
+                                    <div> {{form.addressone(class_ = "form-control form-control-lg mb-3", placeholder="Address one - Required")}} </div>
+                                    <div> {{form.addresstwo(class_ = "form-control form-control-lg mb-3", placeholder="Address two")}} </div>
+                                    <div> {{form.city(class_ = "form-control form-control-lg mb-3", placeholder="City - Required")}} </div>
+                                    <div> {{form.province(class_ = "form-control form-control-lg mb-3", placeholder="Province - Required")}} </div>
+                                    <div> {{form.postal(class_ = "form-control form-control-lg mb-3", placeholder="Postal Code - Required")}} </div>
+                                    <div> {{form.country(class_ = "form-control form-control-lg mb-3", placeholder="Country ")}} </div>
+                                    <div> {{form.sin_number(class_ = "form-control form-control-lg mb-3 required ",pattern="\d{9}", placeholder="Sin Number No Dashes - Required")}} 
+                                        <div class="valid-feedback">
+                                            Looks good!
+                                          </div>
+                                          <div class="invalid-feedback">Please enter exactly 9 digits.</div>
+                                   
+                                </div>
                                     <div> {{form.password(class_ = "form-control form-control-lg mb-3", placeholder="Password - Required", id="password")}} </div>
                                     
                                     <div> {{form.passwordconfirm(class = "form-control form-control-lg mb-3", placeholder="Confirm Password - Required", id="password2")}} </div>
@@ -115,9 +131,13 @@
                                     <div class="d-grid gap-2">
                                             <button type="button" id="phone_check"  style="display: none" class="btn btn-primary mt-3"data-next>Next</button>
                                     </div>
-                            </div>       
+                                
 
-                            <div class="newhire_card" data-step>
+
+
+
+                            </div>
+                            <div  class="newhire_card col-lg-6 col-md-8 col-sm-10 mx-auto" data-step>
                                 <div class="text-center mb-3">Step 2 of 4</div>  
                             <div> {{form.monavail(class = "form-control form-control-lg mb-3", placeholder="Monday Availability - Required")}} 
                         
@@ -200,7 +220,7 @@
                                         </div>
 
                             </div>
-
+                <!--
                            <div class="newhire_card" data-step>
                                  <div class="text-center mb-3">Step 3 of 4</div>
                                     <input id="two_fa_code" class="form"  placeholder = "Two Factor Code" name="two_fa_code">
@@ -229,8 +249,8 @@
                                         </div>
 
                             </div>
-                                     
-                            <div class="newhire_card" data-step>
+                        -->                          
+                            <div class="newhire_card col-lg-6 col-md-8 col-sm-10 mx-auto "data-step>
                                 <div class="text-center mb-3">Step 4 of 4</div>
                                     <div class = "container">
                                         <div id="form-submit" class="d-grid gap-2">
@@ -244,8 +264,8 @@
                         </form>     
 
                             <div class="alert alert-info" style="display: none;"></div>     
-             
-                    </div>                
+          
+                   
    
                
 
