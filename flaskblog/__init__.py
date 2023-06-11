@@ -51,7 +51,14 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, FileType, Disposition
 from PIL import Image
 from apscheduler.schedulers.background import BackgroundScheduler
+import logging
+from logging.handlers import RotatingFileHandler
 
+# Initialize the scheduler
+
+
+# Register the shutdown function to be called when the Flask application exits
+atexit.register(shutdown_scheduler)
 
 bcrypt = Bcrypt(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -182,6 +189,7 @@ ISSUER = 'your_issuer'
 AUDIENCE = 'account-d.docusign.com'
 EXPIRATION_MINUTES = 5
 
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view='login'
@@ -194,7 +202,30 @@ login_manager.needs_refresh_message_category = 'info'
 def load_user(user_id):
     return User.query.get(user_id)
 
+DOCUSIGN_INTEGRATION_KEY =os.environ.get('DOCUSIGN_INTEGRATION_KEY')
+DOCUSIGN_USER_ID = os.environ.get('DOCUSIGN_USER_ID')
+DOCUSIGN_ACCOUNT_ID = os.environ.get('DOCUSIGN_ACCOUNT_ID')
+PRIVATE_KEY = os.environ.get('DOCUSIGN_PRIVATE_KEY')
+NEW_HIRE_DATA_EMAIL = os.environ.get('NEW_HIRE_DATA_EMAIL')
 
+if PRIVATE_KEY is None:
+    raise ValueError('DOCUSIGN_PRIVATE_KEY environment variable is not set')
+
+
+# Create a logging instance
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)  # Set the desired log level
+
+# Create a file handler and set its properties
+file_handler = RotatingFileHandler('app.log', maxBytes=10240, backupCount=10)
+file_handler.setLevel(logging.ERROR)
+
+# Define the log format
+formatter = logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+file_handler.setFormatter(formatter)
+
+# Add the file handler to the logger
+log.addHandler(file_handler)
 
 
 def send_weekly_tobacco_email():
@@ -227,9 +258,7 @@ def send_weekly_tobacco_email():
 
 
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(send_weekly_tobacco_email, 'cron', day_of_week='sun', hour=12, minute=15)
-scheduler.start()
+
         
 
 
@@ -240,6 +269,17 @@ scheduler.start()
 
 
 #@celery.task(context=True)
+
+@celery.task
+def send_sms_to_staff():
+    with app.test_request_context():
+        message = client.messages.create(
+                              body='hello. Attached is a pdf file of our Tobacco Requirements. Please read the file. Respond with "I understand"',
+                              from_=TWILIO_FROM,
+                              media_url=['https://paulfuther.eu-central-1.linodeobjects.com/SMSATTACHMENTS/TOBACCOPOLICIES.pdf'],
+                              to='+15196707469'
+                          )
+
 
 @celery.task
 def send_sms_with_attachment(role_id, message_to_send):
@@ -261,7 +301,7 @@ def send_sms_with_attachment(role_id, message_to_send):
             gsat.append(gsatt)
 
         message = client.messages.create(
-                              body='hello. Attached is a pdf file of our Tobacco Requirements. Please read the file. Respond with "I understand" if you understand the tobacco policy or "I need help" if you do not understand the tobacco policy. Someone will get back to you to offer any help or aaddiional training that you may need. ',
+                              body='hello. Attached is a pdf file of our Tobacco Requirements. Please read the file. Respond with "I understand"',
                               from_=TWILIO_FROM,
                               media_url=['https://paulfuther.eu-central-1.linodeobjects.com/SMSATTACHMENTS/TOBACCOPOLICIES.pdf'],
                               to=gsat
@@ -480,7 +520,10 @@ def make_pdf(staff_id, signatures):
         #with file as f:    
         #    dbx.files_upload(f.read(), path=f"/NEWHRFILES/{filename}", mode=WriteMode('overwrite'))
     
-
+scheduler = BackgroundScheduler()
+scheduler.add_job(send_weekly_tobacco_email, 'cron', day_of_week='sun', hour=12, minute=15)
+scheduler.add_job(send_sms_to_staff, 'cron', day_of_week='sun', hour=16)
+scheduler.start()
 
 
 

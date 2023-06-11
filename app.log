@@ -1,0 +1,5 @@
+2023-06-05 17:51:18,408 ERROR: An error occurred while verifying envelope status. [in /Users/paulfuther/arla0061/flaskblog/routes.py:241]
+Traceback (most recent call last):
+  File "/Users/paulfuther/arla0061/flaskblog/routes.py", line 229, in envelope_status
+    envelope_status = response.json()["status"]
+KeyError: 'status'

@@ -20,7 +20,8 @@ from flaskblog import app, conn, Employee, User, Role, roles_users, bcrypt, \
                                 Empdocs, EMPLOYEE_FILE_UPLOAD_PATH, INCIDENT_HIRES_UPLOAD_PATH, make_incident_file, send_created_email, save_images,\
                                     make_incident_file, completedfile, UserActivity, LINODE_ACCESS_KEY, LINODE_SECRET_KEY, LINODE_BUCKET_URL, LINODE_REGION,\
                                     DROP_BOX_KEY, DROP_BOX_SECRET, DROP_BOX_SHORT_TOKEN, LINODE_BUCKET_NAME, CLIENT_ID,  \
-                                         EXPIRATION_MINUTES, AUDIENCE, TWILIO_FROM, send_sms_with_attachment
+                                         EXPIRATION_MINUTES, AUDIENCE, TWILIO_FROM, send_sms_with_attachment, PRIVATE_KEY, DOCUSIGN_INTEGRATION_KEY, DOCUSIGN_USER_ID,\
+                                         DOCUSIGN_ACCOUNT_ID, log, NEW_HIRE_DATA_EMAIL
 
 from flask_email_verifier import EmailVerifier
 from io import BytesIO
@@ -59,10 +60,216 @@ from sendgrid.helpers.mail import  Mail, Attachment, FileContent, FileName, File
 from dropbox import DropboxOAuth2FlowNoRedirect
 from datetime import timedelta, datetime
 import jwt
-
+from docusign_esign import ApiClient, OAuth, AccountsApi, ApiException
+from docusign_esign.models import Tabs, SignHere
 moment = Moment(app)
 CORS(app)
+api_client = ApiClient()
 
+
+@app.route('/user_info')
+def get_user_info():
+    # Set the required environment variables
+    
+    iat = datetime.utcnow()
+    iat_unix = int(iat.timestamp())
+    print(iat_unix)
+    expiration_time = iat + timedelta(hours=1)
+    exp_unix = int(expiration_time.timestamp())
+    print(exp_unix)
+    
+    # Generate JWT token
+    payload = {
+        "iss": DOCUSIGN_INTEGRATION_KEY,
+        "sub": DOCUSIGN_USER_ID,
+        "aud": "account.docusign.com",
+        "iat": iat_unix,
+        "exp": exp_unix,
+        'scope': 'signature impersonation',
+        }
+    jwt_token = jwt.encode(payload, PRIVATE_KEY, algorithm='RS256')
+    print(jwt_token)
+    # Convert the token to a string
+    #jwt_token_str = jwt_token.decode('utf-8')
+
+    # Print the JWT token
+    #print(jwt_token_str)
+        
+
+    # Exchange JWT for access token
+    oauth_base_url = 'https://account.docusign.com/oauth/token'
+    response = requests.post(oauth_base_url, data={
+        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion': jwt_token
+    })
+
+    print(response)
+
+    access_token = response.json()['access_token']
+    session['access_token'] = access_token
+    # Use the access token to make API request for user info
+    api_base_url = 'https://ca.docusign.net/restapi/v2.1'
+    headers = {
+        'Authorization': 'Bearer ' + access_token,
+        'Content-Type': 'application/json'
+    }
+    template_id = "490e5cfb-4a7c-40af-a943-a4a19cd4cc70"
+    #url = f'{api_base_url}/accounts/{DOCUSIGN_ACCOUNT_ID}/users/{DOCUSIGN_USER_ID}'
+    url = f'{api_base_url}/diagnostics/request_logs'
+    #url = f'{api_base_url}/accounts/{DOCUSIGN_ACCOUNT_ID}/templates'
+    #url = f'{api_base_url}/accounts/{DOCUSIGN_ACCOUNT_ID}/templates'
+    #url = f'{api_base_url}/accounts/{DOCUSIGN_ACCOUNT_ID}/connect/{connectId}/all/users'
+    #url = f'{api_base_url}/accounts/{DOCUSIGN_ACCOUNT_ID}/powerforms/{powerFormId}/form_data'
+    #url = f'{api_base_url}/accounts/{DOCUSIGN_ACCOUNT_ID}/templates/{template_id}'
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        user_info = response.json()
+        return f'User Info: {user_info}'
+    else:
+        return 'Error retrieving user info'
+
+
+@app.route('/sign_file')
+def sign_file():
+     # Set the required environment variables
+    
+    iat = datetime.utcnow()
+    iat_unix = int(iat.timestamp())
+    print(iat_unix)
+    expiration_time = iat + timedelta(hours=1)
+    exp_unix = int(expiration_time.timestamp())
+    print(exp_unix)
+    
+    # Generate JWT token
+    payload = {
+        "iss": DOCUSIGN_INTEGRATION_KEY,
+        "sub": DOCUSIGN_USER_ID,
+        "aud": "account.docusign.com",
+        "iat": iat_unix,
+        "exp": exp_unix,
+        'scope': 'signature impersonation',
+        }
+    jwt_token = jwt.encode(payload, PRIVATE_KEY, algorithm='RS256')
+    print(jwt_token)
+    # Convert the token to a string
+    #jwt_token_str = jwt_token.decode('utf-8')
+
+    # Print the JWT token
+    #print(jwt_token_str)
+        
+
+    # Exchange JWT for access token
+    oauth_base_url = 'https://account.docusign.com/oauth/token'
+    response = requests.post(oauth_base_url, data={
+        'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        'assertion': jwt_token
+    })
+
+    #print(response)
+
+    access_token = response.json()['access_token']
+    session['access_token'] = access_token
+    api_base_url = "https://ca.docusign.net/restapi/v2"
+    # Set the headers
+    headers = {
+        "Authorization": "Bearer " + access_token,
+        "Content-Type": "application/json"
+    }
+
+    # Set the template ID and recipient information
+    template_id = "6ca2fb96-063e-469f-82b9-e9bb7c7da127"
+    recipient_email = "paul.futher@gmail.com"
+    recipient_name = "Paul Futher"
+
+    account_id = DOCUSIGN_ACCOUNT_ID
+
+    # Set the envelope payload
+    payload = {
+        "emailSubject": "Banking Information",
+        "templateId": template_id,
+        "templateRoles": [
+            {
+                "email": recipient_email,
+                "name": recipient_name,
+                "roleName": "Employee",
+                "clientUserId": "1"  # Use this if you want to associate a recipient with your app's user
+            }
+        ],
+        "status": "sent"
+        }
+
+    sign_here = SignHere(
+    anchor_string='Sign Here',
+    anchor_units='pixels',
+    anchor_x_offset='10',
+    anchor_y_offset='20',
+    anchor_ignore_if_not_present='false',
+    anchor_match_whole_word='true'
+    )
+
+    tabs = Tabs(sign_here_tabs=[sign_here])
+    # Convert Tabs object to dictionary
+    tabs_dict = api_client.sanitize_for_serialization(tabs)
+
+    # Add tabs dictionary to the existing payload
+    payload['tabs'] = tabs_dict
+
+    
+
+    # Create the envelope
+
+   
+    response = requests.post(f"{api_base_url}/accounts/{account_id}/envelopes",
+                         headers=headers, data=json.dumps(payload))
+
+        # Handle the response
+    if response.status_code == 201:
+            envelope_id = response.json()["envelopeId"]
+            print("Envelope created with ID:", envelope_id)
+    else:
+            print("Failed to create envelope:", response.text)
+
+    return "done"
+
+
+@app.route('/envelope_status')
+def envelope_status():
+    # Set the envelope ID
+    access_token = session.get('access_token')
+    envelope_id = "a8c0c131-f719-47ad-9a56-b274cd92d36e"
+    api_base_url = "https://ca.docusign.net/restapi/v2"
+    account_id = DOCUSIGN_ACCOUNT_ID
+    headers = {
+        "Authorization": "Bearer " + access_token,
+        "Content-Type": "application/json"
+    }
+    # Get the envelope status
+    response = requests.get(f"{api_base_url}/accounts/{account_id}/envelopes/{envelope_id}",
+                            headers=headers)
+
+    # Handle the response
+    try:
+        response.status_code == 200
+        envelope_status = response.json()["status"]
+        log.info('Success: Response code 200')
+        print("Envelope status:", envelope_status)
+        
+            #print("Failed to retrieve envelope status:", response.text)
+    except Exception as e:
+        # Log the error code and message if available
+        error_code = getattr(e, 'error_code', None)
+        error_message = getattr(e, 'error_message', None)
+        if error_code and error_message:
+            app.logger.error('An error occurred while verifying envelope status. Error code: %s, Error message: %s', error_code, error_message)
+        else:
+            app.logger.exception('An error occurred while verifying envelope status.')
+
+        # Return an error response
+        return jsonify({'error': 'An error occurred while verifying envelope status.'}), 500
+
+    return "done"
 
 @app.route('/cleaning_maintenance')
 def cleaning_maintenance():
@@ -2220,7 +2427,7 @@ def staff_register():
 
                 message = Mail(
                 from_email=DEFAULT_SENDER,
-                to_emails= 'paul.futher@gmail.com',#'stephfuther@rogers.com','terryfuther@rogers.com'],
+                to_emails= NEW_HIRE_DATA_EMAIL,
                 subject = 'We have a New Employee',
                 )
                         
